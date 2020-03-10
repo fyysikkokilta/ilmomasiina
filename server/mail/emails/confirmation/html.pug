@@ -7,21 +7,22 @@ block mainContent
 		p.bodyText Tapahtuman tiedot:
 		ul
 			li
-				strong Tapahtuma: 
+				strong Tapahtuma:
 				| #{event.title}
-			li 
-				strong Sijainti: 
+			li
+				strong Sijainti:
 				| #{event.location}
-			li 
-				strong Aika: 
+			li
+				strong Aika:
 				| #{date}
 	div.content-block
 		p.bodyText Ilmoittautumisesi tiedot:
 		ul
 			each val in answers
 				li
-					strong #{val.label}: 
+					strong #{val.label}:
 					| #{val.answer}
 	div.content-block
 		p.bodyText Mikäli haluat muokata tai perua ilmoittautumisesi, voit tehdä sen painamalla tätä #[a( href=cancelLink ) linkkiä].
-	
+	div.content-block
+		p.bodyText Tapahtumasta voi antaa palautetta osoitteessa #[a( href='www.fyysikkokilta.fi/palaute-raadille/' ) fyysikkokilta.fi/palaute-raadille/].
