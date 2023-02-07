@@ -92,6 +92,7 @@ const EditForm = () => {
                   name="namePublic"
                   as={Form.Check}
                   type="checkbox"
+                  defaultChecked={true}
                   checkAlign
                   checkLabel={(
                     <>
