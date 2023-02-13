@@ -1,9 +1,9 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { BadRequest, NotFound, Unauthorized } from 'http-errors';
-import AdminPasswordAuth from 'src/authentication/adminPasswordAuth';
 
 import type { UserChangePasswordSchema } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
+import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
 import { User } from '../../../models/user';
 
 export default async function changePassword(

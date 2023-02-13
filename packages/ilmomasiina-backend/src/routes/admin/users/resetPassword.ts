@@ -1,10 +1,10 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { NotFound } from 'http-errors';
-import AdminPasswordAuth from 'src/authentication/adminPasswordAuth';
-import EmailService from 'src/mail';
 
 import type { UserPathParams } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
+import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
+import EmailService from '../../../mail';
 import { User } from '../../../models/user';
 import generatePassword from './generatePassword';
 
