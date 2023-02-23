@@ -18,7 +18,6 @@ export type StringifyApi<T> = {
           : StringifyApi<T[P]>
   );
 };
-
 /** Recursively converts all `Date` objects in the given object to strings. */
 export function stringifyDates<T extends object>(obj: T): StringifyApi<T> {
   const result: any = {};
@@ -26,7 +25,9 @@ export function stringifyDates<T extends object>(obj: T): StringifyApi<T> {
     if (val instanceof Date) {
       result[key] = val.toISOString();
     } else if (Array.isArray(val)) {
-      result[key] = val.map(stringifyDates);
+      // This is a bit ugly, but it's the only way to get the type right.
+      // In plain JS or `any` types the entire function could be written in a simple readable recursive way.
+      result[key] = val.map(i => (typeof i === 'object' && obj !== null) ? stringifyDates(i) : i);
     } else if (typeof val === 'object' && val !== null) {
       result[key] = stringifyDates(val);
     } else {
