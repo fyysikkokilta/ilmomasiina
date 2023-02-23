@@ -187,7 +187,7 @@ export async function eventDetailsForAdmin(
       signups: quota.signups!.map((signup) => ({
         ...signup.get({ plain: true }),
         status: signup.status,
-        answers: signup.answers!,
+        answers: signup.answers!.map((answer) => answer.get({ plain: true })),
         confirmed: Boolean(signup.confirmedAt),
       })),
       signupCount: quota.signups!.length,
