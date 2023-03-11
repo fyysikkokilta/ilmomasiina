@@ -1,7 +1,10 @@
 import React, { useCallback } from 'react';
 
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+
+import '../../../utils/i18n';
 
 import ConfirmButton from '../../../components/ConfirmButton';
 import { useNavigate } from '../../../config/router';
@@ -15,16 +18,17 @@ const DeleteSignup = () => {
   const deleteSignup = useDeleteSignup();
   const navigate = useNavigate();
   const paths = usePaths();
+  const { t } = useTranslation();
 
   const { isSubmitting, setSubmitting } = useFormikContext();
 
   const doDelete = useCallback(async () => {
-    const progressToast = toast.loading('Ilmoittautumista poistetaan');
+    const progressToast = toast.loading(t('Deleting signup'));
     try {
       setSubmitting(true);
       await deleteSignup();
       toast.update(progressToast, {
-        render: 'Ilmoittautumisesi poistettiin onnistuneesti.',
+        render: t('Your signup was deleted successfully'),
         type: toast.TYPE.SUCCESS,
         closeButton: true,
         closeOnClick: true,
@@ -34,7 +38,7 @@ const DeleteSignup = () => {
     } catch (error) {
       setSubmitting(false);
       toast.update(progressToast, {
-        render: 'Poisto epäonnistui.',
+        render: t('Deletion failed'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
@@ -42,13 +46,13 @@ const DeleteSignup = () => {
         isLoading: false,
       });
     }
-  }, [deleteSignup, event, navigate, paths, setSubmitting]);
+  }, [deleteSignup, event, navigate, paths, setSubmitting, t]);
 
   return (
     <div className="ilmo--delete-container">
-      <h2>Poista ilmoittautuminen</h2>
+      <h2>{t('Delete signup')}</h2>
       <p>
-        Oletko varma, että haluat poistaa ilmoittautumisesi tapahtumaan
+        {t('Are you sure you want to delete your sign up to')}
         {' '}
         <strong>
           {event!.title}
@@ -56,11 +60,10 @@ const DeleteSignup = () => {
         ?
       </p>
       <p>
-        Jos poistat ilmoittautumisesi, menetät paikkasi jonossa. Jos
-        muutat mielesi, voit aina ilmoittautua tapahtumaan uudelleen
-        myöhemmin, mutta siirryt silloin jonon hännille.
+        {/* eslint-disable-next-line max-len */}
+        {t('If you delete your signup you will lose your spot in the queue. If you change your mind you can always sign up again to the event later, but you will be moved to the end of the queue')}
         {' '}
-        <strong>Tätä toimintoa ei voi perua.</strong>
+        <strong>{t('This action cannot be cancelled.')}</strong>
       </p>
       <ConfirmButton
         type="button"
@@ -70,7 +73,7 @@ const DeleteSignup = () => {
         confirmDelay={DELETE_CONFIRM_MS}
         confirmLabel="Paina uudelleen varmistukseksi&hellip;"
       >
-        Poista ilmoittautuminen
+        {t('Delete signup')}
       </ConfirmButton>
     </div>
   );

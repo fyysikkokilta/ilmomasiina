@@ -1,7 +1,10 @@
 import React, { useCallback, useState } from 'react';
 
 import { Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+
+import '../../../utils/i18n';
 
 import type { QuotaID } from '@tietokilta/ilmomasiina-models';
 import { useNavigate } from '../../../config/router';
@@ -28,11 +31,12 @@ const SignupButton = ({
   const eventState = signupState(registrationStartDate, registrationEndDate);
   const [submitting, setSubmitting] = useState(false);
   const isOnly = quotas.length === 1;
+  const { t } = useTranslation();
 
   const onClick = useCallback(async (quotaId: QuotaID) => {
     if (!isOpen) return;
     setSubmitting(true);
-    const progressToast = toast.loading('Ilmoittautuminen käynnissä');
+    const progressToast = toast.loading(t('Signup in progress'));
     try {
       const response = await beginSignup(quotaId);
       setSubmitting(false);
@@ -41,7 +45,7 @@ const SignupButton = ({
     } catch (e) {
       setSubmitting(false);
       toast.update(progressToast, {
-        render: 'Ilmoittautuminen epäonnistui.',
+        render: t('Sign up failed'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
@@ -49,7 +53,7 @@ const SignupButton = ({
         isLoading: false,
       });
     }
-  }, [navigate, paths, isOpen]);
+  }, [navigate, paths, isOpen, t]);
 
   return (
     <div className="ilmo--side-widget">
@@ -71,7 +75,7 @@ const SignupButton = ({
           className="ilmo--signup-button"
           onClick={() => onClick(quota.id)}
         >
-          {isOnly ? 'Ilmoittaudu nyt' : `Ilmoittaudu: ${quota.title}`}
+          {isOnly ? t('Sign up now') : `${t('Sign up')}: ${quota.title}`}
         </Button>
       ))}
     </div>

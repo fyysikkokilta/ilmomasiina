@@ -1,6 +1,9 @@
 import React from 'react';
 
 import { Spinner, Table } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+
+import '../../utils/i18n';
 
 import { timezone } from '../../config';
 import { linkComponent } from '../../config/router';
@@ -12,14 +15,15 @@ import TableRow from './components/TableRow';
 
 const EventListView = () => {
   const { events, error, pending } = useEventListContext();
+  const { t } = useTranslation();
   const Link = linkComponent();
   const paths = usePaths();
 
   if (error) {
     return (
       <>
-        <h1>Hups, jotain meni pieleen</h1>
-        <p>Tapahtumien lataus epäonnistui</p>
+        <h1>{t('Whoops, something went wrong')}</h1>
+        <p>{t('Downloading events failed')}</p>
       </>
     );
   }
@@ -27,7 +31,7 @@ const EventListView = () => {
   if (pending) {
     return (
       <>
-        <h1>Tapahtumat</h1>
+        <h1>{t('Events')}</h1>
         <Spinner animation="border" />
       </>
     );
@@ -56,7 +60,7 @@ const EventListView = () => {
       return (
         <TableRow
           className="ilmo--quota-row"
-          title={title === OPENQUOTA ? 'Avoin' : title}
+          title={title === OPENQUOTA ? t('Open') : title}
           signupCount={signupCount}
           quotaSize={quotaSize}
           // No real alternatives for key :(
@@ -70,14 +74,14 @@ const EventListView = () => {
 
   return (
     <>
-      <h1>Tapahtumat</h1>
+      <h1>{t('Events')}</h1>
       <Table className="ilmo--event-list">
         <thead>
           <tr>
-            <th>Nimi</th>
-            <th>Ajankohta</th>
-            <th>Ilmoittautuminen</th>
-            <th>Ilmoittautuneita</th>
+            <th>{t('Name')}</th>
+            <th>{t('Date')}</th>
+            <th>{t('Signup')}</th>
+            <th>{t('Quota')}</th>
           </tr>
         </thead>
         <tbody>{tableRows}</tbody>

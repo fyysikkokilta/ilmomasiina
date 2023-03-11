@@ -1,11 +1,16 @@
 import React from 'react';
 
+import { useTranslation } from 'react-i18next';
+
+import '../../../utils/i18n';
+
 import { useSingleEventContext } from '../../../modules/singleEvent';
 import { OPENQUOTA, WAITLIST } from '../../../utils/signupUtils';
 import QuotaProgress from './QuotaProgress';
 
 const QuotaStatus = () => {
   const { event, signupsByQuota } = useSingleEventContext();
+  const { t } = useTranslation();
   return (
     <div className="ilmo--side-widget">
       <h3>Ilmoittautuneet</h3>
@@ -22,7 +27,7 @@ const QuotaStatus = () => {
         }
         if (quota.id === WAITLIST) {
           if (quota.signupCount > 0) {
-            return <p key={quota.id}>{`Jonossa: ${quota.signupCount}`}</p>;
+            return <p key={quota.id}>{`${t('In queue')}: ${quota.signupCount}`}</p>;
           }
           return null;
         }
