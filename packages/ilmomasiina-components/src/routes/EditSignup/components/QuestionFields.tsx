@@ -6,6 +6,9 @@ import find from 'lodash/find';
 import reject from 'lodash/reject';
 import without from 'lodash/without';
 import { Form } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+
+import '../../../utils/i18n';
 
 import type { Question, SignupUpdateBody } from '@tietokilta/ilmomasiina-models';
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
@@ -20,6 +23,7 @@ type Props = {
 const QuestionFields = ({ name, questions, disabled }: Props) => {
   // TODO: add formik-based validation
   const [{ value }, , { setValue }] = useField<SignupUpdateBody['answers']>(name);
+  const { t } = useTranslation();
   return (
     <>
       {questions.map((question) => {
@@ -38,7 +42,7 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
           updateAnswer(newAnswers.join(';'));
         }
 
-        const help = question.public ? 'Tämän kentän vastaukset ovat julkisia / Answers to this fileld are public.' : null;
+        const help = question.public ? t('This field is public.') : null;
 
         let input: ReactNode;
         let isCheckboxes = false;

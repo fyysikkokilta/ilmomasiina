@@ -2,8 +2,11 @@ import React, { useContext } from 'react';
 
 import moment from 'moment-timezone';
 import { Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+
+import '../../../utils/i18n';
 
 import { timezone } from '../../../config';
 import { linkComponent } from '../../../config/router';
@@ -16,55 +19,71 @@ const EventDescription = () => {
   const { loggedIn } = useContext(AuthContext);
   const Link = linkComponent();
   const paths = usePaths();
+  const { t } = useTranslation();
   return (
     <>
       <nav className="ilmo--title-nav">
         <h1>{event.title}</h1>
         {loggedIn && paths.hasAdmin && (
           <Button as={Link} variant="primary" to={paths.adminEditEvent(event.id)}>
-            Muokkaa
+            {t('Edit')}
           </Button>
         )}
       </nav>
       <div className="ilmo--event-heading">
         {event.category && (
           <p>
-            <strong>Kategoria / Category:</strong>
+            <strong>
+              {t('Category')}
+              :
+            </strong>
             {' '}
             {event.category}
           </p>
         )}
         {event.date && (
           <p>
-            <strong>{event.endDate ? 'Alkaa / Begins:' : 'Ajankohta / Date:'}</strong>
+            <strong>{event.endDate ? `${t('Starts')}` : `${t('Date')}:`}</strong>
             {' '}
-            {moment(event.date).tz(timezone()).format('D.M.Y [klo] HH:mm')}
+            {moment(event.date).tz(timezone()).format(`D.M.Y ${t('at')} HH:mm`)}
           </p>
         )}
         {event.endDate && (
           <p>
-            <strong>Loppuu / Ends:</strong>
+            <strong>
+              {t('Ends')}
+              :
+            </strong>
             {' '}
-            {moment(event.endDate).tz(timezone()).format('D.M.Y [klo] HH:mm')}
+            {moment(event.endDate).tz(timezone()).format(`D.M.Y ${t('at')} HH:mm`)}
           </p>
         )}
         {event.location && (
           <p>
-            <strong>Sijainti / Location:</strong>
+            <strong>
+              {t('Location')}
+              :
+            </strong>
             {' '}
             {event.location}
           </p>
         )}
         {event.price && (
           <p>
-            <strong>Hinta / Price:</strong>
+            <strong>
+              {t('Price')}
+              :
+            </strong>
             {' '}
             {event.price}
           </p>
         )}
         {event.webpageUrl && (
           <p>
-            <strong>Kotisivut / Home page:</strong>
+            <strong>
+              {t('Homepage')}
+              :
+            </strong>
             {' '}
             <a href={event.webpageUrl} title="Kotisivut / Home page">
               {event.webpageUrl}
@@ -73,7 +92,10 @@ const EventDescription = () => {
         )}
         {event.facebookUrl && (
           <p>
-            <strong>Facebook-tapahtuma / Facebook event:</strong>
+            <strong>
+              {t('Facebook event')}
+              :
+            </strong>
             {' '}
             <a href={event.facebookUrl} title="Facebook-tapahtuma / Facebook event">
               {event.facebookUrl}

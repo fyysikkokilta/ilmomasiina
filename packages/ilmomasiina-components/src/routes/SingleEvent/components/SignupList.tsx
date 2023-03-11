@@ -2,6 +2,9 @@ import React from 'react';
 
 import filter from 'lodash/filter';
 import { Table } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+
+import '../../../utils/i18n';
 
 import { useSingleEventContext } from '../../../modules/singleEvent';
 import { OPENQUOTA, QuotaSignups, WAITLIST } from '../../../utils/signupUtils';
@@ -15,20 +18,21 @@ const SignupList = ({ quota }: Props) => {
   const { signups } = quota;
   const { questions, nameQuestion } = useSingleEventContext().event!;
   const showQuotas = quota.id === OPENQUOTA || quota.id === WAITLIST;
+  const { t } = useTranslation();
   return (
     <div className="ilmo--quota-signups">
       <h3>{quota.title}</h3>
       {!signups?.length ? (
-        <p>Ei ilmoittautumisia.</p>
+        <p>{t('No signups.')}</p>
       ) : (
         <div className="table-responsive">
           <Table size="sm">
             <thead className="thead-light">
               <tr>
-                <th key="position">Sija / position</th>
+                <th key="position">{t('Position')}</th>
                 {nameQuestion && (
                   <th key="attendee" style={{ minWidth: 90 }}>
-                    Nimi / Name
+                    {t('Name')}
                   </th>
                 )}
                 {filter(questions, 'public').map((question) => (
@@ -38,11 +42,11 @@ const SignupList = ({ quota }: Props) => {
                 ))}
                 {showQuotas && (
                   <th key="quota">
-                    Kiintiö / Quota
+                    {t('Quota')}
                   </th>
                 )}
                 <th key="datetime" style={{ minWidth: 130 }}>
-                  Ilmoittautumisaika / Registration time
+                  {t('Signup time')}
                 </th>
               </tr>
             </thead>
