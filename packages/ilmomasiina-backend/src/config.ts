@@ -23,6 +23,8 @@ const config = {
   /** Whether to log SQL queries from Sequelize. */
   debugDbLogging: envBoolean('DEBUG_DB_LOGGING', false),
 
+  /** The host to run the backend server on. */
+  host: envString('HOST', 'localhost'),
   /** The port to run the backend server on. */
   port: envInteger('PORT', 3000),
 
