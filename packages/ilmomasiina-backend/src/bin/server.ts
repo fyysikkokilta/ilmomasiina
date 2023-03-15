@@ -7,8 +7,7 @@ import config from '../config';
 const debugLog = debug('app:bin:server');
 
 initApp().then(async (fastify) => {
-  const host = config.host || 'localhost';
-  const port = config.port || 3000;
+  const { host, port } = config;
 
   const addr = await fastify.listen({ host, port });
 
