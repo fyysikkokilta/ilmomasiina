@@ -33,6 +33,9 @@ FROM node:16-alpine
 # Default to production
 ENV NODE_ENV=production
 
+# Listen at 0.0.0.0 when inside Docker
+ENV HOST=0.0.0.0
+
 # Copy files needed for pnpm
 COPY package.json pnpm-*.yaml /opt/ilmomasiina/
 COPY packages /opt/ilmomasiina/packages
