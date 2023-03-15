@@ -20,18 +20,20 @@ export type StringifyApi<T> = {
 };
 
 /** Recursively converts all `Date` objects in the given object to strings. */
-export function stringifyDates<T extends object>(obj: T): StringifyApi<T> {
-  const result: any = {};
-  for (const [key, val] of Object.entries(obj)) {
-    if (val instanceof Date) {
-      result[key] = val.toISOString();
-    } else if (Array.isArray(val)) {
-      result[key] = val.map(stringifyDates);
-    } else if (typeof val === 'object' && val !== null) {
-      result[key] = stringifyDates(val);
-    } else {
-      result[key] = val;
-    }
+export function stringifyDates<T>(obj: T): StringifyApi<T> {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj as any;
   }
-  return result;
+  if (Array.isArray(obj)) {
+    return obj.map(stringifyDates) as any;
+  }
+  return Object.fromEntries(Object.entries(obj).map(([key, val]) => {
+    if (val instanceof Date) {
+      return [key, val.toISOString()];
+    }
+    if (typeof val === 'object' && val !== null) {
+      return [key, stringifyDates(val)];
+    }
+    return [key, val];
+  })) as any;
 }
