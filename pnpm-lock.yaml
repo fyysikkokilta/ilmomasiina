@@ -42,7 +42,7 @@ importers:
       '@fastify/static': ^6.5.0
       '@fastify/type-provider-typebox': ^2.3.0
       '@sinclair/typebox': ^0.24.22
-      '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha11
+      '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha12
       '@types/bcrypt': ^5.0.0
       '@types/compression': ^1.7.2
       '@types/debug': ^4.1.7
@@ -127,7 +127,7 @@ importers:
 
   packages/ilmomasiina-components:
     specifiers:
-      '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha11
+      '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha12
       '@types/lodash': ^4.14.182
       '@types/react': ^17 || ^18
       bootstrap: ^4.6.1
@@ -168,8 +168,8 @@ importers:
     specifiers:
       '@craftamap/esbuild-plugin-html': ^0.4.0
       '@sentry/browser': ^6.19.7
-      '@tietokilta/ilmomasiina-components': workspace:2.0.0-alpha11
-      '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha11
+      '@tietokilta/ilmomasiina-components': workspace:2.0.0-alpha12
+      '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha12
       '@types/history': ^4.7.11
       '@types/lodash': ^4.14.182
       '@types/node': ^16.11.41
