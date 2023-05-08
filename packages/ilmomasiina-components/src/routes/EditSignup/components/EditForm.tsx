@@ -30,13 +30,13 @@ const EditForm = () => {
   const [submitError, setSubmitError] = useState(false);
 
   async function onSubmit(answers: SignupUpdateBody, { setSubmitting }: FormikHelpers<SignupUpdateBody>) {
-    const progressToast = toast.loading(isNew ? t('Saving signup') : t('Updating signup'));
+    const progressToast = toast.loading(isNew ? t('editSignup.status.signup') : t('editSignup.status.edit'));
 
     try {
       await updateSignup(answers);
 
       toast.update(progressToast, {
-        render: isNew ? t('Signup succeeded') : t('Editing succeeded'),
+        render: isNew ? t('editSignup.status.signupSuccess') : t('editSignup.status.editSuccess'),
         type: toast.TYPE.SUCCESS,
         autoClose: 5000,
         closeButton: true,
@@ -51,8 +51,8 @@ const EditForm = () => {
     } catch (error) {
       toast.update(progressToast, {
         render: isNew
-          ? t('Signup did not succeed. Make sure you have filled all the mandatory fields and try again')
-          : t('Editing did not succeed. Make sure you have filled all the mandatory fields and try again'),
+          ? t('editSignup.status.signupFailed')
+          : t('editSignup.status.editFailed'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
@@ -71,14 +71,14 @@ const EditForm = () => {
     >
       {({ handleSubmit, isSubmitting }) => (
         <NarrowContainer>
-          <h2>{isNew ? t('Sign up') : t('Edit signup')}</h2>
+          <h2>{isNew ? t('editSignup.title.signup') : t('editSignup.title.edit')}</h2>
           <SignupStatus />
           {submitError && (
-            <p className="ilmo--form-error">{t('There are errors in your sign up.')}</p>
+            <p className="ilmo--form-error">{t('editSignup.errors.invalid')}</p>
           )}
           {registrationClosed && (
             <p className="ilmo--form-error">
-              {t('Your signup cannot be changed anymore as the signup for the event has closed.')}
+              {t('editSignup.errors.closed')}
             </p>
           )}
           <Form onSubmit={handleSubmit} className="ilmo--form">
@@ -106,7 +106,7 @@ const EditForm = () => {
                   checkAlign
                   checkLabel={(
                     <>
-                      {t('Show name in public signup list')}
+                      {t('editSignup.namePublic')}
                     </>
                   )}
                 />
@@ -126,8 +126,8 @@ const EditForm = () => {
 
             {!registrationClosed && (
               <p>
-                {t('You can edit or delete your signup later by saving the URL of this page.')}
-                {event!.emailQuestion && ` ${t('The link will also be included in the confirmation email.')}`}
+                {t('editSignup.editInstructions')}
+                {event!.emailQuestion && ` ${t('editSignup.editInstructions.email')}`}
               </p>
             )}
 
@@ -135,11 +135,11 @@ const EditForm = () => {
               <nav className="ilmo--submit-buttons">
                 {!isNew && (
                   <Button as={Link} variant="link" to={paths.eventDetails(event!.slug)}>
-                    {t('Cancel')}
+                    {t('editSignup.action.cancel')}
                   </Button>
                 )}
                 <Button type="submit" variant="primary" formNoValidate disabled={isSubmitting}>
-                  {isNew ? t('Save') : t('Update')}
+                  {isNew ? t('editSignup.action.save') : t('editSignup.action.edit')}
                 </Button>
               </nav>
             )}

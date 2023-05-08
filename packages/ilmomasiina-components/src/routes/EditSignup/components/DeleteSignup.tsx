@@ -23,12 +23,12 @@ const DeleteSignup = () => {
   const { isSubmitting, setSubmitting } = useFormikContext();
 
   const doDelete = useCallback(async () => {
-    const progressToast = toast.loading(t('Deleting signup'));
+    const progressToast = toast.loading(t('editSignup.status.delete'));
     try {
       setSubmitting(true);
       await deleteSignup();
       toast.update(progressToast, {
-        render: t('Your signup was deleted successfully'),
+        render: t('editSignup.status.deleteSuccess'),
         type: toast.TYPE.SUCCESS,
         closeButton: true,
         closeOnClick: true,
@@ -38,7 +38,7 @@ const DeleteSignup = () => {
     } catch (error) {
       setSubmitting(false);
       toast.update(progressToast, {
-        render: t('Deletion failed'),
+        render: t('editSignup.status.deleteFailed'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
@@ -50,9 +50,9 @@ const DeleteSignup = () => {
 
   return (
     <div className="ilmo--delete-container">
-      <h2>{t('Delete signup')}</h2>
+      <h2>{t('editSignup.delete.action')}</h2>
       <p>
-        <Trans t={t}>
+        <Trans t={t} i18nKey="editSignup.delete.info1">
           {'Are you sure you want to delete your sign up to '}
           <strong>
             {{ event: event!.title }}
@@ -62,9 +62,9 @@ const DeleteSignup = () => {
       </p>
       <p>
         {/* eslint-disable-next-line max-len */}
-        {t('If you delete your signup you will lose your spot in the queue. If you change your mind you can always sign up again to the event later, but you will be moved to the end of the queue.')}
+        {t('editSignup.delete.info2')}
         {' '}
-        <strong>{t('This cannot be undone.')}</strong>
+        <strong>{t('editSignup.delete.info3')}</strong>
       </p>
       <ConfirmButton
         type="button"
@@ -74,7 +74,7 @@ const DeleteSignup = () => {
         confirmDelay={DELETE_CONFIRM_MS}
         confirmLabel="Paina uudelleen varmistukseksi&hellip;"
       >
-        {t('Delete signup')}
+        {t('editSignup.delete.action')}
       </ConfirmButton>
     </div>
   );

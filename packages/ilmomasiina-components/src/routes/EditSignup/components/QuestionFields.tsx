@@ -42,7 +42,7 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
           updateAnswer(newAnswers.join(';'));
         }
 
-        const help = question.public ? t('Answers to this field are public.') : null;
+        const help = question.public ? t('editSignup.publicQuestion') : null;
 
         let input: ReactNode;
         let isCheckboxes = false;

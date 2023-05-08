@@ -33,9 +33,9 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
 
   let fullName;
   if (!confirmed) {
-    fullName = t('Unconfirmed');
+    fullName = t('singleEvent.signups.unconfirmed');
   } else if (!namePublic) {
-    fullName = t('Hidden');
+    fullName = t('singleEvent.signups.nameHidden');
   } else {
     fullName = `${firstName || ''} ${lastName || ''}`;
   }

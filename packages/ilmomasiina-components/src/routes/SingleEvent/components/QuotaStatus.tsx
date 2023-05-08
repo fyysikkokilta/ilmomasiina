@@ -27,7 +27,7 @@ const QuotaStatus = () => {
         }
         if (quota.id === WAITLIST) {
           if (quota.signupCount > 0) {
-            return <p key={quota.id}>{`${t('In queue')}: ${quota.signupCount}`}</p>;
+            return <p key={quota.id}>{t('singleEvent.quotaCounts.queue', { count: quota.signupCount })}</p>;
           }
           return null;
         }

@@ -26,7 +26,7 @@ const EventDescription = () => {
         <h1>{event.title}</h1>
         {loggedIn && paths.hasAdmin && (
           <Button as={Link} variant="primary" to={paths.adminEditEvent(event.id)}>
-            {t('Edit')}
+            {t('singleEvent.editEvent')}
           </Button>
         )}
       </nav>
@@ -34,8 +34,7 @@ const EventDescription = () => {
         {event.category && (
           <p>
             <strong>
-              {t('Category')}
-              :
+              {t('singleEvent.info.category')}
             </strong>
             {' '}
             {event.category}
@@ -43,26 +42,24 @@ const EventDescription = () => {
         )}
         {event.date && (
           <p>
-            <strong>{event.endDate ? `${t('Starts')}` : `${t('Date')}:`}</strong>
+            <strong>{event.endDate ? t('singleEvent.info.startDate') : t('singleEvent.info.date')}</strong>
             {' '}
-            {moment(event.date).tz(timezone()).format(`D.M.Y ${t('at')} HH:mm`)}
+            {moment(event.date).tz(timezone()).format(`D.M.Y ${t('singleEvent.info.dateTimeSep')} HH:mm`)}
           </p>
         )}
         {event.endDate && (
           <p>
             <strong>
-              {t('Ends')}
-              :
+              {t('singleEvent.info.endDate')}
             </strong>
             {' '}
-            {moment(event.endDate).tz(timezone()).format(`D.M.Y ${t('at')} HH:mm`)}
+            {moment(event.endDate).tz(timezone()).format(`D.M.Y ${t('singleEvent.info.dateTimeSep')} HH:mm`)}
           </p>
         )}
         {event.location && (
           <p>
             <strong>
-              {t('Location')}
-              :
+              {t('singleEvent.info.location')}
             </strong>
             {' '}
             {event.location}
@@ -71,8 +68,7 @@ const EventDescription = () => {
         {event.price && (
           <p>
             <strong>
-              {t('Price')}
-              :
+              {t('singleEvent.info.price')}
             </strong>
             {' '}
             {event.price}
@@ -81,11 +77,10 @@ const EventDescription = () => {
         {event.webpageUrl && (
           <p>
             <strong>
-              {t('Website')}
-              :
+              {t('singleEvent.info.website')}
             </strong>
             {' '}
-            <a href={event.webpageUrl} title="Kotisivut">
+            <a href={event.webpageUrl} title={t('singleEvent.info.website') ?? undefined}>
               {event.webpageUrl}
             </a>
           </p>
@@ -93,11 +88,10 @@ const EventDescription = () => {
         {event.facebookUrl && (
           <p>
             <strong>
-              {t('Facebook event')}
-              :
+              {t('singleEvent.info.facebookEvent')}
             </strong>
             {' '}
-            <a href={event.facebookUrl} title="Facebook-tapahtuma">
+            <a href={event.facebookUrl} title={t('singleEvent.info.facebookEvent') ?? undefined}>
               {event.facebookUrl}
             </a>
           </p>
