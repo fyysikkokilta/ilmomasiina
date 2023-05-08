@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 import { useFormikContext } from 'formik';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import '../../../utils/i18n';
@@ -52,18 +52,19 @@ const DeleteSignup = () => {
     <div className="ilmo--delete-container">
       <h2>{t('Delete signup')}</h2>
       <p>
-        {t('Are you sure you want to delete your sign up to')}
-        {' '}
-        <strong>
-          {event!.title}
-        </strong>
-        ?
+        <Trans t={t}>
+          {'Are you sure you want to delete your sign up to '}
+          <strong>
+            {{ event: event!.title }}
+          </strong>
+          ?
+        </Trans>
       </p>
       <p>
         {/* eslint-disable-next-line max-len */}
-        {t('If you delete your signup you will lose your spot in the queue. If you change your mind you can always sign up again to the event later, but you will be moved to the end of the queue')}
+        {t('If you delete your signup you will lose your spot in the queue. If you change your mind you can always sign up again to the event later, but you will be moved to the end of the queue.')}
         {' '}
-        <strong>{t('This action cannot be cancelled.')}</strong>
+        <strong>{t('This cannot be undone.')}</strong>
       </p>
       <ConfirmButton
         type="button"

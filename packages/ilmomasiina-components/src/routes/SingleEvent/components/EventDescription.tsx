@@ -81,7 +81,7 @@ const EventDescription = () => {
         {event.webpageUrl && (
           <p>
             <strong>
-              {t('Homepage')}
+              {t('Website')}
               :
             </strong>
             {' '}
