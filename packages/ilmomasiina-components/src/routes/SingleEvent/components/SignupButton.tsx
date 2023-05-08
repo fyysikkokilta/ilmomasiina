@@ -36,7 +36,7 @@ const SignupButton = ({
   const onClick = useCallback(async (quotaId: QuotaID) => {
     if (!isOpen) return;
     setSubmitting(true);
-    const progressToast = toast.loading(t('Signup in progress'));
+    const progressToast = toast.loading(t('singleEvent.status.signup'));
     try {
       const response = await beginSignup(quotaId);
       setSubmitting(false);
@@ -45,7 +45,7 @@ const SignupButton = ({
     } catch (e) {
       setSubmitting(false);
       toast.update(progressToast, {
-        render: t('Sign up failed'),
+        render: t('singleEvent.status.signupFailed'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
@@ -75,7 +75,7 @@ const SignupButton = ({
           className="ilmo--signup-button"
           onClick={() => onClick(quota.id)}
         >
-          {isOnly ? t('Sign up now') : `${t('Sign up')}: ${quota.title}`}
+          {isOnly ? t('singleEvent.signupButton.singleQuota') : t('singleEvent.signupButton', { quota: quota.title })}
         </Button>
       ))}
     </div>

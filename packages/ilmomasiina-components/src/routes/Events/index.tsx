@@ -22,8 +22,8 @@ const EventListView = () => {
   if (error) {
     return (
       <>
-        <h1>{t('Whoops, something went wrong')}</h1>
-        <p>{t('Failed to load events')}</p>
+        <h1>{t('errorTitle')}</h1>
+        <p>{t('events.loadFailed')}</p>
       </>
     );
   }
@@ -31,16 +31,16 @@ const EventListView = () => {
   if (pending) {
     return (
       <>
-        <h1>{t('Events')}</h1>
+        <h1>{t('events.title')}</h1>
         <Spinner animation="border" />
       </>
     );
   }
 
-  const tableRows = eventsToRows(events!).map((row, index) => {
+  const tableRows = eventsToRows(events!).map((row) => {
     if (row.isEvent) {
       const {
-        slug, title, date, signupState, signupCount, quotaSize,
+        id, slug, title, date, signupState, signupCount, quotaSize,
       } = row;
       const stateText = signupStateText(signupState);
       return (
@@ -51,21 +51,23 @@ const EventListView = () => {
           signupStatus={stateText}
           signupCount={signupCount}
           quotaSize={quotaSize}
-          key={slug}
+          key={id}
         />
       );
     }
-    if (row.title !== WAITLIST) {
-      const { title, signupCount, quotaSize } = row;
+    if (row.id !== WAITLIST) {
+      const {
+        id, title, signupCount, quotaSize,
+      } = row;
       return (
         <TableRow
           className="ilmo--quota-row"
-          title={title === OPENQUOTA ? t('Open') : title}
+          title={id === OPENQUOTA ? t('events.openQuota') : title}
           signupCount={signupCount}
           quotaSize={quotaSize}
           // No real alternatives for key :(
           // eslint-disable-next-line react/no-array-index-key
-          key={index}
+          key={id}
         />
       );
     }
@@ -74,14 +76,14 @@ const EventListView = () => {
 
   return (
     <>
-      <h1>{t('Events')}</h1>
+      <h1>{t('events.title')}</h1>
       <Table className="ilmo--event-list">
         <thead>
           <tr>
-            <th>{t('Name')}</th>
-            <th>{t('Date')}</th>
-            <th>{t('Signup')}</th>
-            <th>{t('Quota')}</th>
+            <th>{t('events.column.name')}</th>
+            <th>{t('events.column.date')}</th>
+            <th>{t('events.column.signupStatus')}</th>
+            <th>{t('events.column.signupCount')}</th>
           </tr>
         </thead>
         <tbody>{tableRows}</tbody>

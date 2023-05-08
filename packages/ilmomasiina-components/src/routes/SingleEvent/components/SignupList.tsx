@@ -23,13 +23,13 @@ const SignupList = ({ quota }: Props) => {
     <div className="ilmo--quota-signups">
       <h3>{quota.title}</h3>
       {!signups?.length ? (
-        <p>{t('No signups.')}</p>
+        <p>{t('singleEvent.signups.emptyQuota')}</p>
       ) : (
         <div className="table-responsive">
           <Table size="sm">
             <thead className="thead-light">
               <tr>
-                <th key="position">{t('Position')}</th>
+                <th key="position">{t('singleEvent.signups.position')}</th>
                 {nameQuestion && (
                   <th key="attendee" style={{ minWidth: 90 }}>
                     {t('Name')}
@@ -42,11 +42,11 @@ const SignupList = ({ quota }: Props) => {
                 ))}
                 {showQuotas && (
                   <th key="quota">
-                    {t('Quota')}
+                    {t('singleEvent.signups.quota')}
                   </th>
                 )}
                 <th key="datetime" style={{ minWidth: 130 }}>
-                  {t('Signup time')}
+                  {t('singleEvent.signups.signupTime')}
                 </th>
               </tr>
             </thead>
