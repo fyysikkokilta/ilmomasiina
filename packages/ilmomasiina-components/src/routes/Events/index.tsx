@@ -23,7 +23,7 @@ const EventListView = () => {
     return (
       <>
         <h1>{t('Whoops, something went wrong')}</h1>
-        <p>{t('Downloading events failed')}</p>
+        <p>{t('Failed to load events')}</p>
       </>
     );
   }

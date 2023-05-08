@@ -1,7 +1,8 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import * as fi from '../locales/fi.json';
+
 import * as en from '../locales/en.json';
+import * as fi from '../locales/fi.json';
 
 const resources = {
   fi,

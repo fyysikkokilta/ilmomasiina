@@ -30,14 +30,13 @@ const EditForm = () => {
   const [submitError, setSubmitError] = useState(false);
 
   async function onSubmit(answers: SignupUpdateBody, { setSubmitting }: FormikHelpers<SignupUpdateBody>) {
-    const action = isNew ? t('Signup') : t('Editing');
-    const progressToast = toast.loading(`${action} ${t('in progress')}`);
+    const progressToast = toast.loading(isNew ? t('Saving signup') : t('Updating signup'));
 
     try {
       await updateSignup(answers);
 
       toast.update(progressToast, {
-        render: `${action} ${t('succeeded')}`,
+        render: isNew ? t('Signup succeeded') : t('Editing succeeded'),
         type: toast.TYPE.SUCCESS,
         autoClose: 5000,
         closeButton: true,
@@ -51,7 +50,9 @@ const EditForm = () => {
       }
     } catch (error) {
       toast.update(progressToast, {
-        render: `${action} ${t('did not succeed. Make sure you have filled all the mandatory fields and try again')}`,
+        render: isNew
+          ? t('Signup did not succeed. Make sure you have filled all the mandatory fields and try again')
+          : t('Editing did not succeed. Make sure you have filled all the mandatory fields and try again'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
@@ -77,7 +78,7 @@ const EditForm = () => {
           )}
           {registrationClosed && (
             <p className="ilmo--form-error">
-              {t('Your signup cannot be changed anymore as the signup has already closed.')}
+              {t('Your signup cannot be changed anymore as the signup for the event has closed.')}
             </p>
           )}
           <Form onSubmit={handleSubmit} className="ilmo--form">
@@ -105,7 +106,7 @@ const EditForm = () => {
                   checkAlign
                   checkLabel={(
                     <>
-                      {t('Show name in public participant list')}
+                      {t('Show name in public signup list')}
                     </>
                   )}
                 />
@@ -125,8 +126,8 @@ const EditForm = () => {
 
             {!registrationClosed && (
               <p>
-                {t('You can edit your sign up or delete it later by saving this URL address')}
-                {event!.emailQuestion && ` ${t('The link will also be sent to your email in the confirmation mail.')}`}
+                {t('You can edit or delete your signup later by saving the URL of this page.')}
+                {event!.emailQuestion && ` ${t('The link will also be included in the confirmation email.')}`}
               </p>
             )}
 
@@ -138,7 +139,7 @@ const EditForm = () => {
                   </Button>
                 )}
                 <Button type="submit" variant="primary" formNoValidate disabled={isSubmitting}>
-                  {isNew ? t('Send') : t('Update')}
+                  {isNew ? t('Save') : t('Update')}
                 </Button>
               </nav>
             )}

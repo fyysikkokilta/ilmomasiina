@@ -18,7 +18,7 @@ const SignupStatus = () => {
     return (
       <p>
         {/* eslint-disable-next-line max-len */}
-        {`${t('You are in quota x in position', { quota_title: quota.title })} ${position}${quota.size ? ` / ${quota.size}` : ''}.`}
+        {t('You are in quota x in position', { quota_title: quota.title, position: `${position}${quota.size ? ` / ${quota.size}` : ''}` })}
       </p>
     );
   }
@@ -26,14 +26,14 @@ const SignupStatus = () => {
   if (status === 'in-open') {
     return (
       <p>
-        {`${t('You are in open quota in position')} ${position} / ${openQuotaSize}.`}
+        {t('You are in the open quota in position', { position: `${position} / ${openQuotaSize}.` })}
       </p>
     );
   }
 
   return (
     <p>
-      {`${t('You are in queue in position')} ${position}.`}
+      {t('You are in the queue in position', { position })}
     </p>
   );
 };
