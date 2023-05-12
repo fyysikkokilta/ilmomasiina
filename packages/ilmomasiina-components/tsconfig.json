@@ -31,7 +31,8 @@
     "dist"
   ],
   "include": [
-    "src"
+    "src",
+    "src/locales/*.json"
   ],
   "references": [
     { "path": "../ilmomasiina-models" }
