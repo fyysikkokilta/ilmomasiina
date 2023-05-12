@@ -72,7 +72,7 @@ const DeleteSignup = () => {
         onClick={doDelete}
         variant="danger"
         confirmDelay={DELETE_CONFIRM_MS}
-        confirmLabel="Paina uudelleen varmistukseksi / Click again to confirm&hellip;"
+        confirmLabel={t('editSignup.delete.action.confirm')}
       >
         {t('editSignup.delete.action')}
       </ConfirmButton>

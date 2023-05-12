@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 import { useParams } from '../../config/router';
 import { EditSignupProps, EditSignupProvider, useEditSignupContext } from '../../modules/editSignup';
@@ -9,17 +10,13 @@ import NarrowContainer from './components/NarrowContainer';
 
 const EditSignupView = () => {
   const { error, pending } = useEditSignupContext();
+  const { t } = useTranslation();
 
   if (error) {
     return (
       <NarrowContainer className="ilmo--status-container">
-        <h1>Hups, jotain meni pieleen / Something went wrong</h1>
-        <p>
-          Ilmoittautumistasi ei löytynyt. Se saattaa olla jo poistettu, tai
-          sitten jotain muuta kummallista tapahtui. Jos ilmoittautumisesi ei
-          ole vielä poistunut, yritä kohta uudestaan. /
-          Registration was not found. It may be already removed.
-        </p>
+        <h1>{t('errors.title')}</h1>
+        <p>{t('editSignup.errors.loadFailed')}</p>
       </NarrowContainer>
     );
   }

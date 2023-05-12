@@ -50,9 +50,7 @@ const EditForm = () => {
       }
     } catch (error) {
       toast.update(progressToast, {
-        render: isNew
-          ? t('editSignup.status.signupFailed')
-          : t('editSignup.status.editFailed'),
+        render: isNew ? t('editSignup.status.signupFailed') : t('editSignup.status.editFailed'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
@@ -86,15 +84,15 @@ const EditForm = () => {
               <>
                 <FieldRow
                   name="firstName"
-                  label="Etunimi / First name"
-                  placeholder="Etunimi"
+                  label={t('editSignup.fields.firstName')}
+                  placeholder={t('editSignup.fields.firstName.placeholder')}
                   required
                   readOnly={!isNew || registrationClosed}
                 />
                 <FieldRow
                   name="lastName"
-                  label="Sukunimi / Last name"
-                  placeholder="Sukunimi"
+                  label={t('editSignup.fields.lastName')}
+                  placeholder={t('editSignup.fields.lastName.placeholder')}
                   required
                   readOnly={!isNew || registrationClosed}
                 />
@@ -115,8 +113,8 @@ const EditForm = () => {
             {event!.emailQuestion && (
               <FieldRow
                 name="email"
-                label="Sähköposti / Email"
-                placeholder="Sähköpostisi"
+                label={t('editSignup.fields.email')}
+                placeholder={t('editSignup.fields.email.placeholder')}
                 required
                 readOnly={!isNew || registrationClosed}
               />

@@ -13,13 +13,13 @@ const QuotaStatus = () => {
   const { t } = useTranslation();
   return (
     <div className="ilmo--side-widget">
-      <h3>Ilmoittautuneet / Registrations</h3>
+      <h3>{t('singleEvent.quotaCounts.title')}</h3>
       {signupsByQuota!.map((quota) => {
         if (quota.id === OPENQUOTA) {
           return (
             <QuotaProgress
               key={quota.id}
-              title="Avoin"
+              title={t('singleEvent.quotaCounts.openQuota')}
               value={quota.signupCount}
               max={event!.openQuotaSize}
             />

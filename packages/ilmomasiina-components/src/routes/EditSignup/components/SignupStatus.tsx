@@ -18,7 +18,7 @@ const SignupStatus = () => {
     return (
       <p>
         {/* eslint-disable-next-line max-len */}
-        {t('editSignup.position.quota', { quota_title: quota.title, position: `${position}${quota.size ? ` / ${quota.size}` : ''}` })}
+        {t('editSignup.position.quota', { quota: quota.title, position: `${position}${quota.size ? ` / ${quota.size}` : ''}` })}
       </p>
     );
   }
