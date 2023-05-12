@@ -15,7 +15,7 @@ export interface EventTableOptions {
   compact?: boolean;
 }
 
-export type TableRow = {
+export type EventRow = {
   isEvent: true;
   id: EventID,
   slug: EventSlug,
@@ -26,13 +26,15 @@ export type TableRow = {
   quotaSize?: number | null;
   totalSignupCount: number;
   totalQuotaSize: number | null;
-} | {
+};
+export type QuotaRow = {
   isEvent: false;
   id: QuotaID | typeof OPENQUOTA | typeof WAITLIST;
   title?: string;
   signupCount: number;
   quotaSize: number | null;
 };
+export type TableRow = EventRow | QuotaRow;
 
 /** Converts an event to rows to be shown in the event list. */
 export function eventToRows(event: UserEventListItem, { compact }: EventTableOptions = {}) {

@@ -10,7 +10,7 @@ import type { QuotaID } from '@tietokilta/ilmomasiina-models';
 import { useNavigate } from '../../../config/router';
 import { usePaths } from '../../../contexts/paths';
 import { beginSignup, useSingleEventContext } from '../../../modules/singleEvent';
-import { signupState, signupStateText } from '../../../utils/signupStateText';
+import { signupState, useSignupStateText } from '../../../utils/signupStateText';
 
 // Show the countdown one minute before opening the signup.
 const COUNTDOWN_DURATION = 60 * 1000;
@@ -55,14 +55,16 @@ const SignupButton = ({
     }
   }, [navigate, paths, isOpen, t]);
 
+  const statusText = useSignupStateText(eventState);
+
   return (
     <div className="ilmo--side-widget">
-      <h3>Ilmoittautuminen</h3>
+      <h3>{t('singleEvent.signupButtons.title')}</h3>
       <p>
-        {signupStateText(eventState).shortLabel}
+        {statusText.shortLabel}
         {total < COUNTDOWN_DURATION && !isOpen && !isClosed && (
           <span style={{ color: 'green' }}>
-            {` (${seconds}  s)`}
+            {` (${seconds} s)`}
           </span>
         )}
       </p>
