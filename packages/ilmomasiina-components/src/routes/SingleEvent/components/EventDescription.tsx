@@ -6,8 +6,6 @@ import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-import '../../../utils/i18n';
-
 import { timezone } from '../../../config';
 import { linkComponent } from '../../../config/router';
 import AuthContext from '../../../contexts/auth';

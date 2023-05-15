@@ -2,8 +2,6 @@ import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 
-import '../../../utils/i18n';
-
 import { useEditSignupContext } from '../../../modules/editSignup';
 
 const SignupStatus = () => {

@@ -8,8 +8,6 @@ import without from 'lodash/without';
 import { Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import '../../../utils/i18n';
-
 import type { Question, SignupUpdateBody } from '@tietokilta/ilmomasiina-models';
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
 import FieldRow from '../../../components/FieldRow';

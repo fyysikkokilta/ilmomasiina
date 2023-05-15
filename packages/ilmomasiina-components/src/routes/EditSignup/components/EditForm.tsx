@@ -5,8 +5,6 @@ import { Button, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
-import '../../../utils/i18n';
-
 import type { SignupUpdateBody } from '@tietokilta/ilmomasiina-models';
 import FieldRow from '../../../components/FieldRow';
 import { linkComponent, useNavigate } from '../../../config/router';

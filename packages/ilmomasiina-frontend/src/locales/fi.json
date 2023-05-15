@@ -1,0 +1,8 @@
+{
+    "translation": {
+        "errors.notFound.title": "404",
+        "errors.notFound.description": "Sivua ei löydy.",
+        "errors.returnToEvents": "Palaa tapahtumalistaukseen",
+        "footer.admin": "Hallinta"
+    }
+}

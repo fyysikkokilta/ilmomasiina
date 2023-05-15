@@ -1,0 +1,8 @@
+{
+    "translation": {
+        "errors.notFound.title": "404",
+        "errors.notFound.description": "The page was not found.",
+        "errors.returnToEvents": "Return to event list",
+        "footer.admin": "Admin"
+    }
+}

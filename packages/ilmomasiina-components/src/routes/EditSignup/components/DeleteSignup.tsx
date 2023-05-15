@@ -4,8 +4,6 @@ import { useFormikContext } from 'formik';
 import { Trans, useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
-import '../../../utils/i18n';
-
 import ConfirmButton from '../../../components/ConfirmButton';
 import { useNavigate } from '../../../config/router';
 import { usePaths } from '../../../contexts';

@@ -83,6 +83,7 @@ Libraries:
 - [Redux](https://redux.js.org/) and [React Redux](https://react-redux.js.org/)
     - Some state is handled locally, if there's no need to share it between components
 - [React Router](https://reactrouter.com/)
+- [i18next](https://www.i18next.com/) for internationalization
 - [Formik](https://formik.org/)
 - [MomentJS](https://momentjs.com/) - will transition to something else in the future
 
