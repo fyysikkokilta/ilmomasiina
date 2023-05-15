@@ -4,8 +4,6 @@ import filter from 'lodash/filter';
 import { Table } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import '../../../utils/i18n';
-
 import { useSingleEventContext } from '../../../modules/singleEvent';
 import { OPENQUOTA, QuotaSignups, WAITLIST } from '../../../utils/signupUtils';
 import SignupListRow from './SignupListRow';

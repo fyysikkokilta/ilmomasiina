@@ -2,8 +2,6 @@ import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 
-import '../../../utils/i18n';
-
 import { useSingleEventContext } from '../../../modules/singleEvent';
 import { OPENQUOTA, WAITLIST } from '../../../utils/signupUtils';
 import QuotaProgress from './QuotaProgress';

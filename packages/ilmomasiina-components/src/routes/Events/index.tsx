@@ -3,11 +3,10 @@ import React from 'react';
 import { Spinner, Table } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import '../../utils/i18n';
-
 import { timezone } from '../../config';
 import { linkComponent } from '../../config/router';
 import { usePaths } from '../../contexts/paths';
+import { I18nProvider } from '../../i18n';
 import { EventListProps, EventListProvider, useEventListContext } from '../../modules/events';
 import {
   EventRow, eventsToRows, OPENQUOTA, QuotaRow, WAITLIST,
@@ -17,7 +16,7 @@ import TableRow from './components/TableRow';
 
 const ListEventRow = ({
   row: {
-    id, slug, title, date, signupState, signupCount, quotaSize,
+    slug, title, date, signupState, signupCount, quotaSize,
   },
 }: { row: EventRow }) => {
   const Link = linkComponent();
@@ -31,7 +30,6 @@ const ListEventRow = ({
       signupStatus={stateText}
       signupCount={signupCount}
       quotaSize={quotaSize}
-      key={id}
     />
   );
 };
@@ -48,9 +46,6 @@ const ListQuotaRow = ({
       title={id === OPENQUOTA ? t('events.openQuota') : title}
       signupCount={signupCount}
       quotaSize={quotaSize}
-      // No real alternatives for key :(
-      // eslint-disable-next-line react/no-array-index-key
-      key={id}
     />
   );
 };
@@ -78,8 +73,8 @@ const EventListView = () => {
   }
 
   const tableRows = eventsToRows(events!).map((row) => {
-    if (row.isEvent) return <ListEventRow row={row} />;
-    if (row.id !== WAITLIST) return <ListQuotaRow row={row} />;
+    if (row.isEvent) return <ListEventRow key={row.id} row={row} />;
+    if (row.id !== WAITLIST) return <ListQuotaRow key={row.id} row={row} />;
     return null;
   });
 
@@ -103,7 +98,9 @@ const EventListView = () => {
 
 const EventList = ({ category }: EventListProps) => (
   <EventListProvider category={category}>
-    <EventListView />
+    <I18nProvider>
+      <EventListView />
+    </I18nProvider>
   </EventListProvider>
 );
 

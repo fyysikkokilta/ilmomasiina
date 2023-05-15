@@ -5,8 +5,6 @@ import find from 'lodash/find';
 import moment from 'moment-timezone';
 import { useTranslation } from 'react-i18next';
 
-import '../../../utils/i18n';
-
 import { timezone } from '../../../config';
 import { useSingleEventContext } from '../../../modules/singleEvent';
 import { SignupWithQuota } from '../../../utils/signupUtils';

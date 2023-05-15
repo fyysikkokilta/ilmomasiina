@@ -4,8 +4,6 @@ import { Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
-import '../../../utils/i18n';
-
 import type { QuotaID } from '@tietokilta/ilmomasiina-models';
 import { useNavigate } from '../../../config/router';
 import { usePaths } from '../../../contexts/paths';

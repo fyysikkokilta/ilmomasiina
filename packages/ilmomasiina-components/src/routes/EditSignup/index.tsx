@@ -4,6 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
 import { useParams } from '../../config/router';
+import { I18nProvider } from '../../i18n';
 import { EditSignupProps, EditSignupProvider, useEditSignupContext } from '../../modules/editSignup';
 import EditForm from './components/EditForm';
 import NarrowContainer from './components/NarrowContainer';
@@ -63,7 +64,9 @@ const EditSignup = () => {
   const { id, editToken } = useParams<EditSignupProps>();
   return (
     <EditSignupProvider id={id} editToken={editToken}>
-      <EditSignupView />
+      <I18nProvider>
+        <EditSignupView />
+      </I18nProvider>
     </EditSignupProvider>
   );
 };

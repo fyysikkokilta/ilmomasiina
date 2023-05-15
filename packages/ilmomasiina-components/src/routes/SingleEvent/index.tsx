@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { linkComponent, useParams } from '../../config/router';
 import { usePaths } from '../../contexts/paths';
+import { I18nProvider } from '../../i18n';
 import {
   SingleEventProps, SingleEventProvider, useSingleEventContext,
 } from '../../modules/singleEvent';
@@ -72,7 +73,9 @@ const SingleEvent = () => {
   const { slug } = useParams<SingleEventProps>();
   return (
     <SingleEventProvider slug={slug}>
-      <SingleEventView />
+      <I18nProvider>
+        <SingleEventView />
+      </I18nProvider>
     </SingleEventProvider>
   );
 };
