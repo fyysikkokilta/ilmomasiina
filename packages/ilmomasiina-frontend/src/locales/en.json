@@ -109,6 +109,7 @@
         "editor.signups.quota": "Quota",
         "editor.signups.time": "Signup time",
         "editor.signups.delete": "Delete",
-        "editor.signups.delete.confirm": "Are you sure? This cannot be undone."
+        "editor.signups.delete.confirm": "Are you sure? This cannot be undone.",
+        "header.switchLanguage": "In English"
     }
 }

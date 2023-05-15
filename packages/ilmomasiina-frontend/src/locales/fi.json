@@ -108,7 +108,7 @@
         "editor.signups.quota": "Kiintiö",
         "editor.signups.time": "Ilmoittautumisaika",
         "editor.signups.delete": "Poista",
-        "editor.signups.delete.confirm": "Oletko varma? Poistamista ei voi perua."
-
+        "editor.signups.delete.confirm": "Oletko varma? Poistamista ei voi perua.",
+        "header.switchLanguage": "Suomeksi"
     }
 }

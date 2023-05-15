@@ -15,7 +15,7 @@ import './Header.scss';
 const Header = () => {
   const dispatch = useTypedDispatch();
   const loggedIn = useTypedSelector((state) => state.auth.loggedIn);
-  const { i18n: { language } } = useTranslation();
+  const { i18n: { language }, t } = useTranslation();
 
   return (
     <Navbar>
@@ -24,8 +24,12 @@ const Header = () => {
         <Link to={appPaths.eventsList} className="navbar-brand mr-auto">
           {branding.headerTitle}
         </Link>
-        {language !== 'fi' && <Button onClick={() => i18n.changeLanguage('fi')}>Suomeksi</Button>}
-        {language !== 'en' && <Button onClick={() => i18n.changeLanguage('en')}>In English</Button>}
+        {language !== 'fi' && (
+          <Button onClick={() => i18n.changeLanguage('fi')}>{t('header.switchLanguage', { lng: 'fi' })}</Button>
+        )}
+        {language !== 'en' && (
+          <Button onClick={() => i18n.changeLanguage('en')}>{t('header.switchLanguage', { lng: 'en' })}</Button>
+        )}
         {loggedIn && (
           <Button
             onClick={() => dispatch(logout())}
