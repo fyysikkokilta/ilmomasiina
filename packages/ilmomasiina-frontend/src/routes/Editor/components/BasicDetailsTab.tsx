@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { useFormikContext } from 'formik';
 import { Form } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { shallowEqual } from 'react-redux';
 
 import { FieldRow } from '@tietokilta/ilmomasiina-components';
@@ -30,6 +31,8 @@ const BasicDetailsTab = () => {
     touched: { slug: slugTouched },
     setFieldValue,
   } = useFormikContext<EditorEvent>();
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isNew && !slugTouched && title !== undefined) {
@@ -66,7 +69,7 @@ const BasicDetailsTab = () => {
     } else {
       slugFeedback = (
         <Form.Text className="text-danger">
-          {'URL-osoite on jo käytössä tapahtumalla '}
+          {t('editor.basic.urlExists')}
           {slugAvailability.title}
         </Form.Text>
       );
@@ -77,84 +80,81 @@ const BasicDetailsTab = () => {
     <div>
       <FieldRow
         name="title"
-        label="Tapahtuman nimi"
+        label={t('editor.basic.name') as string}
         required
-        alternateError="* Otsikko vaaditaan."
+        alternateError={t('editor.basic.nameError') as string}
       />
       <FieldRow
         name="slug"
-        label="Tapahtuman URL"
+        label={t('editor.basic.url') as string}
         required
-        alternateError="* URL-pääte vaaditaan."
+        alternateError={t('editor.basicurlError') as string}
         extraFeedback={slugFeedback}
         as={SlugField}
       />
       <FieldRow
         name="listed"
-        label="Julkisuus"
+        label={t('editor.basic.publicity') as string}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel="Näytä tapahtumalistassa"
-        help={
-          'Piilotettuihin tapahtumiin pääsee vain URL-osoitteella. Luonnoksena tallennettuja tapahtumia ei voi '
-          + 'katsella käyttäjänä riippumatta tästä asetuksesta.'
-        }
+        checkLabel={t('editor.basic.showEvent') as string}
+        help={t('editor.basic.hiddenEventInfo') as string}
       />
       <FieldRow
         name="eventType"
-        label="Tapahtuman tyyppi"
+        label={t('editor.basic.type') as string}
         as={SelectBox}
         options={[
-          [EditorEventType.ONLY_EVENT, 'Tapahtuma ilman ilmoittautumista'],
-          [EditorEventType.EVENT_WITH_SIGNUP, 'Tapahtuma ja ilmoittautuminen'],
-          [EditorEventType.ONLY_SIGNUP, 'Ilmoittautuminen ilman tapahtumaa'],
+          [EditorEventType.ONLY_EVENT, t('editor.onlyEvent')],
+          [EditorEventType.EVENT_WITH_SIGNUP, t('editor.eventWithSignup')],
+          [EditorEventType.ONLY_SIGNUP, t('editor.onlySignup')],
         ]}
       />
       {eventType !== EditorEventType.ONLY_SIGNUP && (
         <FieldRow
           name="date"
-          label="Alkuaika"
+          label={t('editor.time.start') as string}
           as={DateTimePicker}
           selectsStart
           endDate={endDate}
           required
-          alternateError="* Alkuaika vaaditaan."
+          alternateError={t('editor.startDateError') as string}
         />
       )}
       {eventType !== EditorEventType.ONLY_SIGNUP && (
         <FieldRow
           name="endDate"
-          label="Loppuaika"
+          label={t('editor.time.end') as string}
           as={DateTimePicker}
           selectsEnd
           startDate={date}
-          help="Tapahtuma näkyy kalenteriviennissä vain, jos sille on asetettu loppuaika."
+          help={t('editor.basic.dateWarning') as string}
         />
       )}
       <FieldRow
         name="category"
-        label="Kategoria"
+        label={t('editor.basic.category') as string}
         as={Autocomplete}
         options={allCategories || []}
         busy={allCategories === null}
       />
       <FieldRow
         name="webpageUrl"
-        label="Kotisivujen osoite"
+        label={t('editor.basic.homePage') as string}
       />
       <FieldRow
         name="facebookUrl"
-        label="Facebook-tapahtuma"
+        label={t('editor.basic.facebook') as string}
       />
       <FieldRow
         name="location"
-        label="Paikka"
+        label={t('editor.basic.location') as string}
       />
       <FieldRow
         name="description"
-        label="Kuvaus"
-        help="Kuvauksessa voi käyttää Markdownia."
+        label={t('editor.basic.description') as string}
+        help={t('editor.basic.markdown') as string}
         as={Textarea}
         rows={8}
       />
