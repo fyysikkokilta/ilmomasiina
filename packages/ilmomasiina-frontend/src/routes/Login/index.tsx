@@ -2,7 +2,9 @@ import React from 'react';
 
 import { Field, Formik, FormikHelpers } from 'formik';
 import { Button, Form } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
+import { I18nProvider } from '@tietokilta/ilmomasiina-components';
 import { login } from '../../modules/auth/actions';
 import { useTypedDispatch, useTypedSelector } from '../../store/reducers';
 
@@ -13,9 +15,10 @@ type FormData = {
   password: string;
 };
 
-const Login = () => {
+const LoginForm = () => {
   const dispatch = useTypedDispatch();
   const { loginError } = useTypedSelector((state) => state.auth);
+  const { t } = useTranslation();
 
   async function onSubmit(data: FormData, { setSubmitting }: FormikHelpers<FormData>) {
     const { email, password } = data;
@@ -25,9 +28,9 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <h1>Kirjaudu</h1>
+      <h1>{t('login.title')}</h1>
       {loginError && (
-        <p className="text-invalid">Kirjautuminen epäonnistui</p>
+        <p className="text-invalid">{t('login.loginFailed')}</p>
       )}
       <Formik
         initialValues={{
@@ -39,7 +42,7 @@ const Login = () => {
         {({ handleSubmit, isSubmitting, errors }) => (
           <Form onSubmit={handleSubmit} className="ilmo--form">
             <Form.Group controlId="email">
-              <Form.Label data-required>Sähköposti</Form.Label>
+              <Form.Label data-required>{t('login.email')}</Form.Label>
               <Field
                 name="email"
                 as={Form.Control}
@@ -53,7 +56,7 @@ const Login = () => {
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group controlId="password">
-              <Form.Label data-required>Salasana</Form.Label>
+              <Form.Label data-required>{t('login.password')}</Form.Label>
               <Field
                 name="password"
                 as={Form.Control}
@@ -67,7 +70,7 @@ const Login = () => {
               </Form.Control.Feedback>
             </Form.Group>
             <Button type="submit" variant="secondary" disabled={isSubmitting}>
-              Kirjaudu
+              {t('login.button')}
             </Button>
           </Form>
         )}
@@ -75,5 +78,9 @@ const Login = () => {
     </div>
   );
 };
-
+const Login = () => (
+  <I18nProvider>
+    <LoginForm />
+  </I18nProvider>
+);
 export default Login;

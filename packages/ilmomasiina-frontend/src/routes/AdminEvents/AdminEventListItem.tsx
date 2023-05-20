@@ -2,6 +2,7 @@ import React, { MouseEvent } from 'react';
 
 import sumBy from 'lodash/sumBy';
 import moment from 'moment-timezone';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -21,6 +22,8 @@ const AdminEventListItem = ({ event }: Props) => {
   const {
     id, title, slug, date, draft, listed, quotas,
   } = event;
+
+  const { t } = useTranslation();
 
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
@@ -57,12 +60,12 @@ const AdminEventListItem = ({ event }: Props) => {
       <td>{sumBy(quotas, 'signupCount')}</td>
       <td>
         <Link to={appPaths.adminEditEvent(id)}>
-          Muokkaa tapahtumaa
+          {t('panel.editEvent')}
         </Link>
         &ensp;/&ensp;
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#" onClick={onDelete} role="button">
-          Poista tapahtuma
+          {t('panel.deleteEvent')}
         </a>
       </td>
     </tr>

@@ -79,5 +79,6 @@
         "singleEvent.signups.unconfirmed": "Vahvistamatta",
         "singleEvent.status.signup": "Ilmoittautuminen käynnissä",
         "singleEvent.status.signupFailed": "Ilmoittautuminen epäonnistui."
+
     }
 }

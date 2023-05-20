@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useFormikContext } from 'formik';
 import { Nav } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 import { EditorEvent, EditorEventType } from '../../../modules/editor/types';
 
@@ -18,16 +19,17 @@ type Props = {
   setActiveTab: (tab: EditorTab) => void
 };
 
-const TABS: [EditorTab, string][] = [
-  [EditorTab.BASIC_DETAILS, 'Perustiedot'],
-  [EditorTab.QUOTAS, 'Ilmoittautumisasetukset'],
-  [EditorTab.QUESTIONS, 'Kysymykset'],
-  [EditorTab.EMAILS, 'Vahvistusviestit'],
-  [EditorTab.SIGNUPS, 'Ilmoittautuneet'],
-];
-
 const EditorTabHeader = ({ activeTab, setActiveTab }: Props) => {
   const { values: { eventType } } = useFormikContext<EditorEvent>();
+  const { t } = useTranslation();
+
+  const TABS: [EditorTab, string][] = [
+    [EditorTab.BASIC_DETAILS, t('editor.basic')],
+    [EditorTab.QUOTAS, t('editor.quotas')],
+    [EditorTab.QUESTIONS, t('editor.questions')],
+    [EditorTab.EMAILS, t('editor.emails')],
+    [EditorTab.SIGNUPS, t('editor.signups')],
+  ];
 
   return (
     <Nav variant="tabs" activeKey={activeTab} role="tablist">

@@ -5,6 +5,7 @@ import reject from 'lodash/reject';
 import {
   Button, Col, Form, InputGroup, Row,
 } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { SortEnd } from 'react-sortable-hoc';
 
 import { FieldRow } from '@tietokilta/ilmomasiina-components';
@@ -12,16 +13,17 @@ import { QuestionType } from '@tietokilta/ilmomasiina-models';
 import { EditorQuestion } from '../../../modules/editor/types';
 import Sortable from './Sortable';
 
-const QUESTION_TYPES: { value: EditorQuestion['type'], label: string }[] = [
-  { value: QuestionType.TEXT, label: 'Teksti (lyhyt)' },
-  { value: QuestionType.TEXT_AREA, label: 'Teksti (pitkä)' },
-  { value: QuestionType.NUMBER, label: 'Numero' },
-  { value: QuestionType.SELECT, label: 'Monivalinta (voi valita yhden)' },
-  { value: QuestionType.CHECKBOX, label: 'Monivalinta (voi valita monta)' },
-];
-
 const Questions = () => {
   const [{ value: questions }, , { setValue }] = useField<EditorQuestion[]>('questions');
+  const { t } = useTranslation();
+
+  const QUESTION_TYPES: { value: EditorQuestion['type'], label: string }[] = [
+    { value: QuestionType.TEXT, label: t('editor.questions.type.text') },
+    { value: QuestionType.TEXT_AREA, label: t('editor.questions.type.textArea') },
+    { value: QuestionType.NUMBER, label: t('editor.questions.type.number') },
+    { value: QuestionType.SELECT, label: t('editor.questions.type.select') },
+    { value: QuestionType.CHECKBOX, label: t('editor.questions.type.checkbox') },
+  ];
 
   function addQuestion() {
     setValue([
@@ -104,7 +106,7 @@ const Questions = () => {
         <Col xs="12" sm="9" xl="10">
           <FieldRow
             name={`question-${question.key}-question`}
-            label="Kysymys"
+            label={t('editor.questions.question') as string}
             required
           >
             <Form.Control
@@ -116,7 +118,7 @@ const Questions = () => {
           </FieldRow>
           <FieldRow
             name={`question-${question.key}-type`}
-            label="Tyyppi"
+            label={t('editor.questions.type') as string}
             required
           >
             <Form.Control
@@ -175,20 +177,20 @@ const Questions = () => {
         <Col xs="12" sm="3" xl="2" className="event-editor--question-buttons">
           <Form.Check
             id={`question-${question.key}-required`}
-            label="Pakollinen"
+            label={t('editor.questions.mandatory')}
             checked={question.required}
             onChange={(e) => updateField('required', e.target.checked)}
             className="mb-3"
           />
           <Form.Check
             id={`question-${question.key}-public`}
-            label="Julkinen"
+            label={t('editor.questions.public')}
             checked={question.public}
             onChange={(e) => updateField('public', e.target.checked)}
             className="mb-3"
           />
           <Button variant="danger" type="button" onClick={removeQuestion}>
-            Poista kysymys
+            {t('editor.questions.delete')}
           </Button>
         </Col>
       </Row>
@@ -205,7 +207,7 @@ const Questions = () => {
       />
       <div className="text-center mb-3">
         <Button type="button" variant="primary" onClick={addQuestion}>
-          Lisää kysymys
+          {t('editor.questions.add')}
         </Button>
       </div>
     </>

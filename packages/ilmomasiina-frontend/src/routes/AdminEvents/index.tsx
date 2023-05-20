@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { Button, Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -13,6 +14,7 @@ import AdminEventListItem from './AdminEventListItem';
 const AdminEventsList = () => {
   const dispatch = useTypedDispatch();
   const { events, eventsLoadError } = useTypedSelector((state) => state.adminEvents, shallowEqual);
+  const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(getAdminEvents());
@@ -24,8 +26,8 @@ const AdminEventsList = () => {
   if (eventsLoadError) {
     return (
       <>
-        <h1>Hups, jotain meni pieleen</h1>
-        <p>Tapahtumien lataus epäonnistui</p>
+        <h1>{t('errors.title')}</h1>
+        <p>{t('events.loadFailed')}</p>
       </>
     );
   }
@@ -33,7 +35,7 @@ const AdminEventsList = () => {
   if (!events) {
     return (
       <>
-        <h1>Hallinta</h1>
+        <h1>{t('panel.title')}</h1>
         <Spinner animation="border" />
       </>
     );
@@ -42,25 +44,25 @@ const AdminEventsList = () => {
   return (
     <>
       <nav className="ilmo--title-nav">
-        <h1>Hallinta</h1>
+        <h1>{t('panel.title')}</h1>
         <Button as={Link} variant="secondary" to={appPaths.adminUsersList}>
-          Käyttäjät
+          {t('panel.users')}
         </Button>
         <Button as={Link} variant="secondary" to={appPaths.adminAuditLog}>
-          Toimintoloki
+          {t('panel.activityLog')}
         </Button>
         <Button as={Link} variant="primary" to={appPaths.adminEditEvent('new')}>
-          + Uusi tapahtuma
+          {t('panel.newEvent')}
         </Button>
       </nav>
       <table className="table">
         <thead>
           <tr>
-            <th>Nimi</th>
-            <th>Ajankohta</th>
-            <th>Tila</th>
-            <th>Ilmoittautuneita</th>
-            <th>Toiminnot</th>
+            <th>{t('panel.name')}</th>
+            <th>{t('panel.date')}</th>
+            <th>{t('panel.status')}</th>
+            <th>{t('panel.signups')}</th>
+            <th>{t('panel.actions')}</th>
           </tr>
         </thead>
         <tbody>
