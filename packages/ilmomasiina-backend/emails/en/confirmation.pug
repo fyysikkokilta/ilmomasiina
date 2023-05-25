@@ -1,0 +1,23 @@
+extends ../layout.pug
+
+block mainContent
+  div.content-block
+    p.bodyText #{event.verificationEmail}
+  div.content-block
+    p.bodyText Event details:
+    ul
+      li #[strong Event:] #{event.title}
+      li #[strong Location:] #{event.location}
+      if date
+        li #[strong Time:] #{date}
+  div.content-block
+    p.bodyText Signup details:
+    ul
+      if name
+        li #[strong Name:] #{name}
+      li #[strong Email:] #{email}
+      li #[strong Quota:] #{quota}
+      each val in answers
+        li #[strong #{val.label}:] #{val.answer}
+  div.content-block
+    p.bodyText If you want to edit or cancel your signup, you can do it by clicking #[a(href=cancelLink) this link].

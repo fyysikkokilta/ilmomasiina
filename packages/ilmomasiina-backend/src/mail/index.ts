@@ -1,11 +1,17 @@
 import Email from 'email-templates';
+import { existsSync } from 'fs';
+import i18next from 'i18next';
 import path from 'path';
 
 import config from '../config';
+import i18n from '../i18n';
 import { Event } from '../models/event';
 import mailTransporter from './config';
 
 export interface ConfirmationMailParams {
+  name: string;
+  email: string;
+  quota: string;
   answers: {
     label: string;
     answer: string;
@@ -17,10 +23,8 @@ export interface ConfirmationMailParams {
 }
 
 export interface NewUserMailParams {
-  fields: {
-    label: string;
-    answer: string;
-  }[];
+  email: string;
+  password: string;
 }
 
 export interface PromotedFromQueueMailParams {
@@ -29,6 +33,19 @@ export interface PromotedFromQueueMailParams {
 }
 
 const TEMPLATE_DIR = path.join(__dirname, '../../emails');
+
+/** Gets a localized template for the given language, or a fallback one if it doesn't exist. */
+function getTemplate(language: string | null, template: string) {
+  const lng = language || config.mailDefaultLang;
+  // ensure no path injections
+  if (!/^[a-zA-Z-]{2,}$/.test(lng)) throw new Error('invalid language');
+
+  const localizedPath = path.join(TEMPLATE_DIR, lng, `${template}.pug`);
+  if (existsSync(localizedPath)) return { template: localizedPath, lng };
+
+  const defaultPath = path.join(TEMPLATE_DIR, config.mailDefaultLang, `${template}.pug`);
+  return { template: defaultPath, lng: config.mailDefaultLang };
+}
 
 const TEMPLATE_OPTIONS = {
   juice: true,
@@ -52,7 +69,7 @@ export default class EmailService {
     return mailTransporter.sendMail(msg);
   }
 
-  static async sendConfirmationMail(to: string, params: ConfirmationMailParams) {
+  static async sendConfirmationMail(to: string, language: string | null, params: ConfirmationMailParams) {
     try {
       const email = new Email(TEMPLATE_OPTIONS);
       const brandedParams = {
@@ -62,15 +79,19 @@ export default class EmailService {
           footerLink: config.brandingMailFooterLink,
         },
       };
-      const html = await email.render(path.join(TEMPLATE_DIR, 'confirmation/html'), brandedParams);
-      const subject = `${params.edited ? 'Muokkaus' : 'Ilmoittautumis'}vahvistus: ${params.event.title}`;
+      const { template, lng } = getTemplate(language, 'confirmation');
+      const html = await email.render(template, brandedParams);
+      const subject = i18next.t(
+        params.edited ? 'emails.editConfirmation.subject' : 'emails.confirmation.subject',
+        { lng, event: params.event.title },
+      );
       await EmailService.send(to, subject, html);
     } catch (error) {
       console.error(error);
     }
   }
 
-  static async sendNewUserMail(to: string, params: NewUserMailParams) {
+  static async sendNewUserMail(to: string, language: string | null, params: NewUserMailParams) {
     try {
       const email = new Email(TEMPLATE_OPTIONS);
       const brandedParams = {
@@ -81,15 +102,16 @@ export default class EmailService {
           footerLink: config.brandingMailFooterLink,
         },
       };
-      const html = await email.render(path.join(TEMPLATE_DIR, 'newUser/html'), brandedParams);
-      const subject = 'Käyttäjätunnukset Ilmomasiinaan';
+      const { template, lng } = getTemplate(language, 'newUser');
+      const html = await email.render(template, brandedParams);
+      const subject = i18n.t('emails.newUser.subject', { lng });
       await EmailService.send(to, subject, html);
     } catch (error) {
       console.error(error);
     }
   }
 
-  static async sendResetPasswordMail(to: string, params: NewUserMailParams) {
+  static async sendResetPasswordMail(to: string, language: string | null, params: NewUserMailParams) {
     try {
       const email = new Email(TEMPLATE_OPTIONS);
       const brandedParams = {
@@ -100,15 +122,20 @@ export default class EmailService {
           footerLink: config.brandingMailFooterLink,
         },
       };
-      const html = await email.render(path.join(TEMPLATE_DIR, 'resetPassword/html'), brandedParams);
-      const subject = 'Salasanasi Ilmomasiinaan on nollattu';
+      const { template, lng } = getTemplate(language, 'resetPassword');
+      const html = await email.render(template, brandedParams);
+      const subject = i18n.t('emails.resetPassword.subject', { lng });
       await EmailService.send(to, subject, html);
     } catch (error) {
       console.error(error);
     }
   }
 
-  static async sendPromotedFromQueueEmail(to: string, params: PromotedFromQueueMailParams) {
+  static async sendPromotedFromQueueMail(
+    to: string,
+    language: string | null,
+    params: PromotedFromQueueMailParams,
+  ) {
     try {
       const email = new Email(TEMPLATE_OPTIONS);
       const brandedParams = {
@@ -118,8 +145,9 @@ export default class EmailService {
           footerLink: config.brandingMailFooterLink,
         },
       };
-      const html = await email.render(path.join(TEMPLATE_DIR, 'queueMail/html'), brandedParams);
-      const subject = `Pääsit varasijalta tapahtumaan ${params.event.title}`;
+      const { template, lng } = getTemplate(language, 'queueMail');
+      const html = await email.render(template, brandedParams);
+      const subject = i18n.t('emails.promotedFromQueue.subject', { lng, event: params.event.title });
       await EmailService.send(to, subject, html);
     } catch (error) {
       console.error(error);

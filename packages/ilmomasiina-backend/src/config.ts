@@ -73,6 +73,11 @@ const config = {
   brandingMailFooterLink: envString('BRANDING_MAIL_FOOTER_LINK'),
   /** Calendar name included in iCalendar exports. */
   icalCalendarName: envString('BRANDING_ICAL_CALENDAR_NAME', 'Ilmomasiina'),
+  /** Default language for emails, if no language is known for the signup. */
+  mailDefaultLang: envString('MAIL_DEFAULT_LANG', 'fi'),
+
+  /** Timezone used for emails. */
+  timezone: envString('APP_TIMEZONE', 'Europe/Helsinki'),
 
   /** Canonical base URL for the app. Includes $PATH_PREFIX, but NOT a final "/".
    *

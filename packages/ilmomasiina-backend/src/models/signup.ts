@@ -15,7 +15,7 @@ import { generateRandomId, RANDOM_ID_LENGTH } from './randomId';
 
 export interface SignupCreationAttributes
   extends Optional<SignupAttributes, 'id' | 'firstName' | 'lastName' | 'namePublic' | 'email' | 'confirmedAt'
-  | 'status' | 'position' | 'createdAt'> {}
+  | 'language' | 'status' | 'position' | 'createdAt'> {}
 
 export class Signup extends Model<SignupAttributes, SignupCreationAttributes> implements SignupAttributes {
   public id!: string;
@@ -23,6 +23,7 @@ export class Signup extends Model<SignupAttributes, SignupCreationAttributes> im
   public lastName!: string | null;
   public namePublic!: boolean;
   public email!: string | null;
+  public language!: string | null;
   public confirmedAt!: Date | null;
   public status!: SignupStatus | null;
   public position!: number | null;
@@ -81,6 +82,12 @@ export default function setupSignupModel(sequelize: Sequelize) {
         type: DataTypes.STRING,
         validate: {
           isEmail: true,
+        },
+      },
+      language: {
+        type: DataTypes.STRING(8), // allow for language variants
+        validate: {
+          notEmpty: true,
         },
       },
       confirmedAt: {

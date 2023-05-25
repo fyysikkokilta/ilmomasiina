@@ -22,7 +22,7 @@ const EditForm = () => {
   const Link = linkComponent();
   const navigate = useNavigate();
   const paths = usePaths();
-  const { t } = useTranslation();
+  const { t, i18n: { language } } = useTranslation();
 
   // TODO: actually use errors from API
   const [submitError, setSubmitError] = useState(false);
@@ -31,7 +31,10 @@ const EditForm = () => {
     const progressToast = toast.loading(isNew ? t('editSignup.status.signup') : t('editSignup.status.edit'));
 
     try {
-      await updateSignup(answers);
+      await updateSignup({
+        ...answers,
+        language,
+      });
 
       toast.update(progressToast, {
         render: isNew ? t('editSignup.status.signupSuccess') : t('editSignup.status.editSuccess'),
