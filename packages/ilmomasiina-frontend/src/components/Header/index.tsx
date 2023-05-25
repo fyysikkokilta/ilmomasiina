@@ -3,9 +3,9 @@ import React from 'react';
 import { Button, Container, Navbar } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import i18n from 'src/i18n';
 
 import branding from '../../branding';
+import i18n from '../../i18n';
 import { logout } from '../../modules/auth/actions';
 import appPaths from '../../paths';
 import { useTypedDispatch, useTypedSelector } from '../../store/reducers';
