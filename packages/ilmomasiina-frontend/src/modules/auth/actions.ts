@@ -78,3 +78,23 @@ export const loginExpired = () => (dispatch: DispatchAction) => {
   loginToast('error', i18n.t('auth.loginExpired'), 10000);
   dispatch(redirectToLogin());
 };
+
+export const renewLogin = (accessToken: string) => async (dispatch: DispatchAction) => {
+  if (accessToken) {
+    const sessionResponse = await apiFetch<AdminLoginResponse>('authentication/renew', {
+      method: 'POST',
+      body: {
+        accessToken,
+      },
+      headers: {
+        Authorization: accessToken,
+      },
+    });
+    if (sessionResponse) {
+      dispatch(loginSucceeded(sessionResponse));
+      return true;
+    }
+  }
+  dispatch(loginExpired());
+  return false;
+};
