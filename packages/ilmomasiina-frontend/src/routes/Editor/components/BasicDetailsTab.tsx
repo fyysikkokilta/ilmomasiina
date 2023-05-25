@@ -62,10 +62,15 @@ const BasicDetailsTab = () => {
 
   let slugFeedback = null;
   if (slugAvailability === 'checking') {
-    slugFeedback = <Form.Text>Tarkistetaan saatavuutta&hellip;</Form.Text>;
+    slugFeedback = (
+      <Form.Text>
+        {t('editor.basic.url.checking')}
+        &hellip;
+      </Form.Text>
+    );
   } else if (slugAvailability !== null) {
     if (slugAvailability.id === null || slugAvailability.id === event?.id) {
-      slugFeedback = <Form.Text className="text-success">URL-osoite vapaa!</Form.Text>;
+      slugFeedback = <Form.Text className="text-success">{t('editor.basic.url.free')}</Form.Text>;
     } else {
       slugFeedback = (
         <Form.Text className="text-danger">

@@ -28,12 +28,12 @@ const AdminEventListItem = ({ event }: Props) => {
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
     const confirmed = window.confirm(
-      'Haluatko varmasti poistaa tämän tapahtuman? Tätä toimintoa ei voi perua.',
+      t('panel.deleteEvent.confirm') as string,
     );
     if (confirmed) {
       const success = await dispatch(deleteEvent(id));
       if (!success) {
-        toast.error('Poisto epäonnistui :(', { autoClose: 2000 });
+        toast.error(t('panel.deleteEvent.fail'), { autoClose: 2000 });
       }
       dispatch(getAdminEvents());
     }
@@ -41,13 +41,13 @@ const AdminEventListItem = ({ event }: Props) => {
 
   let status;
   if (draft) {
-    status = 'Luonnos';
+    status = t('panel.status.draft');
   } else if (isEventInPast(event)) {
-    status = date === null ? 'Sulkeutunut' : 'Mennyt';
+    status = date === null ? t('panel.status.closed') : t('panel.status.ended');
   } else if (!listed) {
-    status = 'Piilotettu';
+    status = t('panel.status.hidden');
   } else {
-    status = <Link to={appPaths.eventDetails(slug)}>Julkaistu</Link>;
+    status = <Link to={appPaths.eventDetails(slug)}>{t('panel.status.published')}</Link>;
   }
 
   return (
