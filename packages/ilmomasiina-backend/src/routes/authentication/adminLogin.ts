@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { HttpError, Unauthorized } from 'http-errors';
 
-import type { AdminLoginBody, AdminLoginResponse } from '@tietokilta/ilmomasiina-models';
+import type { AdminLoginBody, AdminLoginResponse, AdminRenewLoginBody } from '@tietokilta/ilmomasiina-models';
 import AdminAuthSession, { AdminTokenData } from '../../authentication/adminAuthSession';
 import AdminPasswordAuth from '../../authentication/adminPasswordAuth';
 import { User } from '../../models/user';
@@ -34,7 +34,7 @@ export function adminLogin(session: AdminAuthSession) {
 
 export function renewAdminToken(session: AdminAuthSession) {
   return async (
-    request: FastifyRequest<{ Body: AdminLoginBody }>,
+    request: FastifyRequest<{ Body: AdminRenewLoginBody }>,
     reply: FastifyReply,
   ): Promise<AdminLoginResponse | void> => {
     // Verify existing token
