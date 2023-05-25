@@ -36,13 +36,13 @@ const loginToast = (type: 'success' | 'error', text: string, autoClose: number) 
 };
 
 export const login = (email: string, password: string) => async (dispatch: DispatchAction) => {
-  const sessionResponse = await apiFetch('authentication', {
+  const sessionResponse = await apiFetch<AdminLoginResponse>('authentication', {
     method: 'POST',
     body: {
       email,
       password,
     },
-  }) as AdminLoginResponse;
+  });
   dispatch(loginSucceeded(sessionResponse));
   dispatch(push(appPaths.adminEventsList));
   loginToast('success', i18n.t('auth.loginSuccess'), 2000);

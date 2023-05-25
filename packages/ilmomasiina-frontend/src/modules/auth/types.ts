@@ -1,6 +1,9 @@
+export interface AccessToken {
+  token: string;
+  expiresAt: number; // Unix timestamp
+}
 export interface AuthState {
-  accessToken?: string;
-  accessTokenExpires?: string;
+  accessToken?: AccessToken;
   loggedIn: boolean;
 }
 
