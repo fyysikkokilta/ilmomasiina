@@ -39,7 +39,7 @@ export function configureApi(url: string) {
   apiUrl = url;
 }
 
-export default async function apiFetch<T = any>(uri: string, {
+export default async function apiFetch<T = unknown>(uri: string, {
   method = 'GET', body, headers, signal,
 }: FetchOptions = {}) {
   const allHeaders = {
