@@ -9,11 +9,6 @@ export const adminLoginBody = Type.Object({
     description: 'Plaintext password.',
   }),
 });
-export const adminRenewTokenBody = Type.Object({
-  accessToken: Type.String({
-    description: 'JWT access token. Used in `Authorization` header to authorize requests.',
-  }),
-});
 /** Response schema for a successful login. */
 export const adminLoginResponse = Type.Object({
   accessToken: Type.String({
@@ -23,7 +18,5 @@ export const adminLoginResponse = Type.Object({
 
 /** Request body for login. */
 export type AdminLoginBody = Static<typeof adminLoginBody>;
-/** Request body for renewLogin */
-export type AdminRenewLoginBody = Static<typeof adminRenewTokenBody>;
 /** Response schema for a successful login. */
 export type AdminLoginResponse = Static<typeof adminLoginResponse>;
