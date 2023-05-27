@@ -325,11 +325,10 @@ async function setupPublicRoutes(
 
   // an API endpoint for session token renewal as variant of adminLoginSchema
 
-  server.post<{ Body: schema.AdminRenewLoginBody }>(
+  server.post(
     '/authentication/renew',
     {
       schema: {
-        body: schema.adminRenewTokenBody,
         response: {
           ...errorResponses,
           201: schema.adminLoginResponse,
