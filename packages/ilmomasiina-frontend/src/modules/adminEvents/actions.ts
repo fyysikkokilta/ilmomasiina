@@ -29,7 +29,8 @@ export type AdminEventsActions =
 
 export const getAdminEvents = () => async (dispatch: DispatchAction, getState: GetState) => {
   try {
-    const response = await adminApiFetch('admin/events', { accessToken: getState().auth.accessToken }, dispatch);
+    const { accessToken } = getState().auth;
+    const response = await adminApiFetch('admin/events', { accessToken }, dispatch);
     dispatch(eventsLoaded(response as AdminEventListResponse));
   } catch (e) {
     dispatch(eventsLoadFailed(e as ApiError));
