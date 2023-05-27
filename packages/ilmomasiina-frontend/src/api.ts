@@ -7,7 +7,7 @@ import type { DispatchAction } from './store/types';
 interface AdminApiFetchOptions extends FetchOptions {
   accessToken?: AccessToken;
 }
-
+const RENEW_LOGIN_THRESHOLD = 5 * 60 * 1000;
 /** Wrapper for apiFetch that checks for Unauthenticated responses and dispatches a loginExpired
  * action if necessary.
  */
@@ -18,7 +18,7 @@ export default async function adminApiFetch<T = any>(uri: string, opts: AdminApi
     if (!accessToken) {
       throw new ApiError(401, { isUnauthenticated: true });
     }
-    if (!(accessToken.expiresAt < Date.now() - 4 * 60 * 1000)) {
+    if (!(accessToken.expiresAt < Date.now() - RENEW_LOGIN_THRESHOLD)) {
       await dispatch(renewLogin(accessToken.token));
     }
     return await apiFetch<T>(uri, { ...opts, headers: { ...opts.headers, Authorization: accessToken.token } });
