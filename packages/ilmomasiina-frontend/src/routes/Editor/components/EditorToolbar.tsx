@@ -28,7 +28,7 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
     <>
       <h1>
         {isNew
-          ? t('editor.newEvent')
+          ? t('editor.title.new')
           : t('editor.title.edit')}
       </h1>
       <div className="event-editor--buttons-wrapper">
@@ -43,8 +43,8 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
         <div className="event-editor--public-status">
           <div className={`event-editor--bubble ${isDraft ? 'draft' : 'public'} event-editor--animated`} />
           <span>
-            {isDraft ? t('editor.draft') : (
-              <Link to={appPaths.eventDetails(event!.slug)} target="_blank">{t('editor.published')}</Link>
+            {isDraft ? t('editor.status.draft') : (
+              <Link to={appPaths.eventDetails(event!.slug)} target="_blank">{t('editor.status.published')}</Link>
             )}
           </span>
         </div>
@@ -57,7 +57,7 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
               formNoValidate
               onClick={() => onSubmitClick(!isDraft)}
             >
-              {isDraft ? t('editor.publish') : t('editor.changeToDraft')}
+              {isDraft ? t('editor.action.publish') : t('editor.action.convertToDraft')}
             </Button>
           )}
           <Button
@@ -67,7 +67,7 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
             formNoValidate
             onClick={() => onSubmitClick(isDraft)}
           >
-            {isNew ? t('editor.saveAsDraft') : t('editor.saveChanges')}
+            {isNew ? t('editor.action.saveDraft') : t('editor.action.saveChanges')}
           </Button>
         </ButtonGroup>
       </div>

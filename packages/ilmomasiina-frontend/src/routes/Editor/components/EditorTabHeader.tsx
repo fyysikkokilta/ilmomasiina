@@ -24,11 +24,11 @@ const EditorTabHeader = ({ activeTab, setActiveTab }: Props) => {
   const { t } = useTranslation();
 
   const TABS: [EditorTab, string][] = [
-    [EditorTab.BASIC_DETAILS, t('editor.basic')],
-    [EditorTab.QUOTAS, t('editor.quotas')],
-    [EditorTab.QUESTIONS, t('editor.questions')],
-    [EditorTab.EMAILS, t('editor.emails')],
-    [EditorTab.SIGNUPS, t('editor.signups')],
+    [EditorTab.BASIC_DETAILS, t('editor.tabs.basic')],
+    [EditorTab.QUOTAS, t('editor.tabs.quotas')],
+    [EditorTab.QUESTIONS, t('editor.tabs.questions')],
+    [EditorTab.EMAILS, t('editor.tabs.emails')],
+    [EditorTab.SIGNUPS, t('editor.tabs.signups')],
   ];
 
   return (

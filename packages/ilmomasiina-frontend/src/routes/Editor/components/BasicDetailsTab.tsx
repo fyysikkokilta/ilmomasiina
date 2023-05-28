@@ -63,10 +63,7 @@ const BasicDetailsTab = () => {
   let slugFeedback = null;
   if (slugAvailability === 'checking') {
     slugFeedback = (
-      <Form.Text>
-        {t('editor.basic.url.checking')}
-        &hellip;
-      </Form.Text>
+      <Form.Text>{t('editor.basic.url.checking')}</Form.Text>
     );
   } else if (slugAvailability !== null) {
     if (slugAvailability.id === null || slugAvailability.id === event?.id) {
@@ -74,8 +71,7 @@ const BasicDetailsTab = () => {
     } else {
       slugFeedback = (
         <Form.Text className="text-danger">
-          {t('editor.basic.urlExists')}
-          {slugAvailability.title}
+          {t('editor.basic.url.reserved', { event: slugAvailability.title })}
         </Form.Text>
       );
     }
@@ -85,81 +81,81 @@ const BasicDetailsTab = () => {
     <div>
       <FieldRow
         name="title"
-        label={t('editor.basic.name') as string}
+        label={t('editor.basic.name')}
         required
-        alternateError={t('editor.basic.nameError') as string}
+        alternateError={t('editor.basic.name.missing')}
       />
       <FieldRow
         name="slug"
-        label={t('editor.basic.url') as string}
+        label={t('editor.basic.url')}
         required
-        alternateError={t('editor.basicurlError') as string}
+        alternateError={t('editor.basic.url.missing')}
         extraFeedback={slugFeedback}
         as={SlugField}
       />
       <FieldRow
         name="listed"
-        label={t('editor.basic.publicity') as string}
+        label={t('editor.basic.listed')}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel={t('editor.basic.showEvent') as string}
-        help={t('editor.basic.hiddenEventInfo') as string}
+        checkLabel={t('editor.basic.listed.check')}
+        help={t('editor.basic.listed.info')}
       />
       <FieldRow
         name="eventType"
-        label={t('editor.basic.type') as string}
+        label={t('editor.basic.type')}
         as={SelectBox}
         options={[
-          [EditorEventType.ONLY_EVENT, t('editor.onlyEvent')],
-          [EditorEventType.EVENT_WITH_SIGNUP, t('editor.eventWithSignup')],
-          [EditorEventType.ONLY_SIGNUP, t('editor.onlySignup')],
+          [EditorEventType.ONLY_EVENT, t('editor.basic.type.onlyEvent')],
+          [EditorEventType.EVENT_WITH_SIGNUP, t('editor.basic.type.eventWithSignup')],
+          [EditorEventType.ONLY_SIGNUP, t('editor.basic.type.onlySignup')],
         ]}
       />
       {eventType !== EditorEventType.ONLY_SIGNUP && (
         <FieldRow
           name="date"
-          label={t('editor.time.start') as string}
+          label={t('editor.basic.startDate')}
           as={DateTimePicker}
           selectsStart
           endDate={endDate}
           required
-          alternateError={t('editor.startDateError') as string}
+          alternateError={t('editor.basic.startDate.missing')}
         />
       )}
       {eventType !== EditorEventType.ONLY_SIGNUP && (
         <FieldRow
           name="endDate"
-          label={t('editor.time.end') as string}
+          label={t('editor.basic.endDate')}
           as={DateTimePicker}
           selectsEnd
           startDate={date}
-          help={t('editor.basic.dateWarning') as string}
+          help={t('editor.basic.endDate.info')}
         />
       )}
       <FieldRow
         name="category"
-        label={t('editor.basic.category') as string}
+        label={t('editor.basic.category')}
         as={Autocomplete}
         options={allCategories || []}
         busy={allCategories === null}
       />
       <FieldRow
         name="webpageUrl"
-        label={t('editor.basic.homePage') as string}
+        label={t('editor.basic.homePage')}
       />
       <FieldRow
         name="facebookUrl"
-        label={t('editor.basic.facebook') as string}
+        label={t('editor.basic.facebook')}
       />
       <FieldRow
         name="location"
-        label={t('editor.basic.location') as string}
+        label={t('editor.basic.location')}
       />
       <FieldRow
         name="description"
-        label={t('editor.basic.description') as string}
-        help={t('editor.basic.markdown') as string}
+        label={t('editor.basic.description')}
+        help={t('editor.basic.description.info')}
         as={Textarea}
         rows={8}
       />

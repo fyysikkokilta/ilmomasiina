@@ -11,7 +11,7 @@ const EmailsTab = () => {
     <FieldRow
       name="verificationEmail"
       as={Textarea}
-      label={t('editor.emails.confirmation') as string}
+      label={t('editor.emails.verificationEmail')}
       rows={10}
     />
   );

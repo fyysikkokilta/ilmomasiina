@@ -4,7 +4,6 @@ import { Field, Formik, FormikHelpers } from 'formik';
 import { Button, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { I18nProvider } from '@tietokilta/ilmomasiina-components';
 import { login } from '../../modules/auth/actions';
 import { useTypedDispatch, useTypedSelector } from '../../store/reducers';
 
@@ -15,7 +14,7 @@ type FormData = {
   password: string;
 };
 
-const LoginForm = () => {
+const Login = () => {
   const dispatch = useTypedDispatch();
   const { loginError } = useTypedSelector((state) => state.auth);
   const { t } = useTranslation();
@@ -51,9 +50,6 @@ const LoginForm = () => {
                 placeholder="admin@athene.fi"
                 isInvalid={errors.email}
               />
-              <Form.Control.Feedback type="invalid">
-                {errors.email && 'Tämä kenttä vaaditaan'}
-              </Form.Control.Feedback>
             </Form.Group>
             <Form.Group controlId="password">
               <Form.Label data-required>{t('login.password')}</Form.Label>
@@ -65,12 +61,9 @@ const LoginForm = () => {
                 placeholder="••••••••"
                 isInvalid={errors.password}
               />
-              <Form.Control.Feedback type="invalid">
-                {errors.password && 'Tämä kenttä vaaditaan'}
-              </Form.Control.Feedback>
             </Form.Group>
             <Button type="submit" variant="secondary" disabled={isSubmitting}>
-              {t('login.button')}
+              {t('login.submit')}
             </Button>
           </Form>
         )}
@@ -78,9 +71,5 @@ const LoginForm = () => {
     </div>
   );
 };
-const Login = () => (
-  <I18nProvider>
-    <LoginForm />
-  </I18nProvider>
-);
+
 export default Login;
