@@ -27,13 +27,11 @@ const AdminEventListItem = ({ event }: Props) => {
 
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
-    const confirmed = window.confirm(
-      t('panel.deleteEvent.confirm') as string,
-    );
+    const confirmed = window.confirm(t('adminEvents.action.delete.confirm'));
     if (confirmed) {
       const success = await dispatch(deleteEvent(id));
       if (!success) {
-        toast.error(t('panel.deleteEvent.fail'), { autoClose: 2000 });
+        toast.error(t('adminEvents.action.delete.failed'), { autoClose: 2000 });
       }
       dispatch(getAdminEvents());
     }
@@ -41,13 +39,13 @@ const AdminEventListItem = ({ event }: Props) => {
 
   let status;
   if (draft) {
-    status = t('panel.status.draft');
+    status = t('adminEvents.status.draft');
   } else if (isEventInPast(event)) {
-    status = date === null ? t('panel.status.closed') : t('panel.status.ended');
+    status = date === null ? t('adminEvents.status.closed') : t('adminEvents.status.ended');
   } else if (!listed) {
-    status = t('panel.status.hidden');
+    status = t('adminEvents.status.hidden');
   } else {
-    status = <Link to={appPaths.eventDetails(slug)}>{t('panel.status.published')}</Link>;
+    status = <Link to={appPaths.eventDetails(slug)}>{t('adminEvents.status.published')}</Link>;
   }
 
   return (
@@ -60,12 +58,12 @@ const AdminEventListItem = ({ event }: Props) => {
       <td>{sumBy(quotas, 'signupCount')}</td>
       <td>
         <Link to={appPaths.adminEditEvent(id)}>
-          {t('panel.editEvent')}
+          {t('adminEvents.action.edit')}
         </Link>
         &ensp;/&ensp;
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#" onClick={onDelete} role="button">
-          {t('panel.deleteEvent')}
+          {t('adminEvents.action.delete')}
         </a>
       </td>
     </tr>

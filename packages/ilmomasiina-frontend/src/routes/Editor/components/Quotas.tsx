@@ -63,12 +63,12 @@ const Quotas = () => {
         <Col xs="12" sm="10">
           <FieldRow
             name={`quota-${quota.key}-title`}
-            label={t('editor.quotas.name') as string}
+            label={t('editor.quotas.quotaName')}
             help={
-              (quotas.length === 1
-                ? t('editor.quotas.oneInfo')
-                : '')
-              + (index === 0 ? t('editor.quotas.drag') : '')
+              [
+                quotas.length === 1 ? t('editor.quotas.quotaName.singleQuota') : '',
+                index === 0 ? t('editor.quotas.quotaName.reorder') : '',
+              ].filter(Boolean).join(' ')
             }
             required
           >
@@ -81,8 +81,8 @@ const Quotas = () => {
           </FieldRow>
           <FieldRow
             name={`quota-${quota.key}-max-attendees`}
-            label={t('editor.quotas.size') as string}
-            help={t('editor.quotas.oneInfoRestriction') as string}
+            label={t('editor.quotas.quotaSize')}
+            help={t('editor.quotas.quotaSize.info')}
           >
             <Form.Control
               type="number"
@@ -97,7 +97,7 @@ const Quotas = () => {
           index > 0 && (
             <Col xs="12" sm="2" className="no-focus">
               <Button type="button" variant="danger" onClick={removeQuota}>
-                {t('editor.quotas.delete')}
+                {t('editor.quotas.deleteQuota')}
               </Button>
             </Col>
           )
@@ -116,7 +116,7 @@ const Quotas = () => {
       />
       <div className="text-center mb-3">
         <Button type="button" variant="primary" onClick={addQuota}>
-          {t('editorquotas.add')}
+          {t('editor.quotas.addQuota')}
         </Button>
       </div>
     </>

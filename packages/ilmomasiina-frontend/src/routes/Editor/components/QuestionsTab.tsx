@@ -15,28 +15,28 @@ const QuestionsTab = () => {
     <div>
       <FieldRow
         name="nameQuestion"
-        label={t('editor.questions.name') as string}
+        label={t('editor.questions.nameQuestion')}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel={t('editor.questions.collectNames') as string}
+        checkLabel={t('editor.questions.nameQuestion.check')}
         help={
           nameQuestion
-            ? t('editor.questions.nameMandatory')
-            : t('editor.questions.nameNotMandatory')
+            ? t('editor.questions.nameQuestion.infoOn')
+            : t('editor.questions.nameQuestion.infoOff')
         }
       />
       <FieldRow
         name="emailQuestion"
-        label={t('editor.questions.email') as string}
+        label={t('editor.questions.emailQuestion')}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel={t('editor.questions.collectEmail') as string}
+        checkLabel={t('editor.questions.emailQuestion.check')}
         help={
           emailQuestion
-            ? t('editor.questions.emailMandatory')
-            : t('editor.questions.emailNotMandatory')
+            ? t('editor.questions.emailQuestion.infoOn')
+            : t('editor.questions.emailQuestion.infoOff')
         }
       />
       <Questions />

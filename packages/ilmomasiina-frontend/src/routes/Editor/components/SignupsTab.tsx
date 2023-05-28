@@ -41,15 +41,15 @@ const SignupsTab = () => {
         <thead>
           <tr className="active">
             <th key="position">#</th>
-            {event.nameQuestion && <th key="firstName">{t('editor.signups.firstName')}</th>}
-            {event.nameQuestion && <th key="lastName">{t('editor.signups.lastName')}</th>}
-            {event.emailQuestion && <th key="email">{t('editor.signups.email')}</th>}
-            <th key="quota">{t('editor.signups.quota')}</th>
+            {event.nameQuestion && <th key="firstName">{t('editor.signups.column.firstName')}</th>}
+            {event.nameQuestion && <th key="lastName">{t('editor.signups.column.lastName')}</th>}
+            {event.emailQuestion && <th key="email">{t('editor.signups.column.email')}</th>}
+            <th key="quota">{t('editor.signups.column.quota')}</th>
             {event.questions.map((q) => (
               <th key={q.id}>{q.question}</th>
             ))}
-            <th key="timestamp">{t('editor.signups.time')}</th>
-            <th key="delete" aria-label="Poista" />
+            <th key="timestamp">{t('editor.signups.column.time')}</th>
+            <th key="delete" aria-label={t('editor.signups.column.delete')} />
           </tr>
         </thead>
         <tbody>
@@ -69,16 +69,14 @@ const SignupsTab = () => {
                   type="button"
                   variant="danger"
                   onClick={async () => {
-                    const confirmation = window.confirm(
-                      t('editor.signups.delete.confirm') as string,
-                    );
+                    const confirmation = window.confirm(t('editor.signups.action.delete.confirm'));
                     if (confirmation) {
                       await dispatch(deleteSignup(signup.id!));
                       dispatch(getEvent(event.id));
                     }
                   }}
                 >
-                  {t('editor.signups.delete')}
+                  {t('editor.signups.action.delete')}
                 </Button>
               </td>
             </tr>

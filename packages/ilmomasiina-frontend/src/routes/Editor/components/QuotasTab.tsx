@@ -17,40 +17,40 @@ const QuotasTab = () => {
       <FieldRow
         name="registrationStartDate"
         as={DateTimePicker}
-        label={t('editor.quotas.start') as string}
+        label={t('editor.quotas.registrationStartDate')}
         required
       />
       <FieldRow
         name="registrationEndDate"
         as={DateTimePicker}
-        label={t('editor.quotas.end') as string}
+        label={t('editor.quotas.registrationEndDate')}
         required
       />
       <FieldRow
         name="signupsPublic"
-        label={t('editor.quotas.publicity') as string}
+        label={t('editor.quotas.signupsPublic')}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel={t('editor.quotas.publicQuota')}
+        checkLabel={t('editor.quotas.signupsPublic.check')}
       />
       <hr />
       <Quotas />
       <FieldRow
         name="useOpenQuota"
-        label={t('editor.quotas.openQuota') as string}
+        label={t('editor.quotas.openQuota')}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel={t('editor.quotas.jointQuota')}
+        checkLabel={t('editor.quotas.openQuota.check')}
         help={
-          t('editor.quotas.help')
+          t('editor.quotas.openQuota.info')
         }
       />
       {useOpenQuota && (
         <FieldRow
           name="openQuotaSize"
-          label={t('editor.quotas.openQuotaSize') as string}
+          label={t('editor.quotas.openQuotaSize')}
           type="number"
           min="0"
           required

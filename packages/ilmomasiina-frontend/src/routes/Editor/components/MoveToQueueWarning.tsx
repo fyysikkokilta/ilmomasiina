@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Button, Modal } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 import { moveToQueueCanceled } from '../../../modules/editor/actions';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
@@ -12,6 +13,7 @@ type Props = {
 const MoveToQueueWarning = ({ onProceed }: Props) => {
   const dispatch = useTypedDispatch();
   const modal = useTypedSelector((state) => state.editor.moveToQueueModal);
+  const { t } = useTranslation();
 
   return (
     <Modal
@@ -19,21 +21,19 @@ const MoveToQueueWarning = ({ onProceed }: Props) => {
       onHide={() => dispatch(moveToQueueCanceled())}
     >
       <Modal.Header>
-        <Modal.Title>Siirretäänkö ilmoittautumisia jonoon?</Modal.Title>
+        <Modal.Title>{t('editor.moveToQueue.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>
-          {'Tekemäsi muutokset kiintiöihin siirtävät vähintään '}
-          {modal?.count || '?'}
-          {' jo kiintiöön päässyttä ilmoittautumista jonoon. Käyttäjille ei ilmoiteta tästä automaattisesti.'}
-        </p>
-        <p>
-          Haluatko varmasti jatkaa?
-        </p>
+        <p>{t('editor.moveToQueue.info1', { number: modal?.count || '?' })}</p>
+        <p>{t('editor.moveToQueue.info2')}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="muted" onClick={() => dispatch(moveToQueueCanceled())}>Peruuta</Button>
-        <Button variant="danger" onClick={onProceed}>Jatka</Button>
+        <Button variant="muted" onClick={() => dispatch(moveToQueueCanceled())}>
+          {t('editor.moveToQueue.action.cancel')}
+        </Button>
+        <Button variant="danger" onClick={onProceed}>
+          {t('editor.moveToQueue.action.proceed')}
+        </Button>
       </Modal.Footer>
     </Modal>
   );

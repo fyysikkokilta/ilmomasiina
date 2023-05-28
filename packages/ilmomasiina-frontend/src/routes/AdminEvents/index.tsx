@@ -27,7 +27,7 @@ const AdminEventsList = () => {
     return (
       <>
         <h1>{t('errors.title')}</h1>
-        <p>{t('events.loadFailed')}</p>
+        <p>{t('adminEvents.loadFailed')}</p>
       </>
     );
   }
@@ -35,7 +35,7 @@ const AdminEventsList = () => {
   if (!events) {
     return (
       <>
-        <h1>{t('panel.title')}</h1>
+        <h1>{t('adminEvents.title')}</h1>
         <Spinner animation="border" />
       </>
     );
@@ -44,25 +44,25 @@ const AdminEventsList = () => {
   return (
     <>
       <nav className="ilmo--title-nav">
-        <h1>{t('panel.title')}</h1>
+        <h1>{t('adminEvents.title')}</h1>
         <Button as={Link} variant="secondary" to={appPaths.adminUsersList}>
-          {t('panel.users')}
+          {t('adminEvents.nav.users')}
         </Button>
         <Button as={Link} variant="secondary" to={appPaths.adminAuditLog}>
-          {t('panel.activityLog')}
+          {t('adminEvents.nav.auditLog')}
         </Button>
         <Button as={Link} variant="primary" to={appPaths.adminEditEvent('new')}>
-          {t('panel.newEvent')}
+          {t('adminEvents.nav.newEvent')}
         </Button>
       </nav>
       <table className="table">
         <thead>
           <tr>
-            <th>{t('panel.name')}</th>
-            <th>{t('panel.date')}</th>
-            <th>{t('panel.status')}</th>
-            <th>{t('panel.signups')}</th>
-            <th>{t('panel.actions')}</th>
+            <th>{t('adminEvents.column.name')}</th>
+            <th>{t('adminEvents.column.date')}</th>
+            <th>{t('adminEvents.column.status')}</th>
+            <th>{t('adminEvents.column.signups')}</th>
+            <th>{t('adminEvents.column.actions')}</th>
           </tr>
         </thead>
         <tbody>

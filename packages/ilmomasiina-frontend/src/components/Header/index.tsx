@@ -31,11 +31,7 @@ const Header = () => {
           <Button onClick={() => i18n.changeLanguage('en')}>{t('header.switchLanguage', { lng: 'en' })}</Button>
         )}
         {loggedIn && (
-          <Button
-            onClick={() => dispatch(logout())}
-          >
-            Logout
-          </Button>
+          <Button onClick={() => dispatch(logout())}>{t('header.logout')}</Button>
         )}
       </Container>
     </Navbar>
