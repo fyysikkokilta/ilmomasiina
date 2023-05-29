@@ -15,8 +15,10 @@ const SignupStatus = () => {
   if (status === 'in-quota') {
     return (
       <p>
-        {/* eslint-disable-next-line max-len */}
-        {t('editSignup.position.quota', { quota: quota.title, position: `${position}${quota.size ? ` / ${quota.size}` : ''}` })}
+        {t(
+          'editSignup.position.quota',
+          { quota: quota.title, position: `${position}${quota.size ? ` / ${quota.size}` : ''}` },
+        )}
       </p>
     );
   }
