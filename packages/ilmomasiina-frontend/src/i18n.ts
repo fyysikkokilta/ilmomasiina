@@ -23,6 +23,7 @@ i18n
       // for React
       escapeValue: false,
     },
+    debug: !PROD,
   });
 
 i18n.on('languageChanged', (newLang) => {
