@@ -30,7 +30,7 @@ const SignupList = ({ quota }: Props) => {
                 <th key="position">{t('singleEvent.signups.position')}</th>
                 {nameQuestion && (
                   <th key="attendee" style={{ minWidth: 90 }}>
-                    {t('Name')}
+                    {t('singleEvent.signups.name')}
                   </th>
                 )}
                 {filter(questions, 'public').map((question) => (

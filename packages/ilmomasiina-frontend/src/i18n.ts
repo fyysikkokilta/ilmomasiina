@@ -26,6 +26,8 @@ i18n
     debug: !PROD,
   });
 
+componentsI18n.init({ debug: !PROD });
+
 i18n.on('languageChanged', (newLang) => {
   componentsI18n.changeLanguage(newLang);
 });

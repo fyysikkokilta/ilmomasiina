@@ -73,6 +73,7 @@
         "singleEvent.signups.emptyQuota": "Ei ilmoittautumisia.",
         "singleEvent.signups.nameHidden": "Piilotettu",
         "singleEvent.signups.position": "Sija",
+        "singleEvent.signups.name": "Nimi",
         "singleEvent.signups.quota": "Kiintiö",
         "singleEvent.signups.signupTime": "Ilmoittautumisaika",
         "singleEvent.signups.title": "Ilmoittautuneet",

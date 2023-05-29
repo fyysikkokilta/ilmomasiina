@@ -19,8 +19,8 @@ In addition, you'll want to import suitable (or all) parts of Bootstrap 4's SCSS
 Bootstrap 4 based app, or if you import Bootstrap nested inside your own wrapper CSS class.
 
 The exported route components ()`Events`, `SingleEvent`, `EditSignup`) are already wrapped in `<I18nProvider>`,
-which is an `I18nextProvider` with the exported `i18n` object.
-You can call `changeLanguage` on the latter to set the language.
+which is an `I18nextProvider` with the exported `i18n` object that contains the translations for the routes.
+You must call `init()` on the latter to initialize it. You can call `changeLanguage` on it to set the language.
 
 ### State hooks
 
