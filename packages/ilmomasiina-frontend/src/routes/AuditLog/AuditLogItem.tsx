@@ -1,6 +1,7 @@
 import React from 'react';
 
 import moment from 'moment-timezone';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import type { AuditLogItemSchema } from '@tietokilta/ilmomasiina-models';
@@ -12,21 +13,22 @@ type Props = {
 };
 
 const ACTION_STRINGS: Record<AuditEvent, string> = {
-  [AuditEvent.CREATE_EVENT]: 'loi tapahtuman ',
-  [AuditEvent.EDIT_EVENT]: 'muokkasi tapahtumaa ',
-  [AuditEvent.PUBLISH_EVENT]: 'julkaisi tapahtuman ',
-  [AuditEvent.UNPUBLISH_EVENT]: 'palautti luonnokseksi tapahtuman ',
-  [AuditEvent.DELETE_EVENT]: 'poisti tapahtuman ',
-  [AuditEvent.EDIT_SIGNUP]: 'muokkasi ilmoa ',
-  [AuditEvent.DELETE_SIGNUP]: 'poisti ilmon ',
-  [AuditEvent.PROMOTE_SIGNUP]: 'ilmo nousi jonosta: ',
-  [AuditEvent.CREATE_USER]: 'loi käyttäjän ',
-  [AuditEvent.DELETE_USER]: 'poisti käyttäjän ',
-  [AuditEvent.RESET_PASSWORD]: 'nollasi salasanan käyttäjälle ',
-  [AuditEvent.CHANGE_PASSWORD]: 'vaihtoi salasanansa',
+  [AuditEvent.CREATE_EVENT]: 'auditLog.description.createEvent',
+  [AuditEvent.EDIT_EVENT]: 'auditLog.description.editEvent',
+  [AuditEvent.PUBLISH_EVENT]: 'auditLog.description.publishEvent',
+  [AuditEvent.UNPUBLISH_EVENT]: 'auditLog.description.unpublishEvent',
+  [AuditEvent.DELETE_EVENT]: 'auditLog.description.deleteEvent',
+  [AuditEvent.EDIT_SIGNUP]: 'auditLog.description.editSignup',
+  [AuditEvent.DELETE_SIGNUP]: 'auditLog.description.deleteSignup',
+  [AuditEvent.PROMOTE_SIGNUP]: 'auditLog.description.promoteSignup',
+  [AuditEvent.CREATE_USER]: 'auditLog.description.createUser',
+  [AuditEvent.DELETE_USER]: 'auditLog.description.deleteUser',
+  [AuditEvent.RESET_PASSWORD]: 'auditLog.description.resetPassword',
+  [AuditEvent.CHANGE_PASSWORD]: 'auditLog.description.changeOwnPassword',
 };
 
-function describeAction(item: AuditLogItemSchema) {
+function useItemDescription(item: AuditLogItemSchema) {
+  const { t } = useTranslation();
   let extra: any = {};
   try {
     extra = JSON.parse(item.extra || '');
@@ -38,36 +40,47 @@ function describeAction(item: AuditLogItemSchema) {
     case AuditEvent.UNPUBLISH_EVENT:
     case AuditEvent.DELETE_EVENT:
       return (
-        <>
-          {ACTION_STRINGS[item.action]}
-          {item.eventId && <Link to={appPaths.adminEditEvent(item.eventId)}>{item.eventName}</Link>}
-        </>
+        <Trans t={t} i18nKey={ACTION_STRINGS[item.action]}>
+          created event
+          {item.eventId
+            ? <Link to={appPaths.adminEditEvent(item.eventId as any)}>{{ event: item.eventName ?? '' }}</Link>
+            : { event: item.eventName ?? '' }}
+        </Trans>
       );
     case AuditEvent.EDIT_SIGNUP:
     case AuditEvent.DELETE_SIGNUP:
     case AuditEvent.PROMOTE_SIGNUP:
       return (
-        <>
-          {`${ACTION_STRINGS[item.action]}${item.signupId} (${item.signupName}) tapahtumassa `}
-          {item.eventId && <Link to={appPaths.adminEditEvent(item.eventId)}>{item.eventName}</Link>}
-        </>
+        <Trans t={t} i18nKey={ACTION_STRINGS[item.action]}>
+          edited signup
+          {{ signup: `${item.signupId} (${item.signupName})` }}
+          in event
+          {item.eventId
+            ? <Link to={appPaths.adminEditEvent(item.eventId)}>{{ event: item.eventName ?? '' }}</Link>
+            : { event: item.eventName ?? '' }}
+        </Trans>
       );
     case AuditEvent.CREATE_USER:
     case AuditEvent.DELETE_USER:
     case AuditEvent.RESET_PASSWORD:
-      return `${ACTION_STRINGS[item.action]}${extra.email}`;
+      return t(ACTION_STRINGS[item.action], { user: extra.email });
     default:
-      return ACTION_STRINGS[item.action] ?? `tuntematon toiminto ${item.action}`;
+      return ACTION_STRINGS[item.action]
+        ? t(ACTION_STRINGS[item.action])
+        : t('auditLog.description.unknown', { action: item.action });
   }
 }
 
-const AuditLogItem = ({ item }: Props) => (
-  <tr>
-    <td>{moment(item.createdAt).tz(TIMEZONE).format('YYYY-MM-DD HH:mm:ss')}</td>
-    <td>{item.user || '-'}</td>
-    <td>{item.ipAddress || '-'}</td>
-    <td>{describeAction(item)}</td>
-  </tr>
-);
+const AuditLogItem = ({ item }: Props) => {
+  const desc = useItemDescription(item);
+  return (
+    <tr>
+      <td>{moment(item.createdAt).tz(TIMEZONE).format('YYYY-MM-DD HH:mm:ss')}</td>
+      <td>{item.user || '-'}</td>
+      <td>{item.ipAddress || '-'}</td>
+      <td>{desc}</td>
+    </tr>
+  );
+};
 
 export default AuditLogItem;
