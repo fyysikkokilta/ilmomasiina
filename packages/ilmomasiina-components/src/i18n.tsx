@@ -23,8 +23,6 @@ const i18n = createInstance({
   },
 });
 
-i18n.init();
-
 export default i18n;
 
 export function I18nProvider({ children }: PropsWithChildren<{}>) {

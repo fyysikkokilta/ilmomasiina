@@ -73,6 +73,7 @@
         "singleEvent.signups.emptyQuota": "No signups.",
         "singleEvent.signups.nameHidden": "Hidden",
         "singleEvent.signups.position": "Position",
+        "singleEvent.signups.name": "Name",
         "singleEvent.signups.quota": "Quota",
         "singleEvent.signups.signupTime": "Signup time",
         "singleEvent.signups.title": "Signups",
