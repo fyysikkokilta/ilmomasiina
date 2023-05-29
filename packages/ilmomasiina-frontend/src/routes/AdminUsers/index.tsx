@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -12,11 +13,10 @@ import AdminUserListItem from './AdminUserListItem';
 import ChangePasswordForm from './ChangePasswordForm';
 import UserForm from './UserForm';
 
-// import './AdminUsersList.scss';
-
 const AdminUsersList = () => {
   const dispatch = useTypedDispatch();
   const { users, usersLoadError } = useTypedSelector((state) => state.adminUsers, shallowEqual);
+  const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(getUsers());
@@ -28,8 +28,8 @@ const AdminUsersList = () => {
   if (usersLoadError) {
     return (
       <>
-        <h1>Hups, jotain meni pieleen</h1>
-        <p>Käyttäjien lataus epäonnistui</p>
+        <h1>{t('errors.title')}</h1>
+        <p>{t('adminUsers.loadFailed')}</p>
       </>
     );
   }
@@ -42,8 +42,8 @@ const AdminUsersList = () => {
         <table className="table">
           <thead>
             <tr>
-              <th>Sähköposti</th>
-              <th>Toiminnot</th>
+              <th>{t('adminUsers.column.email')}</th>
+              <th>{t('adminUsers.column.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -56,9 +56,9 @@ const AdminUsersList = () => {
           </tbody>
         </table>
 
-        <h1>Luo uusi käyttäjä</h1>
+        <h1>{t('adminUsers.createUser')}</h1>
         <UserForm />
-        <h1>Vaihda salasanasi</h1>
+        <h1>{t('adminUsers.changePassword')}</h1>
         <ChangePasswordForm />
       </>
     );
@@ -66,8 +66,12 @@ const AdminUsersList = () => {
 
   return (
     <>
-      <Link to={appPaths.adminEventsList}>&#8592; Takaisin</Link>
-      <h1>Käyttäjien hallinta</h1>
+      <Link to={appPaths.adminEventsList}>
+        &#8592;
+        {' '}
+        {t('adminUsers.returnToEvents')}
+      </Link>
+      <h1>{t('adminUsers.title')}</h1>
       {content}
     </>
   );

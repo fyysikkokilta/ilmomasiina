@@ -4,6 +4,7 @@ import { Field, Formik, FormikHelpers } from 'formik';
 import {
   Button, Form, Spinner,
 } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import { createUser, getUsers } from '../../modules/adminUsers/actions';
@@ -15,6 +16,7 @@ type FormData = {
 
 const UserForm = () => {
   const dispatch = useTypedDispatch();
+  const { t } = useTranslation();
 
   const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
     // TODO: better error handling
@@ -22,9 +24,9 @@ const UserForm = () => {
     if (success) {
       dispatch(getUsers());
       resetForm();
-      toast.success('Käyttäjän luominen onnistui,', { autoClose: 2000 });
+      toast.success(t('adminUsers.createUser.success'), { autoClose: 2000 });
     } else {
-      toast.error('Käyttäjän luominen epäonnistui.', { autoClose: 2000 });
+      toast.error(t('adminUsers.createUser.failed'), { autoClose: 2000 });
     }
     setSubmitting(false);
   };
@@ -46,11 +48,11 @@ const UserForm = () => {
             name="email"
             id="email"
             type="email"
-            placeholder="Sähköposti"
-            aria-label="Sähköposti"
+            placeholder={t('adminUsers.createUser.email')}
+            aria-label={t('adminUsers.createUser.email')}
           />
           <Button type="submit" variant="secondary" disabled={isSubmitting}>
-            {isSubmitting ? <Spinner animation="border" /> : 'Luo uusi käyttäjä'}
+            {isSubmitting ? <Spinner animation="border" /> : t('adminUsers.createUser.submit')}
           </Button>
         </Form>
       )}
