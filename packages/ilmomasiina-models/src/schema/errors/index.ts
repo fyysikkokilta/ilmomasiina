@@ -6,7 +6,7 @@ import { quotaID } from '../quota/attributes';
 /** Response schema for a generic error. */
 export const errorResponse = Type.Object({
   statusCode: Type.Number(),
-  error: Type.String(),
+  code: Type.String(),
   message: Type.String(),
 });
 

@@ -5,12 +5,12 @@ import type {
 
 export abstract class CustomError extends Error {
   public readonly statusCode: number;
-  public readonly error: string;
+  public readonly code: string;
 
-  protected constructor(statusCode: number, name: string, message: string) {
+  protected constructor(statusCode: number, code: string, message: string) {
     super(message);
     this.statusCode = statusCode;
-    this.error = name;
+    this.code = code;
   }
 }
 

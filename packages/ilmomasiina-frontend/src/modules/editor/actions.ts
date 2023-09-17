@@ -274,12 +274,12 @@ export const publishEventUpdate = (
     dispatch(loaded(response));
     return response;
   } catch (e) {
-    if (e instanceof ApiError && e.className === 'would-move-signups-to-queue') {
-      dispatch(moveToQueueWarning(e.data!.count));
+    if (e instanceof ApiError && e.code === 'WouldMoveSignupsToQueue') {
+      dispatch(moveToQueueWarning(e.response!.count));
       return null;
     }
-    if (e instanceof ApiError && e.className === 'edit-conflict') {
-      dispatch(editConflictDetected(e.data!));
+    if (e instanceof ApiError && e.code === 'EditConflict') {
+      dispatch(editConflictDetected(e.response!));
       return null;
     }
     dispatch(saveFailed());
