@@ -4,8 +4,10 @@ import { Field, Formik, FormikHelpers } from 'formik';
 import {
   Alert, Button, Form, Spinner,
 } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
+import i18n from '../../i18n';
 import { changePassword } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
 
@@ -15,35 +17,38 @@ type FormData = {
   newPasswordVerify: string;
 };
 
+const MIN_PASSWORD_LENGTH = 10;
+
 function validate(values: FormData) {
   const errors: Partial<FormData> = {};
   if (!values.oldPassword) {
-    errors.oldPassword = 'Pakollinen kenttä';
+    errors.oldPassword = i18n.t('adminUsers.changePassword.errors.required');
   }
   if (!values.newPassword) {
-    errors.newPassword = 'Pakollinen kenttä';
-  } else if (values.newPassword.length < 10) {
-    errors.newPassword = 'Salasanassa täytyy olla vähintään 10 merkkiä';
+    errors.newPassword = i18n.t('adminUsers.changePassword.errors.required');
+  } else if (values.newPassword.length < MIN_PASSWORD_LENGTH) {
+    errors.newPassword = i18n.t('adminUsers.changePassword.errors.minLength', { number: MIN_PASSWORD_LENGTH });
   }
   if (!values.newPasswordVerify) {
-    errors.newPasswordVerify = 'Pakollinen kenttä';
+    errors.newPasswordVerify = i18n.t('adminUsers.changePassword.errors.required');
   } else if (values.newPassword && values.newPassword !== values.newPasswordVerify) {
-    errors.newPasswordVerify = 'Salasanat eivät täsmää';
+    errors.newPasswordVerify = i18n.t('adminUsers.changePassword.errors.verifyMatch');
   }
   return errors;
 }
 
 const ChangePasswordForm = () => {
   const dispatch = useTypedDispatch();
+  const { t } = useTranslation();
 
   const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
     // TODO: better error handling
     const success = await dispatch(changePassword(data));
     if (success) {
       resetForm();
-      toast.success('Salasana vaihdettiin onnistuneesti.', { autoClose: 5000 });
+      toast.success(t('adminUsers.changePassword.success'), { autoClose: 5000 });
     } else {
-      toast.error('Salasanan vaihto epäonnistui.', { autoClose: 5000 });
+      toast.error(t('adminUsers.changePassword.failed'), { autoClose: 5000 });
     }
     setSubmitting(false);
   };
@@ -71,8 +76,8 @@ const ChangePasswordForm = () => {
             name="oldPassword"
             id="oldPassword"
             type="password"
-            placeholder="Vanha salasana"
-            aria-label="Vanha salasana"
+            placeholder={t('adminUsers.changePassword.oldPassword')}
+            aria-label={t('adminUsers.changePassword.oldPassword')}
           />
           {errors.oldPassword && touched.oldPassword ? (
             <Alert variant="danger">{errors.oldPassword}</Alert>
@@ -82,25 +87,25 @@ const ChangePasswordForm = () => {
             name="newPassword"
             id="newPassword"
             type="password"
-            placeholder="Uusi salasana"
-            aria-label="Uusi salasana"
+            placeholder={t('adminUsers.changePassword.newPassword')}
+            aria-label={t('adminUsers.changePassword.newPassword')}
           />
           {errors.newPassword && touched.newPassword ? (
             <Alert variant="danger">{errors.newPassword}</Alert>
           ) : null}
           <Field
             as={Form.Control}
-            name="newPasswordverify"
-            id="newPasswordverify"
+            name="newPasswordVerify"
+            id="newPasswordVerify"
             type="password"
-            placeholder="Uusi salasana"
-            aria-label="Uusi salasana"
+            placeholder={t('adminUsers.changePassword.newPassword')}
+            aria-label={t('adminUsers.changePassword.newPassword')}
           />
           {errors.newPasswordVerify && touched.newPasswordVerify ? (
             <Alert variant="danger">{errors.newPasswordVerify}</Alert>
           ) : null}
           <Button type="submit" variant="secondary" disabled={isSubmitting}>
-            {isSubmitting ? <Spinner animation="border" /> : 'Vaihda salasana'}
+            {isSubmitting ? <Spinner animation="border" /> : t('adminUsers.changePassword.submit')}
           </Button>
         </Form>
       )}

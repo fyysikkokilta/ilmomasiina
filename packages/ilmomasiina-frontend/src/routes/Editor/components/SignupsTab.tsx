@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 
 import { Button } from 'react-bootstrap';
 import { CSVLink } from 'react-csv';
+import { useTranslation } from 'react-i18next';
 
 import { convertSignupsToCSV, getSignupsForAdminList } from '@tietokilta/ilmomasiina-components/dist/utils/signupUtils';
 import { deleteSignup, getEvent } from '../../../modules/editor/actions';
@@ -17,9 +18,11 @@ const SignupsTab = () => {
 
   const csvSignups = useMemo(() => event && convertSignupsToCSV(event, signups!), [event, signups]);
 
+  const { t } = useTranslation();
+
   if (!event || !signups?.length) {
     return (
-      <p>Tapahtumaan ei vielä ole yhtään ilmoittautumista. Kun tapahtumaan tulee ilmoittautumisia, näet ne tästä.</p>
+      <p>{t('editor.signups.noSignups')}</p>
     );
   }
 
@@ -30,7 +33,7 @@ const SignupsTab = () => {
         separator={'\t'}
         filename={`${event.title} osallistujalista.csv`}
       >
-        Lataa osallistujalista
+        {t('editor.signups.download')}
       </CSVLink>
       <br />
       <br />
@@ -38,15 +41,15 @@ const SignupsTab = () => {
         <thead>
           <tr className="active">
             <th key="position">#</th>
-            {event.nameQuestion && <th key="firstName">Etunimi</th>}
-            {event.nameQuestion && <th key="lastName">Sukunimi</th>}
-            {event.emailQuestion && <th key="email">Sähköposti</th>}
-            <th key="quota">Kiintiö</th>
+            {event.nameQuestion && <th key="firstName">{t('editor.signups.column.firstName')}</th>}
+            {event.nameQuestion && <th key="lastName">{t('editor.signups.column.lastName')}</th>}
+            {event.emailQuestion && <th key="email">{t('editor.signups.column.email')}</th>}
+            <th key="quota">{t('editor.signups.column.quota')}</th>
             {event.questions.map((q) => (
               <th key={q.id}>{q.question}</th>
             ))}
-            <th key="timestamp">Ilmoittautumisaika</th>
-            <th key="delete" aria-label="Poista" />
+            <th key="timestamp">{t('editor.signups.column.time')}</th>
+            <th key="delete" aria-label={t('editor.signups.column.delete')} />
           </tr>
         </thead>
         <tbody>
@@ -66,16 +69,14 @@ const SignupsTab = () => {
                   type="button"
                   variant="danger"
                   onClick={async () => {
-                    const confirmation = window.confirm(
-                      'Oletko varma? Poistamista ei voi perua.',
-                    );
+                    const confirmation = window.confirm(t('editor.signups.action.delete.confirm'));
                     if (confirmation) {
                       await dispatch(deleteSignup(signup.id!));
                       dispatch(getEvent(event.id));
                     }
                   }}
                 >
-                  Poista
+                  {t('editor.signups.action.delete')}
                 </Button>
               </td>
             </tr>

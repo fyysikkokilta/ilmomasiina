@@ -4,7 +4,7 @@ import { Transaction } from 'sequelize';
 
 import type { SignupPathParams, SignupUpdateBody, SignupUpdateResponse } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
-import sendSignupConfirmationEmail from '../../mail/signupConfirmation';
+import sendSignupConfirmationMail from '../../mail/signupConfirmation';
 import { Answer } from '../../models/answer';
 import { Event } from '../../models/event';
 import { Question } from '../../models/question';
@@ -19,7 +19,7 @@ export default async function updateSignup(
   const updatedSignup = await Signup.sequelize!.transaction(async (transaction) => {
     // Retrieve event data and lock the row for editing
     const signup = await Signup.scope('active').findByPk(request.params.id, {
-      attributes: ['id', 'quotaId', 'confirmedAt', 'firstName', 'lastName', 'email'],
+      attributes: ['id', 'quotaId', 'confirmedAt', 'firstName', 'lastName', 'email', 'language'],
       transaction,
       lock: Transaction.LOCK.UPDATE,
     });
@@ -63,6 +63,12 @@ export default async function updateSignup(
       const { email } = request.body;
       if (!email) throw new BadRequest('Missing email');
       emailField = { email };
+    }
+
+    // Update signup language if provided
+    let languageField = {};
+    if (request.body.language) {
+      languageField = { language: request.body.language };
     }
 
     // Check that all questions are answered with a valid answer
@@ -124,6 +130,7 @@ export default async function updateSignup(
     const updatedFields = {
       ...nameFields,
       ...emailField,
+      ...languageField,
       namePublic: Boolean(request.body.namePublic),
       confirmedAt: new Date(),
     };
@@ -149,7 +156,7 @@ export default async function updateSignup(
   });
 
   // Send the confirmation email
-  await sendSignupConfirmationEmail(updatedSignup);
+  sendSignupConfirmationMail(updatedSignup);
 
   // Return data
   reply.status(200);

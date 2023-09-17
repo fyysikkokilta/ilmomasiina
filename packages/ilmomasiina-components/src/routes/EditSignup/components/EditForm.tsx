@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { Formik, FormikHelpers } from 'formik';
 import { Button, Form } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import type { SignupUpdateBody } from '@tietokilta/ilmomasiina-models';
@@ -21,19 +22,22 @@ const EditForm = () => {
   const Link = linkComponent();
   const navigate = useNavigate();
   const paths = usePaths();
+  const { t, i18n: { language } } = useTranslation();
 
   // TODO: actually use errors from API
   const [submitError, setSubmitError] = useState(false);
 
   async function onSubmit(answers: SignupUpdateBody, { setSubmitting }: FormikHelpers<SignupUpdateBody>) {
-    const action = isNew ? 'Ilmoittautuminen' : 'Muokkaus';
-    const progressToast = toast.loading(`${action} käynnissä`);
+    const progressToast = toast.loading(isNew ? t('editSignup.status.signup') : t('editSignup.status.edit'));
 
     try {
-      await updateSignup(answers);
+      await updateSignup({
+        ...answers,
+        language,
+      });
 
       toast.update(progressToast, {
-        render: `${action} onnistui!`,
+        render: isNew ? t('editSignup.status.signupSuccess') : t('editSignup.status.editSuccess'),
         type: toast.TYPE.SUCCESS,
         autoClose: 5000,
         closeButton: true,
@@ -47,7 +51,7 @@ const EditForm = () => {
       }
     } catch (error) {
       toast.update(progressToast, {
-        render: `${action} ei onnistunut. Tarkista, että kaikki pakolliset kentät on täytetty ja yritä uudestaan.`,
+        render: isNew ? t('editSignup.status.signupFailed') : t('editSignup.status.editFailed'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
@@ -66,15 +70,14 @@ const EditForm = () => {
     >
       {({ handleSubmit, isSubmitting }) => (
         <NarrowContainer>
-          <h2>{isNew ? 'Ilmoittaudu' : 'Muokkaa ilmoittautumista'}</h2>
+          <h2>{isNew ? t('editSignup.title.signup') : t('editSignup.title.edit')}</h2>
           <SignupStatus />
           {submitError && (
-            <p className="ilmo--form-error">Ilmoittautumisessasi on virheitä.</p>
+            <p className="ilmo--form-error">{t('editSignup.errors.invalid')}</p>
           )}
           {registrationClosed && (
             <p className="ilmo--form-error">
-              Ilmoittautumistasi ei voi enää muokata tai perua, koska tapahtuman
-              ilmoittautuminen on sulkeutunut.
+              {t('editSignup.errors.closed')}
             </p>
           )}
           <Form onSubmit={handleSubmit} className="ilmo--form">
@@ -82,15 +85,15 @@ const EditForm = () => {
               <>
                 <FieldRow
                   name="firstName"
-                  label="Etunimi / First name"
-                  placeholder="Etunimi"
+                  label={t('editSignup.fields.firstName')}
+                  placeholder={t('editSignup.fields.firstName.placeholder')}
                   required
                   readOnly={!isNew || registrationClosed}
                 />
                 <FieldRow
                   name="lastName"
-                  label="Sukunimi / Last name"
-                  placeholder="Sukunimi"
+                  label={t('editSignup.fields.lastName')}
+                  placeholder={t('editSignup.fields.lastName.placeholder')}
                   required
                   readOnly={!isNew || registrationClosed}
                 />
@@ -102,9 +105,7 @@ const EditForm = () => {
                   checkAlign
                   checkLabel={(
                     <>
-                      Näytä nimi julkisessa osallistujalistassa
-                      <br />
-                      Show name in public participant list
+                      {t('editSignup.namePublic')}
                     </>
                   )}
                 />
@@ -113,8 +114,8 @@ const EditForm = () => {
             {event!.emailQuestion && (
               <FieldRow
                 name="email"
-                label="Sähköposti / Email"
-                placeholder="Sähköpostisi"
+                label={t('editSignup.fields.email')}
+                placeholder={t('editSignup.fields.email.placeholder')}
                 required
                 readOnly={!isNew || registrationClosed}
               />
@@ -124,8 +125,8 @@ const EditForm = () => {
 
             {!registrationClosed && (
               <p>
-                Voit muokata ilmoittautumistasi tai poistaa sen myöhemmin tallentamalla tämän sivun URL-osoitteen.
-                {event!.emailQuestion && ' Linkki lähetetään myös sähköpostiisi vahvistusviestissä.'}
+                {t('editSignup.editInstructions')}
+                {event!.emailQuestion && ` ${t('editSignup.editInstructions.email')}`}
               </p>
             )}
 
@@ -133,11 +134,11 @@ const EditForm = () => {
               <nav className="ilmo--submit-buttons">
                 {!isNew && (
                   <Button as={Link} variant="link" to={paths.eventDetails(event!.slug)}>
-                    Peruuta
+                    {t('editSignup.action.cancel')}
                   </Button>
                 )}
                 <Button type="submit" variant="primary" formNoValidate disabled={isSubmitting}>
-                  {isNew ? 'Lähetä' : 'Päivitä'}
+                  {isNew ? t('editSignup.action.save') : t('editSignup.action.edit')}
                 </Button>
               </nav>
             )}

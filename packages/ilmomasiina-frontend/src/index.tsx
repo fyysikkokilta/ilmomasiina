@@ -4,6 +4,8 @@ import * as Sentry from '@sentry/browser';
 import ReactDOM from 'react-dom';
 import { Link, useHistory, useParams } from 'react-router-dom';
 
+import './i18n';
+
 import { configure } from '@tietokilta/ilmomasiina-components';
 import AppContainer from './containers/AppContainer';
 import { apiUrl } from './paths';
@@ -31,4 +33,7 @@ configure({
   timezone: TIMEZONE,
 });
 
-ReactDOM.render(<AppContainer />, document.getElementById('root'));
+ReactDOM.render(
+  <AppContainer />,
+  document.getElementById('root'),
+);

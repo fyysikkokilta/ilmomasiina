@@ -4,6 +4,7 @@ import { useField } from 'formik';
 import {
   Button, Col, Form, Row,
 } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { SortEnd } from 'react-sortable-hoc';
 
 import { FieldRow } from '@tietokilta/ilmomasiina-components';
@@ -12,6 +13,7 @@ import Sortable from './Sortable';
 
 const Quotas = () => {
   const [{ value: quotas }, , { setValue }] = useField<EditorQuota[]>('quotas');
+  const { t } = useTranslation();
 
   function addQuota() {
     setValue([
@@ -61,12 +63,12 @@ const Quotas = () => {
         <Col xs="12" sm="10">
           <FieldRow
             name={`quota-${quota.key}-title`}
-            label="Kiintiön nimi"
+            label={t('editor.quotas.quotaName')}
             help={
-              (quotas.length === 1
-                ? 'Jos kiintiöitä on vain yksi, voit antaa sen nimeksi esim. tapahtuman nimen. '
-                : '')
-                + (index === 0 ? 'Voit järjestellä kiintiöitä raahaamalla niitä vasemmalta.' : '')
+              [
+                quotas.length === 1 ? t('editor.quotas.quotaName.singleQuota') : '',
+                index === 0 ? t('editor.quotas.quotaName.reorder') : '',
+              ].filter(Boolean).join(' ')
             }
             required
           >
@@ -79,8 +81,8 @@ const Quotas = () => {
           </FieldRow>
           <FieldRow
             name={`quota-${quota.key}-max-attendees`}
-            label="Kiintiön koko"
-            help="Jos kiintiön kokoa ei ole rajoitettu, jätä kenttä tyhjäksi."
+            label={t('editor.quotas.quotaSize')}
+            help={t('editor.quotas.quotaSize.info')}
           >
             <Form.Control
               type="number"
@@ -91,13 +93,15 @@ const Quotas = () => {
             />
           </FieldRow>
         </Col>
-        {index > 0 && (
-          <Col xs="12" sm="2" className="no-focus">
-            <Button type="button" variant="danger" onClick={removeQuota}>
-              Poista kiintiö
-            </Button>
-          </Col>
-        )}
+        {
+          index > 0 && (
+            <Col xs="12" sm="2" className="no-focus">
+              <Button type="button" variant="danger" onClick={removeQuota}>
+                {t('editor.quotas.deleteQuota')}
+              </Button>
+            </Col>
+          )
+        }
       </Row>
     );
   });
@@ -112,7 +116,7 @@ const Quotas = () => {
       />
       <div className="text-center mb-3">
         <Button type="button" variant="primary" onClick={addQuota}>
-          Lisää kiintiö
+          {t('editor.quotas.addQuota')}
         </Button>
       </div>
     </>

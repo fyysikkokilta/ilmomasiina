@@ -2,6 +2,7 @@ import React, { MouseEvent } from 'react';
 
 import sumBy from 'lodash/sumBy';
 import moment from 'moment-timezone';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -22,15 +23,15 @@ const AdminEventListItem = ({ event }: Props) => {
     id, title, slug, date, draft, listed, quotas,
   } = event;
 
+  const { t } = useTranslation();
+
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
-    const confirmed = window.confirm(
-      'Haluatko varmasti poistaa tämän tapahtuman? Tätä toimintoa ei voi perua.',
-    );
+    const confirmed = window.confirm(t('adminEvents.action.delete.confirm'));
     if (confirmed) {
       const success = await dispatch(deleteEvent(id));
       if (!success) {
-        toast.error('Poisto epäonnistui :(', { autoClose: 2000 });
+        toast.error(t('adminEvents.action.delete.failed'), { autoClose: 2000 });
       }
       dispatch(getAdminEvents());
     }
@@ -38,13 +39,13 @@ const AdminEventListItem = ({ event }: Props) => {
 
   let status;
   if (draft) {
-    status = 'Luonnos';
+    status = t('adminEvents.status.draft');
   } else if (isEventInPast(event)) {
-    status = date === null ? 'Sulkeutunut' : 'Mennyt';
+    status = date === null ? t('adminEvents.status.closed') : t('adminEvents.status.ended');
   } else if (!listed) {
-    status = 'Piilotettu';
+    status = t('adminEvents.status.hidden');
   } else {
-    status = <Link to={appPaths.eventDetails(slug)}>Julkaistu</Link>;
+    status = <Link to={appPaths.eventDetails(slug)}>{t('adminEvents.status.published')}</Link>;
   }
 
   return (
@@ -57,12 +58,12 @@ const AdminEventListItem = ({ event }: Props) => {
       <td>{sumBy(quotas, 'signupCount')}</td>
       <td>
         <Link to={appPaths.adminEditEvent(id)}>
-          Muokkaa tapahtumaa
+          {t('adminEvents.action.edit')}
         </Link>
         &ensp;/&ensp;
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#" onClick={onDelete} role="button">
-          Poista tapahtuma
+          {t('adminEvents.action.delete')}
         </a>
       </td>
     </tr>

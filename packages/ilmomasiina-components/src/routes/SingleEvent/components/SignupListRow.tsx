@@ -3,6 +3,7 @@ import React from 'react';
 import filter from 'lodash/filter';
 import find from 'lodash/find';
 import moment from 'moment-timezone';
+import { useTranslation } from 'react-i18next';
 
 import { timezone } from '../../../config';
 import { useSingleEventContext } from '../../../modules/singleEvent';
@@ -26,12 +27,13 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
   } = signup;
 
   const { questions, nameQuestion } = useSingleEventContext().event!;
+  const { t } = useTranslation();
 
   let fullName;
   if (!confirmed) {
-    fullName = 'Vahvistamatta';
+    fullName = t('singleEvent.signups.unconfirmed');
   } else if (!namePublic) {
-    fullName = 'Piilotettu';
+    fullName = t('singleEvent.signups.nameHidden');
   } else {
     fullName = `${firstName || ''} ${lastName || ''}`;
   }

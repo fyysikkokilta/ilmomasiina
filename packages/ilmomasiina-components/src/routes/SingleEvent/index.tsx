@@ -1,9 +1,11 @@
 import React from 'react';
 
 import { Col, Row, Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 import { linkComponent, useParams } from '../../config/router';
 import { usePaths } from '../../contexts/paths';
+import { I18nProvider } from '../../i18n';
 import {
   SingleEventProps, SingleEventProvider, useSingleEventContext,
 } from '../../modules/singleEvent';
@@ -18,15 +20,14 @@ const SingleEventView = () => {
   } = useSingleEventContext();
   const Link = linkComponent();
   const paths = usePaths();
+  const { t } = useTranslation();
 
   if (error) {
     return (
       <div className="ilmo--loading-container">
-        <h1>Hups, jotain meni pieleen</h1>
-        <p>
-          Tapahtumaa ei löytynyt. Se saattaa olla menneisyydessä tai poistettu.
-        </p>
-        <Link to={paths.eventsList}>Palaa tapahtumalistaukseen</Link>
+        <h1>{t('errors.title')}</h1>
+        <p>{t('singleEvent.loadFailed')}</p>
+        <Link to={paths.eventsList}>{t('errors.returnToEvents')}</Link>
       </div>
     );
   }
@@ -42,7 +43,7 @@ const SingleEventView = () => {
   return (
     <>
       <Link to={paths.eventsList} style={{ margin: 0 }}>
-        &#8592; Takaisin
+        {`\u2190 ${t('singleEvent.returnToEvents')}`}
       </Link>
       <Row>
         <Col sm={12} md={8}>
@@ -55,7 +56,7 @@ const SingleEventView = () => {
       </Row>
       {event!.signupsPublic && (
         <>
-          <h2>Ilmoittautuneet</h2>
+          <h2>{t('singleEvent.signups.title')}</h2>
           {signupsByQuota!.map((quota) => (
             <SignupList
               key={quota.id}
@@ -72,7 +73,9 @@ const SingleEvent = () => {
   const { slug } = useParams<SingleEventProps>();
   return (
     <SingleEventProvider slug={slug}>
-      <SingleEventView />
+      <I18nProvider>
+        <SingleEventView />
+      </I18nProvider>
     </SingleEventProvider>
   );
 };

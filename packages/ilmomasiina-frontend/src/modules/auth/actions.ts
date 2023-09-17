@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 
 import { apiFetch } from '@tietokilta/ilmomasiina-components';
 import type { AdminLoginResponse } from '@tietokilta/ilmomasiina-models';
+import i18n from '../../i18n';
 import appPaths from '../../paths';
 import type { DispatchAction } from '../../store/types';
 import {
@@ -63,14 +64,10 @@ export const redirectToLogin = () => (dispatch: DispatchAction) => {
 export const logout = () => async (dispatch: DispatchAction) => {
   dispatch(resetState());
   dispatch(redirectToLogin());
-  toast.success('Uloskirjautuminen onnistui.', {
-    autoClose: 10000,
-  });
+  toast.success(i18n.t('auth.logoutSuccess'), { autoClose: 10000 });
 };
 
 export const loginExpired = () => (dispatch: DispatchAction) => {
-  toast.error('Sisäänkirjautumisesi on vanhentunut. Kirjaudu sisään uudelleen.', {
-    autoClose: 10000,
-  });
+  toast.error(i18n.t('auth.loginExpired'), { autoClose: 10000 });
   dispatch(redirectToLogin());
 };

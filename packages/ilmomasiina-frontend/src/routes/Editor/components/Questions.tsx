@@ -5,6 +5,7 @@ import reject from 'lodash/reject';
 import {
   Button, Col, Form, InputGroup, Row,
 } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { SortEnd } from 'react-sortable-hoc';
 
 import { FieldRow } from '@tietokilta/ilmomasiina-components';
@@ -13,15 +14,16 @@ import { EditorQuestion } from '../../../modules/editor/types';
 import Sortable from './Sortable';
 
 const QUESTION_TYPES: { value: EditorQuestion['type'], label: string }[] = [
-  { value: QuestionType.TEXT, label: 'Teksti (lyhyt)' },
-  { value: QuestionType.TEXT_AREA, label: 'Teksti (pitkä)' },
-  { value: QuestionType.NUMBER, label: 'Numero' },
-  { value: QuestionType.SELECT, label: 'Monivalinta (voi valita yhden)' },
-  { value: QuestionType.CHECKBOX, label: 'Monivalinta (voi valita monta)' },
+  { value: QuestionType.TEXT, label: 'editor.questions.questionType.text' },
+  { value: QuestionType.TEXT_AREA, label: 'editor.questions.questionType.textArea' },
+  { value: QuestionType.NUMBER, label: 'editor.questions.questionType.number' },
+  { value: QuestionType.SELECT, label: 'editor.questions.questionType.select' },
+  { value: QuestionType.CHECKBOX, label: 'editor.questions.questionType.checkbox' },
 ];
 
 const Questions = () => {
   const [{ value: questions }, , { setValue }] = useField<EditorQuestion[]>('questions');
+  const { t } = useTranslation();
 
   function addQuestion() {
     setValue([
@@ -104,7 +106,7 @@ const Questions = () => {
         <Col xs="12" sm="9" xl="10">
           <FieldRow
             name={`question-${question.key}-question`}
-            label="Kysymys"
+            label={t('editor.questions.questionText')}
             required
           >
             <Form.Control
@@ -116,7 +118,7 @@ const Questions = () => {
           </FieldRow>
           <FieldRow
             name={`question-${question.key}-type`}
-            label="Tyyppi"
+            label={t('editor.questions.questionType')}
             required
           >
             <Form.Control
@@ -126,8 +128,8 @@ const Questions = () => {
               required
             >
               {QUESTION_TYPES.map((type) => (
-                <option key={type.label} value={type.value}>
-                  {type.label}
+                <option key={type.value} value={type.value}>
+                  {t(type.label)}
                 </option>
               ))}
             </Form.Control>
@@ -137,7 +139,7 @@ const Questions = () => {
               {question.options.map((option, optIndex) => (
                 <FieldRow
                   name={`question-${question.key}-options-${optIndex}`}
-                  label="Vastausvaihtoehto"
+                  label={t('editor.questions.questionOptions')}
                   required
                   // eslint-disable-next-line react/no-array-index-key
                   key={optIndex}
@@ -150,12 +152,8 @@ const Questions = () => {
                       onChange={(e) => updateOption(optIndex, e.target.value)}
                     />
                     <InputGroup.Append>
-                      <Button
-                        variant="outline-danger"
-                        aria-label="Poista vastausvaihtoehto"
-                        onClick={() => removeOption(optIndex)}
-                      >
-                        Poista
+                      <Button variant="outline-danger" onClick={() => removeOption(optIndex)}>
+                        {t('editor.questions.questionOptions.delete')}
                       </Button>
                     </InputGroup.Append>
                   </InputGroup>
@@ -165,7 +163,7 @@ const Questions = () => {
                 <Col sm="3" />
                 <Col sm="9">
                   <Button variant="secondary" type="button" onClick={addOption}>
-                    Lisää vastausvaihtoehto
+                    {t('editor.questions.questionOptions.add')}
                   </Button>
                 </Col>
               </Row>
@@ -175,20 +173,20 @@ const Questions = () => {
         <Col xs="12" sm="3" xl="2" className="event-editor--question-buttons">
           <Form.Check
             id={`question-${question.key}-required`}
-            label="Pakollinen"
+            label={t('editor.questions.questionRequired')}
             checked={question.required}
             onChange={(e) => updateField('required', e.target.checked)}
             className="mb-3"
           />
           <Form.Check
             id={`question-${question.key}-public`}
-            label="Julkinen"
+            label={t('editor.questions.questionPublic')}
             checked={question.public}
             onChange={(e) => updateField('public', e.target.checked)}
             className="mb-3"
           />
           <Button variant="danger" type="button" onClick={removeQuestion}>
-            Poista kysymys
+            {t('editor.questions.deleteQuestion')}
           </Button>
         </Col>
       </Row>
@@ -205,7 +203,7 @@ const Questions = () => {
       />
       <div className="text-center mb-3">
         <Button type="button" variant="primary" onClick={addQuestion}>
-          Lisää kysymys
+          {t('editor.questions.addQuestion')}
         </Button>
       </div>
     </>

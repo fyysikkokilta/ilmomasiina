@@ -1,0 +1,10 @@
+{
+  "translation": {
+    "dateFormat.general": "DD.MM.YYYY HH:mm",
+    "emails.confirmation.subject": "Edit confirmation: {{event}}",
+    "emails.editConfirmation.subject": "Signup confirmation: {{event}}",
+    "emails.newUser.subject": "User created for Ilmomasiina",
+    "emails.promotedFromQueue.subject": "You got into {{event}} from the queue",
+    "emails.resetPassword.subject": "Your Ilmomasiina password has been reset"
+  }
+}

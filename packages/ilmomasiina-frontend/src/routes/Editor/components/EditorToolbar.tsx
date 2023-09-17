@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useFormikContext } from 'formik';
 import { Button, ButtonGroup, Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { shallowEqual } from 'react-redux';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
@@ -21,23 +22,29 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
 
   const isDraft = event?.draft || isNew;
 
+  const { t } = useTranslation();
+
   return (
     <>
       <h1>
         {isNew
-          ? 'Luo uusi tapahtuma'
-          : 'Muokkaa tapahtumaa'}
+          ? t('editor.title.new')
+          : t('editor.title.edit')}
       </h1>
       <div className="event-editor--buttons-wrapper">
         <div className="flex-fill">
-          <Link to={appPaths.adminEventsList}>&#8592; Takaisin</Link>
+          <Link to={appPaths.adminEventsList}>
+            &#8592;
+            {' '}
+            {t('editor.action.goBack')}
+          </Link>
         </div>
         {isSubmitting && <Spinner animation="border" />}
         <div className="event-editor--public-status">
           <div className={`event-editor--bubble ${isDraft ? 'draft' : 'public'} event-editor--animated`} />
           <span>
-            {isDraft ? 'Luonnos' : (
-              <Link to={appPaths.eventDetails(event!.slug)} target="_blank">Julkaistu</Link>
+            {isDraft ? t('editor.status.draft') : (
+              <Link to={appPaths.eventDetails(event!.slug)} target="_blank">{t('editor.status.published')}</Link>
             )}
           </span>
         </div>
@@ -50,7 +57,7 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
               formNoValidate
               onClick={() => onSubmitClick(!isDraft)}
             >
-              {isDraft ? 'Julkaise' : 'Muuta luonnokseksi'}
+              {isDraft ? t('editor.action.publish') : t('editor.action.convertToDraft')}
             </Button>
           )}
           <Button
@@ -60,7 +67,7 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
             formNoValidate
             onClick={() => onSubmitClick(isDraft)}
           >
-            {isNew ? 'Tallenna luonnoksena' : 'Tallenna muutokset'}
+            {isNew ? t('editor.action.saveDraft') : t('editor.action.saveChanges')}
           </Button>
         </ButtonGroup>
       </div>
