@@ -29,3 +29,10 @@ export enum AuditEvent {
   RESET_PASSWORD = 'user.resetpassword',
   CHANGE_PASSWORD = 'user.changepassword',
 }
+
+export enum ErrorCode {
+  BAD_SESSION = 'BadSession',
+  EDIT_CONFLICT = 'EditConflict',
+  WOULD_MOVE_SIGNUPS_TO_QUEUE = 'WouldMoveSignupsToQueue',
+  WRONG_OLD_PASSWORD = 'WrongOldPassword',
+}

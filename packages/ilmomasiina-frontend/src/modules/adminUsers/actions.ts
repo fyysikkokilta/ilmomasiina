@@ -108,14 +108,9 @@ export const changePassword = (data: UserChangePasswordSchema) => async (
 ) => {
   const { accessToken } = getState().auth;
 
-  try {
-    await adminApiFetch('admin/users/self/changepassword', {
-      accessToken,
-      method: 'POST',
-      body: data,
-    }, dispatch);
-    return true;
-  } catch (e) {
-    return false;
-  }
+  await adminApiFetch('admin/users/self/changepassword', {
+    accessToken,
+    method: 'POST',
+    body: data,
+  }, dispatch);
 };

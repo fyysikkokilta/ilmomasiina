@@ -58,6 +58,7 @@
         "adminUsers.changePassword.errors.verifyMatch": "The passwords do not match",
         "adminUsers.changePassword.success": "Password changed successfully.",
         "adminUsers.changePassword.failed": "Failed to change password.",
+        "adminUsers.changePassword.wrongPassword": "Old password is incorrect.",
         "adminUsers.returnToEvents": "Go back",
         "auditLog.title": "Audit log",
         "auditLog.loadFailed": "Failed to load logs",

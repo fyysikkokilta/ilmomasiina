@@ -2,9 +2,9 @@ import {
   createSigner, createVerifier, SignerSync, VerifierSync,
 } from 'fast-jwt';
 import { FastifyRequest } from 'fastify';
-import { Unauthorized } from 'http-errors';
 
 import type { UserID, UserSchema } from '@tietokilta/ilmomasiina-models';
+import { BadSession } from './errors';
 
 export interface AdminTokenData {
   user: UserID;
@@ -34,7 +34,7 @@ export default class AdminAuthSession {
 
   /**
    * Verifies the incoming request authorization.
-   * Throws an Unauthorized error if session is not valid.
+   * Throws a BadSession error if session is not valid.
    *
    * @param request incoming request
    */
@@ -42,7 +42,7 @@ export default class AdminAuthSession {
     const header = request.headers.authorization; // Yes, Fastify converts header names to lowercase :D
 
     if (!header) {
-      throw new Unauthorized('Missing Authorization header');
+      throw new BadSession('Missing Authorization header');
     }
 
     const token = Array.isArray(header) ? header[0] : header;
@@ -51,7 +51,7 @@ export default class AdminAuthSession {
       const data = this.verify(token);
       return { user: parseInt(data.user), email: data.email || '' };
     } catch {
-      throw new Unauthorized('Invalid session');
+      throw new BadSession('Invalid session');
     }
   }
 }
