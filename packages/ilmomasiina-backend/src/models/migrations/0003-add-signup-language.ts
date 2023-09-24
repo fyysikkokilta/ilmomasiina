@@ -1,9 +1,10 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { RunnableMigration } from 'umzug';
+import { DataTypes } from 'sequelize';
 
-const migration: RunnableMigration<Sequelize> = {
+import { defineMigration } from './util';
+
+export default defineMigration({
   name: '0003-add-signup-language',
-  async up({ context: sequelize }) {
+  async up({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
     await query.addColumn(
       'signup',
@@ -12,8 +13,7 @@ const migration: RunnableMigration<Sequelize> = {
         type: DataTypes.STRING(8),
         allowNull: true,
       },
+      { transaction },
     );
   },
-};
-
-export default migration;
+});
