@@ -4,6 +4,7 @@ import { defineMigration } from './util';
 
 type RawQuestion = {
   id: string;
+  type: string;
   options: string;
 };
 
@@ -21,11 +22,14 @@ export default defineMigration({
     const query = sequelize.getQueryInterface();
     // Convert question options to JSON
     const questions = await sequelize.query<RawQuestion>(
-      'SELECT `id`, `options` FROM `question`',
+      'SELECT `id`, `type`, `options` FROM `question`',
       { type: QueryTypes.SELECT, transaction },
     );
     for (const row of questions) {
-      const optionsJson = row.options ? JSON.stringify(row.options.split(';')) : null;
+      let optionsJson = null;
+      if (row.type === 'checkbox' || row.type === 'select') {
+        optionsJson = row.options ? JSON.stringify(row.options.split(';')) : JSON.stringify(['']);
+      }
       await query.bulkUpdate(
         'question',
         { options: optionsJson },
