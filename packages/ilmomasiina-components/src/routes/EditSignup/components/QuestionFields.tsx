@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
 
 import { useField } from 'formik';
-import filter from 'lodash/filter';
 import find from 'lodash/find';
 import reject from 'lodash/reject';
 import without from 'lodash/without';
@@ -11,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import type { Question, SignupUpdateBody } from '@tietokilta/ilmomasiina-models';
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
 import FieldRow from '../../../components/FieldRow';
+import { stringifyAnswer } from '../../../utils/signupUtils';
 
 type Props = {
   name: string;
@@ -25,9 +25,11 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
   return (
     <>
       {questions.map((question) => {
-        const currentAnswer = find(value, { questionId: question.id })?.answer || '';
+        const answerValue = find(value, { questionId: question.id })?.answer || '';
+        const currentAnswerString = stringifyAnswer(answerValue);
+        const currentAnswerArray = Array.isArray(answerValue) ? answerValue : [];
 
-        function updateAnswer(answer: string) {
+        function updateAnswer(answer: string | string[]) {
           setValue(reject(value, { questionId: question.id }).concat({
             questionId: question.id,
             answer,
@@ -35,9 +37,8 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
         }
 
         function toggleChecked(option: string, checked: boolean) {
-          const currentAnswers = filter(currentAnswer.split(';'));
-          const newAnswers = checked ? [...currentAnswers, option] : without(currentAnswers, option);
-          updateAnswer(newAnswers.join(';'));
+          const newAnswers = checked ? [...currentAnswerArray, option] : without(currentAnswerArray, option);
+          updateAnswer(newAnswers);
         }
 
         const help = question.public ? t('editSignup.publicQuestion') : null;
@@ -51,7 +52,7 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
                 type="text"
                 required={question.required}
                 readOnly={disabled}
-                value={currentAnswer}
+                value={currentAnswerString}
                 onChange={(e) => updateAnswer(e.target.value)}
               />
             );
@@ -62,13 +63,12 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
                 type="number"
                 required={question.required}
                 readOnly={disabled}
-                value={currentAnswer}
+                value={currentAnswerString}
                 onChange={(e) => updateAnswer(e.target.value)}
               />
             );
             break;
           case QuestionType.CHECKBOX: {
-            const currentAnswers = currentAnswer.split(';');
             input = question.options?.map((option, optIndex) => (
               <Form.Check
                 // eslint-disable-next-line react/no-array-index-key
@@ -77,9 +77,9 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
                 id={`question-${question.id}-option-${optIndex}`}
                 value={option}
                 label={option}
-                required={question.required && !currentAnswers.some((answer) => answer !== option)}
+                required={question.required && !currentAnswerArray.some((answer) => answer !== option)}
                 disabled={disabled}
-                checked={currentAnswers.includes(option)}
+                checked={currentAnswerArray.includes(option)}
                 onChange={(e) => toggleChecked(option, e.target.checked)}
               />
             ));
@@ -94,7 +94,7 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
                 cols={40}
                 required={question.required}
                 readOnly={disabled}
-                value={currentAnswer}
+                value={currentAnswerString}
                 onChange={(e) => updateAnswer(e.target.value)}
               />
             );
@@ -106,7 +106,7 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
                   as="select"
                   required={question.required}
                   disabled={disabled}
-                  value={currentAnswer}
+                  value={currentAnswerString}
                   onChange={(e) => updateAnswer(e.target.value)}
                 >
                   <option value="" disabled={question.required}>
@@ -132,7 +132,7 @@ const QuestionFields = ({ name, questions, disabled }: Props) => {
                   label={option}
                   required={question.required}
                   disabled={disabled}
-                  checked={currentAnswer === option}
+                  checked={currentAnswerString === option}
                   onChange={(e) => updateAnswer(e.target.value)}
                 />
               ));

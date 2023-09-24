@@ -12,7 +12,7 @@ export interface AnswerCreationAttributes extends Optional<AnswerAttributes, 'id
 
 export class Answer extends Model<AnswerAttributes, AnswerCreationAttributes> implements AnswerAttributes {
   public id!: string;
-  public answer!: string;
+  public answer!: string | string[];
 
   public questionId!: Question['id'];
   public question?: Question;
@@ -48,6 +48,15 @@ export default function setupAnswerModel(sequelize: Sequelize) {
     answer: {
       type: DataTypes.STRING,
       allowNull: false,
+      // TODO: Once we upgrade to Sequelize v7, try migrating this to custom datatypes again.
+      get(): string | string[] {
+        const json = this.getDataValue('answer');
+        return json === null ? null : JSON.parse(json as unknown as string);
+      },
+      set(val: string[] | null) {
+        const json = val === null ? null : JSON.stringify(val);
+        this.setDataValue('answer', json as unknown as (string | string[]));
+      },
     },
   }, {
     sequelize,

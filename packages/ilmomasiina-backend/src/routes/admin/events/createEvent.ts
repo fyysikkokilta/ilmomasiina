@@ -22,7 +22,7 @@ export default async function createEvent(
         questions: request.body.questions ? request.body.questions.map((q, order) => ({
           ...q,
           order,
-          options: (q.options && q.options.length) ? q.options.join(';') : null,
+          options: q.options?.length ? q : null,
         })) : [],
         // add order to quotas
         quotas: request.body.quotas ? request.body.quotas.map((q, order) => ({ ...q, order })) : [],

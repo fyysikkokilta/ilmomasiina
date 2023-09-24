@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { timezone } from '../../../config';
 import { useSingleEventContext } from '../../../modules/singleEvent';
-import { SignupWithQuota } from '../../../utils/signupUtils';
+import { SignupWithQuota, stringifyAnswer } from '../../../utils/signupUtils';
 
 type Props = {
   index: number;
@@ -50,7 +50,7 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
       )}
       {filter(questions, 'public').map((question) => (
         <td key={question.id}>
-          {find(answers, { questionId: question.id })?.answer || ''}
+          {stringifyAnswer(find(answers, { questionId: question.id })?.answer || '')}
         </td>
       ))}
       {showQuota && (

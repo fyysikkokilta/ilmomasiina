@@ -4,7 +4,9 @@ import { Button } from 'react-bootstrap';
 import { CSVLink } from 'react-csv';
 import { useTranslation } from 'react-i18next';
 
-import { convertSignupsToCSV, getSignupsForAdminList } from '@tietokilta/ilmomasiina-components/dist/utils/signupUtils';
+import {
+  convertSignupsToCSV, getSignupsForAdminList, stringifyAnswer,
+} from '@tietokilta/ilmomasiina-components/dist/utils/signupUtils';
 import { deleteSignup, getEvent } from '../../../modules/editor/actions';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
 
@@ -61,7 +63,9 @@ const SignupsTab = () => {
               {event.emailQuestion && <td key="email">{signup.email}</td>}
               <td key="quota">{signup.quota}</td>
               {event.questions.map((question) => (
-                <td key={question.id}>{signup.answers[question.id]}</td>
+                <td key={question.id}>
+                  {stringifyAnswer(signup.answers[question.id])}
+                </td>
               ))}
               <td key="timestamp">{signup.createdAt}</td>
               <td key="delete">
