@@ -60,6 +60,7 @@
         "adminUsers.changePassword.errors.verifyMatch": "Salasanat eivät täsmää",
         "adminUsers.changePassword.success": "Salasana vaihdettiin onnistuneesti.",
         "adminUsers.changePassword.failed": "Salasanan vaihto epäonnistui.",
+        "adminUsers.changePassword.wrongPassword": "Vanha salasana on väärä.",
         "adminUsers.returnToEvents": "Takaisin",
         "auditLog.title": "Toimintoloki",
         "auditLog.loadFailed": "Lokien lataus epäonnistui",

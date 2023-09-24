@@ -1,4 +1,5 @@
 import { ApiError, apiFetch, FetchOptions } from '@tietokilta/ilmomasiina-components';
+import { ErrorCode } from '@tietokilta/ilmomasiina-models';
 import { loginExpired } from './modules/auth/actions';
 import type { DispatchAction } from './store/types';
 
@@ -9,7 +10,7 @@ export default async function adminApiFetch(uri: string, opts: FetchOptions, dis
   try {
     return await apiFetch(uri, opts);
   } catch (err) {
-    if (err instanceof ApiError && err.isUnauthenticated) {
+    if (err instanceof ApiError && err.code === ErrorCode.BAD_SESSION) {
       dispatch(loginExpired());
     }
     throw err;

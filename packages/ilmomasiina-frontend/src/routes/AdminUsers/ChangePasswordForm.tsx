@@ -7,6 +7,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
+import { ApiError } from '@tietokilta/ilmomasiina-components';
+import { ErrorCode } from '@tietokilta/ilmomasiina-models';
 import i18n from '../../i18n';
 import { changePassword } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
@@ -42,15 +44,19 @@ const ChangePasswordForm = () => {
   const { t } = useTranslation();
 
   const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
-    // TODO: better error handling
-    const success = await dispatch(changePassword(data));
-    if (success) {
+    try {
+      await dispatch(changePassword(data));
       resetForm();
       toast.success(t('adminUsers.changePassword.success'), { autoClose: 5000 });
-    } else {
-      toast.error(t('adminUsers.changePassword.failed'), { autoClose: 5000 });
+    } catch (err) {
+      if (err instanceof ApiError && err.code === ErrorCode.WRONG_OLD_PASSWORD) {
+        toast.error(t('adminUsers.changePassword.wrongPassword'), { autoClose: 5000 });
+      } else {
+        toast.error(t('adminUsers.changePassword.failed'), { autoClose: 5000 });
+      }
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   return (

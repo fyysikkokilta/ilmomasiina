@@ -1,10 +1,16 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { BadRequest, NotFound, Unauthorized } from 'http-errors';
+import { BadRequest, NotFound } from 'http-errors';
 
-import type { UserChangePasswordSchema } from '@tietokilta/ilmomasiina-models';
-import { AuditEvent } from '@tietokilta/ilmomasiina-models';
+import { AuditEvent, ErrorCode, UserChangePasswordSchema } from '@tietokilta/ilmomasiina-models';
 import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
 import { User } from '../../../models/user';
+import CustomError from '../../../util/customError';
+
+class WrongOldPassword extends CustomError {
+  constructor(message: string) {
+    super(401, ErrorCode.WRONG_OLD_PASSWORD, message);
+  }
+}
 
 export default async function changePassword(
   request: FastifyRequest<{ Body: UserChangePasswordSchema }>,
@@ -26,7 +32,7 @@ export default async function changePassword(
     } else {
       // Verify old password
       if (!AdminPasswordAuth.verifyHash(request.body.oldPassword, existing.password)) {
-        throw new Unauthorized('Incorrect password');
+        throw new WrongOldPassword('Incorrect password');
       }
       // Update user with a new password
       await existing.update(

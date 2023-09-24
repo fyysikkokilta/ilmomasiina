@@ -1,3 +1,5 @@
+import { ErrorCode } from '@tietokilta/ilmomasiina-models';
+
 export interface FetchOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: any;
@@ -8,7 +10,7 @@ export interface FetchOptions {
 
 export class ApiError extends Error {
   status: number;
-  code?: string;
+  code?: ErrorCode;
   response?: any;
 
   constructor(status: number, response: any) {
@@ -30,10 +32,6 @@ export class ApiError extends Error {
       /* fall through */
     }
     return error;
-  }
-
-  get isUnauthenticated() {
-    return this.status === 401;
   }
 }
 
