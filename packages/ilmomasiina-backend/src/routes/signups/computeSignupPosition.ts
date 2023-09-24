@@ -56,7 +56,7 @@ export async function refreshSignupPositions(
     throw new Error('event missing from DB');
   }
   const signups = await Signup.scope('active').findAll({
-    attributes: ['id', 'quotaId', 'email', 'status', 'position', 'language'],
+    attributes: ['id', 'quotaId', 'firstName', 'lastName', 'email', 'status', 'position', 'language'],
     include: [
       {
         model: Quota,
