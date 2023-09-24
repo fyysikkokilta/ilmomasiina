@@ -25,9 +25,13 @@ export const editToken = Type.String({
 /** Answer to a single signup question */
 export const signupAnswer = Type.Object({
   questionId: questionID,
-  answer: Type.String({
-    description: 'Answer to the question.',
-  }),
+  answer: Type.Union(
+    [
+      Type.String(),
+      Type.Array(Type.String()),
+    ],
+    { description: 'Answer to the question.' },
+  ),
 });
 
 /** Editable attributes of a signup. */

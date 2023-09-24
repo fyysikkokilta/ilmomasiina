@@ -106,16 +106,10 @@ export default async function updateEvent(
         };
         // Update if an id was provided
         if (question.existing) {
-          await question.existing.update({
-            ...questionAttribs,
-            // TODO: Splitting by semicolon might cause problems - requires better solution
-            options: questionAttribs.options ? questionAttribs.options.join(';') : null,
-          }, { transaction });
+          await question.existing.update(questionAttribs, { transaction });
         } else {
           await Question.create({
             ...questionAttribs,
-            // TODO: Splitting by semicolon might cause problems - requires better solution
-            options: questionAttribs.options ? questionAttribs.options.join(';') : null,
             eventId: event.id,
           }, { transaction });
         }

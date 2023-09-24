@@ -28,7 +28,7 @@ export default async function sendSignupConfirmationMail(signup: Signup) {
     .filter(([, answer]) => answer)
     .map(([question, answer]) => ({
       label: question.question,
-      answer: answer!.answer,
+      answer: Array.isArray(answer!.answer) ? answer!.answer.join(', ') : answer!.answer,
     }));
 
   const edited = answers.some((answer) => answer.createdAt.getTime() !== answer.updatedAt.getTime());

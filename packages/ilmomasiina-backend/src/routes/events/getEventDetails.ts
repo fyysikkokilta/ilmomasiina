@@ -68,13 +68,6 @@ export async function eventDetailsForUser(
     throw new NotFound('No event found with id');
   }
 
-  const questions = event.questions!.map((question) => ({
-    ...question.get({ plain: true }),
-    // Split answer options into array
-    // TODO: Splitting by semicolon might cause problems - requires better solution
-    options: question.options ? question.options.split(';') : null,
-  }));
-
   // Only return answers to public questions
   const publicQuestions = new Set(
     event.questions!
@@ -97,8 +90,7 @@ export async function eventDetailsForUser(
 
   return {
     ...stringifyDates(event.get({ plain: true })),
-    questions,
-
+    questions: event.questions!.map((question) => question.get({ plain: true })),
     quotas: event.quotas!.map((quota) => ({
       ...quota.get({ plain: true }),
       signups: event.signupsPublic // Hide all signups from non-admins if answers are not public
@@ -175,12 +167,7 @@ export async function eventDetailsForAdmin(
   // Admins get a simple result with many columns
   return stringifyDates({
     ...event.get({ plain: true }),
-    questions: event.questions!.map((question) => ({
-      ...question.get({ plain: true }),
-      // Split answer options into array
-      // TODO: Splitting by semicolon might cause problems - requires better solution
-      options: question.options ? question.options.split(';') : null,
-    })),
+    questions: event.questions!.map((question) => question.get({ plain: true })),
     updatedAt: event.updatedAt,
     quotas: event.quotas!.map((quota) => ({
       ...quota.get({ plain: true }),
