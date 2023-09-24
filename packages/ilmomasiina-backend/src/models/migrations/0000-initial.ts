@@ -1,12 +1,13 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { RunnableMigration } from 'umzug';
+import { DataTypes } from 'sequelize';
+
+import { defineMigration } from './util';
 
 // Constant from ../randomId
 const RANDOM_ID_LENGTH = 12;
 
-const migration: RunnableMigration<Sequelize> = {
+export default defineMigration({
   name: '0000-initial',
-  async up({ context: sequelize }) {
+  async up({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
     await query.createTable(
       'event',
@@ -97,6 +98,7 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
       'quota',
@@ -138,6 +140,7 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
       'signup',
@@ -190,6 +193,7 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
       'question',
@@ -246,6 +250,7 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
       'answer',
@@ -291,6 +296,7 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
       'user',
@@ -318,8 +324,7 @@ const migration: RunnableMigration<Sequelize> = {
           allowNull: false,
         },
       },
+      { transaction },
     );
   },
-};
-
-export default migration;
+});
