@@ -1,6 +1,6 @@
-@use "~@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
+@use "@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
 
-@use "~bootstrap/scss/bootstrap" with (
+@use "bootstrap/scss/bootstrap" with (
   // Colors
   $primary: $primary,
   $secondary: $secondary,
@@ -22,7 +22,7 @@
 );
 
 @use "widgets";
-@use "~@tietokilta/ilmomasiina-components/src/styles/all";
+@use "@tietokilta/ilmomasiina-components/src/styles/all";
 
 // Global layout
 
