@@ -103,23 +103,6 @@ ADD `namePublic` BOOLEAN NOT NULL DEFAULT 0 AFTER `lastName`;
 UPDATE `signup`
 SET `namePublic` = 1;
 
--- add audit log
-CREATE TABLE `auditlog` (
-  `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user` VARCHAR(255) DEFAULT NULL,
-  `ipAddress` VARCHAR(64) NOT NULL,
-  `action` VARCHAR(32) NOT NULL,
-  `details` TEXT NOT NULL DEFAULT '',
-  `createdAt` DATETIME NOT NULL,
-  `updatedAt` DATETIME NOT NULL,
-  PRIMARY KEY (`id`)
-);
-
--- add end date to events
-
-ALTER TABLE `event`
-ADD `endDate` DATETIME DEFAULT NULL AFTER `date`;
-
 -- ensure unlimited quotas are stored as size=NULL instead of size=0
 
 UPDATE `quota`
