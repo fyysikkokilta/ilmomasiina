@@ -1,18 +1,50 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
-import { useFormikContext } from 'formik';
 import { Nav } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { EditorEvent, EditorEventType } from '../../../modules/editor/types';
+import { EditorEventType } from '../../../modules/editor/types';
+import { useFieldValue } from './hooks';
 
 export enum EditorTab {
-  BASIC_DETAILS = 1,
-  QUOTAS = 2,
-  QUESTIONS = 3,
-  EMAILS = 4,
-  SIGNUPS = 5,
+  BASIC_DETAILS = 'basic',
+  QUOTAS = 'quotas',
+  QUESTIONS = 'questions',
+  EMAILS = 'emails',
+  SIGNUPS = 'signups',
 }
+
+const tabTitles: Record<EditorTab, string> = {
+  [EditorTab.BASIC_DETAILS]: 'editor.tabs.basic',
+  [EditorTab.QUOTAS]: 'editor.tabs.quotas',
+  [EditorTab.QUESTIONS]: 'editor.tabs.questions',
+  [EditorTab.EMAILS]: 'editor.tabs.emails',
+  [EditorTab.SIGNUPS]: 'editor.tabs.signups',
+};
+
+type TabProps = Props & {
+  id: EditorTab;
+};
+
+const Tab = ({
+  id, activeTab, setActiveTab,
+}: TabProps) => {
+  const { t } = useTranslation();
+  const onClick = useCallback(() => setActiveTab(id), [id, setActiveTab]);
+  return (
+    <Nav.Item>
+      <Nav.Link
+        eventKey={id}
+        onClick={onClick}
+        role="tab"
+        aria-selected={activeTab === id}
+        aria-controls={`editor-tab-${id}`}
+      >
+        {t(tabTitles[id])}
+      </Nav.Link>
+    </Nav.Item>
+  );
+};
 
 type Props = {
   activeTab: EditorTab;
@@ -20,37 +52,15 @@ type Props = {
 };
 
 const EditorTabHeader = ({ activeTab, setActiveTab }: Props) => {
-  const { values: { eventType } } = useFormikContext<EditorEvent>();
-  const { t } = useTranslation();
-
-  const TABS: [EditorTab, string][] = [
-    [EditorTab.BASIC_DETAILS, t('editor.tabs.basic')],
-    [EditorTab.QUOTAS, t('editor.tabs.quotas')],
-    [EditorTab.QUESTIONS, t('editor.tabs.questions')],
-    [EditorTab.EMAILS, t('editor.tabs.emails')],
-    [EditorTab.SIGNUPS, t('editor.tabs.signups')],
-  ];
+  const eventType = useFieldValue<EditorEventType>('eventType');
 
   return (
     <Nav variant="tabs" activeKey={activeTab} role="tablist">
-      {TABS.flatMap(([id, label]) => {
+      {Object.values(EditorTab).flatMap((id) => {
         if (id !== EditorTab.BASIC_DETAILS && eventType === EditorEventType.ONLY_EVENT) {
           return [];
         }
-
-        return [
-          <Nav.Item key={id}>
-            <Nav.Link
-              eventKey={id}
-              onClick={() => setActiveTab(id)}
-              role="tab"
-              aria-selected={activeTab === id}
-              aria-controls={`editor-tab-${id}`}
-            >
-              {label}
-            </Nav.Link>
-          </Nav.Item>,
-        ];
+        return [<Tab key={id} id={id} activeTab={activeTab} setActiveTab={setActiveTab} />];
       })}
     </Nav>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 
-import { FieldRow } from '@tietokilta/ilmomasiina-components';
+import { FinalFieldRow as FieldRow } from '@tietokilta/ilmomasiina-components';
 import Textarea from './Textarea';
 
 const EmailsTab = () => {
