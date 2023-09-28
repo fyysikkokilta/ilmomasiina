@@ -17,3 +17,4 @@ export { default as SingleEvent } from './routes/SingleEvent';
 export { default as EditSignup } from './routes/EditSignup';
 
 export { default as FieldRow } from './components/FieldRow';
+export { default as FinalFieldRow } from './components/FinalFieldRow';

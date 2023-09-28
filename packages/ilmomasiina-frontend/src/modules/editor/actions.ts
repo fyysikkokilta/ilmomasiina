@@ -256,21 +256,17 @@ export const publishNewEvent = (data: EditorEvent) => async (dispatch: DispatchA
 export const publishEventUpdate = (
   id: EventID,
   data: EditorEvent,
-  moveSignupsToQueue: boolean = false,
 ) => async (dispatch: DispatchAction, getState: GetState) => {
   dispatch(saving());
 
-  const cleaned = editorEventToServer(data);
+  const body = editorEventToServer(data);
   const { accessToken } = getState().auth;
 
   try {
     const response = await adminApiFetch(`admin/events/${id}`, {
       accessToken,
       method: 'PATCH',
-      body: {
-        ...cleaned,
-        moveSignupsToQueue,
-      },
+      body,
     }, dispatch) as AdminEventResponse;
     dispatch(loaded(response));
     return response;

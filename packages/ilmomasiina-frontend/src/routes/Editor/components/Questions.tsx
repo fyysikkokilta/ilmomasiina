@@ -1,197 +1,168 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-import { useField } from 'formik';
-import reject from 'lodash/reject';
 import {
-  Button, Col, Form, InputGroup, Row,
+  Button, Col, Form, FormCheckProps, InputGroup, Row,
 } from 'react-bootstrap';
+import {
+  Field, FieldRenderProps, useField, useForm,
+} from 'react-final-form';
+import { FieldArray, FieldArrayRenderProps, useFieldArray } from 'react-final-form-arrays';
 import { useTranslation } from 'react-i18next';
 import { SortEnd } from 'react-sortable-hoc';
 
-import { FieldRow } from '@tietokilta/ilmomasiina-components';
+import { FinalFieldRow as FieldRow } from '@tietokilta/ilmomasiina-components';
+import useShallowMemo from '@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo';
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
 import { EditorQuestion } from '../../../modules/editor/types';
+import useEvent from '../../../utils/useEvent';
+import SelectBox from './SelectBox';
 import Sortable from './Sortable';
 
-const QUESTION_TYPES: { value: EditorQuestion['type'], label: string }[] = [
-  { value: QuestionType.TEXT, label: 'editor.questions.questionType.text' },
-  { value: QuestionType.TEXT_AREA, label: 'editor.questions.questionType.textArea' },
-  { value: QuestionType.NUMBER, label: 'editor.questions.questionType.number' },
-  { value: QuestionType.SELECT, label: 'editor.questions.questionType.select' },
-  { value: QuestionType.CHECKBOX, label: 'editor.questions.questionType.checkbox' },
-];
+type OptionProps = {
+  name: string;
+  index: number;
+  remove: FieldArrayRenderProps<string, HTMLElement>['fields']['remove'];
+};
 
-const Questions = () => {
-  const [{ value: questions }, , { setValue }] = useField<EditorQuestion[]>('questions');
+const renderInput = ({ input, meta, ...props }: FieldRenderProps<any>) => <Form.Control {...input} {...props} />;
+
+type CheckboxRenderProps = { input: FormCheckProps };
+
+const renderCheck = ({ input, meta, ...props }: FieldRenderProps<boolean> & CheckboxRenderProps) => (
+  <Form.Check {...input} {...props} />
+);
+
+const OptionRow = ({ name, index, remove }: OptionProps) => {
   const { t } = useTranslation();
 
-  function addQuestion() {
-    setValue([
-      ...questions,
-      {
-        key: `new-${Math.random()}`,
-        required: false,
-        public: false,
-        question: '',
-        type: QuestionType.TEXT,
-        options: [''],
-      },
-    ]);
-  }
+  const removeThis = useEvent(() => remove(index));
 
-  function updateOrder({ newIndex, oldIndex }: SortEnd) {
-    const newQuestions = questions.slice();
-    const [elementToMove] = newQuestions.splice(oldIndex, 1);
-    newQuestions.splice(newIndex, 0, elementToMove);
-    setValue(newQuestions);
-  }
-
-  const questionItems = questions.map((question) => {
-    const thisQuestion = question.key;
-
-    function updateField<F extends keyof EditorQuestion>(field: F, value: EditorQuestion[F]) {
-      setValue(questions.map((item) => {
-        if (item.key === thisQuestion) {
-          return {
-            ...item,
-            [field]: value,
-          };
-        }
-        return item;
-      }));
-    }
-
-    function removeQuestion() {
-      setValue(reject(questions, { key: thisQuestion }));
-    }
-
-    function updateOption(optIndex: number, value: string) {
-      setValue(questions.map((item) => {
-        if (item.key === thisQuestion) {
-          return {
-            ...item,
-            options: item.options?.map((prev, i) => (i === optIndex ? value : prev)) ?? null,
-          };
-        }
-        return item;
-      }));
-    }
-
-    function removeOption(optIndex: number) {
-      setValue(questions.map((item) => {
-        if (item.key === thisQuestion) {
-          return {
-            ...item,
-            options: item.options?.filter((_prev, i) => i !== optIndex) ?? null,
-          };
-        }
-        return item;
-      }));
-    }
-
-    function addOption() {
-      setValue(questions.map((item) => {
-        if (item.key === thisQuestion) {
-          return {
-            ...item,
-            options: [...item.options, ''],
-          };
-        }
-        return item;
-      }));
-    }
-
-    return (
-      <Row key={question.key} className="question-body px-0">
-        <Col xs="12" sm="9" xl="10">
-          <FieldRow
-            name={`question-${question.key}-question`}
-            label={t('editor.questions.questionText')}
-            required
-          >
-            <Form.Control
-              type="text"
-              required
-              value={question.question}
-              onChange={(e) => updateField('question', e.target.value)}
-            />
-          </FieldRow>
-          <FieldRow
-            name={`question-${question.key}-type`}
-            label={t('editor.questions.questionType')}
-            required
-          >
-            <Form.Control
-              as="select"
-              value={question.type}
-              onChange={(e) => updateField('type', e.target.value as EditorQuestion['type'])}
-              required
-            >
-              {QUESTION_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {t(type.label)}
-                </option>
-              ))}
-            </Form.Control>
-          </FieldRow>
-          {(question.type === 'select' || question.type === 'checkbox') && (
-            <>
-              {question.options.map((option, optIndex) => (
-                <FieldRow
-                  name={`question-${question.key}-options-${optIndex}`}
-                  label={t('editor.questions.questionOptions')}
-                  required
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={optIndex}
-                >
-                  <InputGroup>
-                    <Form.Control
-                      type="text"
-                      required
-                      value={option}
-                      onChange={(e) => updateOption(optIndex, e.target.value)}
-                    />
-                    <InputGroup.Append>
-                      <Button variant="outline-danger" onClick={() => removeOption(optIndex)}>
-                        {t('editor.questions.questionOptions.delete')}
-                      </Button>
-                    </InputGroup.Append>
-                  </InputGroup>
-                </FieldRow>
-              ))}
-              <Row>
-                <Col sm="3" />
-                <Col sm="9">
-                  <Button variant="secondary" type="button" onClick={addOption}>
-                    {t('editor.questions.questionOptions.add')}
-                  </Button>
-                </Col>
-              </Row>
-            </>
-          )}
-        </Col>
-        <Col xs="12" sm="3" xl="2" className="event-editor--question-buttons">
-          <Form.Check
-            id={`question-${question.key}-required`}
-            label={t('editor.questions.questionRequired')}
-            checked={question.required}
-            onChange={(e) => updateField('required', e.target.checked)}
-            className="mb-3"
-          />
-          <Form.Check
-            id={`question-${question.key}-public`}
-            label={t('editor.questions.questionPublic')}
-            checked={question.public}
-            onChange={(e) => updateField('public', e.target.checked)}
-            className="mb-3"
-          />
-          <Button variant="danger" type="button" onClick={removeQuestion}>
-            {t('editor.questions.deleteQuestion')}
+  return (
+    <FieldRow
+      name={name}
+      type="text"
+      label={t('editor.questions.questionOptions')}
+      required
+    >
+      <InputGroup>
+        <Field name={name} required>{renderInput}</Field>
+        <InputGroup.Append>
+          <Button variant="outline-danger" onClick={removeThis}>
+            {t('editor.questions.questionOptions.delete')}
           </Button>
-        </Col>
-      </Row>
-    );
+        </InputGroup.Append>
+      </InputGroup>
+    </FieldRow>
+  );
+};
+
+type QuestionProps = {
+  name: string;
+  index: number;
+  remove: FieldArrayRenderProps<EditorQuestion, HTMLElement>['fields']['remove'];
+};
+
+const QuestionRow = ({ name, index, remove }: QuestionProps) => {
+  const { t } = useTranslation();
+  const { mutators: { push } } = useForm();
+
+  const removeThis = useEvent(() => remove(index));
+
+  const addOption = useEvent(() => push(`${name}.options`, ''));
+
+  const { value: type } = useField(`${name}.type`);
+
+  return (
+    <Row className="question-body px-0">
+      <Col xs="12" sm="9" xl="10">
+        <FieldRow
+          name={`${name}.question`}
+          type="text"
+          label={t('editor.questions.questionText')}
+          required
+        />
+        <FieldRow
+          name={`${name}.type`}
+          label={t('editor.questions.questionType')}
+          as={SelectBox}
+          required
+          options={[
+            [QuestionType.TEXT, t('editor.questions.questionType.text')],
+            [QuestionType.TEXT_AREA, t('editor.questions.questionType.textArea')],
+            [QuestionType.NUMBER, t('editor.questions.questionType.number')],
+            [QuestionType.SELECT, t('editor.questions.questionType.select')],
+            [QuestionType.CHECKBOX, t('editor.questions.questionType.checkbox')],
+          ]}
+        />
+        {(type === 'select' || type === 'checkbox') && (
+          <>
+            <FieldArray name={`${name}.options`}>
+              {({ fields }) => fields.map((optName, i) => (
+                <OptionRow key={optName} name={optName} index={i} remove={fields.remove} />
+              ))}
+            </FieldArray>
+            <Row>
+              <Col sm="3" />
+              <Col sm="9">
+                <Button variant="secondary" type="button" onClick={addOption}>
+                  {t('editor.questions.questionOptions.add')}
+                </Button>
+              </Col>
+            </Row>
+          </>
+        )}
+      </Col>
+      <Col xs="12" sm="3" xl="2" className="event-editor--question-buttons">
+        <Field
+          name={`${name}.required`}
+          type="checkbox"
+          id={`${name}.required`}
+          label={t('editor.questions.questionRequired')}
+          className="mb-3"
+        >
+          {renderCheck}
+        </Field>
+        <Field
+          name={`${name}.public`}
+          type="checkbox"
+          id={`${name}.public`}
+          label={t('editor.questions.questionPublic')}
+          className="mb-3"
+        >
+          {renderCheck}
+        </Field>
+        <Button variant="danger" type="button" onClick={removeThis}>
+          {t('editor.questions.deleteQuestion')}
+        </Button>
+      </Col>
+    </Row>
+  );
+};
+
+const Questions = () => {
+  const { t } = useTranslation();
+
+  const { fields } = useFieldArray<EditorQuestion>('questions');
+
+  const addQuestion = useEvent(() => {
+    fields.push({
+      key: `new-${Math.random()}`,
+      required: false,
+      public: false,
+      question: '',
+      type: QuestionType.TEXT,
+      options: [''],
+    });
   });
+
+  const updateOrder = useEvent(({ newIndex, oldIndex }: SortEnd) => fields.move(oldIndex, newIndex));
+
+  const keys = useShallowMemo(fields.value.map((item) => item.key));
+  const questionItems = useMemo(() => fields.map((name, i) => (
+    <QuestionRow key={keys[i]} name={name} index={i} remove={fields.remove} />
+  // This list only invalidates when the question positions or count change.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  )), [keys]);
 
   return (
     <>

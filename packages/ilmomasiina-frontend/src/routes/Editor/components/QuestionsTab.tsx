@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { useFormikContext } from 'formik';
 import { Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { FieldRow } from '@tietokilta/ilmomasiina-components';
-import { EditorEvent } from '../../../modules/editor/types';
+import { FinalFieldRow as FieldRow } from '@tietokilta/ilmomasiina-components';
+import { useFieldValue } from './hooks';
 import Questions from './Questions';
 
 const QuestionsTab = () => {
-  const { values: { nameQuestion, emailQuestion } } = useFormikContext<EditorEvent>();
+  const nameQuestion = useFieldValue<boolean>('nameQuestion');
+  const emailQuestion = useFieldValue<boolean>('emailQuestion');
   const { t } = useTranslation();
   return (
     <div>

@@ -1,27 +1,28 @@
 import React from 'react';
 
-import { useFormikContext } from 'formik';
 import { Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { FieldRow } from '@tietokilta/ilmomasiina-components';
-import { EditorEvent } from '../../../modules/editor/types';
+import { FinalFieldRow as FieldRow } from '@tietokilta/ilmomasiina-components';
 import DateTimePicker from './DateTimePicker';
+import { useFieldValue } from './hooks';
 import Quotas from './Quotas';
 
 const QuotasTab = () => {
-  const { values: { useOpenQuota } } = useFormikContext<EditorEvent>();
+  const useOpenQuota = useFieldValue<boolean>('useOpenQuota');
   const { t } = useTranslation();
   return (
     <div>
       <FieldRow
         name="registrationStartDate"
+        id="registrationStartDate"
         as={DateTimePicker}
         label={t('editor.quotas.registrationStartDate')}
         required
       />
       <FieldRow
         name="registrationEndDate"
+        id="registrationEndDate"
         as={DateTimePicker}
         label={t('editor.quotas.registrationEndDate')}
         required

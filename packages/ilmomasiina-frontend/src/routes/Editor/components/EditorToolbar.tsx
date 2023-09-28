@@ -1,25 +1,22 @@
 import React from 'react';
 
-import { useFormikContext } from 'formik';
 import { Button, ButtonGroup, Spinner } from 'react-bootstrap';
+import { useFormState } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
-import { shallowEqual } from 'react-redux';
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-import { EditorEvent } from '../../../modules/editor/types';
 import appPaths from '../../../paths';
 import { useTypedSelector } from '../../../store/reducers';
 
-interface EditorToolbarProps {
-  onSubmitClick: (asDraft: boolean) => void;
-}
+type Props = {
+  onSave: () => void;
+  onSaveToggleDraft: () => void;
+};
 
-type Props = EditorToolbarProps & RouteComponentProps<{ id: string }>;
-
-const EditorToolbar = ({ onSubmitClick }: Props) => {
-  const { isSubmitting } = useFormikContext<EditorEvent>();
-  const { event, isNew } = useTypedSelector((state) => state.editor, shallowEqual);
-
+const EditorToolbar = ({ onSave, onSaveToggleDraft }: Props) => {
+  const isSubmitting = useFormState({ subscription: { submitting: true } }).submitting;
+  const event = useTypedSelector((state) => state.editor.event);
+  const isNew = useTypedSelector((state) => state.editor.isNew);
   const isDraft = event?.draft || isNew;
 
   const { t } = useTranslation();
@@ -55,7 +52,7 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
               disabled={isSubmitting}
               variant={isDraft ? 'success' : 'warning'}
               formNoValidate
-              onClick={() => onSubmitClick(!isDraft)}
+              onClick={onSaveToggleDraft}
             >
               {isDraft ? t('editor.action.publish') : t('editor.action.convertToDraft')}
             </Button>
@@ -65,7 +62,7 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
             disabled={isSubmitting}
             variant="secondary"
             formNoValidate
-            onClick={() => onSubmitClick(isDraft)}
+            onClick={onSave}
           >
             {isNew ? t('editor.action.saveDraft') : t('editor.action.saveChanges')}
           </Button>
@@ -75,4 +72,4 @@ const EditorToolbar = ({ onSubmitClick }: Props) => {
   );
 };
 
-export default withRouter(EditorToolbar);
+export default EditorToolbar;
