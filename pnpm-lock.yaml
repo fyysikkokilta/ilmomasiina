@@ -56,6 +56,8 @@ importers:
       '@types/node-cron': ^3.0.1
       '@types/nodemailer': ^6.4.4
       '@types/nodemailer-mailgun-transport': ^1.4.3
+      ajv: ^8.12.0
+      ajv-formats: ^2.1.1
       base32-encode: ^1.2.0
       bcrypt: ^5.1.0
       better-npm-run: ^0.1.1
@@ -91,6 +93,8 @@ importers:
       '@fastify/type-provider-typebox': 2.3.0_gn4psg6oqy3csz3ntpslqj66ya
       '@sinclair/typebox': 0.24.22
       '@tietokilta/ilmomasiina-models': link:../ilmomasiina-models
+      ajv: 8.12.0
+      ajv-formats: 2.1.1_ajv@8.12.0
       base32-encode: 1.2.0
       bcrypt: 5.1.0
       better-npm-run: 0.1.1
@@ -413,11 +417,11 @@ packages:
     engines: {node: '>=14'}
     dev: false
 
-  /@fastify/ajv-compiler/3.1.2:
-    resolution: {integrity: sha512-m2nzzQJeuVmeGOB9rnII9sZiY8AZ02a9WMQfMBfK1jxdFnxm3FPYKGbYpPjODj4halNogwpolyugbTNpnDCi0A==}
+  /@fastify/ajv-compiler/3.5.0:
+    resolution: {integrity: sha512-ebbEtlI7dxXF5ziNdr05mOY8NnDiPB1XvAlLHctRt/Rc+C3LCOVW5imUVX+mhvUhnNzmPBHewUkOFgGlCxgdAA==}
     dependencies:
-      ajv: 8.11.0
-      ajv-formats: 2.1.1
+      ajv: 8.12.0
+      ajv-formats: 2.1.1_ajv@8.12.0
       fast-uri: 2.1.0
     dev: false
 
@@ -553,7 +557,7 @@ packages:
       i18n-locales: 0.0.5
       lodash: 4.17.21
       multimatch: 5.0.0
-      punycode: 2.1.1
+      punycode: 2.3.0
       qs: 6.10.5
       titleize: 2.1.0
       tlds: 1.231.0
@@ -1294,13 +1298,15 @@ packages:
       - supports-color
     dev: false
 
-  /ajv-formats/2.1.1:
+  /ajv-formats/2.1.1_ajv@8.12.0:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
+    peerDependencies:
+      ajv: ^8.0.0
     peerDependenciesMeta:
       ajv:
         optional: true
     dependencies:
-      ajv: 8.11.0
+      ajv: 8.12.0
     dev: false
 
   /ajv/6.12.6:
@@ -1312,8 +1318,8 @@ packages:
       uri-js: 4.4.1
     dev: false
 
-  /ajv/8.11.0:
-    resolution: {integrity: sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==}
+  /ajv/8.12.0:
+    resolution: {integrity: sha512-sRu1kpcO9yLtYxBKvqfTeh9KzZEwO3STyX1HT+4CaDzC6HpTGYhIhPIzj9XuKU7KYDwnaeh5hcOwjy1QuJzBPA==}
     dependencies:
       fast-deep-equal: 3.1.3
       json-schema-traverse: 1.0.0
@@ -3349,8 +3355,8 @@ packages:
     resolution: {integrity: sha512-IybGfbUc1DQgyrp9Myhwlr1Z5vjV37mBkdgcbuvsvUxv5fayG+cHlTQQpXH9nMwUPgp+5Y3RT7QDgx5zJ9NS3A==}
     dependencies:
       '@fastify/deepmerge': 1.1.0
-      ajv: 8.11.0
-      ajv-formats: 2.1.1
+      ajv: 8.12.0
+      ajv-formats: 2.1.1_ajv@8.12.0
       fast-uri: 2.1.0
       rfdc: 1.3.0
     dev: false
@@ -3395,7 +3401,7 @@ packages:
   /fastify/4.3.0:
     resolution: {integrity: sha512-9q5Ron8jWmX6ElFkgZH4zmIIXdnkGIu16JozWG2ohcs7th5rAo1ymNi+rn6xCmbWc6jl9lf+9OxVe93LOg6/2w==}
     dependencies:
-      '@fastify/ajv-compiler': 3.1.2
+      '@fastify/ajv-compiler': 3.5.0
       '@fastify/error': 3.0.0
       '@fastify/fast-json-stringify-compiler': 4.0.0
       abstract-logging: 2.0.1

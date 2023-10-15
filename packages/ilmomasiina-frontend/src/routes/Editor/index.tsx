@@ -4,6 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
+import { errorDesc, errorTitle } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import requireAuth from '../../containers/requireAuth';
 import { getEvent, newEvent, resetState } from '../../modules/editor/actions';
 import appPaths from '../../paths';
@@ -39,8 +40,8 @@ const Editor = () => {
   if (loadError) {
     return (
       <div className="ilmo--loading-container">
-        <h1>{t('errors.title')}</h1>
-        <p>{t('editor.eventNotFound', { eventId: urlEventId })}</p>
+        <h1>{errorTitle(t, loadError, 'editor.loadError')}</h1>
+        <p>{errorDesc(t, loadError, 'editor.loadError', { eventId: urlEventId })}</p>
         <Link to={appPaths.adminEventsList}>{t('errors.returnToEvents')}</Link>
       </div>
     );

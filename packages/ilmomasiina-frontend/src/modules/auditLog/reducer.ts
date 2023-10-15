@@ -7,9 +7,8 @@ import {
 import type { AuditLogActions, AuditLogState } from './types';
 
 const initialState: AuditLogState = {
-  auditLogQuery: {},
+  query: {},
   auditLog: null,
-  auditLogLoadError: false,
 };
 
 export default function reducer(
@@ -20,21 +19,21 @@ export default function reducer(
     case AUDIT_LOG_QUERY:
       return {
         ...state,
-        auditLogQuery: action.payload,
+        query: action.payload,
         auditLog: null,
-        auditLogLoadError: false,
+        loadError: undefined,
       };
     case AUDIT_LOG_LOADED:
       return {
         ...state,
         auditLog: action.payload,
-        auditLogLoadError: false,
+        loadError: undefined,
       };
     case AUDIT_LOG_LOAD_FAILED:
       return {
         ...state,
         auditLog: null,
-        auditLogLoadError: true,
+        loadError: action.payload,
       };
     case RESET:
       return initialState;

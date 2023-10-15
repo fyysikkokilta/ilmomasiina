@@ -1,9 +1,10 @@
+import type { ApiError } from '@tietokilta/ilmomasiina-components';
 import type { AuditLogResponse, AuditLoqQuery } from '@tietokilta/ilmomasiina-models';
 
 export interface AuditLogState {
-  auditLogQuery: AuditLoqQuery;
+  query: AuditLoqQuery;
   auditLog: AuditLogResponse | null;
-  auditLogLoadError: boolean;
+  loadError?: ApiError;
 }
 
 export type { AuditLogActions } from './actions';

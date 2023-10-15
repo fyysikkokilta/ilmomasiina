@@ -1,3 +1,4 @@
+import type { ApiError } from '@tietokilta/ilmomasiina-components';
 import type {
   AdminEventResponse, CheckSlugResponse, EditConflictError, EventUpdateBody,
   QuestionID, QuestionUpdate, QuotaID, QuotaUpdate,
@@ -7,11 +8,9 @@ import type { EditorEventType } from './actions';
 export interface EditorState {
   event: AdminEventResponse | null;
   isNew: boolean;
-  loadError: boolean;
+  loadError?: ApiError;
   slugAvailability: null | 'checking' | CheckSlugResponse;
   allCategories: null | string[];
-  saving: boolean;
-  saveError: boolean;
   moveToQueueModal: { count: number } | null;
   editConflictModal: EditConflictError | null;
 }
