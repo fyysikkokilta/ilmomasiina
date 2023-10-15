@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import {
   convertSignupsToCSV, FormattedSignup, getSignupsForAdminList, stringifyAnswer,
 } from '@tietokilta/ilmomasiina-components/dist/utils/signupUtils';
+import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import { deleteSignup, getEvent } from '../../../modules/editor/actions';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
-import useEvent from '../../../utils/useEvent';
 import CSVLink, { CSVOptions } from './CSVLink';
 
 import '../Editor.scss';

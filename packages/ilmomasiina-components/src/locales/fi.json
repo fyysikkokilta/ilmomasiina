@@ -23,6 +23,7 @@
         "editSignup.fields.firstName.placeholder": "Etunimi",
         "editSignup.fields.lastName": "Sukunimi",
         "editSignup.fields.lastName.placeholder": "Sukunimi",
+        "editSignup.fields.select.placeholder": "Valitse\u2026",
         "editSignup.namePublic": "Näytä nimi julkisessa osallistujalistassa",
         "editSignup.position.openQuota": "Olet avoimessa kiintiössä sijalla {{position}}.",
         "editSignup.position.queue": "Olet jonossa sijalla {{position}}.",

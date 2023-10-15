@@ -23,6 +23,7 @@
         "editSignup.fields.firstName.placeholder": "First name",
         "editSignup.fields.lastName": "Last name",
         "editSignup.fields.lastName.placeholder": "Last name",
+        "editSignup.fields.select.placeholder": "Choose\u2026",
         "editSignup.namePublic": "Show name in public signup list",
         "editSignup.position.openQuota": "You are in the open quota in position {{position}}.",
         "editSignup.position.queue": "You are in the queue in position {{position}}.",

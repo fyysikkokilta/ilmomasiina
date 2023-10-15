@@ -9,10 +9,10 @@ import { useTranslation } from 'react-i18next';
 import { SortEnd } from 'react-sortable-hoc';
 
 import { FinalFieldRow as FieldRow } from '@tietokilta/ilmomasiina-components';
+import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import useShallowMemo from '@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo';
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
 import { EditorQuestion } from '../../../modules/editor/types';
-import useEvent from '../../../utils/useEvent';
 import { useFieldValue } from './hooks';
 import SelectBox from './SelectBox';
 import Sortable from './Sortable';

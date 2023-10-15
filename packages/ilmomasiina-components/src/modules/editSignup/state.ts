@@ -3,6 +3,7 @@ import { ApiError } from '../../api';
 import { createStateContext } from '../../utils/stateContext';
 
 export type State = Partial<SignupForEditResponse> & {
+  isNew?: boolean;
   pending: boolean;
   error?: ApiError;
   editToken: string;

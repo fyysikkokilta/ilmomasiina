@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { BaseSyntheticEvent } from 'react';
 
 import { Button, ButtonGroup, Spinner } from 'react-bootstrap';
 import { useFormState } from 'react-final-form';
@@ -9,7 +9,7 @@ import appPaths from '../../../paths';
 import { useTypedSelector } from '../../../store/reducers';
 
 type Props = {
-  onSave: () => void;
+  onSave: (evt: BaseSyntheticEvent) => void;
   onSaveToggleDraft: () => void;
 };
 
