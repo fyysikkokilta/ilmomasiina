@@ -44,6 +44,7 @@ export function useEditSignupState({ id, editToken }: EditSignupProps) {
     error: fetchSignup.error as ApiError | undefined,
     registrationClosed,
     ...fetchSignup.result,
+    isNew: fetchSignup.result && !fetchSignup.result.signup.confirmed,
   });
 }
 

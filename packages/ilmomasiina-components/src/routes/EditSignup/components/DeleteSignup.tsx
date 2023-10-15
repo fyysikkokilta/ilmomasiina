@@ -1,52 +1,23 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 
-import { useFormikContext } from 'formik';
+import { useFormState } from 'react-final-form';
 import { Trans, useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
 
-import { ApiError } from '../../../api';
 import ConfirmButton from '../../../components/ConfirmButton';
-import { useNavigate } from '../../../config/router';
-import { usePaths } from '../../../contexts';
-import { useDeleteSignup, useEditSignupContext } from '../../../modules/editSignup';
-import { errorDesc } from '../../../utils/errorMessage';
+import { useEditSignupContext } from '../../../modules/editSignup';
 
 const DELETE_CONFIRM_MS = 4000;
 
-const DeleteSignup = () => {
+type Props = {
+  deleting: boolean;
+  onDelete: () => void;
+};
+
+const DeleteSignup = ({ deleting, onDelete }: Props) => {
   const { event } = useEditSignupContext();
-  const deleteSignup = useDeleteSignup();
-  const navigate = useNavigate();
-  const paths = usePaths();
   const { t } = useTranslation();
 
-  const { isSubmitting, setSubmitting } = useFormikContext();
-
-  const doDelete = useCallback(async () => {
-    const progressToast = toast.loading(t('editSignup.status.delete'));
-    try {
-      setSubmitting(true);
-      await deleteSignup();
-      toast.update(progressToast, {
-        render: t('editSignup.status.deleteSuccess'),
-        type: toast.TYPE.SUCCESS,
-        closeButton: true,
-        closeOnClick: true,
-        isLoading: false,
-      });
-      navigate(paths.eventDetails(event!.slug));
-    } catch (error) {
-      setSubmitting(false);
-      toast.update(progressToast, {
-        render: errorDesc(t, error as ApiError, 'editSignup.deleteError'),
-        type: toast.TYPE.ERROR,
-        autoClose: 5000,
-        closeButton: true,
-        closeOnClick: true,
-        isLoading: false,
-      });
-    }
-  }, [deleteSignup, event, navigate, paths, setSubmitting, t]);
+  const { submitting } = useFormState({ subscription: { submitting: true } });
 
   return (
     <div className="ilmo--delete-container">
@@ -68,8 +39,8 @@ const DeleteSignup = () => {
       </p>
       <ConfirmButton
         type="button"
-        disabled={isSubmitting}
-        onClick={doDelete}
+        disabled={submitting || deleting}
+        onClick={onDelete}
         variant="danger"
         confirmDelay={DELETE_CONFIRM_MS}
         confirmLabel={t('editSignup.delete.action.confirm')}
