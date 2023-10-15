@@ -1,6 +1,6 @@
 import React, { MouseEvent } from 'react';
 
-import sumBy from 'lodash/sumBy';
+import sumBy from 'lodash-es/sumBy';
 import moment from 'moment-timezone';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';

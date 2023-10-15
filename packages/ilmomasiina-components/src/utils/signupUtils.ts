@@ -1,6 +1,6 @@
-import find from 'lodash/find';
-import orderBy from 'lodash/orderBy';
-import sumBy from 'lodash/sumBy';
+import find from 'lodash-es/find';
+import orderBy from 'lodash-es/orderBy';
+import sumBy from 'lodash-es/sumBy';
 import moment from 'moment-timezone';
 
 import type {
