@@ -19,7 +19,7 @@
     "@tietokilta/ilmomasiina-components": "workspace:2.0.0-alpha13",
     "@tietokilta/ilmomasiina-models": "workspace:2.0.0-alpha13",
     "@types/history": "^4.7.11",
-    "@types/lodash": "^4.14.182",
+    "@types/lodash-es": "^4.17.9",
     "@types/node": "^16.11.41",
     "@types/node-sass": "^4.11.2",
     "@types/react": "^17.0.47",
@@ -39,7 +39,7 @@
     "history": "^4.10.1",
     "i18next": "^22.4.11",
     "i18next-browser-languagedetector": "^7.0.1",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "moment": "^2.29.3",
     "moment-timezone": "^0.5.34",
     "react": "^17.0.2",
@@ -65,8 +65,10 @@
     "typescript": "~4.9"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.199",
     "@types/ws": "^8.5.3",
     "rimraf": "^3.0.2",
+    "lodash": "^4.17.21",
     "ws": "^8.8.0"
   }
 }

@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 
 import { useField } from 'formik';
-import find from 'lodash/find';
-import reject from 'lodash/reject';
-import without from 'lodash/without';
+import find from 'lodash-es/find';
+import reject from 'lodash-es/reject';
+import without from 'lodash-es/without';
 import { Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 

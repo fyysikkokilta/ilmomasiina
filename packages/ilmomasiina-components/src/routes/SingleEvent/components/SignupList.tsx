@@ -1,6 +1,6 @@
 import React from 'react';
 
-import filter from 'lodash/filter';
+import filter from 'lodash-es/filter';
 import { Table } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
