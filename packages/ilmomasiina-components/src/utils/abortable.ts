@@ -21,7 +21,7 @@ export function useAbortableEffect(effect: (signal: AbortSignal) => void, deps?:
 
 export type PromiseState<R> = {
   result: undefined;
-  error: unknown;
+  error: undefined;
   pending: true;
 } | {
   result: R;
@@ -29,7 +29,7 @@ export type PromiseState<R> = {
   pending: false;
 } | {
   result: undefined;
-  error: undefined;
+  error: object;
   pending: false;
 };
 
@@ -55,12 +55,15 @@ export function useAbortablePromise<R>(effect: (signal: AbortSignal) => Promise<
     error: undefined,
     pending: true,
   });
-  const done = useRef(false);
+  // Track promise from latest effect call, ignore updates from other promises
+  const pendingPromise = useRef<unknown>();
   useAbortableEffect((signal) => {
-    ignoreAbort(effect(signal)).then(
+    const promise = ignoreAbort(effect(signal));
+    pendingPromise.current = promise;
+    promise.then(
       (result) => {
-        if (done.current) return;
-        done.current = true;
+        if (pendingPromise.current !== promise) return;
+        pendingPromise.current = undefined;
         setState({
           result,
           error: undefined,
@@ -68,8 +71,8 @@ export function useAbortablePromise<R>(effect: (signal: AbortSignal) => Promise<
         });
       },
       (error) => {
-        if (done.current) return;
-        done.current = true;
+        if (pendingPromise.current !== promise) return;
+        pendingPromise.current = undefined;
         setState({
           result: undefined,
           error,
@@ -78,8 +81,8 @@ export function useAbortablePromise<R>(effect: (signal: AbortSignal) => Promise<
       },
     );
     signal.addEventListener('abort', () => {
-      if (done.current) return;
-      done.current = true;
+      if (pendingPromise.current !== promise) return;
+      pendingPromise.current = undefined;
       setState({
         result: undefined,
         error: undefined,
