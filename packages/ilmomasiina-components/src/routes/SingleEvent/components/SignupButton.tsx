@@ -5,9 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import type { QuotaID } from '@tietokilta/ilmomasiina-models';
+import { ApiError } from '../../../api';
 import { useNavigate } from '../../../config/router';
 import { usePaths } from '../../../contexts/paths';
 import { beginSignup, useSingleEventContext } from '../../../modules/singleEvent';
+import { errorDesc } from '../../../utils/errorMessage';
 import { signupState, useSignupStateText } from '../../../utils/signupStateText';
 
 // Show the countdown one minute before opening the signup.
@@ -34,16 +36,16 @@ const SignupButton = ({
   const onClick = useCallback(async (quotaId: QuotaID) => {
     if (!isOpen) return;
     setSubmitting(true);
-    const progressToast = toast.loading(t('singleEvent.status.signup'));
+    const progressToast = toast.loading(t('singleEvent.signupInProgress'));
     try {
       const response = await beginSignup(quotaId);
       setSubmitting(false);
       navigate(paths.editSignup(response.id, response.editToken));
       toast.dismiss(progressToast);
-    } catch (e) {
+    } catch (err) {
       setSubmitting(false);
       toast.update(progressToast, {
-        render: t('singleEvent.status.signupFailed'),
+        render: errorDesc(t, err as ApiError, 'singleEvent.signupError'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,

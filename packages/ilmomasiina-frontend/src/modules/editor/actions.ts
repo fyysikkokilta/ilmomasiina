@@ -11,7 +11,6 @@ import {
   EDIT_CONFLICT_DISMISSED,
   EVENT_LOAD_FAILED,
   EVENT_LOADED,
-  EVENT_SAVE_FAILED,
   EVENT_SAVING,
   EVENT_SLUG_CHECKED,
   EVENT_SLUG_CHECKING,
@@ -86,8 +85,9 @@ export const newEvent = () => <const>{
   },
 };
 
-export const loadFailed = () => <const>{
+export const loadFailed = (error: ApiError) => <const>{
   type: EVENT_LOAD_FAILED,
+  payload: error,
 };
 
 export const checkingSlugAvailability = () => <const>{
@@ -103,10 +103,6 @@ export const slugAvailabilityChecked = (
 
 export const saving = () => <const>{
   type: EVENT_SAVING,
-};
-
-export const saveFailed = () => <const>{
-  type: EVENT_SAVE_FAILED,
 };
 
 export const moveToQueueWarning = (count: number) => <const>{
@@ -140,7 +136,6 @@ export type EditorActions =
   | ReturnType<typeof checkingSlugAvailability>
   | ReturnType<typeof slugAvailabilityChecked>
   | ReturnType<typeof saving>
-  | ReturnType<typeof saveFailed>
   | ReturnType<typeof moveToQueueWarning>
   | ReturnType<typeof moveToQueueCanceled>
   | ReturnType<typeof editConflictDetected>
@@ -199,7 +194,7 @@ export const getEvent = (id: EventID) => async (dispatch: DispatchAction, getSta
     const response = await adminApiFetch(`admin/events/${id}`, { accessToken }, dispatch) as AdminEventResponse;
     dispatch(loaded(response));
   } catch (e) {
-    dispatch(loadFailed());
+    dispatch(loadFailed(e as ApiError));
   }
 };
 
@@ -239,18 +234,13 @@ export const publishNewEvent = (data: EditorEvent) => async (dispatch: DispatchA
   const cleaned = editorEventToServer(data);
   const { accessToken } = getState().auth;
 
-  try {
-    const response = await adminApiFetch('admin/events', {
-      accessToken,
-      method: 'POST',
-      body: cleaned,
-    }, dispatch) as AdminEventResponse;
-    dispatch(loaded(response));
-    return response;
-  } catch (e) {
-    dispatch(saveFailed());
-    throw e;
-  }
+  const response = await adminApiFetch('admin/events', {
+    accessToken,
+    method: 'POST',
+    body: cleaned,
+  }, dispatch) as AdminEventResponse;
+  dispatch(loaded(response));
+  return response;
 };
 
 export const publishEventUpdate = (
@@ -279,7 +269,6 @@ export const publishEventUpdate = (
       dispatch(editConflictDetected(e.response!));
       return null;
     }
-    dispatch(saveFailed());
     throw e;
   }
 };

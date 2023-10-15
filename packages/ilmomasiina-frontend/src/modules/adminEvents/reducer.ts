@@ -7,7 +7,6 @@ import type { AdminEventsActions, AdminState } from './types';
 
 const initialState: AdminState = {
   events: null,
-  eventsLoadError: false,
 };
 
 export default function reducer(
@@ -19,12 +18,12 @@ export default function reducer(
       return {
         ...state,
         events: action.payload,
-        eventsLoadError: false,
+        loadError: undefined,
       };
     case EVENTS_LOAD_FAILED:
       return {
         ...state,
-        eventsLoadError: true,
+        loadError: action.payload,
       };
     case RESET:
       return initialState;

@@ -4,6 +4,8 @@ import { Button, ButtonGroup } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
+import { ApiError } from '@tietokilta/ilmomasiina-components';
+import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import type { UserSchema } from '@tietokilta/ilmomasiina-models';
 import { deleteUser, getUsers, resetUserPassword } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
@@ -19,11 +21,14 @@ const AdminUserListItem = ({ user }: Props) => {
   async function onDelete() {
     const confirmed = window.confirm(t('adminUsers.deleteUser.confirm', { user: user.email }));
     if (confirmed) {
-      const success = await dispatch(deleteUser(user.id));
-      if (!success) {
-        toast.error(t('adminUsers.deleteUser.failed'), { autoClose: 5000 });
-      } else {
-        toast.success(t('adminUsers.deleteUser.success'), { autoClose: 5000 });
+      try {
+        await dispatch(deleteUser(user.id));
+        toast.success(t('adminUsers.deleteUser.success', { user: user.email }), { autoClose: 5000 });
+      } catch (err) {
+        toast.error(
+          errorDesc(t, err as ApiError, 'adminUsers.deleteUser.errors', { user: user.email }),
+          { autoClose: 5000 },
+        );
       }
       dispatch(getUsers());
     }
@@ -31,11 +36,14 @@ const AdminUserListItem = ({ user }: Props) => {
   async function onResetPassword() {
     const confirmed = window.confirm(t('adminUsers.resetPassword.confirm', { user: user.email }));
     if (confirmed) {
-      const success = await dispatch(resetUserPassword(user.id));
-      if (!success) {
-        toast.error(t('adminUsers.resetPassword.failed'), { autoClose: 5000 });
-      } else {
-        toast.success(t('adminUsers.resetPassword.success'), { autoClose: 5000 });
+      try {
+        await dispatch(resetUserPassword(user.id));
+        toast.success(t('adminUsers.resetPassword.success', { user: user.email }), { autoClose: 5000 });
+      } catch (err) {
+        toast.error(
+          errorDesc(t, err as ApiError, 'adminUsers.resetPassword.errors', { user: user.email }),
+          { autoClose: 5000 },
+        );
       }
     }
   }

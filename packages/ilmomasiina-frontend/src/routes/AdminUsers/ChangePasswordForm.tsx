@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import { ApiError } from '@tietokilta/ilmomasiina-components';
-import { ErrorCode } from '@tietokilta/ilmomasiina-models';
+import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import i18n from '../../i18n';
 import { changePassword } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
@@ -49,11 +49,10 @@ const ChangePasswordForm = () => {
       resetForm();
       toast.success(t('adminUsers.changePassword.success'), { autoClose: 5000 });
     } catch (err) {
-      if (err instanceof ApiError && err.code === ErrorCode.WRONG_OLD_PASSWORD) {
-        toast.error(t('adminUsers.changePassword.wrongPassword'), { autoClose: 5000 });
-      } else {
-        toast.error(t('adminUsers.changePassword.failed'), { autoClose: 5000 });
-      }
+      toast.error(
+        errorDesc(t, err as ApiError, 'adminUsers.changePassword.errors'),
+        { autoClose: 5000 },
+      );
     } finally {
       setSubmitting(false);
     }

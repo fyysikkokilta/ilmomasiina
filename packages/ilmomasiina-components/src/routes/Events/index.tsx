@@ -8,6 +8,7 @@ import { linkComponent } from '../../config/router';
 import { usePaths } from '../../contexts/paths';
 import { I18nProvider } from '../../i18n';
 import { EventListProps, EventListProvider, useEventListContext } from '../../modules/events';
+import { errorDesc, errorTitle } from '../../utils/errorMessage';
 import {
   EventRow, eventsToRows, OPENQUOTA, QuotaRow, WAITLIST,
 } from '../../utils/eventListUtils';
@@ -57,8 +58,8 @@ const EventListView = () => {
   if (error) {
     return (
       <>
-        <h1>{t('errors.title')}</h1>
-        <p>{t('events.loadFailed')}</p>
+        <h1>{errorTitle(t, error, 'events.loadError')}</h1>
+        <p>{errorDesc(t, error, 'events.loadError')}</p>
       </>
     );
   }

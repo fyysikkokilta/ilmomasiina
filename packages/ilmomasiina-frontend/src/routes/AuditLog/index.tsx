@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import requireAuth from '../../containers/requireAuth';
 import { getAuditLogs, resetState } from '../../modules/auditLog/actions';
 import appPaths from '../../paths';
@@ -18,7 +19,7 @@ import './AuditLog.scss';
 
 const AuditLog = () => {
   const dispatch = useTypedDispatch();
-  const { auditLog, auditLogLoadError } = useTypedSelector((state) => state.auditLog, shallowEqual);
+  const { auditLog, loadError } = useTypedSelector((state) => state.auditLog, shallowEqual);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -68,14 +69,14 @@ const AuditLog = () => {
           </tr>
         </thead>
         <tbody>
-          {auditLogLoadError && (
+          {loadError && (
             <tr>
               <td colSpan={4}>
-                {t('auditLog.loadFailed')}
+                {errorDesc(t, loadError, 'auditLog.loadError')}
               </td>
             </tr>
           )}
-          {!auditLogLoadError && !auditLog && (
+          {!loadError && !auditLog && (
             <tr>
               <td colSpan={4}>
                 <Spinner animation="border" />

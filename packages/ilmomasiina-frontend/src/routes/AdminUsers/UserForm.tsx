@@ -7,6 +7,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
+import { ApiError } from '@tietokilta/ilmomasiina-components';
+import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import { createUser, getUsers } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
 
@@ -19,14 +21,16 @@ const UserForm = () => {
   const { t } = useTranslation();
 
   const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
-    // TODO: better error handling
-    const success = await dispatch(createUser(data));
-    if (success) {
+    try {
+      await dispatch(createUser(data));
       dispatch(getUsers());
       resetForm();
-      toast.success(t('adminUsers.createUser.success'), { autoClose: 2000 });
-    } else {
-      toast.error(t('adminUsers.createUser.failed'), { autoClose: 2000 });
+      toast.success(t('adminUsers.createUser.success', { email: data.email }), { autoClose: 2000 });
+    } catch (err) {
+      toast.error(
+        errorDesc(t, err as ApiError, 'adminUsers.createUser.errors', { email: data.email }),
+        { autoClose: 5000 },
+      );
     }
     setSubmitting(false);
   };

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { errorDesc, errorTitle } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import requireAuth from '../../containers/requireAuth';
 import { getAdminEvents, resetState } from '../../modules/adminEvents/actions';
 import appPaths from '../../paths';
@@ -13,7 +14,7 @@ import AdminEventListItem from './AdminEventListItem';
 
 const AdminEventsList = () => {
   const dispatch = useTypedDispatch();
-  const { events, eventsLoadError } = useTypedSelector((state) => state.adminEvents, shallowEqual);
+  const { events, loadError } = useTypedSelector((state) => state.adminEvents, shallowEqual);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -23,11 +24,11 @@ const AdminEventsList = () => {
     };
   }, [dispatch]);
 
-  if (eventsLoadError) {
+  if (loadError) {
     return (
       <>
-        <h1>{t('errors.title')}</h1>
-        <p>{t('adminEvents.loadFailed')}</p>
+        <h1>{errorTitle(t, loadError, 'adminEvents.loadError')}</h1>
+        <p>{errorDesc(t, loadError, 'adminEvents.loadError')}</p>
       </>
     );
   }

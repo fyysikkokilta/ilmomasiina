@@ -9,12 +9,12 @@ import { useTypedDispatch, useTypedSelector } from '../../store/reducers';
 export const LOGS_PER_PAGE = 100;
 
 const AuditLogPagination = () => {
-  const { auditLogQuery, auditLog } = useTypedSelector((state) => state.auditLog);
+  const { query, auditLog } = useTypedSelector((state) => state.auditLog);
   const dispatch = useTypedDispatch();
   const { t } = useTranslation();
 
-  const value = auditLogQuery.offset || 0;
-  const perPage = auditLogQuery.limit || LOGS_PER_PAGE;
+  const value = query.offset || 0;
+  const perPage = query.limit || LOGS_PER_PAGE;
 
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     dispatch(setAuditLogQueryField('offset', Number(e.target.value) - 1));

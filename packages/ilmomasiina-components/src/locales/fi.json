@@ -1,5 +1,5 @@
 {
-    "translation": {
+    "components": {
         "dateFormat.dateTimeSep": "klo",
         "editSignup.action.cancel": "Peruuta",
         "editSignup.action.edit": "Päivitä",
@@ -11,8 +11,12 @@
         "editSignup.delete.info3": "Tätä toimintoa ei voi perua.",
         "editSignup.editInstructions.email": "Linkki lähetetään myös sähköpostiisi vahvistusviestissä.",
         "editSignup.editInstructions": "Voit muokata ilmoittautumistasi tai poistaa sen myöhemmin tallentamalla tämän sivun URL-osoitteen.",
+        "editSignup.loadError.BadEditToken.title": "Virheellinen vahvistuskoodi",
+        "editSignup.loadError.BadEditToken.description": "URL-osoitteen vahvistuskoodi on virheellinen. Tarkista, että kirjoitit URL-osoitteen oikein.",
+        "editSignup.loadError.404.title": "Ilmoittautumista ei löytynyt",
+        "editSignup.loadError.404.description": "Ilmoittautumistasi ei löytynyt. Se saattaa olla jo poistettu.",
+        "editSignup.loadError.default.description": "Ilmoittautumisen lataaminen epäonnistui. $t(errors.contactAdmin)",
         "editSignup.errors.closed": "Ilmoittautumistasi ei voi enää muokata tai perua, koska tapahtuman ilmoittautuminen on sulkeutunut.",
-        "editSignup.errors.loadFailed": "Ilmoittautumistasi ei löytynyt. Se saattaa olla jo poistettu.",
         "editSignup.errors.invalid": "Ilmoittautumisessasi on virheitä.",
         "editSignup.fields.email": "Sähköposti",
         "editSignup.fields.email.placeholder": "Sähköposti",
@@ -37,12 +41,18 @@
         "editSignup.title.edit": "Muokkaa ilmoittautumista",
         "editSignup.title.signup": "Ilmoittaudu",
         "errors.returnToEvents": "Palaa tapahtumalistaukseen",
-        "errors.title": "Hups, jotain meni pieleen",
+        "errors.contactAdmin": "Jos ongelma jatkuu, ota yhteyttä ylläpitäjiin.",
+        "errors.default.title": "Hups, jotain meni pieleen",
+        "errors.default.description": "Tuntematon virhe. $t(errors.contactAdmin)",
+        "errors.500.description": "Palvelimella tapahtui virhe. $t(errors.contactAdmin)",
+        "errors.502.description": "Taustapalvelimeen ei saada yhteyttä. $t(errors.contactAdmin)",
+        "errors.503.description": "Taustapalvelimeen ei saada yhteyttä. $t(errors.contactAdmin)",
+        "errors.504.description": "Taustapalvelin ei vastaa pyyntöihin. $t(errors.contactAdmin)",
         "events.column.date": "Ajankohta",
         "events.column.name": "Nimi",
         "events.column.signupCount": "Ilmoittautuneita",
         "events.column.signupStatus": "Ilmoittautuminen",
-        "events.loadFailed": "Tapahtumien lataus epäonnistui",
+        "events.loadError.default.description": "Tapahtumien lataaminen epäonnistui. $t(errors.contactAdmin)",
         "events.openQuota": "Avoin",
         "events.signupCount": "Ilmoittautuneita:",
         "events.title": "Tapahtumat",
@@ -61,7 +71,9 @@
         "singleEvent.info.price": "Hinta:",
         "singleEvent.info.startDate": "Alkaa:",
         "singleEvent.info.website": "Kotisivut:",
-        "singleEvent.loadFailed": "Tapahtumaa ei löytynyt. Se saattaa olla menneisyydessä tai poistettu.",
+        "singleEvent.loadError.404.title": "Tapahtumaa ei löytynyt",
+        "singleEvent.loadError.404.description": "Tapahtumaa ei löytynyt. Se saattaa olla menneisyydessä tai poistettu, tai olet ehkä kirjoittanut URL-osoitteen väärin.",
+        "singleEvent.loadError.default.description": "Tapahtuman lataaminen epäonnistui. $t(errors.contactAdmin)",
         "singleEvent.quotaCounts.openQuota": "Avoin kiintiö",
         "singleEvent.quotaCounts.queue": "Jonossa: {{count}}",
         "singleEvent.quotaCounts.title": "Ilmoittautuneet",
@@ -78,8 +90,9 @@
         "singleEvent.signups.signupTime": "Ilmoittautumisaika",
         "singleEvent.signups.title": "Ilmoittautuneet",
         "singleEvent.signups.unconfirmed": "Vahvistamatta",
-        "singleEvent.status.signup": "Ilmoittautuminen käynnissä",
-        "singleEvent.status.signupFailed": "Ilmoittautuminen epäonnistui."
-
+        "singleEvent.signupInProgress": "Ilmoittautuminen käynnissä",
+        "singleEvent.signupError.NoSuchQuota.description": "Valitsemasi kiintiö on poistettu.",
+        "singleEvent.signupError.SignupsClosed.description": "Tapahtuman ilmoittautuminen on sulkeutunut.",
+        "singleEvent.signupError.default.description": "Ilmoittautuminen epäonnistui."
     }
 }
