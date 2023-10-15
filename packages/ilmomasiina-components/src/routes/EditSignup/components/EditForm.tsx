@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import type { SignupUpdateBody } from '@tietokilta/ilmomasiina-models';
+import { ApiError } from '../../../api';
 import FieldRow from '../../../components/FieldRow';
 import { linkComponent, useNavigate } from '../../../config/router';
 import { usePaths } from '../../../contexts/paths';
 import { useEditSignupContext, useUpdateSignup } from '../../../modules/editSignup';
+import { errorDesc } from '../../../utils/errorMessage';
 import DeleteSignup from './DeleteSignup';
 import NarrowContainer from './NarrowContainer';
 import QuestionFields from './QuestionFields';
@@ -25,7 +27,7 @@ const EditForm = () => {
   const { t, i18n: { language } } = useTranslation();
 
   // TODO: actually use errors from API
-  const [submitError, setSubmitError] = useState(false);
+  const [submitError, setSubmitError] = useState<ApiError>();
 
   async function onSubmit(answers: SignupUpdateBody, { setSubmitting }: FormikHelpers<SignupUpdateBody>) {
     const progressToast = toast.loading(isNew ? t('editSignup.status.signup') : t('editSignup.status.edit'));
@@ -44,21 +46,21 @@ const EditForm = () => {
         closeOnClick: true,
         isLoading: false,
       });
-      setSubmitError(false);
+      setSubmitError(undefined);
       setSubmitting(false);
       if (isNew) {
         navigate(paths.eventDetails(event!.slug));
       }
     } catch (error) {
       toast.update(progressToast, {
-        render: isNew ? t('editSignup.status.signupFailed') : t('editSignup.status.editFailed'),
+        render: errorDesc(t, error as ApiError, isNew ? 'editSignup.signupError' : 'editSignup.editError'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
         closeOnClick: true,
         isLoading: false,
       });
-      setSubmitError(true);
+      setSubmitError(error as ApiError);
       setSubmitting(false);
     }
   }
@@ -73,7 +75,9 @@ const EditForm = () => {
           <h2>{isNew ? t('editSignup.title.signup') : t('editSignup.title.edit')}</h2>
           <SignupStatus />
           {submitError && (
-            <p className="ilmo--form-error">{t('editSignup.errors.invalid')}</p>
+            <p className="ilmo--form-error">
+              {errorDesc(t, submitError, isNew ? 'editSignup.signupError' : 'editSignup.editError')}
+            </p>
           )}
           {registrationClosed && (
             <p className="ilmo--form-error">

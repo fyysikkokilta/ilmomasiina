@@ -4,10 +4,12 @@ import { useFormikContext } from 'formik';
 import { Trans, useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
+import { ApiError } from '../../../api';
 import ConfirmButton from '../../../components/ConfirmButton';
 import { useNavigate } from '../../../config/router';
 import { usePaths } from '../../../contexts';
 import { useDeleteSignup, useEditSignupContext } from '../../../modules/editSignup';
+import { errorDesc } from '../../../utils/errorMessage';
 
 const DELETE_CONFIRM_MS = 4000;
 
@@ -36,7 +38,7 @@ const DeleteSignup = () => {
     } catch (error) {
       setSubmitting(false);
       toast.update(progressToast, {
-        render: t('editSignup.status.deleteFailed'),
+        render: errorDesc(t, error as ApiError, 'editSignup.deleteError'),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
