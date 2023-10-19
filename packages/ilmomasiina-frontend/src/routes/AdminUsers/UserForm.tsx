@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Field, Formik, FormikHelpers } from 'formik';
+import { FormApi } from 'final-form';
 import {
-  Button, Form, Spinner,
+  Button, Form as BsForm, FormControl, FormGroup, Spinner,
 } from 'react-bootstrap';
+import { Field, Form } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
@@ -20,11 +21,11 @@ const UserForm = () => {
   const dispatch = useTypedDispatch();
   const { t } = useTranslation();
 
-  const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
+  const onSubmit = async (data: FormData, form: FormApi<FormData>) => {
     try {
       await dispatch(createUser(data));
       dispatch(getUsers());
-      resetForm();
+      form.restart();
       toast.success(t('adminUsers.createUser.success', { email: data.email }), { autoClose: 2000 });
     } catch (err) {
       toast.error(
@@ -32,35 +33,36 @@ const UserForm = () => {
         { autoClose: 5000 },
       );
     }
-    setSubmitting(false);
   };
 
   return (
-    <Formik
+    <Form<FormData>
       initialValues={{
         email: '',
       }}
       onSubmit={onSubmit}
     >
-      {({ isSubmitting, handleSubmit }) => (
-        <Form
-          className="ilmo--form"
-          onSubmit={handleSubmit}
-        >
-          <Field
-            as={Form.Control}
-            name="email"
-            id="email"
-            type="email"
-            placeholder={t('adminUsers.createUser.email')}
-            aria-label={t('adminUsers.createUser.email')}
-          />
-          <Button type="submit" variant="secondary" disabled={isSubmitting}>
-            {isSubmitting ? <Spinner animation="border" /> : t('adminUsers.createUser.submit')}
+      {({ submitting, handleSubmit }) => (
+        <BsForm className="ilmo--form" onSubmit={handleSubmit}>
+          <FormGroup>
+            <Field name="email">
+              {({ input }) => (
+                <FormControl
+                  {...input}
+                  id="email"
+                  type="email"
+                  placeholder={t('adminUsers.createUser.email')}
+                  aria-label={t('adminUsers.createUser.email')}
+                />
+              )}
+            </Field>
+          </FormGroup>
+          <Button type="submit" variant="secondary" disabled={submitting}>
+            {submitting ? <Spinner animation="border" /> : t('adminUsers.createUser.submit')}
           </Button>
-        </Form>
+        </BsForm>
       )}
-    </Formik>
+    </Form>
   );
 };
 

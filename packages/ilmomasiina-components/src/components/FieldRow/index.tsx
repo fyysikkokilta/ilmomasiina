@@ -1,22 +1,28 @@
 import React, { ComponentType, ReactNode } from 'react';
 
-import { Field, useField } from 'formik';
 import { Form } from 'react-bootstrap';
+import { useField, UseFieldConfig } from 'react-final-form';
 
 import BaseFieldRow, { BaseFieldRowProps } from '../BaseFieldRow';
 
-type Props = Omit<BaseFieldRowProps, 'error' | 'children'> & {
+type Props = Omit<BaseFieldRowProps, 'error' | 'children'> & Pick<UseFieldConfig<any>, 'type'> & {
+  /** The name of the field in the data. */
+  name: string;
+  /** Passed as `controlId` if no `controlId` is separately set. */
+  id?: string;
   /** Overrides the real error message if the field has errors. */
   alternateError?: string;
   /** Passed as `label` to the field component. Intended for checkboxes. */
   checkLabel?: ReactNode;
-  /** The component or element to use as the field. Passed to Formik's `Field`. */
+  /** The component or element to use as the field. */
   as?: ComponentType<any> | string;
+  /** useField() config. */
+  config?: UseFieldConfig<any>;
   /** If given, this is used as the field. */
   children?: ReactNode;
 };
 
-/** FieldRow for use with formik */
+/** react-final-field field row component */
 export default function FieldRow<P = unknown>({
   name,
   label = '',
@@ -26,11 +32,15 @@ export default function FieldRow<P = unknown>({
   extraFeedback,
   checkAlign,
   checkLabel,
-  as = Form.Control,
+  as: Component = Form.Control,
   children,
+  type,
+  id,
+  controlId = id,
+  config,
   ...props
 }: Props & P) {
-  const [, { error }] = useField<any>(name);
+  const { input, meta: { error, invalid } } = useField(name, { type, ...config });
 
   let field: ReactNode;
   if (children) {
@@ -40,16 +50,16 @@ export default function FieldRow<P = unknown>({
     // and calls it "label", but we still want to call the other one "label" for all other types of field. Therefore
     // we pass "checkLabel" to the field here.
     const overrideProps = checkLabel !== undefined ? { label: checkLabel } : {};
-    field = <Field as={as} name={name} required={required} {...props} {...overrideProps} />;
+    field = <Component required={required} {...props} id={id} {...input} {...overrideProps} />;
   }
 
   return (
     <BaseFieldRow
-      name={name}
+      controlId={controlId}
       label={label}
       help={help}
       required={required}
-      error={error && (alternateError || error)}
+      error={invalid && (alternateError || error)}
       extraFeedback={extraFeedback}
       checkAlign={checkAlign}
     >

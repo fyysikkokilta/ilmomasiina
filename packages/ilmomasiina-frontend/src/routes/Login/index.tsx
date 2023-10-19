@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { Field, Formik, FormikHelpers } from 'formik';
-import { Alert, Button, Form } from 'react-bootstrap';
+import { FORM_ERROR } from 'final-form';
+import {
+  Alert, Button, Form as BsForm, FormControl, FormGroup, FormLabel,
+} from 'react-bootstrap';
+import { Field, Form } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 
-import { ApiError } from '@tietokilta/ilmomasiina-components';
 import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
+import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import { login } from '../../modules/auth/actions';
 import { useTypedDispatch } from '../../store/reducers';
 
@@ -16,66 +19,70 @@ type FormData = {
   password: string;
 };
 
+const initialValues: FormData = {
+  email: '',
+  password: '',
+};
+
 const Login = () => {
   const dispatch = useTypedDispatch();
-  const [loginError, setLoginError] = useState<ApiError>();
   const { t } = useTranslation();
 
-  async function onSubmit(data: FormData, { setSubmitting }: FormikHelpers<FormData>) {
+  const onSubmit = useEvent(async (data: FormData) => {
     const { email, password } = data;
     try {
       await dispatch(login(email, password));
-      setLoginError(undefined);
+      return undefined;
     } catch (err) {
-      setLoginError(err as ApiError);
-    } finally {
-      setSubmitting(false);
+      return { [FORM_ERROR]: err };
     }
-  }
+  });
 
   return (
     <div className="login-container">
       <h1>{t('login.title')}</h1>
-      {loginError && (
-        <Alert variant="danger">{errorDesc(t, loginError, 'login.errors')}</Alert>
-      )}
-      <Formik
-        initialValues={{
-          email: '',
-          password: '',
-        }}
-        onSubmit={onSubmit}
-      >
-        {({ handleSubmit, isSubmitting, errors }) => (
-          <Form onSubmit={handleSubmit} className="ilmo--form">
-            <Form.Group controlId="email">
-              <Form.Label data-required>{t('login.email')}</Form.Label>
-              <Field
-                name="email"
-                as={Form.Control}
-                type="email"
-                required
-                placeholder="admin@athene.fi"
-                isInvalid={errors.email}
-              />
-            </Form.Group>
-            <Form.Group controlId="password">
-              <Form.Label data-required>{t('login.password')}</Form.Label>
-              <Field
-                name="password"
-                as={Form.Control}
-                type="password"
-                required
-                placeholder="••••••••"
-                isInvalid={errors.password}
-              />
-            </Form.Group>
-            <Button type="submit" variant="secondary" disabled={isSubmitting}>
+      <Form<FormData> initialValues={initialValues} onSubmit={onSubmit}>
+        {({
+          handleSubmit, submitting, errors, touched, submitError,
+        }) => (
+          <BsForm onSubmit={handleSubmit} className="ilmo--form">
+            {submitError && (
+              <Alert variant="danger">{errorDesc(t, submitError, 'login.errors')}</Alert>
+            )}
+            <FormGroup controlId="email">
+              <FormLabel data-required>{t('login.email')}</FormLabel>
+              <Field name="email">
+                {({ input }) => (
+                  <FormControl
+                    {...input}
+                    type="email"
+                    required
+                    placeholder="admin@athene.fi"
+                    isInvalid={touched?.email && errors?.email}
+                  />
+                )}
+              </Field>
+            </FormGroup>
+            <FormGroup controlId="password">
+              <FormLabel data-required>{t('login.password')}</FormLabel>
+              <Field name="password">
+                {({ input }) => (
+                  <FormControl
+                    {...input}
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    isInvalid={touched?.password && errors?.password}
+                  />
+                )}
+              </Field>
+            </FormGroup>
+            <Button type="submit" variant="secondary" disabled={submitting}>
               {t('login.submit')}
             </Button>
-          </Form>
+          </BsForm>
         )}
-      </Formik>
+      </Form>
     </div>
   );
 };

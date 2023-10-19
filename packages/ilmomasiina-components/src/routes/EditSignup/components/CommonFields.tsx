@@ -3,7 +3,7 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import FieldRow from '../../../components/FinalFieldRow';
+import FieldRow from '../../../components/FieldRow';
 import { useEditSignupContext } from '../../../modules/editSignup';
 
 const CommonFields = () => {
