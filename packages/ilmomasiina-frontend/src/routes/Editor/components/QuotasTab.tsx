@@ -3,7 +3,7 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { FinalFieldRow as FieldRow } from '@tietokilta/ilmomasiina-components';
+import { FieldRow } from '@tietokilta/ilmomasiina-components';
 import DateTimePicker from './DateTimePicker';
 import { useFieldValue } from './hooks';
 import Quotas from './Quotas';

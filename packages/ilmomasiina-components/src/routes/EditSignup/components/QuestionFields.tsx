@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { Question, SignupUpdateBody } from '@tietokilta/ilmomasiina-models';
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
-import FieldRow from '../../../components/FinalFieldRow';
+import FieldRow from '../../../components/FieldRow';
 import { useEditSignupContext } from '../../../modules/editSignup';
 import { stringifyAnswer } from '../../../utils/signupUtils';
 import useEvent from '../../../utils/useEvent';
@@ -168,7 +168,7 @@ type Props = {
 const QuestionFields = ({ name }: Props) => {
   const { event, registrationClosed } = useEditSignupContext();
   return (
-    // TODO: add formik-based validation
+    // TODO: add proper validation
     <>
       {event!.questions.map((question) => (
         <QuestionField key={question.id} name={name} question={question} disabled={registrationClosed} />

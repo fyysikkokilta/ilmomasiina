@@ -8,7 +8,7 @@ import { FieldArray, FieldArrayRenderProps, useFieldArray } from 'react-final-fo
 import { useTranslation } from 'react-i18next';
 import { SortEnd } from 'react-sortable-hoc';
 
-import { FinalFieldRow as FieldRow } from '@tietokilta/ilmomasiina-components';
+import { FieldRow } from '@tietokilta/ilmomasiina-components';
 import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import useShallowMemo from '@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo';
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
