@@ -1,6 +1,7 @@
 {
     "components": {
         "dateFormat.dateTimeSep": "klo",
+        "editSignup.backToEvent": "Takaisin tapahtumasivulle",
         "editSignup.action.cancel": "Peruuta",
         "editSignup.action.edit": "Päivitä",
         "editSignup.action.save": "Tallenna",

@@ -32,13 +32,22 @@ const SubmitError = () => {
 };
 
 const RegistrationClosed = () => {
-  const { registrationClosed } = useEditSignupContext();
+  const { event, registrationClosed } = useEditSignupContext();
+  const paths = usePaths();
+  const Link = linkComponent();
   const { t } = useTranslation();
 
   return registrationClosed ? (
-    <p className="ilmo--form-error">
-      {t('editSignup.errors.closed')}
-    </p>
+    <>
+      <p className="ilmo--form-error">
+        {t('editSignup.errors.closed')}
+      </p>
+      <p>
+        <Link to={paths.eventDetails(event!.slug)}>
+          {t('editSignup.backToEvent')}
+        </Link>
+      </p>
+    </>
   ) : null;
 };
 
