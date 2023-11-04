@@ -1,6 +1,7 @@
 {
     "components": {
         "dateFormat.dateTimeSep": "at",
+        "editSignup.backToEvent": "Back to event page",
         "editSignup.action.cancel": "Cancel",
         "editSignup.action.edit": "Update",
         "editSignup.action.save": "Save",
