@@ -90,8 +90,8 @@ const ChangePasswordForm = () => {
           ) : null}
           <Field
             as={Form.Control}
-            name="newPasswordverify"
-            id="newPasswordverify"
+            name="newPasswordVerify"
+            id="newPasswordVerify"
             type="password"
             placeholder="Uusi salasana"
             aria-label="Uusi salasana"
