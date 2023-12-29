@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { Button, Col, Row } from 'react-bootstrap';
+import { UseFieldConfig } from 'react-final-form';
 import { FieldArrayRenderProps, useFieldArray } from 'react-final-form-arrays';
 import { useTranslation } from 'react-i18next';
 import { SortEnd } from 'react-sortable-hoc';
@@ -16,6 +17,10 @@ type QuotaRowProps = {
   index: number;
   isOnly: boolean;
   remove: FieldArrayRenderProps<EditorQuota, HTMLElement>['fields']['remove'];
+};
+
+const numberConfig: UseFieldConfig<number> = {
+  parse: (value) => Number(value),
 };
 
 const QuotaRow = ({
@@ -44,6 +49,7 @@ const QuotaRow = ({
           help={t('editor.quotas.quotaSize.info')}
           type="number"
           min={1}
+          config={numberConfig}
           required
         />
       </Col>
