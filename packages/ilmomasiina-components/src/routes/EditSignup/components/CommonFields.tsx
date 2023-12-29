@@ -16,6 +16,7 @@ const CommonFields = () => {
         <>
           <FieldRow
             name="firstName"
+            maxLength={250}
             label={t('editSignup.fields.firstName')}
             placeholder={t('editSignup.fields.firstName.placeholder')}
             required
@@ -23,6 +24,7 @@ const CommonFields = () => {
           />
           <FieldRow
             name="lastName"
+            maxLength={250}
             label={t('editSignup.fields.lastName')}
             placeholder={t('editSignup.fields.lastName.placeholder')}
             required
@@ -45,6 +47,7 @@ const CommonFields = () => {
       {event!.emailQuestion && (
         <FieldRow
           name="email"
+          maxLength={250}
           label={t('editSignup.fields.email')}
           placeholder={t('editSignup.fields.email.placeholder')}
           required

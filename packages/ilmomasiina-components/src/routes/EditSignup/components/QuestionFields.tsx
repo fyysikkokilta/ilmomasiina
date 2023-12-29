@@ -54,6 +54,7 @@ const QuestionField = ({ name, question, disabled }: QuestionFieldProps) => {
       input = (
         <Form.Control
           type="text"
+          maxLength={250}
           required={question.required}
           readOnly={disabled}
           value={currentAnswerString}
@@ -96,6 +97,7 @@ const QuestionField = ({ name, question, disabled }: QuestionFieldProps) => {
           as="textarea"
           rows={3}
           cols={40}
+          maxLength={250}
           required={question.required}
           readOnly={disabled}
           value={currentAnswerString}
