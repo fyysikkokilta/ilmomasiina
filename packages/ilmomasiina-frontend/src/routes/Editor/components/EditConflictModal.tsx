@@ -2,7 +2,7 @@ import React from 'react';
 
 import moment from 'moment-timezone';
 import { Button, Modal } from 'react-bootstrap';
-import { useField, useForm } from 'react-final-form';
+import { useForm } from 'react-final-form';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { EditConflictError } from '@tietokilta/ilmomasiina-models';
@@ -10,10 +10,11 @@ import { editConflictDismissed, reloadEvent } from '../../../modules/editor/acti
 import { EditorEvent, EditorQuestion, EditorQuota } from '../../../modules/editor/types';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
 import useEvent from '../../../utils/useEvent';
+import { useFieldValue } from './hooks';
 
 const DeletedQuotasAndQuestions = ({ modal }: { modal: EditConflictError }) => {
-  const { input: { value: questions } } = useField<EditorQuestion[]>('questions');
-  const { input: { value: quotas } } = useField<EditorQuota[]>('quotas');
+  const questions = useFieldValue<EditorQuestion[]>('questions');
+  const quotas = useFieldValue<EditorQuota[]>('quotas');
   const { t } = useTranslation();
 
   return (

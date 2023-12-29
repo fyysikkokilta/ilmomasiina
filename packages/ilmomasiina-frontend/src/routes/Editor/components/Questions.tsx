@@ -3,9 +3,7 @@ import React, { useMemo } from 'react';
 import {
   Button, Col, Form, FormCheckProps, InputGroup, Row,
 } from 'react-bootstrap';
-import {
-  Field, FieldRenderProps, useField, useForm,
-} from 'react-final-form';
+import { Field, FieldRenderProps, useForm } from 'react-final-form';
 import { FieldArray, FieldArrayRenderProps, useFieldArray } from 'react-final-form-arrays';
 import { useTranslation } from 'react-i18next';
 import { SortEnd } from 'react-sortable-hoc';
@@ -15,6 +13,7 @@ import useShallowMemo from '@tietokilta/ilmomasiina-components/dist/utils/useSha
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
 import { EditorQuestion } from '../../../modules/editor/types';
 import useEvent from '../../../utils/useEvent';
+import { useFieldValue } from './hooks';
 import SelectBox from './SelectBox';
 import Sortable from './Sortable';
 
@@ -70,7 +69,7 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
 
   const addOption = useEvent(() => push(`${name}.options`, ''));
 
-  const { value: type } = useField(`${name}.type`);
+  const type = useFieldValue(`${name}.type`);
 
   return (
     <Row className="question-body px-0">
