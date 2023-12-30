@@ -1,8 +1,8 @@
 {
   "translation": {
     "dateFormat.general": "DD.MM.YYYY HH:mm",
-    "emails.confirmation.subject": "Muokkausvahvistus: {{event}}",
-    "emails.editConfirmation.subject": "Ilmoittautumisvahvistus: {{event}}",
+    "emails.confirmation.subject": "Ilmoittautumisvahvistus: {{event}}",
+    "emails.editConfirmation.subject": "Muokkausvahvistus: {{event}}",
     "emails.newUser.subject": "Käyttäjätunnukset Ilmomasiinaan",
     "emails.promotedFromQueue.subject": "Pääsit varasijalta tapahtumaan {{event}}",
     "emails.resetPassword.subject": "Salasanasi Ilmomasiinaan on nollattu"
