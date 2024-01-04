@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 import { Button, Form } from 'react-bootstrap';
 import { Trans, useTranslation } from 'react-i18next';
 
+import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import { setAuditLogQueryField } from '../../modules/auditLog/actions';
 import { useTypedDispatch, useTypedSelector } from '../../store/reducers';
 
@@ -16,16 +17,23 @@ const AuditLogPagination = () => {
   const value = query.offset || 0;
   const perPage = query.limit || LOGS_PER_PAGE;
 
-  const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    dispatch(setAuditLogQueryField('offset', Number(e.target.value) - 1));
-  };
+  const previousPage = useEvent(() => {
+    dispatch(setAuditLogQueryField('offset', Math.max(0, value - perPage)));
+  });
+  const nextPage = useEvent(() => {
+    dispatch(setAuditLogQueryField('offset', value + perPage));
+  });
+  const onOffsetChange = useEvent((e: ChangeEvent<HTMLSelectElement>) => {
+    const newOffset = Number(e.target.value) - 1;
+    if (newOffset >= 0) dispatch(setAuditLogQueryField('offset', newOffset));
+  });
 
   return (
     <nav className="audit-log--pagination mb-3">
       <Button
         className="mr-3"
         type="button"
-        onClick={() => dispatch(setAuditLogQueryField('offset', value - perPage))}
+        onClick={previousPage}
         aria-label={t('auditLog.pagination.previous')}
         disabled={value <= 0}
       >
@@ -36,7 +44,7 @@ const AuditLogPagination = () => {
         <Form.Control
           type="number"
           value={value + 1}
-          onChange={onChange}
+          onChange={onOffsetChange}
         />
         &ndash;
         {{ last: value + LOGS_PER_PAGE }}
@@ -46,7 +54,7 @@ const AuditLogPagination = () => {
       <Button
         className="ml-3"
         type="button"
-        onClick={() => dispatch(setAuditLogQueryField('offset', value + perPage))}
+        onClick={nextPage}
         aria-label={t('auditLog.pagination.next')}
         disabled={!auditLog || value + perPage >= auditLog.count}
       >
