@@ -8,6 +8,7 @@
         "header.logout": "Kirjaudu ulos",
         "footer.admin": "Hallinta",
         "auth.loginExpired": "Sisäänkirjautumisesi on vanhentunut. Kirjaudu sisään uudelleen.",
+        "auth.loginSuccess": "Sisäänkirjautuminen onnistui.",
         "auth.logoutSuccess": "Uloskirjautuminen onnistui.",
         "login.title": "Kirjaudu",
         "login.email": "Sähköposti",
