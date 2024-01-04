@@ -21,6 +21,17 @@ export type AuthActions =
   | ReturnType<typeof loginSucceeded>
   | ReturnType<typeof resetState>;
 
+let loginToastId = 0;
+
+const loginToast = (type: 'success' | 'error', text: string, autoClose: number) => {
+  if (toast.isActive(`loginState${loginToastId}`)) {
+    toast.update(`loginState${loginToastId}`, { render: text, autoClose, type });
+  } else {
+    loginToastId += 1;
+    toast(text, { autoClose, type, toastId: `loginState${loginToastId}` });
+  }
+};
+
 export const login = (email: string, password: string) => async (dispatch: DispatchAction) => {
   const sessionResponse = await apiFetch('authentication', {
     method: 'POST',
@@ -31,6 +42,7 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
   }) as AdminLoginResponse;
   dispatch(loginSucceeded(sessionResponse));
   dispatch(push(appPaths.adminEventsList));
+  loginToast('success', i18n.t('auth.loginSuccess'), 2000);
   return true;
 };
 
@@ -42,10 +54,10 @@ export const redirectToLogin = () => (dispatch: DispatchAction) => {
 export const logout = () => async (dispatch: DispatchAction) => {
   dispatch(resetState());
   dispatch(redirectToLogin());
-  toast.success(i18n.t('auth.logoutSuccess'), { autoClose: 10000 });
+  loginToast('success', i18n.t('auth.logoutSuccess'), 2000);
 };
 
 export const loginExpired = () => (dispatch: DispatchAction) => {
-  toast.error(i18n.t('auth.loginExpired'), { autoClose: 10000 });
+  loginToast('error', i18n.t('auth.loginExpired'), 10000);
   dispatch(redirectToLogin());
 };
