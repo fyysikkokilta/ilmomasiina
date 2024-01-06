@@ -1,4 +1,6 @@
 import react from '@vitejs/plugin-react';
+import dotenv from 'dotenv';
+import path from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -6,6 +8,8 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import momentPlugin from './src/rollupMomentPlugin';
 
 /* eslint-disable no-console */
+
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const BACKEND_HOST = process.env.HOST || '127.0.0.1';
 const BACKEND_PORT = 3001;

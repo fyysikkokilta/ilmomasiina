@@ -185,7 +185,6 @@ importers:
       '@tietokilta/ilmomasiina-components': workspace:2.0.0-alpha13
       '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha13
       '@types/history': ^4.7.11
-      '@types/lodash': ^4.14.199
       '@types/lodash-es': ^4.17.9
       '@types/node': ^16.11.41
       '@types/node-sass': ^4.11.2
@@ -199,12 +198,12 @@ importers:
       connected-react-router: ^6.9.2
       csv-stringify: ^6.4.2
       date-fns: ^2.28.0
+      dotenv: ^16.0.3
       final-form: ^4.20.10
       final-form-arrays: ^3.1.0
       history: ^4.10.1
       i18next: ^22.4.11
       i18next-browser-languagedetector: ^7.0.1
-      lodash: ^4.17.21
       lodash-es: ^4.17.21
       moment: ^2.29.3
       moment-timezone: ^0.5.34
@@ -251,6 +250,7 @@ importers:
       connected-react-router: 6.9.2_4xep6jux73jwrxkjwaaein5o3u
       csv-stringify: 6.4.2
       date-fns: 2.28.0
+      dotenv: 16.0.3
       final-form: 4.20.10
       final-form-arrays: 3.1.0_final-form@4.20.10
       history: 4.10.1
@@ -284,8 +284,6 @@ importers:
       vite-plugin-checker: 0.6.2_fntcvl7x5qvzeewtlmxvvpd3vi
       vite-tsconfig-paths: 4.2.3_fntcvl7x5qvzeewtlmxvvpd3vi
     devDependencies:
-      '@types/lodash': 4.14.199
-      lodash: 4.17.21
       rimraf: 3.0.2
 
   packages/ilmomasiina-models:
@@ -1316,10 +1314,6 @@ packages:
 
   /@types/lodash/4.14.182:
     resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
-
-  /@types/lodash/4.14.199:
-    resolution: {integrity: sha512-Vrjz5N5Ia4SEzWWgIVwnHNEnb1UE1XMkvY5DGXrAeOGE9imk0hgTHh5GyDjLDJi9OTCn9oo9dXH1uToK1VRfrg==}
-    dev: true
 
   /@types/mdast/3.0.10:
     resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
@@ -4714,6 +4708,7 @@ packages:
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
 
   /long/4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
