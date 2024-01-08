@@ -20,9 +20,11 @@ export default defineMigration({
   name: '0004-answers-to-json',
   async up({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
+    // Handle different quoting for Postgres & MySQL
+    const q = ([name]: TemplateStringsArray) => query.quoteIdentifiers(name);
     // Convert question options to JSON
     const questions = await sequelize.query<RawQuestion>(
-      'SELECT `id`, `type`, `options` FROM `question`',
+      `SELECT ${q`id`}, ${q`type`}, ${q`options`} FROM ${q`question`}`,
       { type: QueryTypes.SELECT, transaction },
     );
     for (const row of questions) {
@@ -39,9 +41,9 @@ export default defineMigration({
     }
     // Convert answers to JSON
     const answers = await sequelize.query<RawAnswer>(
-      'SELECT `answer`.`id`, `answer`.`answer`, `question`.`type` '
-      + 'FROM `answer` '
-      + 'LEFT JOIN `question` ON `answer`.`questionId` = `question`.`id`',
+      `SELECT ${q`answer.id`}, ${q`answer.answer`}, ${q`question.type`} `
+      + `FROM ${q`answer`} `
+      + `LEFT JOIN ${q`question`} ON ${q`answer.questionId`} = ${q`question.id`}`,
       { type: QueryTypes.SELECT, transaction },
     );
     for (const row of answers) {
