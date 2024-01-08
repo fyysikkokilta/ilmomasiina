@@ -1,11 +1,13 @@
 name: Publish Docker image
 
 env:
-  # Change these to build automatically on your fork
+  # Change this to your repo name to build automatically on your fork.
   expected_repo: 'Tietokilta/ilmomasiina'
+
+  # Change this to upload the built image to your own organization.
   docker_tag: 'ghcr.io/tietokilta/ilmomasiina'
 
-  # Change these to customize your build
+  # Change these to customize your build.
   branding_header_title_text: 'Tietokillan ilmomasiina'
   branding_footer_gdpr_text: 'Tietosuoja'
   branding_footer_gdpr_link: 'https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/'

@@ -1,6 +1,64 @@
 # Installation
 
-This file contains installation instructions both for [production](#production) and [development](#development).
+This file contains installation and customization instructions for Ilmomasiina,
+both for [production](#production) and [development](#development).
+
+## Customization
+
+If you want to change any of the following, you'll need to modify the code slightly and
+build your own Docker image (if using Docker):
+
+- Hosting in a subfolder (instead of directly at `https://ilmo.your.domain/`)
+- Colors ([`packages/ilmomasiina-components/src/styles/_definitions.scss`](../packages/ilmomasiina-components/src/styles/_definitions.scss))
+- Header logo (TBD)
+- Header title (build args or [`packages/ilmomasiina-frontend/src/branding.ts`](../packages/ilmomasiina-frontend/src/branding.ts))
+- Footer links (as above)
+- Favicon (`packages/ilmomasiina-frontend/public/*.png`)
+- Translations (`packages/ilmomasiina-*/src/locales/*.json`)
+
+You can of course make further UI changes, but that is not documented.
+
+How build arguments are passed depends on your build method:
+- [GitHub Actions](#github-actions): Workflow YAML file
+- [Docker Compose](#docker-compose): Compose YAML file
+- [Local Docker build](#local-docker-build): build command
+
+**Note:** If you fix bugs or add functionality, it would be *very* appreciated to
+create a pull request to the Tietokilta repository so we can potentially integrate them
+in our version. That also reduces your maintenance work when upgrading.
+
+### Building customized Docker images
+
+#### GitHub Actions
+
+The easiest way to build and host your Docker image is using GitHub Actions. Your public repos
+have free Actions time. The repository contains a workflow called
+[`docker-build.yml`](../.github/workflows//docker-build.yml) that can easily be customized with
+variables to build and push an image for your organization.
+
+Simply [enable GitHub Actions](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository)
+for your fork and modify the `env` block in the workflow file as instructed.
+
+With the current workflow setup, the following trigger an image build:
+- `prod` branch pushes tags `prod` and `latest`
+- `staging` branch pushes tag `staging`
+- tags starting with `v` push semver tags (`major.minor` and full version)
+
+#### Local Docker build
+
+You can of course also build images locally.
+
+```
+docker build \
+  --build-arg BRANDING_HEADER_TITLE_TEXT='Ilmomasiina' \
+  --build-arg BRANDING_FOOTER_GDPR_TEXT='Tietosuoja' \
+  --build-arg BRANDING_FOOTER_GDPR_LINK='https://example.com' \
+  --build-arg BRANDING_FOOTER_HOME_TEXT='Kotisivu' \
+  --build-arg BRANDING_FOOTER_HOME_LINK='https://example.com' \
+  -t ilmomasiina
+```
+
+You can then use `docker push` to a host of your choice, or run the container locally.
 
 ## Production
 
@@ -36,15 +94,38 @@ If you intend to run your own database, you can follow these instructions to ins
 
 1. Install MariaDB with `sudo apt install default-mysql-server`
 2. MariaDB should start automatically. Run `sudo systemctl start mariadb` if necessary.
-3. Run `sudo mysql_secure_installation` and follow instructions (defaults are generally fine).
-4. Open a MariaDB terminal with `sudo mysql -u root -p` (use the root password set in previous step).
+3. Open a MariaDB session with `sudo -u root mysql`.
+4. Create the `ilmomasiina` database:
+    ```sql
+    CREATE DATABASE ilmomasiina;
+    ```
 5. Create a new user for Ilmomasiina:
-   `CREATE USER 'ilmo_user'@'localhost' IDENTIFIED BY '<add a password here>';`
-6. Create the `ilmomasiina` database: `CREATE DATABASE ilmomasiina;`
-7. Grant permissions on the new database:
-   `GRANT ALL PRIVILEGES ON ilmomasiina.* TO 'ilmo_user'@'localhost';`
-8. Exit with `exit`. Try signing in with your new user: `mysql -u ilmo_user -p`
-   (don't use `mysql -u ilmo_user -p password`)
+    ```sql
+    CREATE USER 'ilmo_user'@'localhost' IDENTIFIED BY '<add a password here>';
+    ```
+6. Grant permissions on the new database:
+   ```sql
+   GRANT ALL PRIVILEGES ON ilmomasiina.* TO 'ilmo_user'@'localhost';
+   ```
+7. Exit the MariaDB session with `exit`.
+8. Try signing in with your new user: `mysql -u ilmo_user -p`
+   (don't put your password in the command).
+
+#### Ubuntu/Debian PostgreSQL installation
+
+1. Install PostgreSQL with `sudo apt install postgresql`
+2. PostgreSQL should start automatically. Run `sudo systemctl start postgresql` if necessary.
+3. Open a PostgreSQL session with `sudo -u postgres psql`.
+4. Create a new user for Ilmomasiina:
+    ```sql
+    CREATE USER ilmo_user WITH PASSWORD '<add a password here>';
+    ```
+5. Create the `ilmomasiina` database:
+    ```sql
+    CREATE DATABASE ilmomasiina WITH OWNER ilmo_user;
+    ```
+6. Exit the PostgreSQL session with `exit`.
+7. Try signing in with your new user: `psql -h localhost -U ilmo_user ilmomasiina`.
 
 ### Email sending
 
@@ -81,7 +162,8 @@ Tietokilta uses Azure to run Ilmomasiina. Azure gives credits for free to non-pr
 Azure recently reduced free credits to $2000, which is barely enough to run a production-grade App Service (P1v2/P0v3).
 B-tier App Service Plans have been tried and at least B1 doesn't seem to handle load well.
 
-1. Create an *Azure Database for PostgreSQL Flexible Server* (resource category *Databases*).
+1. **Optional:** Build and push a [customized Docker image](#customization), if necessary.
+2. Create an *Azure Database for PostgreSQL Flexible Server* (resource category *Databases*).
     - *Basics* step: ([screenshot](./screenshots/db-basics.png))
         - *Server name:* Choose freely.
         - *Region:* Choose freely, but probably Europe.
@@ -100,12 +182,25 @@ B-tier App Service Plans have been tried and at least B1 doesn't seem to handle 
 3. **Recommended:** Create a user on the server and grant access to the database.
     - You can technically also use the PostgreSQL admin user if you don't use the database for anything else.
     - This requires connecting to the database manually:
-        1. From the *Networking* page, under *Firewall rules*, add a rule for *current client IP address* and save.
-        2. From the *Connect* tab, copy the `psql` command:
+        1. From the *Networking* page, under *Firewall rules*, add a rule for *current client IP address* and save. Wait a bit for the changes to apply.
+        2. From the *Connect* tab, copy the `psql` command to your shell:
            ```shell
            psql -h {postgres-server-name}.postgres.database.azure.com -p 5432 -U {admin_user_name} {db_name}
            ```
-4. Create an *Azure Web App* (resource category *Web*).
+           - This all-in-one command is under *Connect from browser or locally*. You can also use the variant with environment variables.
+           - The portal was a bit buggy for me and I needed to add the database name manually.
+        3. Create a new user for Ilmomasiina:
+            ```sql
+            CREATE USER ilmo_user WITH PASSWORD '<add a password here>';
+            ```
+        4. Grant access to the database for the new user:
+            ```sql
+            GRANT ALL PRIVILEGES ON SCHEMA public TO ilmo_user;
+            ```
+        5. Exit the PostgreSQL session with `exit`.
+        6. Try signing in with your new user: replace your admin username in the `psql`
+           command with the new user (above: `ilmo_user`).
+5. Create an *Azure Web App* (resource category *Web*).
     - *Basics* step: ([screenshot](./screenshots/web-app-basics.png))
         - *Web App name:* Choose freely, will appear in your URLs as `https://{your-app-name}.azurewebsites.net/`.
         - *Publish:* Docker Container
@@ -119,15 +214,18 @@ B-tier App Service Plans have been tried and at least B1 doesn't seem to handle 
         - *Image Source:* Private Registry
         - *Server URL:* `https://ghcr.io`
         - *Image and tag:*
-          - `tietokilta/ilmomasiina:latest` to use  or pin to a certain version, or use your own modified image
+          - Non-customized Tietokilta image, latest stable version: `tietokilta/ilmomasiina:latest`
+          - Non-customized Tietokilta image, pinned version: `tietokilta/ilmomasiina:2.0.0` (example)
+          - Customized image, built in CI or uploaded by you: `yourorg/ilmomasiina:latest` (example)
+        - If you use Docker Hub or Azure Container Registry, change these accordingly
     - *Networking* step:
         - *Enable public access:* On
     - *Monitoring* and *Tags* can be skipped
-5. Read [.env.example](../.env.example). Set relevant variables as *Application settings* on the *Configuration* page. You'll need at least:
+6. Read [.env.example](../.env.example). Set relevant variables as *Application settings* on the *Configuration* page. You'll need at least:
     - `PORT` and `WEBSITES_PORT` must match (you can set both to 3000)
     - `DB_DIALECT` = `postgres`
     - `DB_HOST` = Domain name of your PostgreSQL server (from *Connect* page)
-    - `DB_USER` = username of PostgreSQL user
+    - `DB_USER` = username of PostgreSQL user (above: `ilmo_user`)
     - `DB_PASSWORD` = password of PostgreSQL user
     - `DB_DATABASE` = name of PostgreSQL database
     - `DB_SSL` = `true` (required with Azure's default config)
@@ -138,9 +236,9 @@ B-tier App Service Plans have been tried and at least B1 doesn't seem to handle 
     - `MAILGUN_*` **or** `SMTP_*` for email credentials (see [_Email sending_](#email-sending))
     - `BASE_URL` = `https://{your-app-name}.azurewebsites.net/`
     - `BRANDING_MAIL_FOOTER_TEXT` and `BRANDING_MAIL_FOOTER_LINK` (may be empty)
-6. Access the app at `https://{your-app-name}.azurewebsites.net/`.
+7. Access the app at `https://{your-app-name}.azurewebsites.net/`.
     - If something is broken, check the *Log stream* page or read logs via `https://{your-app-name}.scm.azurewebsites.net/`.
-7. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
+8. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Docker Compose
 
@@ -148,31 +246,29 @@ You can use Docker Compose to run both a database and production container local
 **Currently, we don't actively test this configuration.**
 
 1. Create a `.env` file at the root of this repository. You can copy [.env.example](../.env.example) to begin and read the instructions within.
-2. Modify `args` in `docker-compose.prod.yml` for frontend customization.
-3. Run `docker-compose -f docker-compose.prod.yml up` manually or e.g. via `systemd`.
-4. Access the app at <http://localhost:8000>.
-5. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
+2. **Optional:** Modify `args` in `docker-compose.prod.yml` for frontend customization.
+3. **Optional:** Make [customizations](#customization) in other files if necessary.
+4. Run `docker-compose -f docker-compose.prod.yml up` manually or e.g. via `systemd`.
+5. Access the app at <http://localhost:8000>.
+6. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Docker (manual)
 
 If you already have a database, you can run a plain Docker container locally.
 
 1. Create a `.env` file at the root of this repository. You can copy [.env.example](../.env.example) to begin and read the instructions within.
-2. Build your image:
-    ```
-    docker build \
-      --build-arg BRANDING_HEADER_TITLE_TEXT='Tietokillan ilmomasiina' \
-      --build-arg BRANDING_FOOTER_GDPR_TEXT='Tietosuoja' \
-      --build-arg BRANDING_FOOTER_GDPR_LINK='https://example.com' \
-      --build-arg BRANDING_FOOTER_HOME_TEXT='Kotisivu' \
-      --build-arg BRANDING_FOOTER_HOME_LINK='https://example.com' \
-      -t ilmomasiina
-    ```
-3. Run manually or with e.g. `systemd`:
-    ```
-    docker run -it --rm --init --env-file=.env -p 3000:3000 ilmomasiina
-    ```
-   You might have to add stuff here to e.g. allow database connections.
+2. **Optional:** Make [customizations](#customization) in other files if necessary.
+    - After this, build your customized image via [GitHub Actions](#github-actions) or [locally](#local-docker-build).
+3. Run the container manually or with e.g. `systemd`.
+      ```
+      docker run -it --rm --init --env-file=.env -p 3000:3000 ghcr.io/tietokilta/ilmomasiina:latest
+      ```
+    - You might have to add stuff here to e.g. allow database connections.
+      - In particular, `--network host` allows connecting to a database running on `localhost` on the host machine. Remove `-p 3000:3000` when using this.
+    - This runs a non-customized Tietokilta image from the latest stable version. For other options, replace `ghcr.io/tietokilta/ilmomasiina:latest` with:
+      - Non-customized Tietokilta image, pinned version: `ghcr.io/tietokilta/ilmomasiina:2.0.0` (example)
+      - Customized image, built in CI or uploaded by you: `ghcr.io/yourorg/ilmomasiina:latest` (example)
+      - Locally built image: `ilmomasiina` (what was after `-t` in `docker build`)
 4. Access the app at <http://localhost:3000>.
 5. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
@@ -184,13 +280,31 @@ You can also set up a production deployment without Docker. **This method is not
 2. Run `npm install -g pnpm@7` to install pnpm. Then run `pnpm install --frozen-lockfile` to setup cross-dependencies
    between packages and install other dependencies.
 3. Create a `.env` file at the root of this repository. You can copy [.env.example](../.env.example) to begin and read the instructions within.
-4. Run `npm run clean` followed by `npm run build`.
-5. Use e.g. `systemd` or `pm2` (`npm install -g pm2`) to run the server process:
+4. **Optional:** Make [customizations](#customization) in other files if necessary.
+5. Run `npm run clean` followed by `npm run build`.
+6. Use e.g. `systemd` or `pm2` (`npm install -g pm2`) to run the server process:
     ```
     node packages/ilmomasiina-backend/dist/bin/server.js
     ```
-6. Access the app at <http://localhost:3000>.
-7. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
+7. Access the app at <http://localhost:3000>.
+8. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
+
+### Creating the first admin user
+
+By default, only logged-in admin users can create new admin users using the `/admin` endpoint.
+To create the first user on a new system, admin registration needs to be allowed.
+
+Allow admin registration temporarily by adding the env variable `ADMIN_REGISTRATION_ALLOWED=true`.
+
+Now, create a new user with POST request to `/api/users`. For example, using `curl`:
+```
+curl 'http://localhost:3000/api/users' \
+    -H 'Content-Type: application/json' \
+    --data '{ "email": "user@tietokilta.fi", "password": "password123" }'
+```
+
+:warning: **Important**: After creating the first user, disallow admin user creation by
+removing the env variable and restarting Ilmomasiina.
 
 ### Reverse proxy
 
@@ -201,7 +315,7 @@ This will also require changing the `PATH_PREFIX` env variable when building the
 The examples assume `/ilmo/` is the subdirectory and `PORT` is 3000 - adjust accordingly if needed.
 
 The examples use the backend server to serve the frontend files, which is less efficient than using
-a proper web server to serve them.
+a proper web server to serve them. (PRs welcome with instructions on how to set up a better method.)
 
 #### Apache + `mod_proxy`
 
@@ -239,30 +353,28 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ilmo/(.*)$ http://127.0.0.1:3000/$1 [P,L]
 ```
 
-### Creating the first admin user
-
-By default, only logged-in admin users can create new admin users using the `/admin` endpoint.
-To create the first user on a new system, admin registration needs to be allowed.
-
-Allow admin registration temporarily by adding the env variable `ADMIN_REGISTRATION_ALLOWED=true`.
-
-Now, create a new user with POST request to `/api/users`. For example, using `curl`:
-```
-curl 'http://localhost:3000/api/users' \
-    -H 'Content-Type: application/json' \
-    --data '{ "email": "user@tietokilta.fi", "password": "password123" }'
-```
-
-**Important**: After creating the first user, disallow admin user creation by removing the env variable and restarting
-Ilmomasiina.
-
 ## Development
 
-In development, we recommend running *without* Docker. It's easier to use in most cases,
+In development, we recommend [running *without* Docker](#running-without-docker-1). It's easier to use in most cases,
 but you'll need to set up your own database.
 
 There's also a [Docker Compose setup](#docker-compose-1). It has drawbacks, but it handles
 database creation automatically.
+
+### VS Code setup
+
+Currently Prettier is not used in the project, so here is a recommended `.vscode/settings.json` config:
+
+```json
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
+}
+```
 
 ### Running without Docker
 
@@ -282,19 +394,6 @@ database creation automatically.
 6. Access the app at <http://localhost:3000>.
 7. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
-Currently Prettier is not used in the project, so here is a recommended `.vscode/settings.json` config:
-
-```json
-// .vscode/settings.json
-{
-  "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  }
-}
-```
 ### Docker Compose
 
 The entire development setup can also be run within Docker using Docker Compose. The
