@@ -1,12 +1,12 @@
 @use "@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
 
 @use "bootstrap/scss/bootstrap" with (
-  // Colors
+  // Override Bootstrap theme colors
   $primary: $primary,
   $secondary: $secondary,
+  $red: $red, // further assigned to $danger by Bootstrap
+  $green: $green, // further assigned to $success by Bootstrap
   $text-muted: $text-muted,
-  $red: $red,
-  $green: $green,
 
   // Just for the sake of Athene legacy
   $btn-border-radius-lg: 2px,
