@@ -39,4 +39,5 @@ export enum ErrorCode {
   NO_SUCH_QUOTA = 'NoSuchQuota',
   NO_SUCH_SIGNUP = 'NoSuchSignup',
   BAD_EDIT_TOKEN = 'BadEditToken',
+  CANNOT_DELETE_SELF = 'CannotDeleteSelf',
 }
