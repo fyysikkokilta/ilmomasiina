@@ -55,7 +55,7 @@ docker build \
   --build-arg BRANDING_FOOTER_GDPR_LINK='https://example.com' \
   --build-arg BRANDING_FOOTER_HOME_TEXT='Kotisivu' \
   --build-arg BRANDING_FOOTER_HOME_LINK='https://example.com' \
-  -t ilmomasiina
+  -t ilmomasiina .
 ```
 
 You can then use `docker push` to a host of your choice, or run the container locally.
