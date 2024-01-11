@@ -85,8 +85,30 @@ generate passwords with at least 32 characters, or e.g. run `openssl rand -hex 3
 ### Database setup
 
 You'll need a MySQL/MariaDB or PostgreSQL database, and a user with full privileges to the DB.
+Instructions are provided here for [PostgreSQL in Docker](#postgresql-with-docker),
+and both [MariaDB](#ubuntudebian-mariadb-installation) and [PostgreSQL](#ubuntudebian-postgresql-installation)
+on Linux without Docker.
 
 The app will automatically create the database schema upon startup.
+
+#### PostgreSQL with Docker
+
+Especially for development, running PostgreSQL with Docker may be the easiest option.
+
+1. Create the data directory: `mkdir data`
+2. Start a container for PostgreSQL. You can change the values for user/password/DB name; you'll need to put
+   those in `.env` later.
+    ```shell
+    docker run -d \
+      --name ilmo_postgres \
+      -p 5432:5432 \
+      -e POSTGRES_USER=ilmo_user \
+      -e POSTGRES_PASSWORD=<add a password here> \
+      -e POSTGRES_DB=ilmomasiina \
+      -v ./data:/var/lib/postgresql/data \
+      postgres
+    ```
+3. If you have the PostgreSQL client installed, try signing in: `psql -h localhost -U ilmo_user ilmomasiina`
 
 #### Ubuntu/Debian MariaDB installation
 
@@ -254,7 +276,7 @@ You can use Docker Compose to run both a database and production container local
 
 ### Docker (manual)
 
-If you already have a database, you can run a plain Docker container locally.
+If you don't want to use Docker Compose, or already have a database, you can run a plain Docker container locally.
 
 1. Create a `.env` file at the root of this repository. You can copy [.env.example](../.env.example) to begin and read the instructions within.
 2. **Optional:** Make [customizations](#customization) in other files if necessary.
@@ -356,10 +378,9 @@ RewriteRule ^ilmo/(.*)$ http://127.0.0.1:3000/$1 [P,L]
 ## Development
 
 In development, we recommend [running *without* Docker](#running-without-docker-1). It's easier to use in most cases,
-but you'll need to set up your own database.
+but you'll need to [set up your own database](#database-setup). That is easiest to do [with Docker](#postgresql-with-docker).
 
-There's also a [Docker Compose setup](#docker-compose-1). It has drawbacks, but it handles
-database creation automatically.
+There's also a [Docker Compose setup](#docker-compose-1) with some significant drawbacks.
 
 ### VS Code setup
 
