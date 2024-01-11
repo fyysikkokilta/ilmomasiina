@@ -156,6 +156,9 @@ Ilmomasiina needs a way to send emails, both for signup confirmation and user pa
 Mailgun and SMTP providers are currently supported. With minor changes, sending mail could
 be also done via Sendgrid or other services. Ilmomasiina uses Nodemailer - PRs welcome.
 
+**Note:** If Ilmomasiina is run without an email provider configured, email contents will
+be printed to the console instead. This can be used for debugging.
+
 #### Mailgun
 
 [Mailgun](https://www.mailgun.com/) is relatively cheap and can be enabled via env variables.
