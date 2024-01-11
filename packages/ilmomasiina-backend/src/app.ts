@@ -17,6 +17,7 @@ import removeDeletedData from './cron/removeDeletedData';
 import enforceHTTPS from './enforceHTTPS';
 import setupDatabase from './models';
 import setupRoutes from './routes';
+import { isInitialSetupDone } from './routes/admin/users/createInitialUser';
 
 // Disable type coercion for request bodies - we don't need it, and it breaks stuff like anyOf
 const bodyCompiler = new Ajv({
@@ -47,6 +48,9 @@ export default async function initApp(): Promise<FastifyInstance> {
   server.setValidatorCompiler(({ httpPart, schema }) => (
     httpPart === 'body' ? bodyCompiler.compile(schema) : defaultCompiler.compile(schema)
   ));
+
+  // Enable admin registration if no users are present
+  server.decorate('initialSetupDone', await isInitialSetupDone());
 
   // Register fastify-sensible (https://github.com/fastify/fastify-sensible)
   server.register(fastifySensible);
@@ -112,4 +116,13 @@ export default async function initApp(): Promise<FastifyInstance> {
   cron.schedule('0 8 * * *', deleteOldAuditLogs);
 
   return server;
+}
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    /** If set to false, GET /api/events raises an error.
+     * This is "cached" in the application instance to avoid an unnecessary database query.
+     */
+    initialSetupDone: boolean;
+  }
 }

@@ -3,8 +3,9 @@ import React from 'react';
 import { Spinner, Table } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
+import { ErrorCode } from '@tietokilta/ilmomasiina-models';
 import { timezone } from '../../config';
-import { linkComponent } from '../../config/router';
+import { linkComponent, Navigate } from '../../config/router';
 import { usePaths } from '../../contexts/paths';
 import { I18nProvider } from '../../i18n';
 import { EventListProps, EventListProvider, useEventListContext } from '../../modules/events';
@@ -54,6 +55,12 @@ const ListQuotaRow = ({
 const EventListView = () => {
   const { events, error, pending } = useEventListContext();
   const { t } = useTranslation();
+  const paths = usePaths();
+
+  // If initial setup is needed and is possible on this frontend, redirect to that page.
+  if (error && error.code === ErrorCode.INITIAL_SETUP_NEEDED && paths.hasAdmin) {
+    return <Navigate to={paths.adminInitialSetup} />;
+  }
 
   if (error) {
     return (
