@@ -4,7 +4,7 @@ export type Branding = {
   footerGdprLink: string;
   footerHomeText: string;
   footerHomeLink: string;
-  headerLogoUrl: string;
+  loginPlaceholderEmail: string;
 };
 
 // The following strings can be changed here in code, or you can use Docker build args
@@ -16,7 +16,7 @@ const branding: Branding = {
   footerGdprLink: BRANDING_FOOTER_GDPR_LINK,
   footerHomeText: BRANDING_FOOTER_HOME_TEXT,
   footerHomeLink: BRANDING_FOOTER_HOME_LINK,
-  headerLogoUrl: BRANDING_LOGO_URL,
+  loginPlaceholderEmail: BRANDING_LOGIN_PLACEHOLDER_EMAIL,
 };
 
 export default branding;

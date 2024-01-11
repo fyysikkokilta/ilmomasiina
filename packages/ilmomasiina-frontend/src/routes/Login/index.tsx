@@ -2,13 +2,15 @@ import React from 'react';
 
 import { FORM_ERROR } from 'final-form';
 import {
-  Alert, Button, Form as BsForm, FormControl, FormGroup, FormLabel,
+  Alert, Button, Form as BsForm, FormControl,
 } from 'react-bootstrap';
-import { Field, Form } from 'react-final-form';
+import { Form } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 
 import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
+import branding from '../../branding';
+import FieldFormGroup from '../../components/FieldFormGroup';
 import { login } from '../../modules/auth/actions';
 import { useTypedDispatch } from '../../store/reducers';
 
@@ -42,41 +44,33 @@ const Login = () => {
     <div className="login-container">
       <h1>{t('login.title')}</h1>
       <Form<FormData> initialValues={initialValues} onSubmit={onSubmit}>
-        {({
-          handleSubmit, submitting, errors, touched, submitError,
-        }) => (
+        {({ handleSubmit, submitting, submitError }) => (
           <BsForm onSubmit={handleSubmit} className="ilmo--form">
             {submitError && (
               <Alert variant="danger">{errorDesc(t, submitError, 'login.errors')}</Alert>
             )}
-            <FormGroup controlId="email">
-              <FormLabel data-required>{t('login.email')}</FormLabel>
-              <Field name="email">
-                {({ input }) => (
-                  <FormControl
-                    {...input}
-                    type="email"
-                    required
-                    placeholder="admin@athene.fi"
-                    isInvalid={touched?.email && errors?.email}
-                  />
-                )}
-              </Field>
-            </FormGroup>
-            <FormGroup controlId="password">
-              <FormLabel data-required>{t('login.password')}</FormLabel>
-              <Field name="password">
-                {({ input }) => (
-                  <FormControl
-                    {...input}
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    isInvalid={touched?.password && errors?.password}
-                  />
-                )}
-              </Field>
-            </FormGroup>
+            <FieldFormGroup name="email" required label={t('login.email')}>
+              {({ input, meta: { touched, error } }) => (
+                <FormControl
+                  {...input}
+                  type="email"
+                  required
+                  placeholder={branding.loginPlaceholderEmail}
+                  isInvalid={touched && error}
+                />
+              )}
+            </FieldFormGroup>
+            <FieldFormGroup name="password" required label={t('login.password')}>
+              {({ input, meta: { touched, error } }) => (
+                <FormControl
+                  {...input}
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  isInvalid={touched && error}
+                />
+              )}
+            </FieldFormGroup>
             <Button type="submit" variant="secondary" disabled={submitting}>
               {t('login.submit')}
             </Button>
