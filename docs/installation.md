@@ -255,7 +255,6 @@ B-tier App Service Plans have been tried and at least B1 doesn't seem to handle 
     - `DB_PASSWORD` = password of PostgreSQL user
     - `DB_DATABASE` = name of PostgreSQL database
     - `DB_SSL` = `true` (required with Azure's default config)
-    - `ADMIN_REGISTRATION_ALLOWED` = `true` for initial setup (see [_Creating the first admin user_](#creating-the-first-admin-user))
     - `NEW_EDIT_TOKEN_SECRET` = secure random string (see [_Generating secrets_](#generating-secrets))
     - `FEATHERS_AUTH_SECRET` = secure random string (see [_Generating secrets_](#generating-secrets))
     - `MAIL_FROM` = "From" email for system messages
@@ -264,7 +263,6 @@ B-tier App Service Plans have been tried and at least B1 doesn't seem to handle 
     - `BRANDING_MAIL_FOOTER_TEXT` and `BRANDING_MAIL_FOOTER_LINK` (may be empty)
 7. Access the app at `https://{your-app-name}.azurewebsites.net/`.
     - If something is broken, check the *Log stream* page or read logs via `https://{your-app-name}.scm.azurewebsites.net/`.
-8. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Docker Compose
 
@@ -276,7 +274,6 @@ You can use Docker Compose to run both a database and production container local
 3. **Optional:** Make [customizations](#customization) in other files if necessary.
 4. Run `docker-compose -f docker-compose.prod.yml up` manually or e.g. via `systemd`.
 5. Access the app at <http://localhost:8000>.
-6. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Docker (manual)
 
@@ -296,7 +293,6 @@ If you don't want to use Docker Compose, or already have a database, you can run
       - Customized image, built in CI or uploaded by you: `ghcr.io/yourorg/ilmomasiina:latest` (example)
       - Locally built image: `ilmomasiina` (what was after `-t` in `docker build`)
 4. Access the app at <http://localhost:3000>.
-5. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Running without Docker
 
@@ -313,24 +309,6 @@ You can also set up a production deployment without Docker. **This method is not
     node packages/ilmomasiina-backend/dist/bin/server.js
     ```
 7. Access the app at <http://localhost:3000>.
-8. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
-
-### Creating the first admin user
-
-By default, only logged-in admin users can create new admin users using the `/admin` endpoint.
-To create the first user on a new system, admin registration needs to be allowed.
-
-Allow admin registration temporarily by adding the env variable `ADMIN_REGISTRATION_ALLOWED=true`.
-
-Now, create a new user with POST request to `/api/users`. For example, using `curl`:
-```
-curl 'http://localhost:3000/api/users' \
-    -H 'Content-Type: application/json' \
-    --data '{ "email": "user@tietokilta.fi", "password": "password123" }'
-```
-
-:warning: **Important**: After creating the first user, disallow admin user creation by
-removing the env variable and restarting Ilmomasiina.
 
 ### Reverse proxy
 
@@ -417,7 +395,6 @@ Currently Prettier is not used in the project, so here is a recommended `.vscode
     - Alternatively, you can use `pnpm run --filter=@tietokilta/ilmomasiina-frontend start`
       (and similar for the backend).
 6. Access the app at <http://localhost:3000>.
-7. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Docker Compose
 
@@ -429,7 +406,6 @@ pre-configured PostgreSQL server, so an external database server is not required
 2. Go to the repository root and run `docker-compose up`. This builds the dev container and starts the frontend and
    backend servers in parallel.
 3. Access the app at <http://localhost:3000>.
-4. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 Due to how the dev Docker is set up, you will still need to rebuild the development image if you change the
 dependencies, package.json or ESLint configs. You'll also need Node.js and pnpm installed locally to do that.

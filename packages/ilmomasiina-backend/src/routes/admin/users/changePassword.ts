@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { BadRequest, NotFound } from 'http-errors';
+import { NotFound } from 'http-errors';
 
 import { AuditEvent, ErrorCode, UserChangePasswordSchema } from '@tietokilta/ilmomasiina-models';
 import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
@@ -16,9 +16,7 @@ export default async function changePassword(
   request: FastifyRequest<{ Body: UserChangePasswordSchema }>,
   reply: FastifyReply,
 ): Promise<void> {
-  if (request.body.newPassword.length < 10) {
-    throw new BadRequest('Password must be at least 10 characters long');
-  }
+  AdminPasswordAuth.validateNewPassword(request.body.newPassword);
 
   await User.sequelize!.transaction(async (transaction) => {
     // Try to fetch existing user

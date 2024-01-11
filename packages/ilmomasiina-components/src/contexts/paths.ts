@@ -12,6 +12,7 @@ export type UserPaths = {
 
 export type AdminPaths = {
   adminLogin: string;
+  adminInitialSetup: string;
   adminEventsList: string;
   adminEditEvent: (id: EventID) => string,
   adminUsersList: string;

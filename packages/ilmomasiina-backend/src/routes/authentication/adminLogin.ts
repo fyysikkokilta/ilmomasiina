@@ -11,7 +11,7 @@ export function adminLogin(session: AdminAuthSession) {
   return async (
     request: FastifyRequest<{ Body: AdminLoginBody }>,
     reply: FastifyReply,
-  ): Promise<AdminLoginResponse | void> => {
+  ): Promise<AdminLoginResponse> => {
     // Verify user
     const user = await User.findOne({
       where: { email: request.body.email },

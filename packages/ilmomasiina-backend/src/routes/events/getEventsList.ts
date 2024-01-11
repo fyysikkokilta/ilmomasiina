@@ -1,4 +1,4 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { col, fn, Order } from 'sequelize';
 
 import type { AdminEventListResponse, EventListQuery, UserEventListResponse } from '@tietokilta/ilmomasiina-models';
@@ -10,6 +10,7 @@ import { Event } from '../../models/event';
 import { Quota } from '../../models/quota';
 import { Signup } from '../../models/signup';
 import { descNullsFirst } from '../../models/util';
+import { InitialSetupNeeded } from '../admin/users/createInitialUser';
 import { stringifyDates } from '../utils';
 
 function eventOrder(): Order {
@@ -23,9 +24,15 @@ function eventOrder(): Order {
 }
 
 export async function getEventsListForUser(
+  this: FastifyInstance<any, any, any, any, any>,
   request: FastifyRequest<{ Querystring: EventListQuery }>,
   reply: FastifyReply,
 ): Promise<UserEventListResponse> {
+  // When the application hasn't been set up for the first time, throw an error.
+  if (!this.initialSetupDone) {
+    throw new InitialSetupNeeded('Initial setup of Ilmomasiina is needed.');
+  }
+
   const eventAttrs = eventListEventAttrs;
   const filter = { ...request.query };
 

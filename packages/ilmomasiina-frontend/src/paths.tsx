@@ -12,6 +12,7 @@ const appPaths: FullPaths = {
   editSignup: (id, editToken) => `${urlPrefix}/signup/${id}/${editToken}`,
 
   adminLogin: `${urlPrefix}/login`,
+  adminInitialSetup: `${urlPrefix}/setup`,
   adminEventsList: `${urlPrefix}/admin`,
   adminEditEvent: (id) => `${urlPrefix}/admin/edit/${id}`,
   adminUsersList: `${urlPrefix}/admin/users`,
