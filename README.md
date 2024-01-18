@@ -1,13 +1,18 @@
 # Ilmomasiina
 
-Ilmomasiina is the event registration system originally created by Athene, forked by Tietokilta and currently under
-heavy development for our new site. Once finished, it will be available for all organizations to use, along with
-migration tools from the Athene-made version.
+Ilmomasiina is the event registration system originally created by Athene in 2016,
+and forked in 2021 by Tietokilta for our new website.
+There are [numerous major upgrades](./CHANGELOG.md) from the Athene version.
 
-The latest reviewed development version is in the `dev` branch.
+Ilmomasiina is easy to [install](docs/installation.md) in various environments and
+is freely available for all organizations to use.
+[Migrating](docs/migration.md) from the Athene-made version is also supported.
+
+The latest reviewed development version is in the `dev` branch. You may want to check
+current PRs for somewhat stable feature additions.
 
 **Please note that the code is currently in alpha phase and may still have bugs.**
-Major features for 2.0 are mostly done and we expect to reach beta in spring 2024.
+Major features for 2.0 are mostly done and we expect to reach a stable beta in spring 2024.
 
 ## Installation
 

@@ -5,7 +5,7 @@ This file documents the migration process from the Athene-created version of Ilm
 ## Migration script
 
 The below SQL script migrates the database schema. It is written for MySQL/MariaDB.
-Scripts for other databases will be created later.
+If you use PostgreSQL, let us know.
 
 There will be more automatic migration tools when we reach production, but the initial migration will likely stay
 as a script.
