@@ -7,7 +7,6 @@
     "start": "vite",
     "typecheck": "tsc --build"
   },
-  "proxy": "http://localhost:3001",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Tietokilta/ilmomasiina.git"

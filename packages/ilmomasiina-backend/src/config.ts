@@ -26,7 +26,8 @@ const config = {
   /** The host to run the backend server on. */
   host: envString('HOST', 'localhost'),
   /** The port to run the backend server on. */
-  port: envInteger('PORT', 3000),
+  // Check DEV_BACKEND_PORT first, then PORT, then default to 3000.
+  port: envInteger('DEV_BACKEND_PORT', envInteger('PORT', 3000)),
 
   /** Whether an Azure App Service environment is detected. */
   isAzure: process.env.WEBSITE_SITE_NAME !== undefined,
