@@ -4,6 +4,7 @@ import {
 import { FastifyRequest } from 'fastify';
 
 import type { UserID, UserSchema } from '@tietokilta/ilmomasiina-models';
+import config from '../config';
 import { BadSession } from './errors';
 
 export interface AdminTokenData {
@@ -13,7 +14,7 @@ export interface AdminTokenData {
 
 export default class AdminAuthSession {
   /** Session lifetime in seconds */
-  static TTL = 10 * 60;
+  static TTL = config.nodeEnv === 'development' ? 365 * 24 * 60 * 60 : 10 * 60;
 
   private readonly sign: typeof SignerSync;
   private readonly verify: typeof VerifierSync;

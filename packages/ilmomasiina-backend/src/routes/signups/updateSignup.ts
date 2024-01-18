@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { BadRequest, Forbidden, NotFound } from 'http-errors';
+import { BadRequest } from 'http-errors';
 import { Transaction } from 'sequelize';
 
 import type { SignupPathParams, SignupUpdateBody, SignupUpdateResponse } from '@tietokilta/ilmomasiina-models';
@@ -10,6 +10,7 @@ import { Event } from '../../models/event';
 import { Question } from '../../models/question';
 import { Signup } from '../../models/signup';
 import { signupsAllowed } from './createNewSignup';
+import { NoSuchSignup, SignupsClosed } from './errors';
 
 /** Requires editTokenVerification */
 export default async function updateSignup(
@@ -24,7 +25,7 @@ export default async function updateSignup(
       lock: Transaction.LOCK.UPDATE,
     });
     if (signup === null) {
-      throw new NotFound('Signup expired or already deleted');
+      throw new NoSuchSignup('Signup expired or already deleted');
     }
 
     const quota = await signup.getQuota({
@@ -42,7 +43,7 @@ export default async function updateSignup(
     });
     const event = quota.event!;
     if (!signupsAllowed(event)) {
-      throw new Forbidden('Signups closed for this event.');
+      throw new SignupsClosed('Signups closed for this event.');
     }
 
     /** Is this signup already confirmed (i.e. is this the first update for this signup) */

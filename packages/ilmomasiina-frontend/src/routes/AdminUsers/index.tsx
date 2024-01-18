@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { errorDesc, errorTitle } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import requireAuth from '../../containers/requireAuth';
 import { getUsers, resetState } from '../../modules/adminUsers/actions';
 import appPaths from '../../paths';
@@ -15,7 +16,7 @@ import UserForm from './UserForm';
 
 const AdminUsersList = () => {
   const dispatch = useTypedDispatch();
-  const { users, usersLoadError } = useTypedSelector((state) => state.adminUsers, shallowEqual);
+  const { users, loadError } = useTypedSelector((state) => state.adminUsers, shallowEqual);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -25,11 +26,11 @@ const AdminUsersList = () => {
     };
   }, [dispatch]);
 
-  if (usersLoadError) {
+  if (loadError) {
     return (
       <>
-        <h1>{t('errors.title')}</h1>
-        <p>{t('adminUsers.loadFailed')}</p>
+        <h1>{errorTitle(t, loadError, 'adminUsers.loadError')}</h1>
+        <p>{errorDesc(t, loadError, 'adminUsers.loadError')}</p>
       </>
     );
   }

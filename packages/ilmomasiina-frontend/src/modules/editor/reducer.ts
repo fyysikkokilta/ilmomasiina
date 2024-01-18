@@ -4,7 +4,6 @@ import {
   EDIT_CONFLICT_DISMISSED,
   EVENT_LOAD_FAILED,
   EVENT_LOADED,
-  EVENT_SAVE_FAILED,
   EVENT_SAVING,
   EVENT_SLUG_CHECKED,
   EVENT_SLUG_CHECKING,
@@ -17,11 +16,8 @@ import type { EditorActions, EditorState } from './types';
 const initialState: EditorState = {
   event: null,
   isNew: true,
-  loadError: false,
   slugAvailability: null,
   allCategories: null,
-  saving: false,
-  saveError: false,
   moveToQueueModal: null,
   editConflictModal: null,
 };
@@ -38,14 +34,12 @@ export default function reducer(
         ...state,
         event: action.payload.event,
         isNew: action.payload.isNew,
-        loadError: false,
-        saving: false,
-        saveError: false,
+        loadError: undefined,
       };
     case EVENT_LOAD_FAILED:
       return {
         ...state,
-        loadError: true,
+        loadError: action.payload,
       };
     case EVENT_SLUG_CHECKING:
       return {
@@ -60,19 +54,11 @@ export default function reducer(
     case EVENT_SAVING:
       return {
         ...state,
-        saving: true,
         moveToQueueModal: null,
-      };
-    case EVENT_SAVE_FAILED:
-      return {
-        ...state,
-        saving: false,
-        saveError: true,
       };
     case MOVE_TO_QUEUE_WARNING:
       return {
         ...state,
-        saving: false,
         moveToQueueModal: action.payload,
       };
     case MOVE_TO_QUEUE_CANCELED:

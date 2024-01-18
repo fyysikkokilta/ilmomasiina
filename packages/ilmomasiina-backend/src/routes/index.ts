@@ -18,10 +18,7 @@ import deleteUser from './admin/users/deleteUser';
 import listUsers from './admin/users/listUsers';
 import resetPassword from './admin/users/resetPassword';
 import { adminLogin, requireAdmin } from './authentication/adminLogin';
-import {
-  getEventDetailsForAdmin,
-  getEventDetailsForUser,
-} from './events/getEventDetails';
+import { getEventDetailsForAdmin, getEventDetailsForUser } from './events/getEventDetails';
 import { getEventsListForAdmin, getEventsListForUser } from './events/getEventsList';
 import { sendICalFeed } from './ical';
 import createSignup from './signups/createNewSignup';

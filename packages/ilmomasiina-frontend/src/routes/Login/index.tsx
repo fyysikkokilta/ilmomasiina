@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Field, Formik, FormikHelpers } from 'formik';
-import { Button, Form } from 'react-bootstrap';
+import { Alert, Button, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
+import { ApiError } from '@tietokilta/ilmomasiina-components';
+import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import { login } from '../../modules/auth/actions';
-import { useTypedDispatch, useTypedSelector } from '../../store/reducers';
+import { useTypedDispatch } from '../../store/reducers';
 
 import './Login.scss';
 
@@ -16,20 +18,26 @@ type FormData = {
 
 const Login = () => {
   const dispatch = useTypedDispatch();
-  const { loginError } = useTypedSelector((state) => state.auth);
+  const [loginError, setLoginError] = useState<ApiError>();
   const { t } = useTranslation();
 
   async function onSubmit(data: FormData, { setSubmitting }: FormikHelpers<FormData>) {
     const { email, password } = data;
-    await dispatch(login(email, password));
-    setSubmitting(false);
+    try {
+      await dispatch(login(email, password));
+      setLoginError(undefined);
+    } catch (err) {
+      setLoginError(err as ApiError);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
     <div className="login-container">
       <h1>{t('login.title')}</h1>
       {loginError && (
-        <p className="text-invalid">{t('login.loginFailed')}</p>
+        <Alert variant="danger">{errorDesc(t, loginError, 'login.errors')}</Alert>
       )}
       <Formik
         initialValues={{

@@ -1,15 +1,11 @@
 import moment, { Moment } from 'moment';
 
-import {
-  LOGGING_IN, LOGIN_FAILED, LOGIN_SUCCEEDED, RESET,
-} from './actionTypes';
+import { LOGIN_SUCCEEDED, RESET } from './actionTypes';
 import type { AuthActions, AuthState } from './types';
 
 const initialState: AuthState = {
   accessToken: undefined,
   accessTokenExpires: undefined,
-  loggingIn: false,
-  loginError: false,
   loggedIn: false,
 };
 
@@ -39,23 +35,9 @@ export default function reducer(
       return initialState;
     case LOGIN_SUCCEEDED:
       return {
-        ...state,
         accessToken: action.payload.accessToken,
         accessTokenExpires: getTokenExpiry(action.payload.accessToken).toISOString(),
-        loggingIn: false,
         loggedIn: true,
-        loginError: false,
-      };
-    case LOGGING_IN:
-      return {
-        ...state,
-        loggingIn: true,
-      };
-    case LOGIN_FAILED:
-      return {
-        ...state,
-        loggingIn: false,
-        loginError: true,
       };
     default:
       return state;

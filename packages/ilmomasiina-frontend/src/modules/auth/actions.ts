@@ -6,24 +6,11 @@ import type { AdminLoginResponse } from '@tietokilta/ilmomasiina-models';
 import i18n from '../../i18n';
 import appPaths from '../../paths';
 import type { DispatchAction } from '../../store/types';
-import {
-  LOGGING_IN,
-  LOGIN_FAILED,
-  LOGIN_SUCCEEDED,
-  RESET,
-} from './actionTypes';
-
-export const loggingIn = () => <const>{
-  type: LOGGING_IN,
-};
+import { LOGIN_SUCCEEDED, RESET } from './actionTypes';
 
 export const loginSucceeded = (payload: AdminLoginResponse) => <const>{
   type: LOGIN_SUCCEEDED,
   payload,
-};
-
-export const loginFailed = () => <const>{
-  type: LOGIN_FAILED,
 };
 
 export const resetState = () => <const>{
@@ -31,29 +18,20 @@ export const resetState = () => <const>{
 };
 
 export type AuthActions =
-  | ReturnType<typeof loggingIn>
   | ReturnType<typeof loginSucceeded>
-  | ReturnType<typeof loginFailed>
   | ReturnType<typeof resetState>;
 
 export const login = (email: string, password: string) => async (dispatch: DispatchAction) => {
-  dispatch(loggingIn());
-
-  try {
-    const sessionResponse = await apiFetch('authentication', {
-      method: 'POST',
-      body: {
-        email,
-        password,
-      },
-    }) as AdminLoginResponse;
-    dispatch(loginSucceeded(sessionResponse));
-    dispatch(push(appPaths.adminEventsList));
-    return true;
-  } catch (e) {
-    dispatch(loginFailed());
-    return false;
-  }
+  const sessionResponse = await apiFetch('authentication', {
+    method: 'POST',
+    body: {
+      email,
+      password,
+    },
+  }) as AdminLoginResponse;
+  dispatch(loginSucceeded(sessionResponse));
+  dispatch(push(appPaths.adminEventsList));
+  return true;
 };
 
 export const redirectToLogin = () => (dispatch: DispatchAction) => {

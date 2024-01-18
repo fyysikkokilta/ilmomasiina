@@ -9,9 +9,9 @@ const PageNotFound = () => {
   const { t } = useTranslation();
   return (
     <div className="ilmo--status-container">
-      <h1>{t('errors.notFound.title')}</h1>
+      <h1>{t('errors.404.title')}</h1>
       <p>
-        {t('errors.notFound.description')}
+        {t('errors.404.description')}
       </p>
       <p>
         <Link to={appPaths.eventsList}>{t('errors.returnToEvents')}</Link>

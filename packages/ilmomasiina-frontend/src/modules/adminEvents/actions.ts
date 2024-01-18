@@ -1,3 +1,4 @@
+import type { ApiError } from '@tietokilta/ilmomasiina-components';
 import type { AdminEventListResponse, EventID } from '@tietokilta/ilmomasiina-models';
 import adminApiFetch from '../../api';
 import type { DispatchAction, GetState } from '../../store/types';
@@ -16,8 +17,9 @@ export const eventsLoaded = (events: AdminEventListResponse) => <const>{
   payload: events,
 };
 
-export const eventsLoadFailed = () => <const>{
+export const eventsLoadFailed = (error: ApiError) => <const>{
   type: EVENTS_LOAD_FAILED,
+  payload: error,
 };
 
 export type AdminEventsActions =
@@ -31,19 +33,14 @@ export const getAdminEvents = () => async (dispatch: DispatchAction, getState: G
     const response = await adminApiFetch('admin/events', { accessToken }, dispatch);
     dispatch(eventsLoaded(response as AdminEventListResponse));
   } catch (e) {
-    dispatch(eventsLoadFailed());
+    dispatch(eventsLoadFailed(e as ApiError));
   }
 };
 
 export const deleteEvent = (id: EventID) => async (dispatch: DispatchAction, getState: GetState) => {
   const { accessToken } = getState().auth;
-  try {
-    await adminApiFetch(`admin/events/${id}`, {
-      accessToken,
-      method: 'DELETE',
-    }, dispatch);
-    return true;
-  } catch (e) {
-    return false;
-  }
+  await adminApiFetch(`admin/events/${id}`, {
+    accessToken,
+    method: 'DELETE',
+  }, dispatch);
 };

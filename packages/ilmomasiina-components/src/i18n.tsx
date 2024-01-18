@@ -16,6 +16,7 @@ export { resources as i18nResources };
 const i18n = createInstance({
   resources,
   fallbackLng: 'fi',
+  defaultNS: 'components',
   returnNull: false,
   interpolation: {
     // for React

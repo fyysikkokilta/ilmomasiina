@@ -2,6 +2,8 @@ import fastifyCompress from '@fastify/compress';
 import fastifyCors from '@fastify/cors';
 import fastifySensible from '@fastify/sensible';
 import fastifyStatic from '@fastify/static';
+import Ajv from 'ajv';
+import ajvFormats from 'ajv-formats';
 import fastify, { FastifyInstance } from 'fastify';
 import cron from 'node-cron';
 import path from 'path';
@@ -16,18 +18,35 @@ import enforceHTTPS from './enforceHTTPS';
 import setupDatabase from './models';
 import setupRoutes from './routes';
 
+// Disable type coercion for request bodies - we don't need it, and it breaks stuff like anyOf
+const bodyCompiler = new Ajv({
+  coerceTypes: false,
+  useDefaults: true,
+  removeAdditional: true,
+  addUsedSchema: false,
+  allErrors: false,
+});
+ajvFormats(bodyCompiler);
+
+const defaultCompiler = new Ajv({
+  coerceTypes: 'array',
+  useDefaults: true,
+  removeAdditional: true,
+  addUsedSchema: false,
+  allErrors: false,
+});
+ajvFormats(defaultCompiler);
+
 export default async function initApp(): Promise<FastifyInstance> {
   await setupDatabase();
 
   const server = fastify({
     trustProxy: config.isAzure || config.trustProxy, // Get IPs from X-Forwarded-For
     logger: true, // Enable logger
-    ajv: {
-      customOptions: {
-        coerceTypes: false, // Disable type coercion - we don't need it, and it breaks stuff like anyOf
-      },
-    },
   });
+  server.setValidatorCompiler(({ httpPart, schema }) => (
+    httpPart === 'body' ? bodyCompiler.compile(schema) : defaultCompiler.compile(schema)
+  ));
 
   // Register fastify-sensible (https://github.com/fastify/fastify-sensible)
   server.register(fastifySensible);

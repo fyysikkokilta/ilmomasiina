@@ -9,6 +9,7 @@ import { I18nProvider } from '../../i18n';
 import {
   SingleEventProps, SingleEventProvider, useSingleEventContext,
 } from '../../modules/singleEvent';
+import { errorDesc, errorTitle } from '../../utils/errorMessage';
 import EventDescription from './components/EventDescription';
 import QuotaStatus from './components/QuotaStatus';
 import SignupCountdown from './components/SignupCountdown';
@@ -25,8 +26,8 @@ const SingleEventView = () => {
   if (error) {
     return (
       <div className="ilmo--loading-container">
-        <h1>{t('errors.title')}</h1>
-        <p>{t('singleEvent.loadFailed')}</p>
+        <h1>{errorTitle(t, error, 'singleEvent.loadError')}</h1>
+        <p>{errorDesc(t, error, 'singleEvent.loadError')}</p>
         <Link to={paths.eventsList}>{t('errors.returnToEvents')}</Link>
       </div>
     );

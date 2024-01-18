@@ -13,10 +13,10 @@ build(config)
     const totals = new Map<string, number>();
     for (const [path, { bytesInOutput }] of Object.entries(inputs)) {
       // extract package name from path
-      const names = path.replace(/\\/g, '/').match(/\/node_modules\/(?:@[^/]+\/)?[^/]+/g) || ['.'];
-      const lastName = names[names.length - 1].replace('/node_modules/', '');
+      // const names = path.replace(/\\/g, '/').match(/\/node_modules\/(?:@[^/]+\/)?[^/]+/g) || ['.'];
+      // const lastName = names[names.length - 1].replace('/node_modules/', '');
       // count size
-      totals.set(lastName, (totals.get(lastName) ?? 0) + bytesInOutput);
+      totals.set(path, (totals.get(path) ?? 0) + bytesInOutput);
     }
 
     // sort by name

@@ -22,16 +22,15 @@ export class ApiError extends Error {
   }
 
   static async fromResponse(response: Response) {
-    let error = new Error(response.statusText);
     try {
       const data = await response.json();
       if (data.message) {
-        error = new ApiError(response.status, data);
+        return new ApiError(response.status, data);
       }
     } catch (e) {
       /* fall through */
     }
-    return error;
+    return new ApiError(response.status, { message: response.statusText });
   }
 }
 
@@ -59,10 +58,20 @@ export default async function apiFetch(uri: string, {
     body: body === undefined ? undefined : JSON.stringify(body),
     headers: allHeaders,
     signal,
+  }).catch((err) => {
+    // convert network errors to barebones ApiError
+    throw new ApiError(0, err);
   });
-
+  // proper API errors, try to parse JSON
   if (!response.ok) {
     throw await ApiError.fromResponse(response);
   }
-  return response.status === 204 ? null : response.json();
+  // 204 No Content
+  if (response.status === 204) {
+    return null;
+  }
+  // just in case, convert JSON parse errors for 2xx responses to ApiError
+  return response.json().catch((err) => {
+    throw new ApiError(0, err);
+  });
 }

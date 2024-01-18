@@ -1,17 +1,8 @@
-import {
-  RESET,
-  USER_CREATE_FAILED,
-  USER_CREATED,
-  USER_CREATING,
-  USERS_LOAD_FAILED,
-  USERS_LOADED,
-} from './actionTypes';
+import { RESET, USERS_LOAD_FAILED, USERS_LOADED } from './actionTypes';
 import type { AdminUsersActions, AdminUsersState } from './types';
 
 const initialState: AdminUsersState = {
   users: null,
-  usersLoadError: false,
-  userCreating: false,
 };
 
 export default function reducer(
@@ -23,23 +14,12 @@ export default function reducer(
       return {
         ...state,
         users: action.payload,
-        usersLoadError: false,
+        loadError: undefined,
       };
     case USERS_LOAD_FAILED:
       return {
         ...state,
-        usersLoadError: true,
-      };
-    case USER_CREATING:
-      return {
-        ...state,
-        userCreating: true,
-      };
-    case USER_CREATE_FAILED:
-    case USER_CREATED:
-      return {
-        ...state,
-        userCreating: false,
+        loadError: action.payload,
       };
     case RESET:
       return initialState;

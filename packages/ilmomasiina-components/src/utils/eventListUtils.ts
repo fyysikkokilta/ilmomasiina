@@ -1,5 +1,5 @@
-import every from 'lodash/every';
-import sumBy from 'lodash/sumBy';
+import every from 'lodash-es/every';
+import sumBy from 'lodash-es/sumBy';
 import moment, { Moment } from 'moment-timezone';
 
 import type {

@@ -1,5 +1,4 @@
-import _ from 'lodash';
-
+import type { ApiError } from '@tietokilta/ilmomasiina-components';
 import type { AuditLogResponse, AuditLoqQuery } from '@tietokilta/ilmomasiina-models';
 import adminApiFetch from '../../api';
 import type { DispatchAction, GetState } from '../../store/types';
@@ -24,8 +23,9 @@ export const auditLogLoaded = (log: AuditLogResponse) => <const>{
   payload: log,
 };
 
-export const auditLogLoadFailed = () => <const>{
+export const auditLogLoadFailed = (error: ApiError) => <const>{
   type: AUDIT_LOG_LOAD_FAILED,
+  payload: error,
 };
 
 export type AuditLogActions =
@@ -40,10 +40,11 @@ export const getAuditLogs = (query: AuditLoqQuery = {} as AuditLoqQuery) => asyn
 ) => {
   dispatch(auditLogQuery(query));
 
-  const queryString = _.entries(query)
-    .filter(([, value]) => value)
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string | number | boolean)}`)
-    .join('&');
+  const queryString = new URLSearchParams(Object.fromEntries(
+    Object.entries(query)
+      .filter(([, value]) => value)
+      .map(([key, value]) => [key, String(value)]),
+  ));
 
   const { accessToken } = getState().auth;
 
@@ -51,7 +52,7 @@ export const getAuditLogs = (query: AuditLoqQuery = {} as AuditLoqQuery) => asyn
     const response = await adminApiFetch(`admin/auditlog?${queryString}`, { accessToken }, dispatch);
     dispatch(auditLogLoaded(response as AuditLogResponse));
   } catch (e) {
-    dispatch(auditLogLoadFailed());
+    dispatch(auditLogLoadFailed(e as ApiError));
   }
 };
 
@@ -60,7 +61,7 @@ export const setAuditLogQueryField = <K extends keyof AuditLoqQuery>(
   value: AuditLoqQuery[K],
 ) => async (dispatch: DispatchAction, getState: GetState) => {
     const newQuery = {
-      ...getState().auditLog.auditLogQuery,
+      ...getState().auditLog.query,
       [key]: value,
     };
     if (!key.startsWith('$')) {

@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { Forbidden, NotFound } from 'http-errors';
 
 import type { SignupPathParams } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
@@ -9,6 +8,7 @@ import { Quota } from '../../models/quota';
 import { Signup } from '../../models/signup';
 import { refreshSignupPositions } from './computeSignupPosition';
 import { signupsAllowed } from './createNewSignup';
+import { NoSuchSignup, SignupsClosed } from './errors';
 
 /** Requires admin authentication OR editTokenVerification */
 async function deleteSignup(id: string, auditLogger: AuditLogger, admin: boolean = false): Promise<void> {
@@ -29,10 +29,10 @@ async function deleteSignup(id: string, auditLogger: AuditLogger, admin: boolean
       transaction,
     });
     if (signup === null) {
-      throw new NotFound('No signup found with id');
+      throw new NoSuchSignup('No signup found with id');
     }
     if (!admin && !signupsAllowed(signup.quota!.event!)) {
-      throw new Forbidden('Signups closed for this event.');
+      throw new SignupsClosed('Signups closed for this event.');
     }
 
     // Delete the DB object
