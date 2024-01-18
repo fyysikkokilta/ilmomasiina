@@ -22,6 +22,14 @@ if (PATH_PREFIX.endsWith('/')) {
 
 const TIMEZONE = process.env.APP_TIMEZONE || 'Europe/Helsinki';
 
+/** config.define takes literal JavaScript code to be search-and-replaced into the build.
+ *
+ * Therefore we need to quote string values, which is easiest done using JSON.stringify.
+ */
+function quoteValues(values: Record<string, string | number | boolean>) {
+  return Object.fromEntries(Object.entries(values).map(([key, value]) => [key, JSON.stringify(value)]));
+}
+
 export default defineConfig(({ mode }) => ({
   server: {
     port: 3000,
@@ -40,7 +48,7 @@ export default defineConfig(({ mode }) => ({
     sourcemap: true,
   },
 
-  define: Object.fromEntries(Object.entries({
+  define: quoteValues({
     DEV: mode === 'development',
     PROD: mode === 'production',
     TEST: mode === 'test',
@@ -55,7 +63,7 @@ export default defineConfig(({ mode }) => ({
     BRANDING_FOOTER_HOME_TEXT: process.env.BRANDING_FOOTER_HOME_TEXT,
     BRANDING_FOOTER_HOME_LINK: process.env.BRANDING_FOOTER_HOME_LINK,
     TIMEZONE,
-  }).map(([key, value]) => [key, JSON.stringify(value)])),
+  }),
 
   plugins: [
     react(),
@@ -68,6 +76,8 @@ export default defineConfig(({ mode }) => ({
       typescript: {
         buildMode: true,
       },
+      // TypeScript in build mode automatically typechecks all depended packages, but
+      // ESLint needs to be told where to find our code
       eslint: {
         lintCommand: 'eslint ../../packages',
       },
