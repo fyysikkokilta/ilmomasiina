@@ -56,12 +56,10 @@ const EditorTabHeader = ({ activeTab, setActiveTab }: Props) => {
 
   return (
     <Nav variant="tabs" activeKey={activeTab} role="tablist">
-      {Object.values(EditorTab).flatMap((id) => {
-        if (id !== EditorTab.BASIC_DETAILS && eventType === EditorEventType.ONLY_EVENT) {
-          return [];
-        }
-        return [<Tab key={id} id={id} activeTab={activeTab} setActiveTab={setActiveTab} />];
-      })}
+      {Object.values(EditorTab)
+        // Only show Basic details for ONLY_EVENT events.
+        .filter((id) => id === EditorTab.BASIC_DETAILS && eventType !== EditorEventType.ONLY_EVENT)
+        .map((id) => <Tab key={id} id={id} activeTab={activeTab} setActiveTab={setActiveTab} />)}
     </Nav>
   );
 };
