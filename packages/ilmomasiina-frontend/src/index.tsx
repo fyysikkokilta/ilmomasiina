@@ -10,12 +10,6 @@ import { configure } from '@tietokilta/ilmomasiina-components';
 import AppContainer from './containers/AppContainer';
 import { apiUrl } from './paths';
 
-if (!PROD) {
-  // eslint-disable-next-line global-require
-  const whyDidYouRender = require('@welldone-software/why-did-you-render');
-  whyDidYouRender(React);
-}
-
 if (PROD && SENTRY_DSN) {
   Sentry.init({ dsn: SENTRY_DSN });
 }
