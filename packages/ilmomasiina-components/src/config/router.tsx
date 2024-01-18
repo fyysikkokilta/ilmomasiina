@@ -1,4 +1,4 @@
-import React, { AnchorHTMLAttributes, ComponentType } from 'react';
+import React, { AnchorHTMLAttributes, ComponentType, useEffect } from 'react';
 
 /** <Link> props that aim to be compatible with multiple routers, including `react-router-dom`, `@reach/router`
  * and `gatsby`.
@@ -60,4 +60,15 @@ export function useParams<T extends {}>(): T {
 
 export function useNavigate() {
   return config.useNavigate();
+}
+
+export function Navigate({ to, replace }: LinkProps) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate(to, { replace });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [to]);
+
+  return null;
 }

@@ -27,6 +27,7 @@ services:
         - BRANDING_FOOTER_GDPR_LINK=https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/
         - BRANDING_FOOTER_HOME_TEXT=Tietokilta.fi
         - BRANDING_FOOTER_HOME_LINK=https://tietokilta.fi
+        - BRANDING_LOGIN_PLACEHOLDER_EMAIL=admin@tietokilta.fi
     restart: always
     depends_on:
       - database

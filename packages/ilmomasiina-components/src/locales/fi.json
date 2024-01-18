@@ -53,6 +53,8 @@
         "errors.contactAdmin": "Jos ongelma jatkuu, ota yhteyttä ylläpitäjiin.",
         "errors.default.title": "Hups, jotain meni pieleen",
         "errors.default.description": "Tuntematon virhe. $t(errors.contactAdmin)",
+        "errors.InitialSetupNeeded.title": "Käyttöönotto kesken",
+        "errors.InitialSetupNeeded.description": "Palvelin vaikuttaa vasta asennetulta. Tämä käyttöliittymä ei tue käyttöönottoa \u2013 ota palvelin käyttöön hallintakäyttöliittymän kautta.",
         "errors.500.description": "Palvelimella tapahtui virhe. $t(errors.contactAdmin)",
         "errors.502.description": "Taustapalvelimeen ei saada yhteyttä. $t(errors.contactAdmin)",
         "errors.503.description": "Taustapalvelimeen ei saada yhteyttä. $t(errors.contactAdmin)",

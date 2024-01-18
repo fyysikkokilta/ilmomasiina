@@ -118,9 +118,6 @@ const config = {
   /** Host for Mailgun API server. */
   mailgunHost: envString('MAILGUN_HOST', 'api.eu.mailgun.net'),
 
-  /** Whether or not new admin accounts can be added. */
-  adminRegistrationAllowed: envBoolean('ADMIN_REGISTRATION_ALLOWED', false),
-
   /** How long after an event's date to remove signup details. */
   anonymizeAfterDays: envInteger('ANONYMIZE_AFTER_DAYS', 180),
   /** How long items stay in the database after deletion, in order to allow restoring accidentally deleted items. */
@@ -169,15 +166,6 @@ if (!config.eventDetailsUrl.includes('{slug}')) {
 
 if (!config.editSignupUrl.includes('{id}') || !config.editSignupUrl.includes('{editToken}')) {
   throw new Error('EDIT_SIGNUP_URL must contain {id} and {editToken} if set.');
-}
-
-if (config.adminRegistrationAllowed) {
-  console.warn(
-    '----------------------------------------------------\n'
-    + 'WARNING!\nAdmin registration is enabled, meaning anyone can register an administrator account.\n'
-    + 'After creating your initial administrator account, make sure to set ADMIN_REGISTRATION_ALLOWED=false.\n'
-    + '----------------------------------------------------',
-  );
 }
 
 export default config;

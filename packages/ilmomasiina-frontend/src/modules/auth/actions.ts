@@ -49,6 +49,20 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
   return true;
 };
 
+export const createInitialUser = (email: string, password: string) => async (dispatch: DispatchAction) => {
+  const sessionResponse = await apiFetch('users', {
+    method: 'POST',
+    body: {
+      email,
+      password,
+    },
+  }) as AdminLoginResponse;
+  dispatch(loginSucceeded(sessionResponse));
+  dispatch(push(appPaths.adminEventsList));
+  loginToast('success', i18n.t('initialSetup.success'), 2000);
+  return true;
+};
+
 export const redirectToLogin = () => (dispatch: DispatchAction) => {
   dispatch(resetState());
   dispatch(push(appPaths.adminLogin));

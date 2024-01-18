@@ -52,6 +52,8 @@
         "errors.returnToEvents": "Return to event list",
         "errors.contactAdmin": "If the problem persists, please report it to the administrators.",
         "errors.default.title": "Whoops, something went wrong",
+        "errors.InitialSetupNeeded.title": "Initial setup needed",
+        "errors.InitialSetupNeeded.description": "The server seems to be freshly installed. This frontend doesn't support initial setup \u2013 please visit the admin interface to set up the server.",
         "errors.500.description": "An internal error occurred on the server. $t(errors.contactAdmin)",
         "errors.502.description": "The backend server seems to be down. $t(errors.contactAdmin)",
         "errors.503.description": "The backend server seems to be down. $t(errors.contactAdmin)",
