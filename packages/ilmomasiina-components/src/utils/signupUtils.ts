@@ -101,7 +101,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
 }
 
 function getAnswersFromSignup(event: AdminEventResponse, signup: AnySignupSchema) {
-  const answers: Record<QuestionID, string> = {};
+  const answers: Record<QuestionID, string | string[]> = {};
 
   event.questions.forEach((question) => {
     const answer = find(signup.answers, { questionId: question.id });
@@ -116,7 +116,7 @@ export type FormattedSignup = {
   firstName: string | null;
   lastName: string | null;
   email: string | null;
-  answers: Record<QuestionID, string>;
+  answers: Record<QuestionID, string | string[]>;
   quota: string;
   createdAt: string;
   confirmed: boolean;
@@ -148,6 +148,11 @@ export function getSignupsForAdminList(event: AdminEventResponse): FormattedSign
   });
 }
 
+/** Formats an answer for display. */
+export function stringifyAnswer(answer: string | string[] | undefined) {
+  return Array.isArray(answer) ? answer.join(', ') : (answer ?? '');
+}
+
 /** Converts an array of signup rows from `getSignupsForAdminList` to a an array of CSV cells. */
 export function convertSignupsToCSV(event: AdminEventResponse, signups: FormattedSignup[]): string[][] {
   return [
@@ -164,7 +169,7 @@ export function convertSignupsToCSV(event: AdminEventResponse, signups: Formatte
       ...(event.nameQuestion ? [signup.firstName || '', signup.lastName || ''] : []),
       ...(event.emailQuestion ? [signup.email || ''] : []),
       signup.quota,
-      ...event.questions.map((question) => signup.answers[question.id] || ''),
+      ...event.questions.map((question) => stringifyAnswer(signup.answers[question.id])),
       signup.createdAt,
     ]),
   ];

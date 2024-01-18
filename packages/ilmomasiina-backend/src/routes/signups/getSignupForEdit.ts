@@ -54,11 +54,7 @@ export default async function getSignupForEdit(
     },
     event: {
       ...stringifyDates(event.get({ plain: true })),
-      questions: event.questions!.map((question) => ({
-        ...question.get({ plain: true }),
-        // Split answer options into array
-        options: question.options ? question.options.split(';') : null,
-      })),
+      questions: event.questions!.map((question) => question.get({ plain: true })),
     },
   };
 

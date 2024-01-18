@@ -73,16 +73,34 @@ export default async function updateSignup(
 
     // Check that all questions are answered with a valid answer
     const newAnswers = questions.map((question) => {
-      const answer = request.body.answers
+      // Fetch the answer to this question from the request body
+      let answer = request.body.answers
         ?.find((a) => a.questionId === question.id)
-        ?.answer
-        || '';
+        ?.answer;
 
-      if (!answer) {
+      if (!answer || !answer.length) {
+        // Disallow empty answers to required questions
         if (question.required) {
           throw new BadRequest(`Missing answer for question ${question.question}`);
         }
+        // Normalize empty answers to "" or [], depending on question type
+        answer = question.type === 'checkbox' ? [] : '';
+      } else if (question.type === 'checkbox') {
+        // Ensure checkbox answers are arrays
+        if (!Array.isArray(answer)) {
+          throw new BadRequest(`Invalid answer to question ${question.question}`);
+        }
+        // Check that all checkbox answers are valid
+        answer.forEach((option) => {
+          if (!question.options!.includes(option)) {
+            throw new BadRequest(`Invalid answer to question ${question.question}`);
+          }
+        });
       } else {
+        // Don't allow arrays for non-checkbox questions
+        if (typeof answer !== 'string') {
+          throw new BadRequest(`Invalid answer to question ${question.question}`);
+        }
         switch (question.type) {
           case 'text':
           case 'textarea':
@@ -95,23 +113,9 @@ export default async function updateSignup(
             break;
           case 'select': {
             // Check that the select answer is valid
-            const options = question.options!.split(';');
-
-            if (!options.includes(answer)) {
+            if (!question.options!.includes(answer)) {
               throw new BadRequest(`Invalid answer to question ${question.question}`);
             }
-            break;
-          }
-          case 'checkbox': {
-            // Check that all checkbox answers are valid
-            const options = question.options!.split(';');
-            const answers = answer.split(';');
-
-            answers.forEach((option) => {
-              if (!options.includes(option)) {
-                throw new BadRequest(`Invalid answer to question ${question.question}`);
-              }
-            });
             break;
           }
           default:
