@@ -74,17 +74,18 @@ export default async function updateSignup(
 
     // Check that all questions are answered with a valid answer
     const newAnswers = questions.map((question) => {
-      const emptyAnswer = question.type === 'checkbox' ? [] : '';
+      // Fetch the answer to this question from the request body
       let answer = request.body.answers
         ?.find((a) => a.questionId === question.id)
         ?.answer;
 
       if (!answer || !answer.length) {
-        // Normalize empty answers
+        // Disallow empty answers to required questions
         if (question.required) {
           throw new BadRequest(`Missing answer for question ${question.question}`);
         }
-        answer = emptyAnswer;
+        // Normalize empty answers to "" or [], depending on question type
+        answer = question.type === 'checkbox' ? [] : '';
       } else if (question.type === 'checkbox') {
         // Ensure checkbox answers are arrays
         if (!Array.isArray(answer)) {
