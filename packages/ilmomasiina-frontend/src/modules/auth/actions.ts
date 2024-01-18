@@ -45,6 +45,7 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
   }) as AdminLoginResponse;
   dispatch(loginSucceeded(sessionResponse));
   dispatch(push(appPaths.adminEventsList));
+  loginToast('success', i18n.t('auth.loginSuccess'), 2000);
   return true;
 };
 

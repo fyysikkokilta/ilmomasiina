@@ -2,9 +2,9 @@ import React from 'react';
 
 import { FormApi } from 'final-form';
 import {
-  Button, Form as BsForm, FormControl, Spinner,
+  Button, Form as BsForm, FormControl, FormGroup, Spinner,
 } from 'react-bootstrap';
-import { Form } from 'react-final-form';
+import { Field, Form } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
@@ -21,11 +21,11 @@ const UserForm = () => {
   const dispatch = useTypedDispatch();
   const { t } = useTranslation();
 
-  const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
+  const onSubmit = async (data: FormData, form: FormApi<FormData>) => {
     try {
       await dispatch(createUser(data));
       dispatch(getUsers());
-      resetForm();
+      form.restart();
       toast.success(t('adminUsers.createUser.success', { email: data.email }), { autoClose: 2000 });
     } catch (err) {
       toast.error(
@@ -44,18 +44,19 @@ const UserForm = () => {
     >
       {({ submitting, handleSubmit }) => (
         <BsForm className="ilmo--form" onSubmit={handleSubmit}>
-          <FieldFormGroup name="email" label={t('adminUsers.createUser.email')}>
-            {({ input, meta: { touched, error } }) => (
-              <FormControl
-                {...input}
-                type="email"
-                required
-                isInvalid={touched && error}
-                placeholder={branding.loginPlaceholderEmail}
-              />
-            )}
-          </FieldFormGroup>
-          <p>{t('adminUsers.createUser.passwordInfo')}</p>
+          <FormGroup>
+            <Field name="email">
+              {({ input }) => (
+                <FormControl
+                  {...input}
+                  id="email"
+                  type="email"
+                  placeholder={t('adminUsers.createUser.email')}
+                  aria-label={t('adminUsers.createUser.email')}
+                />
+              )}
+            </Field>
+          </FormGroup>
           <Button type="submit" variant="secondary" disabled={submitting}>
             {submitting ? <Spinner animation="border" /> : t('adminUsers.createUser.submit')}
           </Button>

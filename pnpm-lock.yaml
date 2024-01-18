@@ -141,7 +141,6 @@ importers:
       '@types/react': ^17.0.47
       bootstrap: ^4.6.1
       final-form: ^4.20.10
-      formik: ^2.4.5
       i18next: ^22.4.11
       lodash-es: ^4.17.21
       moment: ^2.29.3
@@ -163,7 +162,6 @@ importers:
       '@types/react': 17.0.65
       bootstrap: 4.6.1
       final-form: 4.20.10
-      formik: 2.4.5_react@17.0.2
       i18next: 22.4.11
       lodash-es: 4.17.21
       moment: 2.29.3
@@ -205,7 +203,6 @@ importers:
       esbuild-sass-plugin: ^2.2.6
       final-form: ^4.20.10
       final-form-arrays: ^3.1.0
-      formik: ^2.4.5
       history: ^4.10.1
       i18next: ^22.4.11
       i18next-browser-languagedetector: ^7.0.1
@@ -259,7 +256,6 @@ importers:
       esbuild-sass-plugin: 2.2.6
       final-form: 4.20.10
       final-form-arrays: 3.1.0_final-form@4.20.10
-      formik: 2.4.5_react@17.0.2
       history: 4.10.1
       i18next: 22.4.11
       i18next-browser-languagedetector: 7.0.1
@@ -3486,22 +3482,6 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
-    dev: false
-
-  /formik/2.4.5_react@17.0.2:
-    resolution: {integrity: sha512-Gxlht0TD3vVdzMDHwkiNZqJ7Mvg77xQNfmBRrNtvzcHZs72TJppSTDKHpImCMJZwcWPBJ8jSQQ95GJzXFf1nAQ==}
-    peerDependencies:
-      react: '>=16.8.0'
-    dependencies:
-      '@types/hoist-non-react-statics': 3.3.1
-      deepmerge: 2.2.1
-      hoist-non-react-statics: 3.3.2
-      lodash: 4.17.21
-      lodash-es: 4.17.21
-      react: 17.0.2
-      react-fast-compare: 2.0.4
-      tiny-warning: 1.0.3
-      tslib: 2.6.2
     dev: false
 
   /forwarded/0.2.0:
@@ -7011,10 +6991,6 @@ packages:
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
-
-  /tslib/2.6.2:
-    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
-    dev: false
 
   /tsutils/3.21.0_typescript@5.2.2:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}

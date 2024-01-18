@@ -8,6 +8,7 @@
         "header.logout": "Logout",
         "footer.admin": "Admin",
         "auth.loginExpired": "Your session has expired. Please log in again.",
+        "auth.loginSuccess": "Logged in successfully.",
         "auth.logoutSuccess": "Logged out successfully.",
         "login.title": "Log in",
         "login.email": "Email",

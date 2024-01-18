@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { BaseSyntheticEvent, useMemo, useState } from 'react';
 
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
@@ -10,12 +10,12 @@ import { toast } from 'react-toastify';
 
 import { ApiError } from '@tietokilta/ilmomasiina-components';
 import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
+import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import { publishEventUpdate, publishNewEvent, serverEventToEditor } from '../../../modules/editor/actions';
 import { selectFormData } from '../../../modules/editor/selectors';
 import type { EditorEvent } from '../../../modules/editor/types';
 import appPaths from '../../../paths';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
-import useEvent from '../../../utils/useEvent';
 import BasicDetailsTab from './BasicDetailsTab';
 import EditConflictModal from './EditConflictModal';
 import EditorTabBody from './EditorTabBody';
@@ -32,7 +32,8 @@ const EditFormBody = ({ form }: FormRenderProps<EditorEvent>) => {
 
   const isDraft = useTypedSelector((state) => state.editor.event?.draft || state.editor.isNew);
 
-  const onSave = useEvent(() => {
+  const onSave = useEvent((evt?: BaseSyntheticEvent) => {
+    evt?.preventDefault();
     form.change('moveSignupsToQueue', false);
     form.submit();
   });

@@ -2,14 +2,15 @@ import React from 'react';
 
 import { FormApi } from 'final-form';
 import {
-  Button, Form as BsForm, FormControl, Spinner,
+  Button, Form as BsForm, FormControl, FormGroup, FormText, Spinner,
 } from 'react-bootstrap';
-import { Form } from 'react-final-form';
+import { Field, Form } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import { ApiError } from '@tietokilta/ilmomasiina-components';
 import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
+import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import i18n from '../../i18n';
 import { changePassword } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
@@ -60,8 +61,6 @@ const ChangePasswordForm = () => {
         errorDesc(t, err as ApiError, 'adminUsers.changePassword.errors'),
         { autoClose: 5000 },
       );
-    } finally {
-      setSubmitting(false);
     }
   });
 
@@ -71,41 +70,59 @@ const ChangePasswordForm = () => {
       onSubmit={onSubmit}
       validate={validate}
     >
-      {({ submitting, handleSubmit }) => (
+      {({
+        errors, touched, submitting, handleSubmit,
+      }) => (
+
         <BsForm className="ilmo--form" onSubmit={handleSubmit}>
-          <FieldFormGroup name="oldPassword" required label={t('adminUsers.changePassword.oldPassword')}>
-            {({ input, meta: { touched, error } }) => (
-              <FormControl
-                {...input}
-                type="password"
-                required
-                isInvalid={touched && error}
-                placeholder="••••••••"
-              />
-            )}
-          </FieldFormGroup>
-          <FieldFormGroup name="newPassword" required label={t('adminUsers.changePassword.newPassword')}>
-            {({ input, meta: { touched, error } }) => (
-              <FormControl
-                {...input}
-                type="password"
-                required
-                isInvalid={touched && error}
-                placeholder="••••••••"
-              />
-            )}
-          </FieldFormGroup>
-          <FieldFormGroup name="newPasswordVerify" required label={t('adminUsers.changePassword.newPasswordVerify')}>
-            {({ input, meta: { touched, error } }) => (
-              <FormControl
-                {...input}
-                type="password"
-                required
-                isInvalid={touched && error}
-                placeholder="••••••••"
-              />
-            )}
-          </FieldFormGroup>
+          <FormGroup>
+            <Field name="oldPassword">
+              {({ input }) => (
+                <FormControl
+                  {...input}
+                  id="oldPassword"
+                  type="password"
+                  placeholder={t('adminUsers.changePassword.oldPassword')}
+                  aria-label={t('adminUsers.changePassword.oldPassword')}
+                />
+              )}
+            </Field>
+            {errors?.oldPassword && touched?.oldPassword ? (
+              <FormText className="text-danger">{errors.oldPassword}</FormText>
+            ) : null}
+          </FormGroup>
+          <FormGroup>
+            <Field name="newPassword">
+              {({ input }) => (
+                <FormControl
+                  {...input}
+                  id="newPassword"
+                  type="password"
+                  placeholder={t('adminUsers.changePassword.newPassword')}
+                  aria-label={t('adminUsers.changePassword.newPassword')}
+                />
+              )}
+            </Field>
+            {errors?.newPassword && touched?.newPassword ? (
+              <FormText className="text-danger">{errors.newPassword}</FormText>
+            ) : null}
+          </FormGroup>
+          <FormGroup>
+            <Field name="newPasswordVerify">
+              {({ input }) => (
+                <FormControl
+                  {...input}
+                  id="newPasswordVerify"
+                  type="password"
+                  placeholder={t('adminUsers.changePassword.newPassword')}
+                  aria-label={t('adminUsers.changePassword.newPassword')}
+                />
+              )}
+            </Field>
+            {errors?.newPasswordVerify && touched?.newPasswordVerify ? (
+              <FormText className="text-danger">{errors.newPasswordVerify}</FormText>
+            ) : null}
+          </FormGroup>
           <Button type="submit" variant="secondary" disabled={submitting}>
             {submitting ? <Spinner animation="border" /> : t('adminUsers.changePassword.submit')}
           </Button>
