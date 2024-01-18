@@ -42,6 +42,7 @@
         "adminUsers.deleteUser": "Delete user",
         "adminUsers.deleteUser.confirm": "Are you sure you want to delete {{user}}? This cannot be undone.",
         "adminUsers.deleteUser.success": "User {{user}} deleted successfully.",
+        "adminUsers.deleteUser.errors.CannotDeleteSelf.description": "You can't delete your own user.",
         "adminUsers.deleteUser.errors.404.description": "The user {{user}} has already been deleted.",
         "adminUsers.deleteUser.errors.default.description": "Failed to delete {{user}}.",
         "adminUsers.resetPassword": "Reset password",

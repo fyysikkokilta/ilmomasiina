@@ -55,6 +55,7 @@ docker build \
   --build-arg BRANDING_FOOTER_GDPR_LINK='https://example.com' \
   --build-arg BRANDING_FOOTER_HOME_TEXT='Kotisivu' \
   --build-arg BRANDING_FOOTER_HOME_LINK='https://example.com' \
+  --build-arg BRANDING_LOGIN_PLACEHOLDER_EMAIL='admin@example.com' \
   -t ilmomasiina .
 ```
 
@@ -254,7 +255,6 @@ B-tier App Service Plans have been tried and at least B1 doesn't seem to handle 
     - `DB_PASSWORD` = password of PostgreSQL user
     - `DB_DATABASE` = name of PostgreSQL database
     - `DB_SSL` = `true` (required with Azure's default config)
-    - `ADMIN_REGISTRATION_ALLOWED` = `true` for initial setup (see [_Creating the first admin user_](#creating-the-first-admin-user))
     - `NEW_EDIT_TOKEN_SECRET` = secure random string (see [_Generating secrets_](#generating-secrets))
     - `FEATHERS_AUTH_SECRET` = secure random string (see [_Generating secrets_](#generating-secrets))
     - `MAIL_FROM` = "From" email for system messages
@@ -263,7 +263,6 @@ B-tier App Service Plans have been tried and at least B1 doesn't seem to handle 
     - `BRANDING_MAIL_FOOTER_TEXT` and `BRANDING_MAIL_FOOTER_LINK` (may be empty)
 7. Access the app at `https://{your-app-name}.azurewebsites.net/`.
     - If something is broken, check the *Log stream* page or read logs via `https://{your-app-name}.scm.azurewebsites.net/`.
-8. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Docker Compose
 
@@ -275,7 +274,6 @@ You can use Docker Compose to run both a database and production container local
 3. **Optional:** Make [customizations](#customization) in other files if necessary.
 4. Run `docker-compose -f docker-compose.prod.yml up` manually or e.g. via `systemd`.
 5. Access the app at <http://localhost:8000>.
-6. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Docker (manual)
 
@@ -311,39 +309,6 @@ You can also set up a production deployment without Docker. **This method is not
     node packages/ilmomasiina-backend/dist/bin/server.js
     ```
 7. Access the app at <http://localhost:3000>.
-8. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
-
-#### Apache + `mod_rewrite`
-
-This approach works both in `.htaccess` (with suitable `AllowOverride`s) or Apache config.
-In Apache config, you may need to change the rules slightly.
-
-It can use either the backend server or Apache to also serve the frontend files.
-If Apache is to be used, the built frontend must be placed in the folder. **(untested)**
-
-```apache
-RewriteEngine On
-
-# redirect https://your.website/ilmo to https://your.website/ilmo/
-RewriteBase /
-RewriteRule ^ilmo$ ilmo/ [NC,R=301,L]
-
-# always proxy https://your.website/ilmo/ to http://127.0.0.1:3000/
-RewriteRule ^ilmo/(.*)$ http://127.0.0.1:3000/$1 [P,L]
-
-# proxy https://your.website/ilmo/whatever to http://127.0.0.1:3000/whatever,
-# but only if the file doesn't exist in the webroot
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ilmo/(.*)$ http://127.0.0.1:3000/$1 [P,L]
-```
-curl 'http://localhost:3000/api/users' \
-    -H 'Content-Type: application/json' \
-    --data '{ "email": "user@tietokilta.fi", "password": "password123" }'
-```
-
-:warning: **Important**: After creating the first user, disallow admin user creation by
-removing the env variable and restarting Ilmomasiina.
 
 ### Reverse proxy
 
@@ -430,7 +395,6 @@ Currently Prettier is not used in the project, so here is a recommended `.vscode
     - Alternatively, you can use `pnpm run --filter=@tietokilta/ilmomasiina-frontend start`
       (and similar for the backend).
 6. Access the app at <http://localhost:3000>.
-7. On first run, follow the instructions in [_Creating the first admin user_](#creating-the-first-admin-user).
 
 ### Docker Compose
 

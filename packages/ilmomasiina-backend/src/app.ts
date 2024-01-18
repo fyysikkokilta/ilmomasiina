@@ -38,25 +38,6 @@ const defaultCompiler = new Ajv({
 });
 ajvFormats(defaultCompiler);
 
-// Disable type coercion for request bodies - we don't need it, and it breaks stuff like anyOf
-const bodyCompiler = new Ajv({
-  coerceTypes: false,
-  useDefaults: true,
-  removeAdditional: true,
-  addUsedSchema: false,
-  allErrors: false,
-});
-ajvFormats(bodyCompiler);
-
-const defaultCompiler = new Ajv({
-  coerceTypes: 'array',
-  useDefaults: true,
-  removeAdditional: true,
-  addUsedSchema: false,
-  allErrors: false,
-});
-ajvFormats(defaultCompiler);
-
 export default async function initApp(): Promise<FastifyInstance> {
   await setupDatabase();
 
@@ -67,6 +48,9 @@ export default async function initApp(): Promise<FastifyInstance> {
   server.setValidatorCompiler(({ httpPart, schema }) => (
     httpPart === 'body' ? bodyCompiler.compile(schema) : defaultCompiler.compile(schema)
   ));
+
+  // Enable admin registration if no users are present
+  server.decorate('initialSetupDone', await isInitialSetupDone());
 
   // Register fastify-sensible (https://github.com/fastify/fastify-sensible)
   server.register(fastifySensible);
