@@ -9,7 +9,7 @@ import appPaths from '../../../paths';
 import { useTypedSelector } from '../../../store/reducers';
 
 type Props = {
-  onSave: (evt: BaseSyntheticEvent) => void;
+  onSave: () => void;
   onSaveToggleDraft: () => void;
 };
 

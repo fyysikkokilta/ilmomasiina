@@ -5,11 +5,11 @@ import { Button, Modal } from 'react-bootstrap';
 import { useForm } from 'react-final-form';
 import { Trans, useTranslation } from 'react-i18next';
 
-import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import { EditConflictError } from '@tietokilta/ilmomasiina-models';
 import { editConflictDismissed, reloadEvent } from '../../../modules/editor/actions';
 import { EditorEvent, EditorQuestion, EditorQuota } from '../../../modules/editor/types';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
+import useEvent from '../../../utils/useEvent';
 import { useFieldValue } from './hooks';
 
 const DeletedQuotasAndQuestions = ({ modal }: { modal: EditConflictError }) => {

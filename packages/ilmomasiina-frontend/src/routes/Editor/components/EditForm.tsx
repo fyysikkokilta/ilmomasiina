@@ -1,4 +1,4 @@
-import React, { BaseSyntheticEvent, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
@@ -8,14 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { ApiError } from '@tietokilta/ilmomasiina-components';
-import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
-import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import { publishEventUpdate, publishNewEvent, serverEventToEditor } from '../../../modules/editor/actions';
 import { selectFormData } from '../../../modules/editor/selectors';
 import type { EditorEvent } from '../../../modules/editor/types';
 import appPaths from '../../../paths';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
+import useEvent from '../../../utils/useEvent';
 import BasicDetailsTab from './BasicDetailsTab';
 import EditConflictModal from './EditConflictModal';
 import EditorTabBody from './EditorTabBody';
@@ -32,8 +30,7 @@ const EditFormBody = ({ form }: FormRenderProps<EditorEvent>) => {
 
   const isDraft = useTypedSelector((state) => state.editor.event?.draft || state.editor.isNew);
 
-  const onSave = useEvent((evt?: BaseSyntheticEvent) => {
-    evt?.preventDefault();
+  const onSave = useEvent(() => {
     form.change('moveSignupsToQueue', false);
     form.submit();
   });
@@ -100,7 +97,7 @@ const EditForm = () => {
         form.change('questions', newFormData.questions);
       }
     } catch (error) {
-      toast.error(errorDesc(t, error as ApiError, 'editor.saveError'), { autoClose: 2000 });
+      toast.error(t('editor.status.saveFailed'), { autoClose: 2000 });
     }
   });
 

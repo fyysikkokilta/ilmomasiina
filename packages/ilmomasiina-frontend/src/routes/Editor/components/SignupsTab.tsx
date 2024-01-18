@@ -4,10 +4,11 @@ import { Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
 import {
-  convertSignupsToCSV, getSignupsForAdminList, stringifyAnswer,
+  convertSignupsToCSV, FormattedSignup, getSignupsForAdminList, stringifyAnswer,
 } from '@tietokilta/ilmomasiina-components/dist/utils/signupUtils';
 import { deleteSignup, getEvent } from '../../../modules/editor/actions';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
+import useEvent from '../../../utils/useEvent';
 import CSVLink, { CSVOptions } from './CSVLink';
 
 import '../Editor.scss';
@@ -99,36 +100,7 @@ const SignupsTab = () => {
           </tr>
         </thead>
         <tbody>
-          {signups.map((signup, index) => (
-            <tr key={signup.id} className={!signup.confirmed ? 'text-muted' : ''}>
-              <td key="position">{`${index + 1}.`}</td>
-              {event.nameQuestion && <td key="firstName">{signup.firstName}</td>}
-              {event.nameQuestion && <td key="lastName">{signup.lastName}</td>}
-              {event.emailQuestion && <td key="email">{signup.email}</td>}
-              <td key="quota">{signup.quota}</td>
-              {event.questions.map((question) => (
-                <td key={question.id}>
-                  {stringifyAnswer(signup.answers[question.id])}
-                </td>
-              ))}
-              <td key="timestamp">{signup.createdAt}</td>
-              <td key="delete">
-                <Button
-                  type="button"
-                  variant="danger"
-                  onClick={async () => {
-                    const confirmation = window.confirm(t('editor.signups.action.delete.confirm'));
-                    if (confirmation) {
-                      await dispatch(deleteSignup(signup.id!));
-                      dispatch(getEvent(event.id));
-                    }
-                  }}
-                >
-                  {t('editor.signups.action.delete')}
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {signups.map((signup, index) => <SignupRow key={signup.id} position={index + 1} signup={signup} />)}
         </tbody>
       </table>
     </div>

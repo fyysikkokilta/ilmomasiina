@@ -5,7 +5,7 @@ import { useForm } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 import Combobox from 'react-widgets/Combobox';
 
-import { FieldRow } from '@tietokilta/ilmomasiina-components';
+import { FinalFieldRow as FieldRow } from '@tietokilta/ilmomasiina-components';
 import { checkingSlugAvailability, checkSlugAvailability, loadCategories } from '../../../modules/editor/actions';
 import { EditorEventType } from '../../../modules/editor/types';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
