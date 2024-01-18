@@ -21,6 +21,20 @@ export type AuthActions =
   | ReturnType<typeof loginSucceeded>
   | ReturnType<typeof resetState>;
 
+/** ID of latest login/auth related toast shown. Only used by `loginToast`. */
+let loginToastId = 0;
+
+const loginToast = (type: 'success' | 'error', text: string, autoClose: number) => {
+  // If the previous login/auth related toast is still visible, update it instead of spamming a new one.
+  // Otherwise, increment the ID and show a new one.
+  if (toast.isActive(`loginState${loginToastId}`)) {
+    toast.update(`loginState${loginToastId}`, { render: text, autoClose, type });
+  } else {
+    loginToastId += 1;
+    toast(text, { autoClose, type, toastId: `loginState${loginToastId}` });
+  }
+};
+
 export const login = (email: string, password: string) => async (dispatch: DispatchAction) => {
   const sessionResponse = await apiFetch('authentication', {
     method: 'POST',
