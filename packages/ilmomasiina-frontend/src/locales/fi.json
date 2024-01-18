@@ -42,7 +42,6 @@
         "adminUsers.deleteUser": "Poista käyttäjä",
         "adminUsers.deleteUser.confirm": "Haluatko varmasti poistaa käyttäjän {{user}}? Tätä toimintoa ei voi perua.",
         "adminUsers.deleteUser.success": "Käyttäjä {{user}} poistettiin onnistuneesti.",
-        "adminUsers.deleteUser.errors.CannotDeleteSelf.description": "Et voi poistaa omaa käyttäjääsi.",
         "adminUsers.deleteUser.errors.404.description": "Käyttäjä {{user}} on jo poistettu.",
         "adminUsers.deleteUser.errors.default.description": "Käyttäjän {{user}} poistaminen epäonnistui.",
         "adminUsers.resetPassword": "Nollaa salasana",

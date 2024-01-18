@@ -10,8 +10,6 @@ import { toast } from 'react-toastify';
 
 import { ApiError } from '@tietokilta/ilmomasiina-components';
 import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
-import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
-import FieldFormGroup from '../../components/FieldFormGroup';
 import i18n from '../../i18n';
 import { changePassword } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
@@ -62,6 +60,8 @@ const ChangePasswordForm = () => {
         errorDesc(t, err as ApiError, 'adminUsers.changePassword.errors'),
         { autoClose: 5000 },
       );
+    } finally {
+      setSubmitting(false);
     }
   });
 

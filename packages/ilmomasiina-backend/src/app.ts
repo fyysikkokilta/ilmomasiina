@@ -38,24 +38,35 @@ const defaultCompiler = new Ajv({
 });
 ajvFormats(defaultCompiler);
 
+// Disable type coercion for request bodies - we don't need it, and it breaks stuff like anyOf
+const bodyCompiler = new Ajv({
+  coerceTypes: false,
+  useDefaults: true,
+  removeAdditional: true,
+  addUsedSchema: false,
+  allErrors: false,
+});
+ajvFormats(bodyCompiler);
+
+const defaultCompiler = new Ajv({
+  coerceTypes: 'array',
+  useDefaults: true,
+  removeAdditional: true,
+  addUsedSchema: false,
+  allErrors: false,
+});
+ajvFormats(defaultCompiler);
+
 export default async function initApp(): Promise<FastifyInstance> {
   await setupDatabase();
 
   const server = fastify({
     trustProxy: config.isAzure || config.trustProxy, // Get IPs from X-Forwarded-For
     logger: true, // Enable logger
-    ajv: {
-      customOptions: {
-        coerceTypes: false, // Disable type coercion - we don't need it, and it breaks stuff like anyOf
-      },
-    },
   });
   server.setValidatorCompiler(({ httpPart, schema }) => (
     httpPart === 'body' ? bodyCompiler.compile(schema) : defaultCompiler.compile(schema)
   ));
-
-  // Enable admin registration if no users are present
-  server.decorate('initialSetupDone', await isInitialSetupDone());
 
   // Register fastify-sensible (https://github.com/fastify/fastify-sensible)
   server.register(fastifySensible);

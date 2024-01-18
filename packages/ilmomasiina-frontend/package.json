@@ -66,6 +66,10 @@
     "vite-tsconfig-paths": "^4.2.1"
   },
   "devDependencies": {
-    "rimraf": "^3.0.2"
+    "@types/lodash": "^4.14.199",
+    "@types/ws": "^8.5.3",
+    "rimraf": "^3.0.2",
+    "lodash": "^4.17.21",
+    "ws": "^8.8.0"
   }
 }

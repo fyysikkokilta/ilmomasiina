@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import { ApiError } from '@tietokilta/ilmomasiina-components';
+import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import { publishEventUpdate, publishNewEvent, serverEventToEditor } from '../../../modules/editor/actions';
 import { selectFormData } from '../../../modules/editor/selectors';
 import type { EditorEvent } from '../../../modules/editor/types';
@@ -97,7 +99,7 @@ const EditForm = () => {
         form.change('questions', newFormData.questions);
       }
     } catch (error) {
-      toast.error(t('editor.status.saveFailed'), { autoClose: 2000 });
+      toast.error(errorDesc(t, error as ApiError, 'editor.saveError'), { autoClose: 2000 });
     }
   });
 

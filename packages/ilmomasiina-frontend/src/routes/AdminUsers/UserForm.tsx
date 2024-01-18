@@ -10,8 +10,6 @@ import { toast } from 'react-toastify';
 
 import { ApiError } from '@tietokilta/ilmomasiina-components';
 import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
-import branding from '../../branding';
-import FieldFormGroup from '../../components/FieldFormGroup';
 import { createUser, getUsers } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
 
@@ -23,11 +21,11 @@ const UserForm = () => {
   const dispatch = useTypedDispatch();
   const { t } = useTranslation();
 
-  const onSubmit = async (data: FormData, form: FormApi<FormData>) => {
+  const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
     try {
       await dispatch(createUser(data));
       dispatch(getUsers());
-      form.restart();
+      resetForm();
       toast.success(t('adminUsers.createUser.success', { email: data.email }), { autoClose: 2000 });
     } catch (err) {
       toast.error(

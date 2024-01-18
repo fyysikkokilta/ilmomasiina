@@ -137,7 +137,7 @@ importers:
   packages/ilmomasiina-components:
     specifiers:
       '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha13
-      '@types/lodash': ^4.14.182
+      '@types/lodash-es': ^4.17.9
       '@types/react': ^17.0.47
       bootstrap: ^4.6.1
       final-form: ^4.20.10
@@ -159,7 +159,7 @@ importers:
       typescript: ~5.2.2
     dependencies:
       '@tietokilta/ilmomasiina-models': link:../ilmomasiina-models
-      '@types/lodash': 4.14.182
+      '@types/lodash-es': 4.17.9
       '@types/react': 17.0.65
       bootstrap: 4.6.1
       final-form: 4.20.10
@@ -187,6 +187,7 @@ importers:
       '@tietokilta/ilmomasiina-components': workspace:2.0.0-alpha13
       '@tietokilta/ilmomasiina-models': workspace:2.0.0-alpha13
       '@types/history': ^4.7.11
+      '@types/lodash': ^4.14.199
       '@types/lodash-es': ^4.17.9
       '@types/node': ^16.11.41
       '@types/node-sass': ^4.11.2
@@ -208,6 +209,7 @@ importers:
       history: ^4.10.1
       i18next: ^22.4.11
       i18next-browser-languagedetector: ^7.0.1
+      lodash: ^4.17.21
       lodash-es: ^4.17.21
       moment: ^2.29.3
       moment-timezone: ^0.5.34
@@ -289,6 +291,9 @@ importers:
       vite-plugin-checker: 0.6.2_qsr2g56wd6dxvjcula2afu72k4
       vite-tsconfig-paths: 4.2.3_qsr2g56wd6dxvjcula2afu72k4
     devDependencies:
+      '@types/lodash': 4.14.199
+      '@types/ws': 8.5.3
+      lodash: 4.17.21
       rimraf: 3.0.2
 
   packages/ilmomasiina-models:
@@ -964,6 +969,10 @@ packages:
 
   /@types/lodash/4.14.182:
     resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
+
+  /@types/lodash/4.14.199:
+    resolution: {integrity: sha512-Vrjz5N5Ia4SEzWWgIVwnHNEnb1UE1XMkvY5DGXrAeOGE9imk0hgTHh5GyDjLDJi9OTCn9oo9dXH1uToK1VRfrg==}
+    dev: true
 
   /@types/mdast/3.0.10:
     resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
@@ -4397,7 +4406,6 @@ packages:
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: false
 
   /long/4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}

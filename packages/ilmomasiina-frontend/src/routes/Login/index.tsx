@@ -1,16 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { FORM_ERROR } from 'final-form';
-import {
-  Alert, Button, Form as BsForm, FormControl,
-} from 'react-bootstrap';
-import { Form } from 'react-final-form';
+import { Field, Formik, FormikHelpers } from 'formik';
+import { Alert, Button, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
+import { ApiError } from '@tietokilta/ilmomasiina-components';
 import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
-import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
-import branding from '../../branding';
-import FieldFormGroup from '../../components/FieldFormGroup';
 import { login } from '../../modules/auth/actions';
 import { useTypedDispatch } from '../../store/reducers';
 
@@ -28,50 +23,59 @@ const initialValues: FormData = {
 
 const Login = () => {
   const dispatch = useTypedDispatch();
+  const [loginError, setLoginError] = useState<ApiError>();
   const { t } = useTranslation();
 
   const onSubmit = useEvent(async (data: FormData) => {
     const { email, password } = data;
     try {
       await dispatch(login(email, password));
-      return undefined;
+      setLoginError(undefined);
     } catch (err) {
-      return { [FORM_ERROR]: err };
+      setLoginError(err as ApiError);
+    } finally {
+      setSubmitting(false);
     }
-  });
+  }
 
   return (
     <div className="login-container">
       <h1>{t('login.title')}</h1>
-      <Form<FormData> initialValues={initialValues} onSubmit={onSubmit}>
-        {({ handleSubmit, submitting, submitError }) => (
-          <BsForm onSubmit={handleSubmit} className="ilmo--form">
-            {submitError && (
-              <Alert variant="danger">{errorDesc(t, submitError, 'login.errors')}</Alert>
-            )}
-            <FieldFormGroup name="email" required label={t('login.email')}>
-              {({ input, meta: { touched, error } }) => (
-                <FormControl
-                  {...input}
-                  type="email"
-                  required
-                  placeholder={branding.loginPlaceholderEmail}
-                  isInvalid={touched && error}
-                />
-              )}
-            </FieldFormGroup>
-            <FieldFormGroup name="password" required label={t('login.password')}>
-              {({ input, meta: { touched, error } }) => (
-                <FormControl
-                  {...input}
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  isInvalid={touched && error}
-                />
-              )}
-            </FieldFormGroup>
-            <Button type="submit" variant="secondary" disabled={submitting}>
+      {loginError && (
+        <Alert variant="danger">{errorDesc(t, loginError, 'login.errors')}</Alert>
+      )}
+      <Formik
+        initialValues={{
+          email: '',
+          password: '',
+        }}
+        onSubmit={onSubmit}
+      >
+        {({ handleSubmit, isSubmitting, errors }) => (
+          <Form onSubmit={handleSubmit} className="ilmo--form">
+            <Form.Group controlId="email">
+              <Form.Label data-required>{t('login.email')}</Form.Label>
+              <Field
+                name="email"
+                as={Form.Control}
+                type="email"
+                required
+                placeholder="admin@athene.fi"
+                isInvalid={errors.email}
+              />
+            </Form.Group>
+            <Form.Group controlId="password">
+              <Form.Label data-required>{t('login.password')}</Form.Label>
+              <Field
+                name="password"
+                as={Form.Control}
+                type="password"
+                required
+                placeholder="••••••••"
+                isInvalid={errors.password}
+              />
+            </Form.Group>
+            <Button type="submit" variant="secondary" disabled={isSubmitting}>
               {t('login.submit')}
             </Button>
           </BsForm>
