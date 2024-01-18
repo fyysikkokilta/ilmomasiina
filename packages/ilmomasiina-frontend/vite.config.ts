@@ -11,8 +11,12 @@ import momentPlugin from './src/rollupMomentPlugin';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
+// Default to 127.0.0.1:3001 for the backend.
+// Use the dev-only variable DEV_BACKEND_PORT for this, keeping PORT always for the user-facing port.
 const BACKEND_HOST = process.env.HOST || '127.0.0.1';
-const BACKEND_PORT = 3001;
+const BACKEND_PORT = Number(process.env.DEV_BACKEND_PORT) || 3001;
+
+const FRONTEND_PORT = Number(process.env.PORT) || 3000;
 
 const PATH_PREFIX = process.env.PATH_PREFIX || '';
 if (PATH_PREFIX.endsWith('/')) {
@@ -32,7 +36,7 @@ function quoteValues(values: Record<string, string | number | boolean>) {
 
 export default defineConfig(({ mode }) => ({
   server: {
-    port: 3000,
+    port: FRONTEND_PORT,
     strictPort: true,
     proxy: {
       '/api': {
