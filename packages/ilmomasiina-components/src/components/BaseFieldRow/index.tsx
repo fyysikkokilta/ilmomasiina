@@ -3,8 +3,8 @@ import React, { ReactNode } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 
 export type BaseFieldRowProps = {
-  /** The name of the field in the Formik data. */
-  name: string;
+  /** Passed to the `FormGroup`. */
+  controlId?: string;
   /** The label placed in the left column. */
   label?: string;
   /** The help string placed below the field. */
@@ -20,8 +20,9 @@ export type BaseFieldRowProps = {
   children: ReactNode;
 };
 
+/** Form library agnostic field row component */
 export default function BaseFieldRow({
-  name,
+  controlId,
   label = '',
   help,
   required = false,
@@ -31,7 +32,7 @@ export default function BaseFieldRow({
   error,
 }: BaseFieldRowProps) {
   return (
-    <Form.Group as={Row} controlId={name}>
+    <Form.Group as={Row} controlId={controlId}>
       <Form.Label column sm="3" data-required={required} className={checkAlign ? 'pt-0' : ''}>{label}</Form.Label>
       <Col sm="9">
         {children}

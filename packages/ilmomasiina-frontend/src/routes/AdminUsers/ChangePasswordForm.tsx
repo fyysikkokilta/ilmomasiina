@@ -1,14 +1,16 @@
 import React from 'react';
 
-import { Field, Formik, FormikHelpers } from 'formik';
+import { FormApi } from 'final-form';
 import {
-  Alert, Button, Form, Spinner,
+  Button, Form as BsForm, FormControl, FormGroup, FormText, Spinner,
 } from 'react-bootstrap';
+import { Field, Form } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import { ApiError } from '@tietokilta/ilmomasiina-components';
 import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
+import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import i18n from '../../i18n';
 import { changePassword } from '../../modules/adminUsers/actions';
 import { useTypedDispatch } from '../../store/reducers';
@@ -17,6 +19,12 @@ type FormData = {
   oldPassword: string;
   newPassword: string;
   newPasswordVerify: string;
+};
+
+const initialValues: FormData = {
+  oldPassword: '',
+  newPassword: '',
+  newPasswordVerify: '',
 };
 
 const MIN_PASSWORD_LENGTH = 10;
@@ -43,78 +51,84 @@ const ChangePasswordForm = () => {
   const dispatch = useTypedDispatch();
   const { t } = useTranslation();
 
-  const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
+  const onSubmit = useEvent(async (data: FormData, form: FormApi<FormData>) => {
     try {
       await dispatch(changePassword(data));
-      resetForm();
+      form.restart();
       toast.success(t('adminUsers.changePassword.success'), { autoClose: 5000 });
     } catch (err) {
       toast.error(
         errorDesc(t, err as ApiError, 'adminUsers.changePassword.errors'),
         { autoClose: 5000 },
       );
-    } finally {
-      setSubmitting(false);
     }
-  };
+  });
 
   return (
-    <Formik
-      initialValues={{
-        oldPassword: '',
-        newPassword: '',
-        newPasswordVerify: '',
-      }}
+    <Form<FormData>
+      initialValues={initialValues}
       onSubmit={onSubmit}
       validate={validate}
     >
       {({
-        errors, touched, isSubmitting, handleSubmit,
+        errors, touched, submitting, handleSubmit,
       }) => (
 
-        <Form
-          className="ilmo--form"
-          onSubmit={handleSubmit}
-        >
-          <Field
-            as={Form.Control}
-            name="oldPassword"
-            id="oldPassword"
-            type="password"
-            placeholder={t('adminUsers.changePassword.oldPassword')}
-            aria-label={t('adminUsers.changePassword.oldPassword')}
-          />
-          {errors.oldPassword && touched.oldPassword ? (
-            <Alert variant="danger">{errors.oldPassword}</Alert>
-          ) : null}
-          <Field
-            as={Form.Control}
-            name="newPassword"
-            id="newPassword"
-            type="password"
-            placeholder={t('adminUsers.changePassword.newPassword')}
-            aria-label={t('adminUsers.changePassword.newPassword')}
-          />
-          {errors.newPassword && touched.newPassword ? (
-            <Alert variant="danger">{errors.newPassword}</Alert>
-          ) : null}
-          <Field
-            as={Form.Control}
-            name="newPasswordVerify"
-            id="newPasswordVerify"
-            type="password"
-            placeholder={t('adminUsers.changePassword.newPassword')}
-            aria-label={t('adminUsers.changePassword.newPassword')}
-          />
-          {errors.newPasswordVerify && touched.newPasswordVerify ? (
-            <Alert variant="danger">{errors.newPasswordVerify}</Alert>
-          ) : null}
-          <Button type="submit" variant="secondary" disabled={isSubmitting}>
-            {isSubmitting ? <Spinner animation="border" /> : t('adminUsers.changePassword.submit')}
+        <BsForm className="ilmo--form" onSubmit={handleSubmit}>
+          <FormGroup>
+            <Field name="oldPassword">
+              {({ input }) => (
+                <FormControl
+                  {...input}
+                  id="oldPassword"
+                  type="password"
+                  placeholder={t('adminUsers.changePassword.oldPassword')}
+                  aria-label={t('adminUsers.changePassword.oldPassword')}
+                />
+              )}
+            </Field>
+            {errors?.oldPassword && touched?.oldPassword ? (
+              <FormText className="text-danger">{errors.oldPassword}</FormText>
+            ) : null}
+          </FormGroup>
+          <FormGroup>
+            <Field name="newPassword">
+              {({ input }) => (
+                <FormControl
+                  {...input}
+                  id="newPassword"
+                  type="password"
+                  placeholder={t('adminUsers.changePassword.newPassword')}
+                  aria-label={t('adminUsers.changePassword.newPassword')}
+                />
+              )}
+            </Field>
+            {errors?.newPassword && touched?.newPassword ? (
+              <FormText className="text-danger">{errors.newPassword}</FormText>
+            ) : null}
+          </FormGroup>
+          <FormGroup>
+            <Field name="newPasswordVerify">
+              {({ input }) => (
+                <FormControl
+                  {...input}
+                  id="newPasswordVerify"
+                  type="password"
+                  placeholder={t('adminUsers.changePassword.newPassword')}
+                  aria-label={t('adminUsers.changePassword.newPassword')}
+                />
+              )}
+            </Field>
+            {errors?.newPasswordVerify && touched?.newPasswordVerify ? (
+              <FormText className="text-danger">{errors.newPasswordVerify}</FormText>
+            ) : null}
+          </FormGroup>
+          <Button type="submit" variant="secondary" disabled={submitting}>
+            {submitting ? <Spinner animation="border" /> : t('adminUsers.changePassword.submit')}
           </Button>
-        </Form>
+        </BsForm>
       )}
-    </Formik>
+    </Form>
   );
 };
 

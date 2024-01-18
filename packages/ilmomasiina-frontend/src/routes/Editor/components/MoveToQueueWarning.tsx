@@ -2,8 +2,8 @@ import React from 'react';
 
 import { Button, Modal } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import useEvent from 'src/utils/useEvent';
 
+import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
 import { moveToQueueCanceled } from '../../../modules/editor/actions';
 import { useTypedDispatch, useTypedSelector } from '../../../store/reducers';
 

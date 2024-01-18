@@ -1,6 +1,7 @@
 {
     "components": {
         "dateFormat.dateTimeSep": "klo",
+        "editSignup.backToEvent": "Takaisin tapahtumasivulle",
         "editSignup.action.cancel": "Peruuta",
         "editSignup.action.edit": "Päivitä",
         "editSignup.action.save": "Tallenna",
@@ -23,6 +24,7 @@
         "editSignup.fields.firstName.placeholder": "Etunimi",
         "editSignup.fields.lastName": "Sukunimi",
         "editSignup.fields.lastName.placeholder": "Sukunimi",
+        "editSignup.fields.select.placeholder": "Valitse\u2026",
         "editSignup.namePublic": "Näytä nimi julkisessa osallistujalistassa",
         "editSignup.position.openQuota": "Olet avoimessa kiintiössä sijalla {{position}}.",
         "editSignup.position.queue": "Olet jonossa sijalla {{position}}.",
