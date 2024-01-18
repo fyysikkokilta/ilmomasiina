@@ -4,6 +4,7 @@ This folder contains documentation files for Ilmomasiina.
 
 If you're interested in using Ilmomasiina for your purposes, these might be for you:
 - [Installation](installation.md) of a new instance
+- [Customization](installation.md#customization) with your organization's text, colors etc.
 - [Migration](migration.md) from the Athene version to 2.0.0 and from there to later versions
 - [Hacking Ilmomasiina](hacking.md) to suit your purposes
 

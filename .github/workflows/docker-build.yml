@@ -1,5 +1,19 @@
 name: Publish Docker image
 
+env:
+  # Change this to your repo name to build automatically on your fork.
+  expected_repo: 'Tietokilta/ilmomasiina'
+
+  # Change this to upload the built image to your own organization.
+  docker_tag: 'ghcr.io/tietokilta/ilmomasiina'
+
+  # Change these to customize your build.
+  branding_header_title_text: 'Tietokillan ilmomasiina'
+  branding_footer_gdpr_text: 'Tietosuoja'
+  branding_footer_gdpr_link: 'https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/'
+  branding_footer_home_text: 'Tietokilta.fi'
+  branding_footer_home_link: 'https://tietokilta.fi'
+
 on:
   push:
     branches:
@@ -15,6 +29,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+    if: github.repository == env.expected_repo
     steps:
       -
         name: Check out the repo
@@ -34,7 +49,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/tietokilta/ilmomasiina
+          images: ${{ env.docker_tag }}
           flavor: |
             latest=${{ github.ref == 'refs/heads/prod' }}
           tags: |
@@ -50,69 +65,19 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Customize your build here
           build-args: |
-            BRANDING_HEADER_TITLE_TEXT=Tietokillan ilmomasiina
-            BRANDING_FOOTER_GDPR_TEXT=Tietosuoja
-            BRANDING_FOOTER_GDPR_LINK=https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/
-            BRANDING_FOOTER_HOME_TEXT=Tietokilta.fi
-            BRANDING_FOOTER_HOME_LINK=https://tietokilta.fi
+            BRANDING_HEADER_TITLE_TEXT=${{ env.branding_header_title_text }}
+            BRANDING_FOOTER_GDPR_TEXT=${{ env.branding_footer_gdpr_text }}
+            BRANDING_FOOTER_GDPR_LINK=${{ env.branding_footer_gdpr_link }}
+            BRANDING_FOOTER_HOME_TEXT=${{ env.branding_footer_home_text }}
+            BRANDING_FOOTER_HOME_LINK=${{ env.branding_footer_home_link }}
 
-  npm:
-    name: Publish JS packages
-    if: github.ref_type == 'tag'
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-    steps:
-      -
-        name: Check out the repo
-        uses: actions/checkout@v3
-      -
-        uses: pnpm/action-setup@v2
-        with:
-          version: 7
-      -
-        name: Setup Node.js for NPM
-        uses: actions/setup-node@v3
-        with:
-          registry-url: 'https://registry.npmjs.org'
-          node-version: '16'
-          cache: 'pnpm'
-      -
-        name: Install dependencies
-        run: |
-          npm install -g pnpm@7
-          pnpm install --frozen-lockfile --ignore-scripts
-      -
-        name: Build packages
-        run: |
-          pnpm run --filter @tietokilta/ilmomasiina-models build
-          pnpm run --filter @tietokilta/ilmomasiina-components build
-      -
-        name: Publish to NPM
-        run: |
-          pnpm publish --filter @tietokilta/ilmomasiina-models --no-git-checks --access public
-          pnpm publish --filter @tietokilta/ilmomasiina-components --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      -
-        name: Setup Node.js for GitHub Packages
-        uses: actions/setup-node@v3
-        with:
-          registry-url: 'https://npm.pkg.github.com'
-      -
-        name: Publish to GitHub Packages
-        run: |
-          pnpm publish --filter @tietokilta/ilmomasiina-models --no-git-checks --access public
-          pnpm publish --filter @tietokilta/ilmomasiina-components --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+  # This is disabled on forks since you'll most likely need to modify it anyway for your usage
   deploy:
     name: Push update to App Service
     needs: docker
-    if: github.ref_type == 'branch'
+    if: github.ref_type == 'branch' && github.repository == 'Tietokilta/ilmomasiina'
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -125,4 +90,4 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: tik-ilmo-${{ github.ref_name }}-app
-        images: 'ghcr.io/tietokilta/ilmomasiina:${{ github.ref_name }}'
+        images: '${{ env.docker_tag }}:${{ github.ref_name }}'
