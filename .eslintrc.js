@@ -11,6 +11,12 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/issues/2094
     "EXPERIMENTAL_useSourceOfProjectReferenceRedirect": true
   },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    ".eslintrc.js"
+  ],
   "settings": {
     "react": {
       "pragma": "React",

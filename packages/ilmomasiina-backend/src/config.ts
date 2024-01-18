@@ -26,7 +26,8 @@ const config = {
   /** The host to run the backend server on. */
   host: envString('HOST', 'localhost'),
   /** The port to run the backend server on. */
-  port: envInteger('PORT', 3000),
+  // Check DEV_BACKEND_PORT first, then PORT, then default to 3000.
+  port: envInteger('DEV_BACKEND_PORT', envInteger('PORT', 3000)),
 
   /** Whether an Azure App Service environment is detected. */
   isAzure: process.env.WEBSITE_SITE_NAME !== undefined,
@@ -152,6 +153,14 @@ if (config.oldEditTokenSalt === config.newEditTokenSecret) {
     + 'If this is a new installation, leave EDIT_TOKEN_SALT empty. If this is an old installation, '
     + 'leave EDIT_TOKEN_SALT as is and generate a new secret for NEW_EDIT_TOKEN_SECRET.',
   );
+}
+
+try {
+  // Node only supports URL.canParse since 18.17.0
+  // eslint-disable-next-line no-new
+  new URL(config.baseUrl);
+} catch (err) {
+  throw new Error('BASE_URL is invalid - make sure it is a full URL like http://example.com.');
 }
 
 if (!config.eventDetailsUrl.includes('{slug}')) {
