@@ -15,9 +15,7 @@ module.exports = {
     "**/node_modules/**",
     "**/dist/**",
     "**/build/**",
-    ".eslintrc.js",
-    "*.scss",
-    "*.json"
+    ".eslintrc.js"
   ],
   "settings": {
     "react": {

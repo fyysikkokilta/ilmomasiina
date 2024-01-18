@@ -1,7 +1,7 @@
 @use "@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
 
 @use "bootstrap/scss/bootstrap" with (
-  // Override Bootstrap theme colors
+  // Colors
   $primary: $primary,
   $secondary: $secondary,
   $red: $red, // further assigned to $danger by Bootstrap
