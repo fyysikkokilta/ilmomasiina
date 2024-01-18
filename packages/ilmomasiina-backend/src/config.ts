@@ -151,6 +151,14 @@ if (config.oldEditTokenSalt === config.newEditTokenSecret) {
   );
 }
 
+try {
+  // Node only supports URL.canParse since 18.17.0
+  // eslint-disable-next-line no-new
+  new URL(config.baseUrl);
+} catch (err) {
+  throw new Error('BASE_URL is invalid - make sure it is a full URL like http://example.com.');
+}
+
 if (!config.eventDetailsUrl.includes('{slug}')) {
   throw new Error('EVENT_DETAILS_URL must contain {slug} if set.');
 }
