@@ -52,17 +52,10 @@ export default async function initApp(): Promise<FastifyInstance> {
     }
   }
 
-  // Add on-the-fly compression
-  server.register(fastifyCompress, { inflateIfDeflated: true });
-
-  server.register(setupRoutes, {
-    prefix: '/api',
-    adminSession: new AdminAuthSession(config.feathersAuthSecret),
-  });
-
   // Serving frontend files if frontendFilesPath is not null.
   // Ideally these files should be served by a web server and not the app server,
   // but this helps run a low-effort server.
+  // frontend files should not be gzipped on the fly, rather done on the build step.
   if (config.frontendFilesPath) {
     console.info(`Serving frontend files from '${config.frontendFilesPath}'`);
     // With fastify-static, historyApiFallback mode works out of the box
@@ -75,6 +68,13 @@ export default async function initApp(): Promise<FastifyInstance> {
       reply.sendFile('index.html');
     });
   }
+  // Add on-the-fly compression
+  server.register(fastifyCompress, { inflateIfDeflated: true });
+
+  server.register(setupRoutes, {
+    prefix: '/api',
+    adminSession: new AdminAuthSession(config.feathersAuthSecret),
+  });
 
   // Every minute, remove signups that haven't been confirmed fast enough
   cron.schedule('* * * * *', deleteUnconfirmedSignups);
