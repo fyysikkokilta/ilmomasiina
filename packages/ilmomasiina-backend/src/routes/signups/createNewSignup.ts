@@ -33,17 +33,17 @@ export default async function createSignup(
   });
 
   // Do some validation.
-  if (!quota) {
+  if (!quota || !quota.event) {
     throw new NoSuchQuota('Quota doesn\'t exist.');
   }
 
-  if (!signupsAllowed(quota.event!)) {
+  if (!signupsAllowed(quota.event)) {
     throw new SignupsClosed('Signups closed for this event.');
   }
 
   // Create the signup.
   const newSignup = await Signup.create({ quotaId: request.body.quotaId });
-  await refreshSignupPositions(quota.event!);
+  await refreshSignupPositions(quota.event);
 
   const editToken = generateToken(newSignup.id);
 
