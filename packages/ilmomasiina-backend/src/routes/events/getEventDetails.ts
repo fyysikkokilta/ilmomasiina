@@ -26,11 +26,11 @@ export async function eventDetailsForUser(
   // First query general event information
   const event = await Event.scope('user').findOne({
     where: { slug: eventSlug },
-    attributes: [...eventGetEventAttrs],
+    attributes: eventGetEventAttrs,
     include: [
       {
         model: Question,
-        attributes: [...eventGetQuestionAttrs],
+        attributes: eventGetQuestionAttrs,
       },
     ],
     order: [[Question, 'order', 'ASC']],
@@ -49,18 +49,18 @@ export async function eventDetailsForUser(
   // Query all quotas for the event
   const quotas = await Quota.findAll({
     where: { eventId: event.id },
-    attributes: [...eventGetQuotaAttrs],
+    attributes: eventGetQuotaAttrs,
     include: [
       // Include all signups for the quota
       {
         model: Signup.scope('active'),
-        attributes: [...eventGetSignupAttrs, 'confirmedAt'],
+        attributes: eventGetSignupAttrs,
         required: false,
         include: [
           // ... and public answers of signups
           {
             model: Answer,
-            attributes: [...eventGetAnswerAttrs],
+            attributes: eventGetAnswerAttrs,
             required: false,
             where: { questionId: { [Op.in]: publicQuestions } },
           },
@@ -122,12 +122,12 @@ export async function eventDetailsForAdmin(
 
   const event = await Event.findOne({
     where: { id: eventID },
-    attributes: [...adminEventGetEventAttrs],
+    attributes: adminEventGetEventAttrs,
     include: [
       // Include all questions (also non-public for the form)
       {
         model: Question,
-        attributes: [...eventGetQuestionAttrs],
+        attributes: eventGetQuestionAttrs,
       },
     ],
     order: [[Question, 'order', 'ASC']],
@@ -140,18 +140,18 @@ export async function eventDetailsForAdmin(
 
   const quotas = await Quota.findAll({
     where: { eventId: event.id },
-    attributes: [...eventGetQuotaAttrs],
+    attributes: eventGetQuotaAttrs,
     // Include all signups for the quotas
     include: [
       {
         model: Signup.scope('active'),
-        attributes: [...eventGetSignupAttrs, 'confirmedAt', 'id', 'email'],
+        attributes: [...eventGetSignupAttrs, 'id', 'email'],
         required: false,
         // ... and answers of signups
         include: [
           {
             model: Answer,
-            attributes: [...eventGetAnswerAttrs],
+            attributes: eventGetAnswerAttrs,
             required: false,
           },
         ],
