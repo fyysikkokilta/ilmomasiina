@@ -33,12 +33,9 @@ export async function getEventsListForUser(
     throw new InitialSetupNeeded('Initial setup of Ilmomasiina is needed.');
   }
 
-  const eventAttrs = eventListEventAttrs;
-  const filter = { ...request.query };
-
   const events = await Event.scope('user').findAll({
-    attributes: [...eventAttrs],
-    where: { listed: true, ...filter },
+    attributes: eventListEventAttrs,
+    where: { listed: true, ...request.query },
     // Include quotas of event and count of signups
     include: [
       {
@@ -66,25 +63,22 @@ export async function getEventsListForUser(
     ...stringifyDates(event.get({ plain: true })),
     quotas: event.quotas!.map((quota) => ({
       ...quota.get({ plain: true }),
-      signupCount: Number(quota.signupCount!),
+      signupCount: Number(quota.signupCount),
     })),
   }));
 
   reply.status(200);
   return res;
 }
-
 export async function getEventsListForAdmin(
   request: FastifyRequest<{ Querystring: EventListQuery }>,
   reply: FastifyReply,
 ): Promise<AdminEventListResponse> {
   // Admin view also shows id, draft and listed fields.
-  const eventAttrs = adminEventListEventAttrs;
-  const filter = { ...request.query };
 
   const events = await Event.findAll({
-    attributes: [...eventAttrs],
-    where: { ...filter },
+    attributes: adminEventListEventAttrs,
+    where: request.query,
     // Include quotas of event and count of signups
     include: [
       {
