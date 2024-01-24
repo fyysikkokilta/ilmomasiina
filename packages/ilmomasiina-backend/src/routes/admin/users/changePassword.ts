@@ -3,6 +3,7 @@ import { NotFound } from 'http-errors';
 
 import { AuditEvent, ErrorCode, UserChangePasswordSchema } from '@tietokilta/ilmomasiina-models';
 import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
+import { getSequelize } from '../../../models';
 import { User } from '../../../models/user';
 import CustomError from '../../../util/customError';
 
@@ -18,7 +19,7 @@ export default async function changePassword(
 ): Promise<void> {
   AdminPasswordAuth.validateNewPassword(request.body.newPassword);
 
-  await User.sequelize!.transaction(async (transaction) => {
+  await getSequelize().transaction(async (transaction) => {
     // Try to fetch existing user
     const existing = await User.findByPk(
       request.sessionData.user,

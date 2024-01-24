@@ -6,6 +6,7 @@ import { internalAuditLogger } from '../../auditlog';
 import config from '../../config';
 import i18n from '../../i18n';
 import EmailService from '../../mail';
+import { getSequelize } from '../../models';
 import { Event } from '../../models/event';
 import { Quota } from '../../models/quota';
 import { Signup } from '../../models/signup';
@@ -41,7 +42,7 @@ export async function refreshSignupPositions(
 ): Promise<Signup[]> {
   // Wrap in transaction if not given
   if (!transaction) {
-    return Event.sequelize!.transaction(
+    return getSequelize().transaction(
       async (trans) => refreshSignupPositions(eventRef, trans),
     );
   }

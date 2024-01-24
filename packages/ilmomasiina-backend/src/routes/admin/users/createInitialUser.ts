@@ -5,6 +5,7 @@ import { Transaction } from 'sequelize';
 import { AdminLoginResponse, ErrorCode, UserCreateSchema } from '@tietokilta/ilmomasiina-models';
 import AdminAuthSession from '../../../authentication/adminAuthSession';
 import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
+import { getSequelize } from '../../../models';
 import { User } from '../../../models/user';
 import CustomError from '../../../util/customError';
 import { createUser } from './inviteUser';
@@ -39,7 +40,7 @@ export default function createInitialUser(session: AdminAuthSession) {
   ): Promise<AdminLoginResponse> {
     AdminPasswordAuth.validateNewPassword(request.body.password);
 
-    const user = await User.sequelize!.transaction(async (transaction) => {
+    const user = await getSequelize().transaction(async (transaction) => {
       if (await isInitialSetupDone(transaction)) {
         throw new InitialSetupAlreadyDone('The initial admin user has already been created.');
       }

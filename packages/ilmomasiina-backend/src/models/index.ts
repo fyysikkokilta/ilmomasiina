@@ -14,7 +14,15 @@ import setupUserModel from './user';
 
 const debugLog = debug('app:db');
 
-async function runMigration(sequelize: Sequelize) {
+let sequelize: Sequelize | null = null;
+
+export function getSequelize() {
+  if (!sequelize) throw new Error('setupDatabase() has not been called');
+  return sequelize;
+}
+
+async function runMigrations() {
+  if (!sequelize) throw new Error();
   const storage = new SequelizeStorage({ sequelize });
 
   debugLog('Running database migrations');
@@ -28,8 +36,10 @@ async function runMigration(sequelize: Sequelize) {
 }
 
 export default async function setupDatabase() {
+  if (sequelize) return;
+
   debugLog('Connecting to database');
-  const sequelize = new Sequelize(sequelizeConfig.default);
+  sequelize = new Sequelize(sequelizeConfig.default);
   try {
     await sequelize.authenticate();
     const cfg = (sequelize.connectionManager as any).config;
@@ -88,5 +98,5 @@ export default async function setupDatabase() {
   });
   Answer.belongsTo(Question);
 
-  await runMigration(sequelize);
+  await runMigrations();
 }

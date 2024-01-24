@@ -1,8 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { NotFound } from 'http-errors';
 
-import type { UserPathParams } from '@tietokilta/ilmomasiina-models';
-import { AuditEvent, ErrorCode } from '@tietokilta/ilmomasiina-models';
+import { AuditEvent, ErrorCode, UserPathParams } from '@tietokilta/ilmomasiina-models';
+import { getSequelize } from '../../../models';
 import { User } from '../../../models/user';
 import CustomError from '../../../util/customError';
 
@@ -16,7 +16,7 @@ export default async function deleteUser(
   request: FastifyRequest<{ Params: UserPathParams }>,
   reply: FastifyReply,
 ): Promise<void> {
-  await User.sequelize!.transaction(async (transaction) => {
+  await getSequelize().transaction(async (transaction) => {
     // Try to fetch existing user
     const existing = await User.findByPk(
       request.params.id,

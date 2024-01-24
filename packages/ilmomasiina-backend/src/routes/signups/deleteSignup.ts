@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import type { SignupPathParams } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
 import { AuditLogger } from '../../auditlog';
+import { getSequelize } from '../../models';
 import { Event } from '../../models/event';
 import { Quota } from '../../models/quota';
 import { Signup } from '../../models/signup';
@@ -12,7 +13,7 @@ import { NoSuchSignup, SignupsClosed } from './errors';
 
 /** Requires admin authentication OR editTokenVerification */
 async function deleteSignup(id: string, auditLogger: AuditLogger, admin: boolean = false): Promise<void> {
-  await Signup.sequelize!.transaction(async (transaction) => {
+  await getSequelize().transaction(async (transaction) => {
     const signup = await Signup.scope('active').findByPk(id, {
       include: [
         {

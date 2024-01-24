@@ -5,6 +5,7 @@ import { Transaction } from 'sequelize';
 import type { SignupPathParams, SignupUpdateBody, SignupUpdateResponse } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
 import sendSignupConfirmationMail from '../../mail/signupConfirmation';
+import { getSequelize } from '../../models';
 import { Answer } from '../../models/answer';
 import { Event } from '../../models/event';
 import { Question } from '../../models/question';
@@ -17,7 +18,7 @@ export default async function updateSignup(
   request: FastifyRequest<{ Params: SignupPathParams, Body: SignupUpdateBody }>,
   reply: FastifyReply,
 ): Promise<SignupUpdateResponse> {
-  const updatedSignup = await Signup.sequelize!.transaction(async (transaction) => {
+  const updatedSignup = await getSequelize().transaction(async (transaction) => {
     // Retrieve event data and lock the row for editing
     const signup = await Signup.scope('active').findByPk(request.params.id, {
       attributes: ['id', 'quotaId', 'confirmedAt', 'firstName', 'lastName', 'email', 'language'],
