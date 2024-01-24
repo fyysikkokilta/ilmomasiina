@@ -6,6 +6,7 @@ import type {
   AdminEventPathParams, AdminEventResponse, EditConflictError, EventUpdateBody, WouldMoveSignupsToQueueError,
 } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
+import { getSequelize } from '../../../models';
 import { Event } from '../../../models/event';
 import { Question } from '../../../models/question';
 import { Quota } from '../../../models/quota';
@@ -18,7 +19,7 @@ export default async function updateEvent(
   request: FastifyRequest<{ Params: AdminEventPathParams, Body: EventUpdateBody }>,
   response: FastifyReply,
 ): Promise<AdminEventResponse | EditConflictError | WouldMoveSignupsToQueueError> {
-  await Event.sequelize!.transaction(async (transaction) => {
+  await getSequelize().transaction(async (transaction) => {
   // Get the event with all relevant information for the update
     const event = await Event.findByPk(request.params.id, {
       attributes: ['id', 'openQuotaSize', 'draft', 'updatedAt'],

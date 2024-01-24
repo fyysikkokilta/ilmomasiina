@@ -7,6 +7,7 @@ import { AuditEvent } from '@tietokilta/ilmomasiina-models';
 import { AuditLogger } from '../../../auditlog';
 import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
 import EmailService from '../../../mail';
+import { getSequelize } from '../../../models';
 import { User } from '../../../models/user';
 import generatePassword from './generatePassword';
 
@@ -60,7 +61,7 @@ export default async function inviteUser(
   // Generate secure password
   const password = generatePassword();
 
-  const user = await User.sequelize!.transaction(async (transaction) => createUser(
+  const user = await getSequelize().transaction(async (transaction) => createUser(
     {
       email: request.body.email,
       password,

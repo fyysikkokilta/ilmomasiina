@@ -5,6 +5,7 @@ import type { UserPathParams } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
 import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
 import EmailService from '../../../mail';
+import { getSequelize } from '../../../models';
 import { User } from '../../../models/user';
 import generatePassword from './generatePassword';
 
@@ -12,7 +13,7 @@ export default async function resetPassword(
   request: FastifyRequest<{ Params: UserPathParams }>,
   reply: FastifyReply,
 ): Promise<void> {
-  await User.sequelize!.transaction(async (transaction) => {
+  await getSequelize().transaction(async (transaction) => {
     // Try to fetch existing user
     const existing = await User.findByPk(
       request.params.id,
