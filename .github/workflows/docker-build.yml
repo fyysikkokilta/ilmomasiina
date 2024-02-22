@@ -62,6 +62,10 @@ jobs:
             type=ref,event=branch,enable=${{ github.ref_type == 'branch' }}
             type=sha
 
+      - name: Get version tag
+        id: get-version
+        run: echo "version=$(git describe --always --tags)" >> "$GITHUB_OUTPUT"
+
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v5
         with:
@@ -77,6 +81,7 @@ jobs:
             BRANDING_FOOTER_HOME_TEXT=${{ env.branding_footer_home_text }}
             BRANDING_FOOTER_HOME_LINK=${{ env.branding_footer_home_link }}
             BRANDING_LOGIN_PLACEHOLDER_EMAIL=${{ env.branding_login_placeholder_email }}
+            VERSION=${{steps.get-version.outputs.version}}
 
   # This is disabled on forks, you'll most likely need to modify it anyway for your usage
   deploy:

@@ -33,6 +33,10 @@ RUN find packages/ilmomasiina-frontend/build -type f\
 # Main stage:
 FROM node:16-alpine
 
+# Accept VERSION at build time, pass to backend server
+ARG VERSION
+ENV VERSION=$VERSION
+
 # Default to production
 ENV NODE_ENV=production
 
