@@ -63,6 +63,13 @@ export default async function initApp(): Promise<FastifyInstance> {
     });
   }
 
+  // Announce Ilmomasiina version as header
+  if (config.version) {
+    server.addHook('onRequest', async (_, reply) => {
+      reply.header('X-Ilmomasiina-Version', config.version);
+    });
+  }
+
   // Enforce HTTPS connections in production
   if (config.nodeEnv === 'production') {
     if (config.enforceHttps) {
@@ -94,7 +101,7 @@ export default async function initApp(): Promise<FastifyInstance> {
       setHeaders: (res, filePath) => {
         // set immutable cache for javascript files with hash in the name
         if (javascriptHashRegex.test(filePath)) {
-          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          res.header('Cache-Control', 'public, max-age=31536000, immutable');
         }
       },
     });

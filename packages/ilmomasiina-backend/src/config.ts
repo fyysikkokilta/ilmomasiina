@@ -42,6 +42,9 @@ const config = {
   /** Allowed origins for cross-site requests to API. Comma-separated, `*` for all. */
   allowOrigin: envString('ALLOW_ORIGIN', null),
 
+  /** Version number added as a header to responses. */
+  version: envString('VERSION', null),
+
   /** ClearDB connection string. */
   clearDbUrl: envString('CLEARDB_DATABASE_URL', null),
   /** `mysql` and `postgres` are supported. */
