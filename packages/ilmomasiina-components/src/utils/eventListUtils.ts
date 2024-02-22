@@ -6,9 +6,6 @@ import type {
   EventID, EventSlug, QuotaID, UserEventListItem, UserEventListResponse,
 } from '@tietokilta/ilmomasiina-models';
 import { signupState, SignupStateInfo } from './signupStateText';
-import { OPENQUOTA, WAITLIST } from './signupUtils';
-
-export { OPENQUOTA, WAITLIST };
 
 export interface EventTableOptions {
   /** If true, quotas are not placed on separate rows. */
@@ -77,7 +74,7 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
   if (openQuotaSize > 0) {
     rows.push({
       type: 'openquota',
-      id: event.id + OPENQUOTA,
+      id: `${event.id} openquota`,
       signupCount: Math.min(overflow, openQuotaSize),
       quotaSize: openQuotaSize,
     });
@@ -87,7 +84,7 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
   if (overflow > openQuotaSize) {
     rows.push({
       type: 'waitlist',
-      id: event.id + WAITLIST,
+      id: `${event.id} waitlist`,
       signupCount: overflow - openQuotaSize,
       quotaSize: null,
     });
