@@ -11,9 +11,9 @@ import { SignupStatus } from '@tietokilta/ilmomasiina-models';
 import { timezone } from '../config';
 
 /** Placeholder quota ID for the open quota. */
-export const OPENQUOTA = '\x00open';
+export const OPENQUOTA = '\x00open' as const;
 /** Placeholder quota ID for the queue. */
-export const WAITLIST = '\x00waitlist';
+export const WAITLIST = '\x00waitlist' as const;
 
 export type AnyEventSchema = AdminEventResponse | UserEventResponse;
 export type AnySignupSchema = AdminSignupSchema | PublicSignupSchema;
@@ -76,7 +76,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
   const openSignups = signups.filter((signup) => signup.status === 'in-open');
   // Open quota is shown if the event has one, or if signups have been assigned there nevertheless.
   const openQuota = openSignups.length > 0 || event.openQuotaSize > 0 ? [{
-    id: OPENQUOTA as typeof OPENQUOTA,
+    id: OPENQUOTA,
     title: 'Avoin kiintiö',
     size: event.openQuotaSize,
     signups: openSignups,
@@ -86,7 +86,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
   const queueSignups = signups.filter((signup) => signup.status === 'in-queue');
   // Queue is shown if signups have been assigned there.
   const queue = queueSignups.length > 0 ? [{
-    id: WAITLIST as typeof WAITLIST,
+    id: WAITLIST,
     title: 'Jonossa',
     size: null,
     signups: queueSignups,

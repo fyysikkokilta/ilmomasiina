@@ -56,7 +56,9 @@ const EventListView = () => {
   const { events, error, pending } = useEventListContext();
   const { t } = useTranslation();
   const paths = usePaths();
-  const tableRows = useMemo(() => eventsToRows(events).filter((row) => row.type !== 'waitlist'), [events]);
+
+  const tableRows = useMemo(() => eventsToRows(events ?? []).filter((row) => row.type !== 'waitlist'), [events]);
+
   // If initial setup is needed and is possible on this frontend, redirect to that page.
   if (error && error.code === ErrorCode.INITIAL_SETUP_NEEDED && paths.hasAdmin) {
     return <Navigate to={paths.adminInitialSetup} />;
