@@ -6,9 +6,6 @@ import type {
   EventID, EventSlug, QuotaID, UserEventListItem, UserEventListResponse,
 } from '@tietokilta/ilmomasiina-models';
 import { signupState, SignupStateInfo } from './signupStateText';
-import { OPENQUOTA, WAITLIST } from './signupUtils';
-
-export { OPENQUOTA, WAITLIST };
 
 export interface EventTableOptions {
   /** If true, quotas are not placed on separate rows. */
@@ -16,8 +13,8 @@ export interface EventTableOptions {
 }
 
 export type EventRow = {
-  isEvent: true;
   id: EventID,
+  type: 'event';
   slug: EventSlug,
   title: string,
   date: Moment | null,
@@ -28,8 +25,8 @@ export type EventRow = {
   totalQuotaSize: number | null;
 };
 export type QuotaRow = {
-  isEvent: false;
-  id: QuotaID | typeof OPENQUOTA | typeof WAITLIST;
+  type: 'quota' | 'openquota' | 'waitlist';
+  id: QuotaID;
   title?: string;
   signupCount: number;
   quotaSize: number | null;
@@ -45,7 +42,7 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
 
   // Event row
   const rows: TableRow[] = [{
-    isEvent: true,
+    type: 'event',
     id,
     signupState: state,
     slug,
@@ -63,7 +60,7 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
   // Multiple quotas go on their own rows
   if (quotas.length > 1) {
     quotas.forEach((quota) => rows.push({
-      isEvent: false,
+      type: 'quota',
       id: quota.id,
       title: quota.title,
       signupCount: quota.size ? Math.min(quota.signupCount, quota.size) : quota.signupCount,
@@ -76,8 +73,8 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
   // Open quota
   if (openQuotaSize > 0) {
     rows.push({
-      isEvent: false,
-      id: OPENQUOTA,
+      type: 'openquota',
+      id: `${event.id} openquota`,
       signupCount: Math.min(overflow, openQuotaSize),
       quotaSize: openQuotaSize,
     });
@@ -86,8 +83,8 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
   // Queue/waitlist
   if (overflow > openQuotaSize) {
     rows.push({
-      isEvent: false,
-      id: WAITLIST,
+      type: 'waitlist',
+      id: `${event.id} waitlist`,
       signupCount: overflow - openQuotaSize,
       quotaSize: null,
     });
