@@ -12,17 +12,17 @@ jobs:
     steps:
       -
         name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
         with:
           version: 7
       -
         name: Setup Node.js for NPM
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           registry-url: 'https://registry.npmjs.org'
-          node-version: '16'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
       -
         name: Install dependencies
@@ -43,7 +43,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       -
         name: Setup Node.js for GitHub Packages
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           registry-url: 'https://npm.pkg.github.com'
       -
