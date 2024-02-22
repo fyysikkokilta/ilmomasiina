@@ -14,27 +14,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-    -
-      name: Check out the repo
+
+    - name: Check out the repo
       uses: actions/checkout@v4
-    -
-      uses: pnpm/action-setup@v3
+
+    - uses: pnpm/action-setup@v3
       with:
         version: 7
-    -
-      name: Setup Node.js
+
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
         cache: 'pnpm'
-    -
-      name: Install dependencies
-      run: |
-        npm install -g pnpm@7
-        pnpm install --frozen-lockfile --ignore-scripts
-    -
-      name: Run ESLint
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile --ignore-scripts
+
+    - name: Run ESLint
       run: npm run lint
-    -
-      name: Run type checking
+
+    - name: Run type checking
       run: npm run typecheck
