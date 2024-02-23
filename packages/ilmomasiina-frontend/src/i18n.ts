@@ -25,7 +25,6 @@ i18n
     fallbackLng: 'fi',
     defaultNS: ['frontend', 'components'],
     supportedLngs: Object.keys(resources),
-    returnNull: false,
     interpolation: {
       // for React
       escapeValue: false,

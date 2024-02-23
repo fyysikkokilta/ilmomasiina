@@ -79,7 +79,7 @@ const AuditLog = () => {
           {!loadError && !auditLog && (
             <tr>
               <td colSpan={4}>
-                <Spinner animation="border" />
+                <Spinner aria-label="Loading" animation="border" />
               </td>
             </tr>
           )}

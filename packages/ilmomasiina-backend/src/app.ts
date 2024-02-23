@@ -102,7 +102,7 @@ export default async function initApp(): Promise<FastifyInstance> {
       setHeaders: (res, filePath) => {
         // set immutable cache for javascript files with hash in the name
         if (javascriptHashRegex.test(filePath)) {
-          res.header('Cache-Control', 'public, max-age=31536000, immutable');
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         }
       },
     });
@@ -116,7 +116,6 @@ export default async function initApp(): Promise<FastifyInstance> {
     brotliOptions: {
       params: {
         [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT, // useful for APIs
-        [zlib.constants.BROTLI_PARAM_QUALITY]: 5, // https://blog.cloudflare.com/results-experimenting-brotli
       },
     },
   });

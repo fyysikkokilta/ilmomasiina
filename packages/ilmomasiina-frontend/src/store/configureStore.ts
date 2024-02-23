@@ -1,7 +1,7 @@
+import { composeWithDevTools } from '@redux-devtools/extension';
 import { routerMiddleware } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
 import { applyMiddleware, createStore } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import thunk, { ThunkMiddleware } from 'redux-thunk';
