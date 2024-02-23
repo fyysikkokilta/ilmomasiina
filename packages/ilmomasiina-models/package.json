@@ -27,10 +27,10 @@
     "typecheck": "tsc --build"
   },
   "devDependencies": {
-    "rimraf": "^3.0.2",
+    "rimraf": "^5.0.5",
     "typescript": "~5.2.2"
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.24.22"
+    "@sinclair/typebox": "^0.25.24"
   }
 }
