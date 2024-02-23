@@ -36,4 +36,4 @@ ENV NODE_ENV=development
 ENV HOST=0.0.0.0
 
 # Install dependencies (we're running as root, so the postinstall script doesn't run automatically)
-RUN npm install -g pnpm@7 && pnpm install --frozen-lockfile
+RUN npm install -g pnpm@8 && pnpm install --frozen-lockfile
