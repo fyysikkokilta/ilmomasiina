@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react';
-import dotenv from 'dotenv';
+import dotenvFlow from 'dotenv-flow';
 import path from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
@@ -9,7 +9,8 @@ import momentPlugin from './src/rollupMomentPlugin';
 
 /* eslint-disable no-console */
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Load environment variables from .env files (from the root of repository)
+dotenvFlow.config({ path: path.resolve(__dirname, '../..') });
 
 // Default to 127.0.0.1:3001 for the backend.
 // Use the dev-only variable DEV_BACKEND_PORT for this, keeping PORT always for the user-facing port.

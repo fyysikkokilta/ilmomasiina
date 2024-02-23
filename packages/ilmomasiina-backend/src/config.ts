@@ -1,12 +1,12 @@
-import dotenv from 'dotenv';
+import dotenvFlow from 'dotenv-flow';
 import path from 'path';
 
 import {
   envBoolean, envEnum, envInteger, envString, frontendFilesPath,
 } from './util/config';
 
-// Load environment variables from .env file (from the root of repository)
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+// Load environment variables from .env files (from the root of repository)
+dotenvFlow.config({ path: path.resolve(__dirname, '../../..') });
 
 // Compatibility for older configs
 if (!process.env.BASE_URL && process.env.EMAIL_BASE_URL) {
@@ -61,6 +61,8 @@ const config = {
   dbPassword: envString('DB_PASSWORD', null),
   /** Database name. */
   dbDatabase: envString('DB_DATABASE', null),
+  /** Required to run tests, as they reset the test database for every test. */
+  allowTestsToResetDb: envBoolean('THIS_IS_A_TEST_DB_AND_CAN_BE_WIPED', false),
 
   /** Salt for generating legacy edit tokens. Used only to keep tokens valid from a previous installation. */
   oldEditTokenSalt: envString('EDIT_TOKEN_SALT', null),
