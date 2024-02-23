@@ -39,6 +39,7 @@ importers:
 
   packages/ilmomasiina-backend:
     specifiers:
+      '@faker-js/faker': ^8.3.1
       '@fastify/compress': ^6.1.0
       '@fastify/cors': ^8.2.0
       '@fastify/sensible': ^5.1.0
@@ -62,7 +63,7 @@ importers:
       bcrypt: ^5.1.0
       better-npm-run: ^0.1.1
       debug: ^4.3.4
-      dotenv: ^16.0.3
+      dotenv-flow: ^4.1.0
       email-templates: ^8.1.0
       fast-jwt: ^1.7.0
       fastify: ^4.3.0
@@ -94,12 +95,12 @@ importers:
       '@sinclair/typebox': 0.24.22
       '@tietokilta/ilmomasiina-models': link:../ilmomasiina-models
       ajv: 8.12.0
-      ajv-formats: 2.1.1_ajv@8.12.0
+      ajv-formats: 2.1.1
       base32-encode: 1.2.0
       bcrypt: 5.1.0
       better-npm-run: 0.1.1
       debug: 4.3.4
-      dotenv: 16.0.3
+      dotenv-flow: 4.1.0
       email-templates: 8.1.0
       fast-jwt: 1.7.0
       fastify: 4.3.0
@@ -118,6 +119,7 @@ importers:
       sequelize: 6.21.0_ek64ldxalhadmdq3ipl6ljgiqu
       umzug: 3.1.1
     devDependencies:
+      '@faker-js/faker': 8.4.1
       '@types/bcrypt': 5.0.0
       '@types/compression': 1.7.2
       '@types/debug': 4.1.7
@@ -198,7 +200,7 @@ importers:
       connected-react-router: ^6.9.2
       csv-stringify: ^6.4.2
       date-fns: ^2.28.0
-      dotenv: ^16.0.3
+      dotenv-flow: ^4.1.0
       final-form: ^4.20.10
       final-form-arrays: ^3.1.0
       history: ^4.10.1
@@ -250,7 +252,7 @@ importers:
       connected-react-router: 6.9.2_4xep6jux73jwrxkjwaaein5o3u
       csv-stringify: 6.4.2
       date-fns: 2.28.0
-      dotenv: 16.0.3
+      dotenv-flow: 4.1.0
       final-form: 4.20.10
       final-form-arrays: 3.1.0_final-form@4.20.10
       history: 4.10.1
@@ -814,6 +816,11 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: false
 
+  /@faker-js/faker/8.4.1:
+    resolution: {integrity: sha512-XQ3cU+Q8Uqmrbf2e0cIC/QN43sTBSC8KF12u29Mb47tWrt2hAgBXSgpZMj4Ao8Uk0iJcU99QsOCaIL8934obCg==}
+    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
+    dev: true
+
   /@fastify/accept-negotiator/1.0.0:
     resolution: {integrity: sha512-4R/N2KfYeld7A5LGkai+iUFMahXcxxYbDp+XS2B1yuL3cdmZLJ9TlCnNzT3q5xFTqsYm0GPpinLUwfSwjcVjyA==}
     engines: {node: '>=14'}
@@ -823,7 +830,7 @@ packages:
     resolution: {integrity: sha512-ebbEtlI7dxXF5ziNdr05mOY8NnDiPB1XvAlLHctRt/Rc+C3LCOVW5imUVX+mhvUhnNzmPBHewUkOFgGlCxgdAA==}
     dependencies:
       ajv: 8.12.0
-      ajv-formats: 2.1.1_ajv@8.12.0
+      ajv-formats: 2.1.1
       fast-uri: 2.1.0
     dev: false
 
@@ -1754,10 +1761,8 @@ packages:
       - supports-color
     dev: false
 
-  /ajv-formats/2.1.1_ajv@8.12.0:
+  /ajv-formats/2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
-    peerDependencies:
-      ajv: ^8.0.0
     peerDependenciesMeta:
       ajv:
         optional: true
@@ -2342,7 +2347,7 @@ packages:
       lodash: ^4.17.20
       marko: ^3.14.4
       mote: ^0.2.0
-      mustache: ^3.0.0
+      mustache: ^4.0.1
       nunjucks: ^3.2.2
       plates: ~0.4.11
       pug: ^3.0.0
@@ -2934,6 +2939,13 @@ packages:
       dom-serializer: 2.0.0
       domelementtype: 2.3.0
       domhandler: 5.0.3
+
+  /dotenv-flow/4.1.0:
+    resolution: {integrity: sha512-0cwP9jpQBQfyHwvE0cRhraZMkdV45TQedA8AAUZMsFzvmLcQyc1HPv+oX0OOYwLFjIlvgVepQ+WuQHbqDaHJZg==}
+    engines: {node: '>= 12.0.0'}
+    dependencies:
+      dotenv: 16.0.3
+    dev: false
 
   /dotenv/16.0.3:
     resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
@@ -3635,7 +3647,7 @@ packages:
     dependencies:
       '@fastify/deepmerge': 1.1.0
       ajv: 8.12.0
-      ajv-formats: 2.1.1_ajv@8.12.0
+      ajv-formats: 2.1.1
       fast-uri: 2.1.0
       rfdc: 1.3.0
     dev: false

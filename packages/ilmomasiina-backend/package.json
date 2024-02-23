@@ -12,9 +12,10 @@
     "start:prod": "bnr start:prod",
     "stop:prod": "pm2 stop 0",
     "monit:prod": "pm2 monit",
-    "build": "tsc --build",
+    "build": "tsc --build tsconfig.build.json",
     "clean": "rimraf dist",
-    "typecheck": "tsc --build"
+    "typecheck": "tsc --build tsconfig.build.json",
+    "filldb": "ts-node -r tsconfig-paths/register --project tsconfig.json test/fillDatabase.ts"
   },
   "betterScripts": {
     "start:dev": {
@@ -47,7 +48,7 @@
     "bcrypt": "^5.1.0",
     "better-npm-run": "^0.1.1",
     "debug": "^4.3.4",
-    "dotenv": "^16.0.3",
+    "dotenv-flow": "^4.1.0",
     "email-templates": "^8.1.0",
     "fast-jwt": "^1.7.0",
     "fastify": "^4.3.0",
@@ -67,6 +68,7 @@
     "umzug": "^3.1.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
     "@types/bcrypt": "^5.0.0",
     "@types/compression": "^1.7.2",
     "@types/debug": "^4.1.7",

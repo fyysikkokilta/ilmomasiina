@@ -10,7 +10,8 @@ coverage/
 .idea/
 .vscode/
 
-.env
+.env*
+!.env*.example
 
 data/
 
