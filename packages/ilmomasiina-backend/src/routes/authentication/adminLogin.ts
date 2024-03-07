@@ -34,7 +34,7 @@ export function adminLogin(session: AdminAuthSession) {
 
 export function renewAdminToken(session: AdminAuthSession) {
   return async (
-    request: FastifyRequest<{ Body: AdminLoginBody }>,
+    request: FastifyRequest,
     reply: FastifyReply,
   ): Promise<AdminLoginResponse | void> => {
     // Verify existing token

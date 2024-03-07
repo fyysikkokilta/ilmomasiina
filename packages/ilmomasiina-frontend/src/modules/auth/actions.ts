@@ -1,8 +1,8 @@
 import { push } from 'connected-react-router';
 import { toast } from 'react-toastify';
 
-import { apiFetch } from '@tietokilta/ilmomasiina-components';
-import type { AdminLoginResponse } from '@tietokilta/ilmomasiina-models';
+import { ApiError, apiFetch } from '@tietokilta/ilmomasiina-components';
+import { AdminLoginResponse, ErrorCode } from '@tietokilta/ilmomasiina-models';
 import i18n from '../../i18n';
 import appPaths from '../../paths';
 import type { DispatchAction } from '../../store/types';
@@ -36,13 +36,13 @@ const loginToast = (type: 'success' | 'error', text: string, autoClose: number) 
 };
 
 export const login = (email: string, password: string) => async (dispatch: DispatchAction) => {
-  const sessionResponse = await apiFetch('authentication', {
+  const sessionResponse = await apiFetch<AdminLoginResponse>('authentication', {
     method: 'POST',
     body: {
       email,
       password,
     },
-  }) as AdminLoginResponse;
+  });
   dispatch(loginSucceeded(sessionResponse));
   dispatch(push(appPaths.adminEventsList));
   loginToast('success', i18n.t('auth.loginSuccess'), 2000);
@@ -77,4 +77,29 @@ export const logout = () => async (dispatch: DispatchAction) => {
 export const loginExpired = () => (dispatch: DispatchAction) => {
   loginToast('error', i18n.t('auth.loginExpired'), 10000);
   dispatch(redirectToLogin());
+};
+
+export const renewLogin = (accessToken: string) => async (dispatch: DispatchAction) => {
+  try {
+    if (accessToken) {
+      const sessionResponse = await apiFetch<AdminLoginResponse>('authentication/renew', {
+        method: 'POST',
+        body: {
+          accessToken,
+        },
+        headers: {
+          Authorization: accessToken,
+        },
+      });
+      if (sessionResponse) {
+        dispatch(loginSucceeded(sessionResponse));
+      }
+    }
+  } catch (err) {
+    if (err instanceof ApiError && err.code === ErrorCode.BAD_SESSION) {
+      dispatch(loginExpired());
+    } else {
+      throw err;
+    }
+  }
 };

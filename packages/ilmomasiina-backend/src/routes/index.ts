@@ -17,7 +17,7 @@ import deleteUser from './admin/users/deleteUser';
 import inviteUser from './admin/users/inviteUser';
 import listUsers from './admin/users/listUsers';
 import resetPassword from './admin/users/resetPassword';
-import { adminLogin, requireAdmin } from './authentication/adminLogin';
+import { adminLogin, renewAdminToken, requireAdmin } from './authentication/adminLogin';
 import { getEventDetailsForAdmin, getEventDetailsForUser } from './events/getEventDetails';
 import { getEventsListForAdmin, getEventsListForUser } from './events/getEventsList';
 import { sendICalFeed } from './ical';
@@ -323,7 +323,18 @@ async function setupPublicRoutes(
     adminLogin(opts.adminSession),
   );
 
-  // TODO: Add an API endpoint for session token renewal as variant of adminLoginSchema
+  server.post(
+    '/authentication/renew',
+    {
+      schema: {
+        response: {
+          ...errorResponses,
+          201: schema.adminLoginResponse,
+        },
+      },
+    },
+    renewAdminToken(opts.adminSession),
+  );
 
   // Public routes for events
 
