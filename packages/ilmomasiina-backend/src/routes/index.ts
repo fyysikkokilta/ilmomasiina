@@ -323,8 +323,6 @@ async function setupPublicRoutes(
     adminLogin(opts.adminSession),
   );
 
-  // an API endpoint for session token renewal as variant of adminLoginSchema
-
   server.post(
     '/authentication/renew',
     {
@@ -337,6 +335,7 @@ async function setupPublicRoutes(
     },
     renewAdminToken(opts.adminSession),
   );
+
   // Public routes for events
 
   server.get<{ Querystring: schema.EventListQuery }>(
