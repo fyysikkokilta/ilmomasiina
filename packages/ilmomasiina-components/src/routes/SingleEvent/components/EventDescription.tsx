@@ -84,11 +84,11 @@ const EventDescription = () => {
       <div className="ilmo--event-description">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
           {event.description || ''}
-          <hr/>
-            <p>Ilmoittautumisen sulkeuduttua ilmoittautuminen on sitova. Tämän jälkeen maksulliseen tapahtumaan ilmoittautunut on velvollinen maksamaan osallistumismaksun tai löytämään paikalleen toisen osallistujan. Fyysikkokillan peruutuskäytännöt löydät <a href="https://www.fyysikkokilta.fi/peruutuskaytannot-ja-korvausvelvollisuus/">täältä</a>.</p>
-            <p>The sign up is binding when sign-up closes. After this, the person who has signed up to a paid event is obligated to pay the participation fee or find another participant to attend in one’s place. The Guild of Physics' sign-up cancellation -policy can be found <a href="https://www.fyysikkokilta.fi/en/peruutuskaytannot-ja-korvausvelvollisuus/">here</a>.</p>
-          <hr/>
         </ReactMarkdown>
+        <hr/>
+          <p>Ilmoittautumisen sulkeuduttua ilmoittautuminen on sitova. Tämän jälkeen maksulliseen tapahtumaan ilmoittautunut on velvollinen maksamaan osallistumismaksun tai löytämään paikalleen toisen osallistujan. Fyysikkokillan peruutuskäytännöt löydät <a href="https://www.fyysikkokilta.fi/peruutuskaytannot-ja-korvausvelvollisuus/">täältä</a>.</p>
+          <p>The sign up is binding when sign-up closes. After this, the person who has signed up to a paid event is obligated to pay the participation fee or find another participant to attend in one’s place. The Guild of Physics' sign-up cancellation -policy can be found <a href="https://www.fyysikkokilta.fi/en/peruutuskaytannot-ja-korvausvelvollisuus/">here</a>.</p>
+        <hr/>
       </div>
     </>
   );
