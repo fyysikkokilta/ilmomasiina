@@ -63,7 +63,8 @@ export const setAuditLogQueryField = <K extends keyof AuditLoqQuery>(
       ...getState().auditLog.auditLogQuery,
       [key]: value,
     };
-    if (!key.startsWith('$')) {
+    // reset pagination when touching non-pagination fields
+    if (key !== 'offset' && key !== 'limit') {
       delete newQuery.offset;
     }
     await dispatch(getAuditLogs(newQuery));
