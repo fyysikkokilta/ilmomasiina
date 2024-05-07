@@ -31,6 +31,12 @@ export default defineMigration({
       let optionsJson = null;
       if (row.type === 'checkbox' || row.type === 'select') {
         optionsJson = row.options ? JSON.stringify(row.options.split(';')) : JSON.stringify(['']);
+        // If the options are too long, store an empty array
+        // otherwise they won't fit in the column and the migration will fail
+        // This is a rather quick and dirty way to handle this, but it's good enough for now
+        if (optionsJson.length > 255) {
+          optionsJson = JSON.stringify([]);
+        }
       }
       await query.bulkUpdate(
         'question',
@@ -51,7 +57,13 @@ export default defineMigration({
       // Non-empty answer to checkbox question -> ["ans1", "ans2"]
       // Empty answer to checkbox question -> []
       const answer = row.type === 'checkbox' ? row.answer.split(';').filter(Boolean) : row.answer;
-      const answerJson = JSON.stringify(answer);
+      let answerJson = JSON.stringify(answer);
+      // If the answer is too long, store an empty array
+      // otherwise it won't fit in the column and the migration will fail
+      // This is a rather quick and dirty way to handle this, but it's good enough for now
+      if (answerJson.length > 255) {
+        answerJson = JSON.stringify([]);
+      }
       await query.bulkUpdate(
         'answer',
         { answer: answerJson },
