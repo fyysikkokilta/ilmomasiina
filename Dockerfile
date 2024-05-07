@@ -5,6 +5,7 @@ RUN apk add --no-cache brotli
 ARG SENTRY_DSN
 ARG PATH_PREFIX
 ARG API_URL
+ARG BRANDING_LOGO_URL
 ARG BRANDING_HEADER_TITLE_TEXT
 ARG BRANDING_FOOTER_GDPR_TEXT
 ARG BRANDING_FOOTER_GDPR_LINK
@@ -19,16 +20,6 @@ WORKDIR /opt/ilmomasiina
 
 # Install dependencies (we're running as root, so the postinstall script doesn't run automatically)
 RUN npm install -g pnpm@8 && pnpm install --frozen-lockfile
-
-ARG SENTRY_DSN
-ARG PREFIX_URL
-ARG API_URL
-ARG BRANDING_LOGO_URL
-ARG BRANDING_HEADER_TITLE_TEXT
-ARG BRANDING_FOOTER_GDPR_TEXT
-ARG BRANDING_FOOTER_GDPR_LINK
-ARG BRANDING_FOOTER_HOME_TEXT
-ARG BRANDING_FOOTER_HOME_LINK
 
 # Default to production (after pnpm install, so we get our types etc.)
 ENV NODE_ENV=production

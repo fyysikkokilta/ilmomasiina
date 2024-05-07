@@ -67,6 +67,7 @@ export default defineConfig(({ mode }) => ({
     BRANDING_FOOTER_GDPR_LINK: process.env.BRANDING_FOOTER_GDPR_LINK || '',
     BRANDING_FOOTER_HOME_TEXT: process.env.BRANDING_FOOTER_HOME_TEXT || '',
     BRANDING_FOOTER_HOME_LINK: process.env.BRANDING_FOOTER_HOME_LINK || '',
+    BRANDING_LOGO_URL: process.env.BRANDING_LOGO_URL || '',
     BRANDING_LOGIN_PLACEHOLDER_EMAIL: process.env.BRANDING_LOGIN_PLACEHOLDER_EMAIL || 'admin@tietokilta.fi',
     TIMEZONE,
   }),

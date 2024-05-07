@@ -10,6 +10,7 @@ env:
   branding_footer_gdpr_link: 'https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/'
   branding_footer_home_text: 'Tietokilta.fi'
   branding_footer_home_link: 'https://tietokilta.fi'
+  branding_logo_url: 'https://tietokilta.fi/wp-content/uploads/2019/08/tietokilta_logo.png'
   branding_login_placeholder_email: 'admin@tietokilta.fi'
 
 on:
@@ -80,6 +81,7 @@ jobs:
             BRANDING_FOOTER_GDPR_LINK=${{ env.branding_footer_gdpr_link }}
             BRANDING_FOOTER_HOME_TEXT=${{ env.branding_footer_home_text }}
             BRANDING_FOOTER_HOME_LINK=${{ env.branding_footer_home_link }}
+            BRANDING_LOGO_URL=${{ env.branding_logo_url }}
             BRANDING_LOGIN_PLACEHOLDER_EMAIL=${{ env.branding_login_placeholder_email }}
             VERSION=${{steps.get-version.outputs.version}}
 
