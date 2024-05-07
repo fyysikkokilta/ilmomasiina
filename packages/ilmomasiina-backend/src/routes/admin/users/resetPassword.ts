@@ -1,7 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { NotFound } from 'http-errors';
-import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
-import EmailService from '../../../mail';
 
 import type { UserPathParams } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';

@@ -24,8 +24,8 @@ export function ascNullsFirst() {
  * https://dev.mysql.com/doc/refman/8.0/en/working-with-null.html
  * https://www.sqlite.org/datatype3.html#comparisons
  */
- export function descNullsFirst() {
-  if (Event.sequelize!.getDialect() === 'postgres') {
+export function descNullsFirst() {
+  if (getSequelize().getDialect() === 'postgres') {
     return 'DESC NULLS FIRST';
   }
   return 'DESC';

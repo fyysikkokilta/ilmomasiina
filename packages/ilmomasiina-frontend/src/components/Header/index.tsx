@@ -19,7 +19,6 @@ const Header = () => {
 
   return (
     <Navbar>
-      <img alt="Logo" src={branding.headerLogoUrl} />
       <Container>
         <Link to={appPaths.eventsList} className="navbar-brand mr-auto">
           {branding.headerTitle}
