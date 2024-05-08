@@ -32,7 +32,6 @@ services:
       - DB_HOST=db
       - NODE_ENV=development
       - HOST=0.0.0.0
-      - ADMIN_REGISTRATION_ALLOWED=true
     volumes:
       - type: bind
         source: ./packages/ilmomasiina-models/src
