@@ -1,6 +1,6 @@
-import find from 'lodash/find';
-import orderBy from 'lodash/orderBy';
-import sumBy from 'lodash/sumBy';
+import find from 'lodash-es/find';
+import orderBy from 'lodash-es/orderBy';
+import sumBy from 'lodash-es/sumBy';
 import moment from 'moment-timezone';
 
 import type {
@@ -11,9 +11,9 @@ import { SignupStatus } from '@tietokilta/ilmomasiina-models';
 import { timezone } from '../config';
 
 /** Placeholder quota ID for the open quota. */
-export const OPENQUOTA = '\x00open';
+export const OPENQUOTA = '\x00open' as const;
 /** Placeholder quota ID for the queue. */
-export const WAITLIST = '\x00waitlist';
+export const WAITLIST = '\x00waitlist' as const;
 
 export type AnyEventSchema = AdminEventResponse | UserEventResponse;
 export type AnySignupSchema = AdminSignupSchema | PublicSignupSchema;
@@ -76,7 +76,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
   const openSignups = signups.filter((signup) => signup.status === 'in-open');
   // Open quota is shown if the event has one, or if signups have been assigned there nevertheless.
   const openQuota = openSignups.length > 0 || event.openQuotaSize > 0 ? [{
-    id: OPENQUOTA as typeof OPENQUOTA,
+    id: OPENQUOTA,
     title: 'Avoin kiintiö',
     size: event.openQuotaSize,
     signups: openSignups,
@@ -86,7 +86,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
   const queueSignups = signups.filter((signup) => signup.status === 'in-queue');
   // Queue is shown if signups have been assigned there.
   const queue = queueSignups.length > 0 ? [{
-    id: WAITLIST as typeof WAITLIST,
+    id: WAITLIST,
     title: 'Jonossa',
     size: null,
     signups: queueSignups,
@@ -101,7 +101,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
 }
 
 function getAnswersFromSignup(event: AdminEventResponse, signup: AnySignupSchema) {
-  const answers: Record<QuestionID, string> = {};
+  const answers: Record<QuestionID, string | string[]> = {};
 
   event.questions.forEach((question) => {
     const answer = find(signup.answers, { questionId: question.id });
@@ -116,7 +116,7 @@ export type FormattedSignup = {
   firstName: string | null;
   lastName: string | null;
   email: string | null;
-  answers: Record<QuestionID, string>;
+  answers: Record<QuestionID, string | string[]>;
   quota: string;
   createdAt: string;
   confirmed: boolean;
@@ -148,6 +148,11 @@ export function getSignupsForAdminList(event: AdminEventResponse): FormattedSign
   });
 }
 
+/** Formats an answer for display. */
+export function stringifyAnswer(answer: string | string[] | undefined) {
+  return Array.isArray(answer) ? answer.join(', ') : (answer ?? '');
+}
+
 /** Converts an array of signup rows from `getSignupsForAdminList` to a an array of CSV cells. */
 export function convertSignupsToCSV(event: AdminEventResponse, signups: FormattedSignup[]): string[][] {
   return [
@@ -164,7 +169,7 @@ export function convertSignupsToCSV(event: AdminEventResponse, signups: Formatte
       ...(event.nameQuestion ? [signup.firstName || '', signup.lastName || ''] : []),
       ...(event.emailQuestion ? [signup.email || ''] : []),
       signup.quota,
-      ...event.questions.map((question) => signup.answers[question.id] || ''),
+      ...event.questions.map((question) => stringifyAnswer(signup.answers[question.id])),
       signup.createdAt,
     ]),
   ];

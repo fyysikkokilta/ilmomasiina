@@ -1,7 +1,6 @@
 import { createContext } from 'react';
 
 export interface AuthState {
-  accessToken?: string;
   loggedIn: boolean;
 }
 

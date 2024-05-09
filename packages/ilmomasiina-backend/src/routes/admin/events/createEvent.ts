@@ -3,6 +3,7 @@ import { CreationAttributes } from 'sequelize';
 
 import type { AdminEventResponse, EventCreateBody } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
+import { getSequelize } from '../../../models';
 import { Event } from '../../../models/event';
 import { Question } from '../../../models/question';
 import { Quota } from '../../../models/quota';
@@ -14,7 +15,7 @@ export default async function createEvent(
   response: FastifyReply,
 ): Promise<AdminEventResponse> {
   // Create the event with relations - Sequelize will handle validation
-  const event = await Event.sequelize!.transaction(async (transaction) => {
+  const event = await getSequelize().transaction(async (transaction) => {
     const created = await Event.create(
       {
         ...request.body,
@@ -22,7 +23,7 @@ export default async function createEvent(
         questions: request.body.questions ? request.body.questions.map((q, order) => ({
           ...q,
           order,
-          options: (q.options && q.options.length) ? q.options.join(';') : null,
+          options: q.options?.length ? q : null,
         })) : [],
         // add order to quotas
         quotas: request.body.quotas ? request.body.quotas.map((q, order) => ({ ...q, order })) : [],

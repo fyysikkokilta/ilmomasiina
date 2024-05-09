@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useMemo } from 'react';
 
 import type { UserEventResponse } from '@tietokilta/ilmomasiina-models';
-import apiFetch from '../../api';
+import apiFetch, { ApiError } from '../../api';
 import { useAbortablePromise } from '../../utils/abortable';
 import { getSignupsByQuota, QuotaSignups } from '../../utils/signupUtils';
 import { createStateContext } from '../../utils/stateContext';
@@ -15,7 +15,7 @@ type State = {
   event?: UserEventResponse;
   signupsByQuota?: QuotaSignups[];
   pending: boolean;
-  error: boolean;
+  error?: ApiError;
 };
 
 const { Provider, useStateContext } = createStateContext<State>();
@@ -35,7 +35,7 @@ export function useSingleEventState({ slug }: SingleEventProps) {
     event,
     signupsByQuota,
     pending: fetchEvent.pending,
-    error: fetchEvent.error,
+    error: fetchEvent.error as ApiError | undefined,
   });
 }
 

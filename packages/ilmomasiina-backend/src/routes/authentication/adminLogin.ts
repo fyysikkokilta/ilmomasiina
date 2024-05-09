@@ -5,12 +5,13 @@ import type { AdminLoginBody, AdminLoginResponse } from '@tietokilta/ilmomasiina
 import AdminAuthSession, { AdminTokenData } from '../../authentication/adminAuthSession';
 import AdminPasswordAuth from '../../authentication/adminPasswordAuth';
 import { User } from '../../models/user';
+import CustomError from '../../util/customError';
 
 export function adminLogin(session: AdminAuthSession) {
   return async (
     request: FastifyRequest<{ Body: AdminLoginBody }>,
     reply: FastifyReply,
-  ): Promise<AdminLoginResponse | void> => {
+  ): Promise<AdminLoginResponse> => {
     // Verify user
     const user = await User.findOne({
       where: { email: request.body.email },
@@ -33,7 +34,7 @@ export function adminLogin(session: AdminAuthSession) {
 
 export function renewAdminToken(session: AdminAuthSession) {
   return async (
-    request: FastifyRequest<{ Body: AdminLoginBody }>,
+    request: FastifyRequest,
     reply: FastifyReply,
   ): Promise<AdminLoginResponse | void> => {
     // Verify existing token
@@ -62,7 +63,7 @@ export function requireAdmin(session: AdminAuthSession, fastify: FastifyInstance
       } catch (err) {
         // Throwing inside hook is not safe, so the errors must be converted to actual reply here
         fastify.log.error(err);
-        if (err instanceof HttpError) {
+        if (err instanceof HttpError || err instanceof CustomError) {
           reply.code(err.statusCode).send(err);
         } else {
           reply.internalServerError('Session validation failed');

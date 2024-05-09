@@ -1,30 +1,32 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { BadRequest, Forbidden, NotFound } from 'http-errors';
+import { BadRequest } from 'http-errors';
 import { Transaction } from 'sequelize';
 
 import type { SignupPathParams, SignupUpdateBody, SignupUpdateResponse } from '@tietokilta/ilmomasiina-models';
 import { AuditEvent } from '@tietokilta/ilmomasiina-models';
-import sendSignupConfirmationEmail from '../../mail/signupConfirmation';
+import sendSignupConfirmationMail from '../../mail/signupConfirmation';
+import { getSequelize } from '../../models';
 import { Answer } from '../../models/answer';
 import { Event } from '../../models/event';
 import { Question } from '../../models/question';
 import { Signup } from '../../models/signup';
 import { signupsAllowed } from './createNewSignup';
+import { NoSuchSignup, SignupsClosed } from './errors';
 
 /** Requires editTokenVerification */
 export default async function updateSignup(
   request: FastifyRequest<{ Params: SignupPathParams, Body: SignupUpdateBody }>,
   reply: FastifyReply,
 ): Promise<SignupUpdateResponse> {
-  const updatedSignup = await Signup.sequelize!.transaction(async (transaction) => {
+  const updatedSignup = await getSequelize().transaction(async (transaction) => {
     // Retrieve event data and lock the row for editing
     const signup = await Signup.scope('active').findByPk(request.params.id, {
-      attributes: ['id', 'quotaId', 'confirmedAt', 'firstName', 'lastName', 'email'],
+      attributes: ['id', 'quotaId', 'confirmedAt', 'firstName', 'lastName', 'email', 'language'],
       transaction,
       lock: Transaction.LOCK.UPDATE,
     });
     if (signup === null) {
-      throw new NotFound('Signup expired or already deleted');
+      throw new NoSuchSignup('Signup expired or already deleted');
     }
 
     const quota = await signup.getQuota({
@@ -42,7 +44,7 @@ export default async function updateSignup(
     });
     const event = quota.event!;
     if (!signupsAllowed(event)) {
-      throw new Forbidden('Signups closed for this event.');
+      throw new SignupsClosed('Signups closed for this event.');
     }
 
     /** Is this signup already confirmed (i.e. is this the first update for this signup) */
@@ -65,18 +67,42 @@ export default async function updateSignup(
       emailField = { email };
     }
 
+    // Update signup language if provided
+    let languageField = {};
+    if (request.body.language) {
+      languageField = { language: request.body.language };
+    }
+
     // Check that all questions are answered with a valid answer
     const newAnswers = questions.map((question) => {
-      const answer = request.body.answers
+      // Fetch the answer to this question from the request body
+      let answer = request.body.answers
         ?.find((a) => a.questionId === question.id)
-        ?.answer
-        || '';
+        ?.answer;
 
-      if (!answer) {
+      if (!answer || !answer.length) {
+        // Disallow empty answers to required questions
         if (question.required) {
           throw new BadRequest(`Missing answer for question ${question.question}`);
         }
+        // Normalize empty answers to "" or [], depending on question type
+        answer = question.type === 'checkbox' ? [] : '';
+      } else if (question.type === 'checkbox') {
+        // Ensure checkbox answers are arrays
+        if (!Array.isArray(answer)) {
+          throw new BadRequest(`Invalid answer to question ${question.question}`);
+        }
+        // Check that all checkbox answers are valid
+        answer.forEach((option) => {
+          if (!question.options!.includes(option)) {
+            throw new BadRequest(`Invalid answer to question ${question.question}`);
+          }
+        });
       } else {
+        // Don't allow arrays for non-checkbox questions
+        if (typeof answer !== 'string') {
+          throw new BadRequest(`Invalid answer to question ${question.question}`);
+        }
         switch (question.type) {
           case 'text':
           case 'textarea':
@@ -89,23 +115,9 @@ export default async function updateSignup(
             break;
           case 'select': {
             // Check that the select answer is valid
-            const options = question.options!.split(';');
-
-            if (!options.includes(answer)) {
+            if (!question.options!.includes(answer)) {
               throw new BadRequest(`Invalid answer to question ${question.question}`);
             }
-            break;
-          }
-          case 'checkbox': {
-            // Check that all checkbox answers are valid
-            const options = question.options!.split(';');
-            const answers = answer.split(';');
-
-            answers.forEach((option) => {
-              if (!options.includes(option)) {
-                throw new BadRequest(`Invalid answer to question ${question.question}`);
-              }
-            });
             break;
           }
           default:
@@ -124,6 +136,7 @@ export default async function updateSignup(
     const updatedFields = {
       ...nameFields,
       ...emailField,
+      ...languageField,
       namePublic: Boolean(request.body.namePublic),
       confirmedAt: new Date(),
     };
@@ -149,7 +162,7 @@ export default async function updateSignup(
   });
 
   // Send the confirmation email
-  await sendSignupConfirmationEmail(updatedSignup);
+  sendSignupConfirmationMail(updatedSignup);
 
   // Return data
   reply.status(200);

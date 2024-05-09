@@ -1,12 +1,12 @@
-import dotenv from 'dotenv';
+import dotenvFlow from 'dotenv-flow';
 import path from 'path';
 
 import {
   envBoolean, envEnum, envInteger, envString, frontendFilesPath,
 } from './util/config';
 
-// Load environment variables from .env file (from the root of repository)
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+// Load environment variables from .env files (from the root of repository)
+dotenvFlow.config({ path: path.resolve(__dirname, '../../..') });
 
 // Compatibility for older configs
 if (!process.env.BASE_URL && process.env.EMAIL_BASE_URL) {
@@ -23,8 +23,11 @@ const config = {
   /** Whether to log SQL queries from Sequelize. */
   debugDbLogging: envBoolean('DEBUG_DB_LOGGING', false),
 
+  /** The host to run the backend server on. */
+  host: envString('HOST', 'localhost'),
   /** The port to run the backend server on. */
-  port: envInteger('PORT', 3000),
+  // Check DEV_BACKEND_PORT first, then PORT, then default to 3000.
+  port: envInteger('DEV_BACKEND_PORT', envInteger('PORT', 3000)),
 
   /** Whether an Azure App Service environment is detected. */
   isAzure: process.env.WEBSITE_SITE_NAME !== undefined,
@@ -38,6 +41,9 @@ const config = {
   frontendFilesPath: frontendFilesPath(),
   /** Allowed origins for cross-site requests to API. Comma-separated, `*` for all. */
   allowOrigin: envString('ALLOW_ORIGIN', null),
+
+  /** Version number added as a header to responses. */
+  version: envString('VERSION', null),
 
   /** ClearDB connection string. */
   clearDbUrl: envString('CLEARDB_DATABASE_URL', null),
@@ -55,6 +61,8 @@ const config = {
   dbPassword: envString('DB_PASSWORD', null),
   /** Database name. */
   dbDatabase: envString('DB_DATABASE', null),
+  /** Required to run tests, as they reset the test database for every test. */
+  allowTestsToResetDb: envBoolean('THIS_IS_A_TEST_DB_AND_CAN_BE_WIPED', false),
 
   /** Salt for generating legacy edit tokens. Used only to keep tokens valid from a previous installation. */
   oldEditTokenSalt: envString('EDIT_TOKEN_SALT', null),
@@ -71,6 +79,11 @@ const config = {
   brandingMailFooterLink: envString('BRANDING_MAIL_FOOTER_LINK'),
   /** Calendar name included in iCalendar exports. */
   icalCalendarName: envString('BRANDING_ICAL_CALENDAR_NAME', 'Ilmomasiina'),
+  /** Default language for emails, if no language is known for the signup. */
+  mailDefaultLang: envString('MAIL_DEFAULT_LANG', 'fi'),
+
+  /** Timezone used for emails. */
+  timezone: envString('APP_TIMEZONE', 'Europe/Helsinki'),
 
   /** Canonical base URL for the app. Includes $PATH_PREFIX, but NOT a final "/".
    *
@@ -110,9 +123,6 @@ const config = {
   /** Host for Mailgun API server. */
   mailgunHost: envString('MAILGUN_HOST', 'api.eu.mailgun.net'),
 
-  /** Whether or not new admin accounts can be added. */
-  adminRegistrationAllowed: envBoolean('ADMIN_REGISTRATION_ALLOWED', false),
-
   /** How long after an event's date to remove signup details. */
   anonymizeAfterDays: envInteger('ANONYMIZE_AFTER_DAYS', 180),
   /** How long items stay in the database after deletion, in order to allow restoring accidentally deleted items. */
@@ -147,25 +157,20 @@ if (config.oldEditTokenSalt === config.newEditTokenSecret) {
   );
 }
 
+try {
+  // Node only supports URL.canParse since 18.17.0
+  // eslint-disable-next-line no-new
+  new URL(config.baseUrl);
+} catch (err) {
+  throw new Error('BASE_URL is invalid - make sure it is a full URL like http://example.com.');
+}
+
 if (!config.eventDetailsUrl.includes('{slug}')) {
   throw new Error('EVENT_DETAILS_URL must contain {slug} if set.');
 }
 
 if (!config.editSignupUrl.includes('{id}') || !config.editSignupUrl.includes('{editToken}')) {
   throw new Error('EDIT_SIGNUP_URL must contain {id} and {editToken} if set.');
-}
-
-if (config.adminRegistrationAllowed) {
-  console.warn(
-    '----------------------------------------------------\n'
-    + 'WARNING!\nAdmin registration is enabled, meaning anyone can register an administrator account.\n'
-    + 'After creating your initial administrator account, make sure to set ADMIN_REGISTRATION_ALLOWED=false.\n'
-    + '----------------------------------------------------',
-  );
-}
-
-if (!config.feathersAuthSecret) {
-  throw new Error('Env variable FEATHERS_AUTH_SECRET must be set');
 }
 
 export default config;

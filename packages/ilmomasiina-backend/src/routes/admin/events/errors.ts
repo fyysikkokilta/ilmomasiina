@@ -1,18 +1,8 @@
 /* eslint-disable max-classes-per-file */
-import type {
-  EditConflictError, QuestionID, QuotaID, WouldMoveSignupsToQueueError,
+import {
+  EditConflictError, ErrorCode, QuestionID, QuotaID, WouldMoveSignupsToQueueError,
 } from '@tietokilta/ilmomasiina-models';
-
-export abstract class CustomError extends Error {
-  public readonly statusCode: number;
-  public readonly error: string;
-
-  protected constructor(statusCode: number, name: string, message: string) {
-    super(message);
-    this.statusCode = statusCode;
-    this.error = name;
-  }
-}
+import CustomError from '../../../util/customError';
 
 export class EditConflict extends CustomError implements EditConflictError {
   public readonly updatedAt: string; // in date-time format
@@ -23,7 +13,7 @@ export class EditConflict extends CustomError implements EditConflictError {
     const updatedAtStr = updatedAt.toISOString();
     super(
       409,
-      'EditConflict',
+      ErrorCode.EDIT_CONFLICT,
       `the event was updated separately at ${updatedAtStr}`,
     );
     this.updatedAt = updatedAtStr;
@@ -38,7 +28,7 @@ export class WouldMoveSignupsToQueue extends CustomError implements WouldMoveSig
   constructor(count: number) {
     super(
       409,
-      'WouldMoveSignupsToQueue',
+      ErrorCode.WOULD_MOVE_SIGNUPS_TO_QUEUE,
       `this change would move ${count} signups into the queue`,
     );
     this.count = count;

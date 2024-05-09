@@ -5,7 +5,6 @@ import { FastifyInstance } from 'fastify';
 import * as schema from '@tietokilta/ilmomasiina-models';
 import { addLogEventHook } from '../auditlog';
 import AdminAuthSession from '../authentication/adminAuthSession';
-import config from '../config';
 import getAuditLogItems from './admin/auditlog/getAuditLogs';
 import getCategoriesList from './admin/categories/getCategoriesList';
 import createEvent from './admin/events/createEvent';
@@ -13,15 +12,13 @@ import deleteEvent from './admin/events/deleteEvent';
 import updateEvent from './admin/events/updateEvent';
 import checkSlugAvailability from './admin/slugs/checkSlugAvailability';
 import changePassword from './admin/users/changePassword';
-import { createUser, inviteUser } from './admin/users/createUser';
+import createInitialUser from './admin/users/createInitialUser';
 import deleteUser from './admin/users/deleteUser';
+import inviteUser from './admin/users/inviteUser';
 import listUsers from './admin/users/listUsers';
 import resetPassword from './admin/users/resetPassword';
-import { adminLogin, requireAdmin } from './authentication/adminLogin';
-import {
-  getEventDetailsForAdmin,
-  getEventDetailsForUser,
-} from './events/getEventDetails';
+import { adminLogin, renewAdminToken, requireAdmin } from './authentication/adminLogin';
+import { getEventDetailsForAdmin, getEventDetailsForUser } from './events/getEventDetails';
 import { getEventsListForAdmin, getEventsListForUser } from './events/getEventsList';
 import { sendICalFeed } from './ical';
 import createSignup from './signups/createNewSignup';
@@ -326,7 +323,18 @@ async function setupPublicRoutes(
     adminLogin(opts.adminSession),
   );
 
-  // TODO: Add an API endpoint for session token renewal as variant of adminLoginSchema
+  server.post(
+    '/authentication/renew',
+    {
+      schema: {
+        response: {
+          ...errorResponses,
+          201: schema.adminLoginResponse,
+        },
+      },
+    },
+    renewAdminToken(opts.adminSession),
+  );
 
   // Public routes for events
 
@@ -380,22 +388,20 @@ async function setupPublicRoutes(
     sendICalFeed,
   );
 
-  if (config.adminRegistrationAllowed) {
-    // Public route for initial admin user creation
-    server.post<{ Body: schema.UserCreateSchema }>(
-      '/users',
-      {
-        schema: {
-          body: schema.userCreateSchema,
-          response: {
-            ...errorResponses,
-            201: schema.userSchema,
-          },
+  // Public route for initial admin user creation
+  server.post<{ Body: schema.UserCreateSchema }>(
+    '/users',
+    {
+      schema: {
+        body: schema.userCreateSchema,
+        response: {
+          ...errorResponses,
+          201: schema.adminLoginResponse,
         },
       },
-      createUser,
-    );
-  }
+    },
+    createInitialUser(opts.adminSession),
+  );
 }
 
 export default async function setupRoutes(

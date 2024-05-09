@@ -1,4 +1,5 @@
 import moment, { Moment } from 'moment-timezone';
+import { useTranslation } from 'react-i18next';
 
 export enum SignupState {
   disabled = 'disabled',
@@ -39,30 +40,31 @@ export interface SignupStateText {
   fullLabel?: string;
 }
 
-export function signupStateText(state: SignupStateInfo): SignupStateText {
-  const timeFormat = 'D.M.Y [klo] HH:mm';
+export function useSignupStateText(state: SignupStateInfo): SignupStateText {
+  const { t } = useTranslation();
+  const timeFormat = `D.M.Y [${t('dateFormat.dateTimeSep')}] HH:mm`;
 
   switch (state.state) {
     case SignupState.disabled:
       return {
-        shortLabel: 'Tapahtumaan ei voi ilmoittautua.',
+        shortLabel: t('signupState.disabled'),
         class: 'ilmo--signup-disabled',
       };
     case SignupState.not_opened:
       return {
-        shortLabel: `Alkaa ${moment(state.opens).format(timeFormat)}.`,
-        fullLabel: `Ilmoittautuminen alkaa / registration begins: ${moment(state.opens).format(timeFormat)}.`,
+        shortLabel: t('signupState.notOpened.short', { date: moment(state.opens).format(timeFormat) }),
+        fullLabel: t('signupState.notOpened', { date: moment(state.opens).format(timeFormat) }),
         class: 'ilmo--signup-not-opened',
       };
     case SignupState.open:
       return {
-        shortLabel: `Auki ${moment(state.closes).format(timeFormat)} asti.`,
-        fullLabel: `Ilmoittautuminen auki / registration is open until ${moment(state.closes).format(timeFormat)} asti.`,
+        shortLabel: t('signupState.open.short', { date: moment(state.closes).format(timeFormat) }),
+        fullLabel: t('signupState.open.short', { date: moment(state.closes).format(timeFormat) }),
         class: 'ilmo--signup-opened',
       };
     case SignupState.closed:
       return {
-        shortLabel: 'Ilmoittautuminen on päättynyt / Registration has closed',
+        shortLabel: t('signupState.closed'),
         class: 'ilmo--signup-closed',
       };
     default:

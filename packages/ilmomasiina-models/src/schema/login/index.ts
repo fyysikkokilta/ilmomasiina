@@ -9,7 +9,6 @@ export const adminLoginBody = Type.Object({
     description: 'Plaintext password.',
   }),
 });
-
 /** Response schema for a successful login. */
 export const adminLoginResponse = Type.Object({
   accessToken: Type.String({

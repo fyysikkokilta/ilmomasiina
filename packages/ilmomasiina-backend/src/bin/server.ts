@@ -6,17 +6,17 @@ import config from '../config';
 
 const debugLog = debug('app:bin:server');
 
-initApp().then((server) => {
-  const port = config.port || 3000;
+initApp().then(async (fastify) => {
+  const { host, port } = config;
 
-  server.listen({ port, host: '0.0.0.0' });
+  const addr = await fastify.listen({ host, port });
 
-  server.ready().then(() => {
-    const url = config.nodeEnv === 'development'
-      ? `http://localhost:${port}`
-      : config.baseUrl;
-    debugLog(`Server is now running at ${url}.`);
-  });
+  await fastify.ready();
+
+  const url = config.nodeEnv === 'development'
+    ? `http://${addr}`
+    : config.baseUrl;
+  debugLog(`Server is now running at ${url}.`);
 }).catch((err) => {
   console.error('Failed to initialize app', err);
   exit(1);

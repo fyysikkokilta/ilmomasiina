@@ -1,6 +1,6 @@
 {
   "name": "@tietokilta/ilmomasiina-models",
-  "version": "2.0.0-alpha11",
+  "version": "2.0.0-alpha13",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Tietokilta/ilmomasiina.git"
@@ -27,10 +27,10 @@
     "typecheck": "tsc --build"
   },
   "devDependencies": {
-    "rimraf": "^3.0.2",
-    "typescript": "~4.9"
+    "rimraf": "^5.0.5",
+    "typescript": "~5.2.2"
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.24.22"
+    "@sinclair/typebox": "^0.32.14"
   }
 }

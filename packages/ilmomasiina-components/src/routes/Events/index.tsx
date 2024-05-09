@@ -1,25 +1,74 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { Spinner, Table } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
+import { ErrorCode } from '@tietokilta/ilmomasiina-models';
 import { timezone } from '../../config';
-import { linkComponent } from '../../config/router';
+import { linkComponent, Navigate } from '../../config/router';
 import { usePaths } from '../../contexts/paths';
+import { I18nProvider } from '../../i18n';
 import { EventListProps, EventListProvider, useEventListContext } from '../../modules/events';
-import { eventsToRows, OPENQUOTA, WAITLIST } from '../../utils/eventListUtils';
-import { signupStateText } from '../../utils/signupStateText';
+import { errorDesc, errorTitle } from '../../utils/errorMessage';
+import {
+  EventRow, eventsToRows, QuotaRow,
+} from '../../utils/eventListUtils';
+import { useSignupStateText } from '../../utils/signupStateText';
 import TableRow from './components/TableRow';
+
+const ListEventRow = ({
+  row: {
+    slug, title, date, signupState, signupCount, quotaSize,
+  },
+}: { row: EventRow }) => {
+  const Link = linkComponent();
+  const paths = usePaths();
+  const stateText = useSignupStateText(signupState);
+  return (
+    <TableRow
+      className={stateText.class}
+      title={<Link to={paths.eventDetails(slug)}>{title}</Link>}
+      date={date ? date.tz(timezone()).format('DD.MM.YYYY') : ''}
+      signupStatus={stateText}
+      signupCount={signupCount}
+      quotaSize={quotaSize}
+    />
+  );
+};
+
+const ListQuotaRow = ({
+  row: {
+    type, title, signupCount, quotaSize,
+  },
+}: { row: QuotaRow }) => {
+  const { t } = useTranslation();
+  return (
+    <TableRow
+      className="ilmo--quota-row"
+      title={type === 'openquota' ? t('events.openQuota') : title}
+      signupCount={signupCount}
+      quotaSize={quotaSize}
+    />
+  );
+};
 
 const EventListView = () => {
   const { events, error, pending } = useEventListContext();
-  const Link = linkComponent();
+  const { t } = useTranslation();
   const paths = usePaths();
+
+  const tableRows = useMemo(() => eventsToRows(events ?? []).filter((row) => row.type !== 'waitlist'), [events]);
+
+  // If initial setup is needed and is possible on this frontend, redirect to that page.
+  if (error && error.code === ErrorCode.INITIAL_SETUP_NEEDED && paths.hasAdmin) {
+    return <Navigate to={paths.adminInitialSetup} />;
+  }
 
   if (error) {
     return (
       <>
-        <h1>Hups, jotain meni pieleen / Something went wrong</h1>
-        <p>Tapahtumien lataus epäonnistui / Could not load events.</p>
+        <h1>{errorTitle(t, error, 'events.loadError')}</h1>
+        <p>{errorDesc(t, error, 'events.loadError')}</p>
       </>
     );
   }
@@ -27,60 +76,30 @@ const EventListView = () => {
   if (pending) {
     return (
       <>
-        <h1>Tapahtumat / Event</h1>
+        <h1>{t('events.title')}</h1>
         <Spinner animation="border" />
       </>
     );
   }
 
-  const tableRows = eventsToRows(events!).map((row, index) => {
-    if (row.isEvent) {
-      const {
-        slug, title, date, signupState, signupCount, quotaSize,
-      } = row;
-      const stateText = signupStateText(signupState);
-      return (
-        <TableRow
-          className={stateText.class}
-          title={<Link to={paths.eventDetails(slug)}>{title}</Link>}
-          date={date ? date.tz(timezone()).format('DD.MM.YYYY') : ''}
-          signupStatus={stateText}
-          signupCount={signupCount}
-          quotaSize={quotaSize}
-          key={slug}
-        />
-      );
-    }
-    if (row.title !== WAITLIST) {
-      const { title, signupCount, quotaSize } = row;
-      return (
-        <TableRow
-          className="ilmo--quota-row"
-          title={title === OPENQUOTA ? 'Avoin' : title}
-          signupCount={signupCount}
-          quotaSize={quotaSize}
-          // No real alternatives for key :(
-          // eslint-disable-next-line react/no-array-index-key
-          key={index}
-        />
-      );
-    }
-    return null;
-  });
-
   return (
     <>
-      <h1>Tapahtumat / Events</h1>
+      <h1>{t('events.title')}</h1>
       <Table className="ilmo--event-list">
         <thead>
           <tr>
-            <th>Nimi / Name</th>
-            <th>Ajankohta / Date</th>
-            <th>Ilmoittautuminen / Registration</th>
-            <th>Ilmoittautuneita / Registered</th>
+            <th>{t('events.column.name')}</th>
+            <th>{t('events.column.date')}</th>
+            <th>{t('events.column.signupStatus')}</th>
+            <th>{t('events.column.signupCount')}</th>
           </tr>
         </thead>
-        <tbody>{tableRows}</tbody>
+        <tbody>
+          {tableRows.map((row) => (row.type === 'event'
+            ? <ListEventRow key={row.id} row={row} />
+            : <ListQuotaRow key={row.id} row={row} />))}
+
+        </tbody>
       </Table>
     </>
   );
@@ -88,7 +107,9 @@ const EventListView = () => {
 
 const EventList = ({ category }: EventListProps) => (
   <EventListProvider category={category}>
-    <EventListView />
+    <I18nProvider>
+      <EventListView />
+    </I18nProvider>
   </EventListProvider>
 );
 

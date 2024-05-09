@@ -3,24 +3,29 @@ import { Transaction, WhereOptions } from 'sequelize';
 
 import { AuditEvent, SignupStatus } from '@tietokilta/ilmomasiina-models';
 import { internalAuditLogger } from '../../auditlog';
+import config from '../../config';
+import i18n from '../../i18n';
 import EmailService from '../../mail';
+import { getSequelize } from '../../models';
 import { Event } from '../../models/event';
 import { Quota } from '../../models/quota';
 import { Signup } from '../../models/signup';
 import { WouldMoveSignupsToQueue } from '../admin/events/errors';
 
-async function sendPromotedFromQueueEmail(signup: Signup, eventId: Event['id']) {
+async function sendPromotedFromQueueMail(signup: Signup, eventId: Event['id']) {
   if (signup.email === null) return;
 
   // Re-fetch event for all attributes
   const event = await Event.findByPk(eventId);
   if (event === null) throw new Error('event missing when sending queue email');
 
+  const lng = signup.language ?? undefined;
+  const dateFormat = i18n.t('dateFormat.general', { lng });
   const params = {
     event,
-    date: event.date && moment(event.date).tz('Europe/Helsinki').format('DD.MM.YYYY HH:mm'),
+    date: event.date && moment(event.date).tz(config.timezone).format(dateFormat),
   };
-  EmailService.sendPromotedFromQueueEmail(signup.email, params);
+  await EmailService.sendPromotedFromQueueMail(signup.email, signup.language, params);
 }
 
 /**
@@ -37,7 +42,7 @@ export async function refreshSignupPositions(
 ): Promise<Signup[]> {
   // Wrap in transaction if not given
   if (!transaction) {
-    return Event.sequelize!.transaction(
+    return getSequelize().transaction(
       async (trans) => refreshSignupPositions(eventRef, trans),
     );
   }
@@ -52,7 +57,7 @@ export async function refreshSignupPositions(
     throw new Error('event missing from DB');
   }
   const signups = await Signup.scope('active').findAll({
-    attributes: ['id', 'quotaId', 'email', 'status', 'position'],
+    attributes: ['id', 'quotaId', 'firstName', 'lastName', 'email', 'status', 'position', 'language'],
     include: [
       {
         model: Quota,
@@ -113,7 +118,7 @@ export async function refreshSignupPositions(
   // If a signup was just promoted from the queue, send an email about it asynchronously.
   await Promise.all(result.map(async ({ signup, status }) => {
     if (signup.status === 'in-queue' && status !== 'in-queue') {
-      sendPromotedFromQueueEmail(signup, event.id);
+      sendPromotedFromQueueMail(signup, event.id);
 
       await internalAuditLogger(AuditEvent.PROMOTE_SIGNUP, {
         signup,

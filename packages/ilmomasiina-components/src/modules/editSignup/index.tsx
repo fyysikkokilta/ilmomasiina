@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from 'react';
 
 import type { SignupForEditResponse } from '@tietokilta/ilmomasiina-models';
 import { EDIT_TOKEN_HEADER } from '@tietokilta/ilmomasiina-models';
-import apiFetch from '../../api';
+import apiFetch, { ApiError } from '../../api';
 import { useAbortablePromise } from '../../utils/abortable';
 import useShallowMemo from '../../utils/useShallowMemo';
 import { Provider, State } from './state';
@@ -41,9 +41,10 @@ export function useEditSignupState({ id, editToken }: EditSignupProps) {
   return useShallowMemo<State>({
     editToken,
     pending: fetchSignup.pending,
-    error: fetchSignup.error,
+    error: fetchSignup.error as ApiError | undefined,
     registrationClosed,
     ...fetchSignup.result,
+    isNew: fetchSignup.result && !fetchSignup.result.signup.confirmed,
   });
 }
 

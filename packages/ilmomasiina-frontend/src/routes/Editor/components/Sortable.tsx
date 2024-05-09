@@ -15,7 +15,8 @@ type SortableItemProps = {
 };
 
 const SortableItem = SortableElement(({ value }: SortableItemProps) => (
-  <Card className="sortable-item">
+  // Set .ilmo--form to keep styling of form elements
+  <Card className="sortable-item ilmo--form">
     <DragHandle />
     {value}
   </Card>

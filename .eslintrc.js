@@ -11,6 +11,14 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/issues/2094
     "EXPERIMENTAL_useSourceOfProjectReferenceRedirect": true
   },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    ".eslintrc.js",
+    "*.scss",
+    "*.json"
+  ],
   "settings": {
     "react": {
       "pragma": "React",
@@ -63,6 +71,15 @@ module.exports = {
       namedComponents: ["function-declaration", "arrow-function"],
       unnamedComponents: "arrow-function",
     }],
+    // Allow dev deps in test files.
+    "import/no-extraneous-dependencies": ["error", {
+      devDependencies: [
+        "**/test/**",
+        "**/vite.config.ts",
+        "**/vitest.config.ts",
+        "**/.eslintrc.js"
+      ],
+    }],
     // Sort imports: React first, then npm packages, then local files, then CSS.
     "simple-import-sort/imports": [
       "error",
@@ -78,6 +95,17 @@ module.exports = {
           ["css$"]
         ]
       }
-    ]
+    ],
+    // Prevent imports from "src/...". VS Code adds these automatically, but they
+    // break when compiled.
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [{
+          group: ["src/*"],
+          message: "This import will break when compiled by tsc. Use a relative path instead, or \"../src/\" in test files."
+        }],
+      },
+    ],
   }
 };

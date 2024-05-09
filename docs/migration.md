@@ -5,7 +5,7 @@ This file documents the migration process from the Athene-created version of Ilm
 ## Migration script
 
 The below SQL script migrates the database schema. It is written for MySQL/MariaDB.
-Scripts for other databases will be created later.
+If you use PostgreSQL, let us know.
 
 There will be more automatic migration tools when we reach production, but the initial migration will likely stay
 as a script.
@@ -103,24 +103,8 @@ ADD `namePublic` BOOLEAN NOT NULL DEFAULT 0 AFTER `lastName`;
 UPDATE `signup`
 SET `namePublic` = 1;
 
--- add audit log
-CREATE TABLE `auditlog` (
-  `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user` VARCHAR(255) DEFAULT NULL,
-  `ipAddress` VARCHAR(64) NOT NULL,
-  `action` VARCHAR(32) NOT NULL,
-  `details` TEXT NOT NULL DEFAULT '',
-  `createdAt` DATETIME NOT NULL,
-  `updatedAt` DATETIME NOT NULL,
-  PRIMARY KEY (`id`)
-);
+-- ensure unlimited quotas are stored as size=NULL instead of size=0
 
--- add end date to events
-
-ALTER TABLE `event`
-ADD `endDate` DATETIME DEFAULT NULL AFTER `date`;
-
--- change events with quotas with size 0 to have `null` size meaning unlimited.
 UPDATE `quota`
 SET `size` = NULL WHERE `size` = 0;
 

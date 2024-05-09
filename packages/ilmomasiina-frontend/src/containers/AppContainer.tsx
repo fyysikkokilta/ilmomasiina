@@ -16,6 +16,7 @@ import AdminEventsList from '../routes/AdminEvents';
 import AdminUsersList from '../routes/AdminUsers';
 import AuditLog from '../routes/AuditLog';
 import Editor from '../routes/Editor';
+import InitialSetup from '../routes/InitialSetup';
 import Login from '../routes/Login';
 import configureStore, { history } from '../store/configureStore';
 import AuthProvider from './AuthProvider';
@@ -46,6 +47,9 @@ const AppContainer = () => (
                   </Route>
                   <Route exact path={appPaths.adminLogin}>
                     <Login />
+                  </Route>
+                  <Route exact path={appPaths.adminInitialSetup}>
+                    <InitialSetup />
                   </Route>
                   <Route exact path={appPaths.adminEventsList}>
                     <AdminEventsList />

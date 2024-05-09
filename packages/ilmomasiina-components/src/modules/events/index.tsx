@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 
 import type { UserEventListResponse } from '@tietokilta/ilmomasiina-models';
-import apiFetch from '../../api';
+import apiFetch, { ApiError } from '../../api';
 import { useAbortablePromise } from '../../utils/abortable';
 import { createStateContext } from '../../utils/stateContext';
 import useShallowMemo from '../../utils/useShallowMemo';
@@ -13,7 +13,7 @@ export type EventListProps = {
 type State = {
   events?: UserEventListResponse;
   pending: boolean;
-  error: boolean;
+  error?: ApiError;
 };
 
 const { Provider, useStateContext } = createStateContext<State>();
@@ -28,7 +28,7 @@ export function useEventListState({ category }: EventListProps = {}) {
   return useShallowMemo<State>({
     events: fetchEvents.result,
     pending: fetchEvents.pending,
-    error: fetchEvents.error,
+    error: fetchEvents.error as ApiError | undefined,
   });
 }
 

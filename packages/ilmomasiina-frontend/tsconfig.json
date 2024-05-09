@@ -22,7 +22,7 @@
     "outDir": "dist",
     "rootDirs": [
       "src",
-      "scripts"
+      "."
     ],
     "baseUrl": ".",
     "paths": {
@@ -36,7 +36,7 @@
   ],
   "include": [
     "src",
-    "scripts"
+    "vite.config.ts"
   ],
   "references": [
     { "path": "../ilmomasiina-components" },

@@ -1,12 +1,13 @@
 import { Static, Type } from '@sinclair/typebox';
 
+import { ErrorCode } from '../../enum';
 import { questionID } from '../question/attributes';
 import { quotaID } from '../quota/attributes';
 
 /** Response schema for a generic error. */
 export const errorResponse = Type.Object({
   statusCode: Type.Number(),
-  error: Type.String(),
+  code: Type.Optional(Type.Enum(ErrorCode)),
   message: Type.String(),
 });
 

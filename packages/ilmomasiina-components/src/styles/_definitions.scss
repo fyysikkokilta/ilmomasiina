@@ -1,23 +1,34 @@
 @use "sass:color";
 
-@import url('https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i|Source+Sans+Pro&display=swap');
+// Override theme colors for Bootstrap.
+// These are defined before the imports below for use in Ilmomasiina's SCSS.
+
+// For Bootstrap components, the overrides are made in ilmomasiina-frontend/src/styles/app.scss.
+// If you want to override more colors, you'll also need to add them to the @use there.
+
+// The colors here are inherited from Athene's code and will remain in place while mainline
+// Ilmomasiina uses Bootstrap 4.
 
 // Bootstrap override colors
 $primary: #201E1E;
 // $secondary: #0288d1 !default;
 $secondary: #FF8A04;
+$red: #d74949 !default; // further assigned to $danger by Bootstrap
+$green: #319236 !default; // further assigned to $success by Bootstrap
 $text-muted: #888 !default;
-$red: #d74949 !default;
-$green: #319236 !default;
 
-// Additional colors
+// Additional colors, only used by Ilmomasiina's SCSS.
+
 $secondary-background: #f1f1f1 !default;
 $secondary-text-color: #7a7a7a !default;
 
-// Bootstrap core mixins
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/mixins";
+// Import Bootstrap core mixins/variables/functions for use in Ilmomasiina's SCSS.
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+// Colors for signup states. You can use Bootstrap variables here.
 
 $signup-state-not-opened: $body-color !default;
 $signup-state-opened: $green !default;

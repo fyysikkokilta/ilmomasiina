@@ -1,12 +1,15 @@
 import React from 'react';
 
 import { Col, Row, Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 import { linkComponent, useParams } from '../../config/router';
 import { usePaths } from '../../contexts/paths';
+import { I18nProvider } from '../../i18n';
 import {
   SingleEventProps, SingleEventProvider, useSingleEventContext,
 } from '../../modules/singleEvent';
+import { errorDesc, errorTitle } from '../../utils/errorMessage';
 import EventDescription from './components/EventDescription';
 import QuotaStatus from './components/QuotaStatus';
 import SignupCountdown from './components/SignupCountdown';
@@ -18,15 +21,14 @@ const SingleEventView = () => {
   } = useSingleEventContext();
   const Link = linkComponent();
   const paths = usePaths();
+  const { t } = useTranslation();
 
   if (error) {
     return (
       <div className="ilmo--loading-container">
-        <h1>Hups, jotain meni pieleen / Something went wrong</h1>
-        <p>
-          Tapahtumaa ei löytynyt. Se saattaa olla menneisyydessä tai poistettu. / Event could not be found.
-        </p>
-        <Link to={paths.eventsList}>Palaa tapahtumalistaukseen / Back to event list</Link>
+        <h1>{errorTitle(t, error, 'singleEvent.loadError')}</h1>
+        <p>{errorDesc(t, error, 'singleEvent.loadError')}</p>
+        <Link to={paths.eventsList}>{t('errors.returnToEvents')}</Link>
       </div>
     );
   }
@@ -42,7 +44,7 @@ const SingleEventView = () => {
   return (
     <>
       <Link to={paths.eventsList} style={{ margin: 0 }}>
-        &#8592; Takaisin
+        {`\u2190 ${t('singleEvent.returnToEvents')}`}
       </Link>
       <Row>
         <Col sm={12} md={8}>
@@ -55,7 +57,7 @@ const SingleEventView = () => {
       </Row>
       {event!.signupsPublic && (
         <>
-          <h2>Ilmoittautuneet / Registered</h2>
+          <h2>{t('singleEvent.signups.title')}</h2>
           {signupsByQuota!.map((quota) => (
             <SignupList
               key={quota.id}
@@ -72,7 +74,9 @@ const SingleEvent = () => {
   const { slug } = useParams<SingleEventProps>();
   return (
     <SingleEventProvider slug={slug}>
-      <SingleEventView />
+      <I18nProvider>
+        <SingleEventView />
+      </I18nProvider>
     </SingleEventProvider>
   );
 };

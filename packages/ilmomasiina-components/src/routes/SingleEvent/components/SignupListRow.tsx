@@ -1,12 +1,13 @@
 import React from 'react';
 
-import filter from 'lodash/filter';
-import find from 'lodash/find';
+import filter from 'lodash-es/filter';
+import find from 'lodash-es/find';
 import moment from 'moment-timezone';
+import { useTranslation } from 'react-i18next';
 
 import { timezone } from '../../../config';
 import { useSingleEventContext } from '../../../modules/singleEvent';
-import { SignupWithQuota } from '../../../utils/signupUtils';
+import { SignupWithQuota, stringifyAnswer } from '../../../utils/signupUtils';
 
 type Props = {
   index: number;
@@ -26,12 +27,13 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
   } = signup;
 
   const { questions, nameQuestion } = useSingleEventContext().event!;
+  const { t } = useTranslation();
 
   let fullName;
   if (!confirmed) {
-    fullName = 'Vahvistamatta / Not confirmed';
+    fullName = t('singleEvent.signups.unconfirmed');
   } else if (!namePublic) {
-    fullName = 'Piilotettu / Hidden';
+    fullName = t('singleEvent.signups.nameHidden');
   } else {
     fullName = `${firstName || ''} ${lastName || ''}`;
   }
@@ -48,7 +50,7 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
       )}
       {filter(questions, 'public').map((question) => (
         <td key={question.id}>
-          {find(answers, { questionId: question.id })?.answer || ''}
+          {stringifyAnswer(find(answers, { questionId: question.id })?.answer || '')}
         </td>
       ))}
       {showQuota && (

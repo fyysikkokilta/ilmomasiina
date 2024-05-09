@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /** Returns an AbortSignal and a function that aborts the signal. */
 export function abortable(): [AbortSignal, () => void] {
@@ -21,15 +21,15 @@ export function useAbortableEffect(effect: (signal: AbortSignal) => void, deps?:
 
 export type PromiseState<R> = {
   result: undefined;
-  error: false;
+  error: undefined;
   pending: true;
 } | {
   result: R;
-  error: false;
+  error: undefined;
   pending: false;
 } | {
   result: undefined;
-  error: true;
+  error: object;
   pending: false;
 };
 
@@ -52,27 +52,43 @@ export function ignoreAbort<R>(promise: Promise<R>): Promise<R> {
 export function useAbortablePromise<R>(effect: (signal: AbortSignal) => Promise<R>, deps?: any[]) {
   const [state, setState] = useState<PromiseState<R>>({
     result: undefined,
-    error: false,
+    error: undefined,
     pending: true,
   });
+  // Track promise from latest effect call, ignore updates from other promises
+  const pendingPromise = useRef<unknown>();
   useAbortableEffect((signal) => {
-    ignoreAbort(effect(signal)).then(
-      (result) => setState({
-        result,
-        error: false,
-        pending: false,
-      }),
-      () => setState({
-        result: undefined,
-        error: true,
-        pending: false,
-      }),
+    const promise = ignoreAbort(effect(signal));
+    pendingPromise.current = promise;
+    promise.then(
+      (result) => {
+        if (pendingPromise.current !== promise) return;
+        pendingPromise.current = undefined;
+        setState({
+          result,
+          error: undefined,
+          pending: false,
+        });
+      },
+      (error) => {
+        if (pendingPromise.current !== promise) return;
+        pendingPromise.current = undefined;
+        setState({
+          result: undefined,
+          error,
+          pending: false,
+        });
+      },
     );
-    signal.addEventListener('abort', () => setState({
-      result: undefined,
-      error: false,
-      pending: true,
-    }));
+    signal.addEventListener('abort', () => {
+      if (pendingPromise.current !== promise) return;
+      pendingPromise.current = undefined;
+      setState({
+        result: undefined,
+        error: undefined,
+        pending: true,
+      });
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return state;

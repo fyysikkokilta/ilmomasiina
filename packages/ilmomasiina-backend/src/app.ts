@@ -2,9 +2,12 @@ import fastifyCompress from '@fastify/compress';
 import fastifyCors from '@fastify/cors';
 import fastifySensible from '@fastify/sensible';
 import fastifyStatic from '@fastify/static';
+import Ajv from 'ajv';
+import ajvFormats from 'ajv-formats';
 import fastify, { FastifyInstance } from 'fastify';
 import cron from 'node-cron';
 import path from 'path';
+import zlib from 'zlib';
 
 import AdminAuthSession from './authentication/adminAuthSession';
 import config from './config';
@@ -15,6 +18,26 @@ import removeDeletedData from './cron/removeDeletedData';
 import enforceHTTPS from './enforceHTTPS';
 import setupDatabase from './models';
 import setupRoutes from './routes';
+import { isInitialSetupDone } from './routes/admin/users/createInitialUser';
+
+// Disable type coercion for request bodies - we don't need it, and it breaks stuff like anyOf
+const bodyCompiler = new Ajv({
+  coerceTypes: false,
+  useDefaults: true,
+  removeAdditional: true,
+  addUsedSchema: false,
+  allErrors: false,
+});
+ajvFormats(bodyCompiler);
+
+const defaultCompiler = new Ajv({
+  coerceTypes: 'array',
+  useDefaults: true,
+  removeAdditional: true,
+  addUsedSchema: false,
+  allErrors: false,
+});
+ajvFormats(defaultCompiler);
 
 export default async function initApp(): Promise<FastifyInstance> {
   await setupDatabase();
@@ -23,6 +46,12 @@ export default async function initApp(): Promise<FastifyInstance> {
     trustProxy: config.isAzure || config.trustProxy, // Get IPs from X-Forwarded-For
     logger: true, // Enable logger
   });
+  server.setValidatorCompiler(({ httpPart, schema }) => (
+    httpPart === 'body' ? bodyCompiler.compile(schema) : defaultCompiler.compile(schema)
+  ));
+
+  // Enable admin registration if no users are present
+  server.decorate('initialSetupDone', await isInitialSetupDone());
 
   // Register fastify-sensible (https://github.com/fastify/fastify-sensible)
   server.register(fastifySensible);
@@ -32,6 +61,13 @@ export default async function initApp(): Promise<FastifyInstance> {
     const corsOrigins = config.allowOrigin === '*' ? '*' : (config.allowOrigin?.split(',') ?? []);
     await server.register(fastifyCors, {
       origin: corsOrigins,
+    });
+  }
+
+  // Announce Ilmomasiina version as header
+  if (config.version) {
+    server.addHook('onRequest', async (_, reply) => {
+      reply.header('X-Ilmomasiina-Version', config.version);
     });
   }
 
@@ -52,29 +88,42 @@ export default async function initApp(): Promise<FastifyInstance> {
     }
   }
 
-  // Add on-the-fly compression
-  server.register(fastifyCompress, { inflateIfDeflated: true });
-
-  server.register(setupRoutes, {
-    prefix: '/api',
-    adminSession: new AdminAuthSession(config.feathersAuthSecret),
-  });
-
   // Serving frontend files if frontendFilesPath is not null.
   // Ideally these files should be served by a web server and not the app server,
   // but this helps run a low-effort server.
+  // frontend files should not be gzipped on the fly, rather done on the build step.
   if (config.frontendFilesPath) {
+    const javascriptHashRegex = /.*[.-][0-9a-fA-F]+[..*]+/;
     console.info(`Serving frontend files from '${config.frontendFilesPath}'`);
-    // With fastify-static, historyApiFallback mode works out of the box
     server.register(fastifyStatic, {
       root: path.resolve(config.frontendFilesPath),
       preCompressed: true,
-      wildcard: false,  // Disable wildcard matching, so that own index.html is served
+      wildcard: false, // Disable wildcard matching, so that own index.html is served
+      setHeaders: (res, filePath) => {
+        // set immutable cache for javascript files with hash in the name
+        if (javascriptHashRegex.test(filePath)) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        }
+      },
     });
     server.get('*', (_req, reply) => {
       reply.sendFile('index.html');
     });
   }
+  // Add on-the-fly compression
+  server.register(fastifyCompress, {
+    inflateIfDeflated: true,
+    brotliOptions: {
+      params: {
+        [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT, // useful for APIs
+      },
+    },
+  });
+
+  server.register(setupRoutes, {
+    prefix: '/api',
+    adminSession: new AdminAuthSession(config.feathersAuthSecret),
+  });
 
   // Every minute, remove signups that haven't been confirmed fast enough
   cron.schedule('* * * * *', deleteUnconfirmedSignups);
@@ -89,4 +138,13 @@ export default async function initApp(): Promise<FastifyInstance> {
   cron.schedule('0 8 * * *', deleteOldAuditLogs);
 
   return server;
+}
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    /** If set to false, GET /api/events raises an error.
+     * This is "cached" in the application instance to avoid an unnecessary database query.
+     */
+    initialSetupDone: boolean;
+  }
 }

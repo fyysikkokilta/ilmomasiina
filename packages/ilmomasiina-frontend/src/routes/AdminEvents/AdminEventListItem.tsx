@@ -1,10 +1,13 @@
 import React, { MouseEvent } from 'react';
 
-import sumBy from 'lodash/sumBy';
+import sumBy from 'lodash-es/sumBy';
 import moment from 'moment-timezone';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import { ApiError } from '@tietokilta/ilmomasiina-components';
+import { errorDesc } from '@tietokilta/ilmomasiina-components/dist/utils/errorMessage';
 import type { AdminEventListItem as AdminEventListItemSchema } from '@tietokilta/ilmomasiina-models';
 import { deleteEvent, getAdminEvents } from '../../modules/adminEvents/actions';
 import appPaths from '../../paths';
@@ -22,29 +25,32 @@ const AdminEventListItem = ({ event }: Props) => {
     id, title, slug, date, draft, listed, quotas,
   } = event;
 
+  const { t } = useTranslation();
+
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
-    const confirmed = window.confirm(
-      'Haluatko varmasti poistaa tämän tapahtuman? Tätä toimintoa ei voi perua.',
-    );
+    // eslint-disable-next-line no-alert
+    const confirmed = window.confirm(t('adminEvents.action.delete.confirm'));
     if (confirmed) {
-      const success = await dispatch(deleteEvent(id));
-      if (!success) {
-        toast.error('Poisto epäonnistui :(', { autoClose: 2000 });
+      try {
+        await dispatch(deleteEvent(id));
+      } catch (err) {
+        toast.error(errorDesc(t, err as ApiError, 'adminEvents.action.delete.error'), { autoClose: 2000 });
+      } finally {
+        dispatch(getAdminEvents());
       }
-      dispatch(getAdminEvents());
     }
   }
 
   let status;
   if (draft) {
-    status = 'Luonnos';
+    status = t('adminEvents.status.draft');
   } else if (isEventInPast(event)) {
-    status = date === null ? 'Sulkeutunut' : 'Mennyt';
+    status = date === null ? t('adminEvents.status.closed') : t('adminEvents.status.ended');
   } else if (!listed) {
-    status = 'Piilotettu';
+    status = t('adminEvents.status.hidden');
   } else {
-    status = <Link to={appPaths.eventDetails(slug)}>Julkaistu</Link>;
+    status = <Link to={appPaths.eventDetails(slug)}>{t('adminEvents.status.published')}</Link>;
   }
 
   return (
@@ -57,12 +63,12 @@ const AdminEventListItem = ({ event }: Props) => {
       <td>{sumBy(quotas, 'signupCount')}</td>
       <td>
         <Link to={appPaths.adminEditEvent(id)}>
-          Muokkaa tapahtumaa
+          {t('adminEvents.action.edit')}
         </Link>
         &ensp;/&ensp;
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#" onClick={onDelete} role="button">
-          Poista tapahtuma
+          {t('adminEvents.action.delete')}
         </a>
       </td>
     </tr>

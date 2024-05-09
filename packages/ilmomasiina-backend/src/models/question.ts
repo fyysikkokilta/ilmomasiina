@@ -19,7 +19,7 @@ export class Question extends Model<QuestionAttributes, QuestionCreationAttribut
   public order!: number;
   public question!: string;
   public type!: QuestionType;
-  public options!: string | null;
+  public options!: string[] | null;
   public required!: boolean;
   public public!: boolean;
 
@@ -74,6 +74,15 @@ export default function setupQuestionModel(sequelize: Sequelize) {
     options: {
       type: DataTypes.STRING,
       allowNull: true,
+      // TODO: Once we upgrade to Sequelize v7, try migrating this to custom datatypes again.
+      get(): string[] {
+        const json = this.getDataValue('options');
+        return json === null ? null : JSON.parse(json as unknown as string);
+      },
+      set(val: string[] | null) {
+        const json = val === null ? null : JSON.stringify(val);
+        this.setDataValue('options', json as unknown as string[]);
+      },
     },
     required: {
       type: DataTypes.BOOLEAN,

@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { NotFound } from 'http-errors';
 
 import type { SignupForEditResponse, SignupPathParams } from '@tietokilta/ilmomasiina-models';
 import { Answer } from '../../models/answer';
@@ -8,6 +7,7 @@ import { Question } from '../../models/question';
 import { Quota } from '../../models/quota';
 import { Signup } from '../../models/signup';
 import { stringifyDates } from '../utils';
+import { NoSuchSignup } from './errors';
 
 /** Requires editTokenVerification */
 export default async function getSignupForEdit(
@@ -39,7 +39,7 @@ export default async function getSignupForEdit(
   });
   if (signup === null) {
     // Event not found with id, probably deleted
-    throw new NotFound('No signup found with given id');
+    throw new NoSuchSignup('No signup found with given id');
   }
 
   const event = signup.quota!.event!;
@@ -54,11 +54,7 @@ export default async function getSignupForEdit(
     },
     event: {
       ...stringifyDates(event.get({ plain: true })),
-      questions: event.questions!.map((question) => ({
-        ...question.get({ plain: true }),
-        // Split answer options into array
-        options: question.options ? question.options.split(';') : null,
-      })),
+      questions: event.questions!.map((question) => question.get({ plain: true })),
     },
   };
 
