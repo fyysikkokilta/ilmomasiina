@@ -44,13 +44,14 @@ export default async function initApp(): Promise<FastifyInstance> {
 
   const server = fastify({
     trustProxy: config.isAzure || config.trustProxy, // Get IPs from X-Forwarded-For
-    logger: true, // Enable logger
+    logger: config.nodeEnv !== 'test', // Enable logger when not testing
   });
   server.setValidatorCompiler(({ httpPart, schema }) => (
     httpPart === 'body' ? bodyCompiler.compile(schema) : defaultCompiler.compile(schema)
   ));
 
-  // Enable admin registration if no users are present
+  // Enable admin registration if no users are present.
+  // The "cached" flag is present to prevent an unnecessary DB check on every /api/events call.
   server.decorate('initialSetupDone', await isInitialSetupDone());
 
   // Register fastify-sensible (https://github.com/fastify/fastify-sensible)
@@ -125,17 +126,19 @@ export default async function initApp(): Promise<FastifyInstance> {
     adminSession: new AdminAuthSession(config.feathersAuthSecret),
   });
 
-  // Every minute, remove signups that haven't been confirmed fast enough
-  cron.schedule('* * * * *', deleteUnconfirmedSignups);
+  if (config.nodeEnv !== 'test') {
+    // Every minute, remove signups that haven't been confirmed fast enough
+    cron.schedule('* * * * *', deleteUnconfirmedSignups);
 
-  // Daily at 8am, anonymize old signups
-  cron.schedule('0 8 * * *', anonymizeOldSignups);
+    // Daily at 8am, anonymize old signups
+    cron.schedule('0 8 * * *', anonymizeOldSignups);
 
-  // Daily at 8am, delete deleted items from the database
-  cron.schedule('0 8 * * *', removeDeletedData);
+    // Daily at 8am, delete deleted items from the database
+    cron.schedule('0 8 * * *', removeDeletedData);
 
-  // Daily at 8am, delete old audit logs
-  cron.schedule('0 8 * * *', deleteOldAuditLogs);
+    // Daily at 8am, delete old audit logs
+    cron.schedule('0 8 * * *', deleteOldAuditLogs);
+  }
 
   return server;
 }
