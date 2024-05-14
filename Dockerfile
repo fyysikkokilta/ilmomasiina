@@ -1,6 +1,8 @@
 # Build stage:
-FROM node:16-alpine as builder
+FROM node:18-alpine as builder
+
 RUN apk add --no-cache brotli
+
 # Build-time env variables
 ARG SENTRY_DSN
 ARG PATH_PREFIX
@@ -18,7 +20,7 @@ COPY packages /opt/ilmomasiina/packages
 WORKDIR /opt/ilmomasiina
 
 # Install dependencies (we're running as root, so the postinstall script doesn't run automatically)
-RUN npm install -g pnpm@8 && pnpm install --frozen-lockfile
+RUN corepack enable && pnpm install --frozen-lockfile
 
 # Default to production (after pnpm install, so we get our types etc.)
 ENV NODE_ENV=production
@@ -31,7 +33,7 @@ RUN find packages/ilmomasiina-frontend/build -type f\
   -regex ".*\.\(js\|json\|html\|map\|css\|svg\|ico\|txt\)" -exec gzip -k "{}" \; -exec brotli "{}" \;
 
 # Main stage:
-FROM node:16-alpine
+FROM node:18-alpine
 
 # Accept VERSION at build time, pass to backend server
 ARG VERSION
@@ -49,7 +51,7 @@ COPY packages /opt/ilmomasiina/packages
 WORKDIR /opt/ilmomasiina
 
 # Install dependencies for backend only
-RUN npm install -g pnpm@8 && pnpm install --frozen-lockfile --prod --filter @tietokilta/ilmomasiina-backend --filter @tietokilta/ilmomasiina-models
+RUN corepack enable && pnpm install --frozen-lockfile --prod --filter @tietokilta/ilmomasiina-backend --filter @tietokilta/ilmomasiina-models
 
 # Copy compiled ilmomasiina-models from build stage
 COPY --from=builder /opt/ilmomasiina/packages/ilmomasiina-models/dist /opt/ilmomasiina/packages/ilmomasiina-models/dist
