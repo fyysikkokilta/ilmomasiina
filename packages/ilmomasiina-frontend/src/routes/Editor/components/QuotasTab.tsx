@@ -1,12 +1,17 @@
 import React from 'react';
 
 import { Form } from 'react-bootstrap';
+import { UseFieldConfig } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 
 import { FieldRow } from '@tietokilta/ilmomasiina-components';
 import DateTimePicker from './DateTimePicker';
 import { useFieldValue } from './hooks';
 import Quotas from './Quotas';
+
+const numberConfig: UseFieldConfig<number> = {
+  parse: (value) => Number(value),
+};
 
 const QuotasTab = () => {
   const useOpenQuota = useFieldValue<boolean>('useOpenQuota');
@@ -53,7 +58,8 @@ const QuotasTab = () => {
           name="openQuotaSize"
           label={t('editor.quotas.openQuotaSize')}
           type="number"
-          min="0"
+          config={numberConfig}
+          min={0}
           required
         />
       )}
