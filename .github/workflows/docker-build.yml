@@ -2,16 +2,16 @@ name: Build & deploy
 
 env:
   # Change this to upload the built image to your own organization.
-  docker_tag: 'ghcr.io/tietokilta/ilmomasiina'
+  docker_tag: "ghcr.io/tietokilta/ilmomasiina"
 
   # Change these to customize your build.
-  branding_header_title_text: 'Tietokillan ilmomasiina'
-  branding_footer_gdpr_text: 'Tietosuoja'
-  branding_footer_gdpr_link: 'https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/'
-  branding_footer_home_text: 'Tietokilta.fi'
-  branding_footer_home_link: 'https://tietokilta.fi'
-  branding_logo_url: 'https://tietokilta.fi/wp-content/uploads/2019/08/tietokilta_logo.png'
-  branding_login_placeholder_email: 'admin@tietokilta.fi'
+  branding_header_title_text: "Tietokillan ilmomasiina"
+  branding_footer_gdpr_text: "Tietosuoja"
+  branding_footer_gdpr_link: "https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/"
+  branding_footer_home_text: "Tietokilta.fi"
+  branding_footer_home_link: "https://tietokilta.fi"
+  branding_logo_url: "https://tietokilta.fi/wp-content/uploads/2019/08/tietokilta_logo.png"
+  branding_login_placeholder_email: "admin@tietokilta.fi"
 
 on:
   push:
@@ -19,12 +19,12 @@ on:
       - prod
       - staging
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   lint:
     name: Lint & type-check
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/lint-test.yml
 
   docker:
     name: Push Docker image to GitHub Packages
@@ -36,7 +36,6 @@ jobs:
     # Change this to your repo name to build automatically on your fork.
     if: github.repository == 'Tietokilta/ilmomasiina'
     steps:
-
       - name: Check out the repo
         uses: actions/checkout@v4
 
@@ -93,16 +92,15 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Login via Azure CLI
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - uses: azure/webapps-deploy@v3
-      with:
-        app-name: tik-ilmo-${{ github.ref_name }}-app
-        images: '${{ env.docker_tag }}:${{ github.ref_name }}'
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: tik-ilmo-${{ github.ref_name }}-app
+          images: "${{ env.docker_tag }}:${{ github.ref_name }}"
 
   # This is disabled on forks since you probably don't need to upload your own packages
   npm:
