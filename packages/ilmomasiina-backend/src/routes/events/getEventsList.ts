@@ -11,7 +11,7 @@ import { Quota } from '../../models/quota';
 import { Signup } from '../../models/signup';
 import { descNullsFirst } from '../../models/util';
 import { InitialSetupNeeded, isInitialSetupDone } from '../admin/users/createInitialUser';
-import { stringifyDates } from '../utils';
+import { StringifyApi } from '../utils';
 
 function eventOrder(): Order {
   return [
@@ -62,15 +62,15 @@ export async function getEventsListForUser(
   const res = events
     .filter((event) => event.endDate === null || new Date(event.endDate) >= new Date())
     .map((event) => ({
-      ...stringifyDates(event.get({ plain: true })),
+      ...event.get({ plain: true }),
       quotas: event.quotas!.map((quota) => ({
         ...quota.get({ plain: true }),
-        signupCount: Number(quota.signupCount!),
+        signupCount: Number(quota.signupCount),
       })),
     }));
 
   reply.status(200);
-  return res;
+  return res as StringifyApi<typeof res>;
 }
 export async function getEventsListForAdmin(
   request: FastifyRequest<{ Querystring: EventListQuery }>,
@@ -105,7 +105,7 @@ export async function getEventsListForAdmin(
   });
 
   const res = events.map((event) => ({
-    ...stringifyDates(event.get({ plain: true })),
+    ...event.get({ plain: true }),
     quotas: event.quotas!.map((quota) => ({
       ...quota.get({ plain: true }),
       signupCount: Number(quota.signupCount!),
@@ -113,5 +113,5 @@ export async function getEventsListForAdmin(
   }));
 
   reply.status(200);
-  return res;
+  return res as StringifyApi<typeof res>;
 }
