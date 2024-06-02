@@ -156,7 +156,7 @@ const Questions = () => {
 
   const updateOrder = useEvent(({ newIndex, oldIndex }: SortEnd) => fields.move(oldIndex, newIndex));
 
-  const keys = useShallowMemo(fields.value.map((item) => item.key));
+  const keys = useShallowMemo(fields.value ? fields.value.map((item) => item.key) : []);
   const questionItems = useMemo(() => fields.map((name, i) => (
     <QuestionRow key={keys[i]} name={name} index={i} remove={fields.remove} />
   // This list only invalidates when the question positions or count change.
