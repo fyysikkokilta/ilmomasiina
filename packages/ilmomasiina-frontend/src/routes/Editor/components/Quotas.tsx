@@ -19,8 +19,8 @@ type QuotaRowProps = {
   remove: FieldArrayRenderProps<EditorQuota, HTMLElement>['fields']['remove'];
 };
 
-const numberConfig: UseFieldConfig<number> = {
-  parse: (value) => Number(value),
+const numberConfig: UseFieldConfig<number | null> = {
+  parse: (value) => (value ? Number(value) : null),
 };
 
 const QuotaRow = ({
