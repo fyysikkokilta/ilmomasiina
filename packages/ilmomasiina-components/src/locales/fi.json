@@ -51,6 +51,7 @@
         "editSignup.title.signup": "Ilmoittaudu",
         "errors.returnToEvents": "Palaa tapahtumalistaukseen",
         "errors.contactAdmin": "Jos ongelma jatkuu, ota yhteyttä ylläpitäjiin.",
+        "errors.default.required": "Pakollinen kenttä",
         "errors.default.title": "Hups, jotain meni pieleen",
         "errors.default.description": "Tuntematon virhe. $t(errors.contactAdmin)",
         "errors.InitialSetupNeeded.title": "Käyttöönotto kesken",

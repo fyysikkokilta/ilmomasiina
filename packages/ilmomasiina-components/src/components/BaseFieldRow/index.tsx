@@ -35,12 +35,12 @@ export default function BaseFieldRow({
     <Form.Group as={Row} controlId={controlId}>
       <Form.Label column sm="3" data-required={required} className={checkAlign ? 'pt-0' : ''}>{label}</Form.Label>
       <Col sm="9">
-        {children}
-        {error && (
-          <Form.Control.Feedback type="invalid">
-            {error}
-          </Form.Control.Feedback>
-        )}
+        <div className={error ? 'is-invalid' : ''}>
+          {children}
+        </div>
+        <Form.Control.Feedback type="invalid">
+          {error}
+        </Form.Control.Feedback>
         {extraFeedback}
         {help && <Form.Text muted>{help}</Form.Text>}
       </Col>

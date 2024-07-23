@@ -50,7 +50,6 @@ const QuotaRow = ({
           type="number"
           min={1}
           config={numberConfig}
-          required
         />
       </Col>
       {index > 0 && (

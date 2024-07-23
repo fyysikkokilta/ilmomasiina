@@ -4,6 +4,7 @@ import { Form } from 'react-bootstrap';
 import { useField, UseFieldConfig } from 'react-final-form';
 
 import BaseFieldRow, { BaseFieldRowProps } from '../BaseFieldRow';
+import { useTranslation } from 'react-i18next';
 
 type Props = Omit<BaseFieldRowProps, 'error' | 'children'> & Pick<UseFieldConfig<any>, 'type'> & {
   /** The name of the field in the data. */
@@ -40,7 +41,9 @@ export default function FieldRow<P = unknown>({
   config,
   ...props
 }: Props & P) {
-  const { input, meta: { error, invalid } } = useField(name, { type, ...config });
+  const { t } = useTranslation();
+  const requiredValidation = required ? (value: any) => (value ? undefined : t('errors.default.required')) : undefined;
+  const { input, meta: { error, invalid } } = useField(name, { validate: requiredValidation, type, ...config });
 
   let field: ReactNode;
   if (children) {
