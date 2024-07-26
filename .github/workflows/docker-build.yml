@@ -15,8 +15,7 @@ env:
 on:
   push:
     branches:
-      - prod
-      - staging
+      - dev
     tags:
       - "v*"
 
@@ -54,11 +53,9 @@ jobs:
         with:
           images: ${{ env.docker_tag }}
           flavor: |
-            latest=${{ github.ref == 'refs/heads/prod' }}
+            latest=${{ github.ref == 'refs/heads/dev' }}
           tags: |
-            type=semver,pattern={{version}},enable=${{ github.ref_type == 'tag' }}
-            type=semver,pattern={{major}}.{{minor}},enable=${{ github.ref_type == 'tag' }}
-            type=ref,event=branch,enable=${{ github.ref_type == 'branch' }}
+            type=semver,pattern={{raw}},enable=${{ github.ref_type == 'tag' }}
             type=sha
 
       - name: Get version tag
@@ -86,7 +83,7 @@ jobs:
   deploy:
     name: Push update to App Service
     needs: docker
-    if: github.ref_type == 'branch' && github.repository == 'Tietokilta/ilmomasiina'
+    if: github.ref_type == 'tag' && github.repository == 'Tietokilta/ilmomasiina'
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -97,7 +94,7 @@ jobs:
 
       - uses: azure/webapps-deploy@v3
         with:
-          app-name: tik-ilmo-${{ github.ref_name }}-app
+          app-name: tik-ilmo-prod-app
           images: "${{ env.docker_tag }}:${{ github.ref_name }}"
 
   # This is disabled on forks since you probably don't need to upload your own packages
