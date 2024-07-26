@@ -45,7 +45,7 @@ export const editableSignupAttributes = Type.Object({
     { description: 'Last name of the attendee. Null if not set yet.' },
   ),
   email: Nullable(
-    Type.String({ format: 'email' }),
+    Type.String(),
     { description: 'Email of the attendee. Null if not set yet.' },
   ),
   namePublic,
