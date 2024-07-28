@@ -72,7 +72,7 @@ importers:
         specifier: ^0.32.14
         version: 0.32.30
       '@tietokilta/ilmomasiina-models':
-        specifier: workspace:2.0.0-alpha13
+        specifier: workspace:*
         version: link:../ilmomasiina-models
       ajv:
         specifier: ^8.12.0
@@ -208,7 +208,7 @@ importers:
   packages/ilmomasiina-components:
     dependencies:
       '@tietokilta/ilmomasiina-models':
-        specifier: workspace:2.0.0-alpha13
+        specifier: workspace:*
         version: link:../ilmomasiina-models
       bootstrap:
         specifier: ^4.6.2
@@ -278,10 +278,10 @@ importers:
         specifier: ^6.19.7
         version: 6.19.7
       '@tietokilta/ilmomasiina-components':
-        specifier: workspace:2.0.0-alpha13
+        specifier: workspace:*
         version: link:../ilmomasiina-components
       '@tietokilta/ilmomasiina-models':
-        specifier: workspace:2.0.0-alpha13
+        specifier: workspace:*
         version: link:../ilmomasiina-models
       bootstrap:
         specifier: ^4.6.2
