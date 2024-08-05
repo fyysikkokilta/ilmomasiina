@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 
-import { Col, Form, Row } from 'react-bootstrap';
+import { Col, Form, Row } from "react-bootstrap";
 
 export type BaseFieldRowProps = {
   /** Passed to the `FormGroup`. */
@@ -23,7 +23,7 @@ export type BaseFieldRowProps = {
 /** Form library agnostic field row component */
 export default function BaseFieldRow({
   controlId,
-  label = '',
+  label = "",
   help,
   required = false,
   extraFeedback,
@@ -33,14 +33,12 @@ export default function BaseFieldRow({
 }: BaseFieldRowProps) {
   return (
     <Form.Group as={Row} controlId={controlId}>
-      <Form.Label column sm="3" data-required={required} className={checkAlign ? 'pt-0' : ''}>{label}</Form.Label>
+      <Form.Label column sm="3" data-required={required} className={checkAlign ? "pt-0" : ""}>
+        {label}
+      </Form.Label>
       <Col sm="9">
         {children}
-        {error && (
-          <Form.Control.Feedback type="invalid">
-            {error}
-          </Form.Control.Feedback>
-        )}
+        {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
         {extraFeedback}
         {help && <Form.Text muted>{help}</Form.Text>}
       </Col>

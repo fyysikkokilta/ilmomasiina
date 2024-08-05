@@ -1,21 +1,21 @@
-import debug from 'debug';
-import moment from 'moment';
-import { Op } from 'sequelize';
+import debug from "debug";
+import moment from "moment";
+import { Op } from "sequelize";
 
-import config from '../config';
-import { Answer } from '../models/answer';
-import { Event } from '../models/event';
-import { Quota } from '../models/quota';
-import { Signup } from '../models/signup';
+import config from "../config";
+import { Answer } from "../models/answer";
+import { Event } from "../models/event";
+import { Quota } from "../models/quota";
+import { Signup } from "../models/signup";
 
-const redactedName = 'Deleted';
-const redactedEmail = 'deleted@gdpr.invalid';
-const redactedAnswer = 'Deleted';
+const redactedName = "Deleted";
+const redactedEmail = "deleted@gdpr.invalid";
+const redactedAnswer = "Deleted";
 
-const debugLog = debug('app:cron:anonymize');
+const debugLog = debug("app:cron:anonymize");
 
 export default async function anonymizeOldSignups() {
-  const redactOlderThan = moment().subtract(config.anonymizeAfterDays, 'days').toDate();
+  const redactOlderThan = moment().subtract(config.anonymizeAfterDays, "days").toDate();
 
   const signups = await Signup.findAll({
     include: [
@@ -49,15 +49,15 @@ export default async function anonymizeOldSignups() {
         {
           [Op.or]: {
             // Only anonymize if the event was long enough ago
-            '$quota.event.date$': {
+            "$quota.event.date$": {
               [Op.lt]: redactOlderThan,
             },
             // Or the event has no date and the signup closed long enough ago
             [Op.and]: {
-              '$quota.event.date$': {
+              "$quota.event.date$": {
                 [Op.eq]: null,
               },
-              '$quota.event.registrationEndDate$': {
+              "$quota.event.registrationEndDate$": {
                 [Op.lt]: redactOlderThan,
               },
             },
@@ -73,27 +73,29 @@ export default async function anonymizeOldSignups() {
     },
   });
   if (signups.length === 0) {
-    debugLog('No old signups to redact');
+    debugLog("No old signups to redact");
     return;
   }
 
   const ids = signups.map((signup) => signup.id);
 
-  console.info(`Redacting older signups: ${ids.join(', ')}`);
+  console.info(`Redacting older signups: ${ids.join(", ")}`);
   try {
-    await Signup.update({
-      firstName: redactedName,
-      lastName: redactedName,
-      email: redactedEmail,
-    }, {
-      where: { id: ids },
-    });
-    await Answer.update({
-      answer: redactedAnswer,
-    }, {
-      where: { signupId: ids },
-    });
-    debugLog('Signups anonymized');
+    await Signup.update(
+      {
+        firstName: redactedName,
+        lastName: redactedName,
+        email: redactedEmail,
+      },
+      { where: { id: ids } },
+    );
+    await Answer.update(
+      {
+        answer: redactedAnswer,
+      },
+      { where: { signupId: ids } },
+    );
+    debugLog("Signups anonymized");
   } catch (error) {
     console.error(error);
   }

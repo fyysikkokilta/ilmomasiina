@@ -1,21 +1,45 @@
-import moment from 'moment';
+import moment from "moment";
 import {
-  DataTypes, HasManyAddAssociationMixin, HasManyAddAssociationsMixin, HasManyCountAssociationsMixin,
-  HasManyCreateAssociationMixin, HasManyGetAssociationsMixin, HasManyHasAssociationMixin, HasManyHasAssociationsMixin,
-  HasManyRemoveAssociationMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin,
-  HasOneCreateAssociationMixin, HasOneGetAssociationMixin, HasOneSetAssociationMixin,
-  Model, Op, Optional, Sequelize,
-} from 'sequelize';
+  DataTypes,
+  HasManyAddAssociationMixin,
+  HasManyAddAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyRemoveAssociationsMixin,
+  HasManySetAssociationsMixin,
+  HasOneCreateAssociationMixin,
+  HasOneGetAssociationMixin,
+  HasOneSetAssociationMixin,
+  Model,
+  Op,
+  Optional,
+  Sequelize,
+} from "sequelize";
 
-import { SignupStatus } from '@tietokilta/ilmomasiina-models';
-import type { SignupAttributes } from '@tietokilta/ilmomasiina-models/dist/models';
-import type { Answer } from './answer';
-import type { Quota } from './quota';
-import { generateRandomId, RANDOM_ID_LENGTH } from './randomId';
+import { SignupStatus } from "@tietokilta/ilmomasiina-models";
+import type { SignupAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
+import type { Answer } from "./answer";
+import type { Quota } from "./quota";
+import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
 
 export interface SignupCreationAttributes
-  extends Optional<SignupAttributes, 'id' | 'firstName' | 'lastName' | 'namePublic' | 'email' | 'confirmedAt'
-  | 'language' | 'status' | 'position' | 'createdAt'> {}
+  extends Optional<
+    SignupAttributes,
+    | "id"
+    | "firstName"
+    | "lastName"
+    | "namePublic"
+    | "email"
+    | "confirmedAt"
+    | "language"
+    | "status"
+    | "position"
+    | "createdAt"
+  > {}
 
 export class Signup extends Model<SignupAttributes, SignupCreationAttributes> implements SignupAttributes {
   public id!: string;
@@ -28,22 +52,22 @@ export class Signup extends Model<SignupAttributes, SignupCreationAttributes> im
   public status!: SignupStatus | null;
   public position!: number | null;
 
-  public quotaId!: Quota['id'];
+  public quotaId!: Quota["id"];
   public quota?: Quota;
   public getQuota!: HasOneGetAssociationMixin<Quota>;
-  public setQuota!: HasOneSetAssociationMixin<Quota, Quota['id']>;
+  public setQuota!: HasOneSetAssociationMixin<Quota, Quota["id"]>;
   public createQuota!: HasOneCreateAssociationMixin<Quota>;
 
   public answers?: Answer[];
   public getAnswers!: HasManyGetAssociationsMixin<Answer>;
   public countAnswers!: HasManyCountAssociationsMixin;
-  public hasAnswer!: HasManyHasAssociationMixin<Answer, Answer['id']>;
-  public hasAnswers!: HasManyHasAssociationsMixin<Answer, Answer['id']>;
-  public setAnswers!: HasManySetAssociationsMixin<Answer, Answer['id']>;
-  public addAnswer!: HasManyAddAssociationMixin<Answer, Answer['id']>;
-  public addAnswers!: HasManyAddAssociationsMixin<Answer, Answer['id']>;
-  public removeAnswer!: HasManyRemoveAssociationMixin<Answer, Answer['id']>;
-  public removeAnswers!: HasManyRemoveAssociationsMixin<Answer, Answer['id']>;
+  public hasAnswer!: HasManyHasAssociationMixin<Answer, Answer["id"]>;
+  public hasAnswers!: HasManyHasAssociationsMixin<Answer, Answer["id"]>;
+  public setAnswers!: HasManySetAssociationsMixin<Answer, Answer["id"]>;
+  public addAnswer!: HasManyAddAssociationMixin<Answer, Answer["id"]>;
+  public addAnswers!: HasManyAddAssociationsMixin<Answer, Answer["id"]>;
+  public removeAnswer!: HasManyRemoveAssociationMixin<Answer, Answer["id"]>;
+  public removeAnswers!: HasManyRemoveAssociationsMixin<Answer, Answer["id"]>;
   public createAnswer!: HasManyCreateAssociationMixin<Answer>;
 
   public readonly createdAt!: Date;
@@ -108,7 +132,7 @@ export default function setupSignupModel(sequelize: Sequelize) {
     },
     {
       sequelize,
-      modelName: 'signup',
+      modelName: "signup",
       freezeTableName: true,
       paranoid: true,
       scopes: {
@@ -121,9 +145,7 @@ export default function setupSignupModel(sequelize: Sequelize) {
               },
               // Under 30 minutes old
               createdAt: {
-                [Op.gt]: moment()
-                  .subtract(30, 'minutes')
-                  .toDate(),
+                [Op.gt]: moment().subtract(30, "minutes").toDate(),
               },
             },
           },

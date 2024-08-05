@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
-import { ErrorCode } from '@tietokilta/ilmomasiina-models';
-import CustomError from '../../util/customError';
+import { ErrorCode } from "@tietokilta/ilmomasiina-models";
+import CustomError from "../../util/customError";
 
 export class SignupsClosed extends CustomError {
   constructor(message: string) {

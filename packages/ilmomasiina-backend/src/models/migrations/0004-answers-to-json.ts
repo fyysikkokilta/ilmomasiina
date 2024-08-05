@@ -1,6 +1,6 @@
-import { QueryTypes } from 'sequelize';
+import { QueryTypes } from "sequelize";
 
-import { defineMigration } from './util';
+import { defineMigration } from "./util";
 
 type RawQuestion = {
   id: string;
@@ -17,7 +17,7 @@ type RawAnswer = {
 /* eslint-disable no-await-in-loop */
 
 export default defineMigration({
-  name: '0004-answers-to-json',
+  name: "0004-answers-to-json",
   async up({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
     // Handle different quoting for Postgres & MySQL
@@ -29,35 +29,25 @@ export default defineMigration({
     );
     for (const row of questions) {
       let optionsJson = null;
-      if (row.type === 'checkbox' || row.type === 'select') {
-        optionsJson = row.options ? JSON.stringify(row.options.split(';')) : JSON.stringify(['']);
+      if (row.type === "checkbox" || row.type === "select") {
+        optionsJson = row.options ? JSON.stringify(row.options.split(";")) : JSON.stringify([""]);
       }
-      await query.bulkUpdate(
-        'question',
-        { options: optionsJson },
-        { id: row.id },
-        { transaction },
-      );
+      await query.bulkUpdate("question", { options: optionsJson }, { id: row.id }, { transaction });
     }
     // Convert answers to JSON
     const answers = await sequelize.query<RawAnswer>(
-      `SELECT ${q`answer.id`}, ${q`answer.answer`}, ${q`question.type`} `
-      + `FROM ${q`answer`} `
-      + `LEFT JOIN ${q`question`} ON ${q`answer.questionId`} = ${q`question.id`}`,
+      `SELECT ${q`answer.id`}, ${q`answer.answer`}, ${q`question.type`} ` +
+        `FROM ${q`answer`} ` +
+        `LEFT JOIN ${q`question`} ON ${q`answer.questionId`} = ${q`question.id`}`,
       { type: QueryTypes.SELECT, transaction },
     );
     for (const row of answers) {
       // Non-checkbox question -> "entire answer"
       // Non-empty answer to checkbox question -> ["ans1", "ans2"]
       // Empty answer to checkbox question -> []
-      const answer = row.type === 'checkbox' ? row.answer.split(';').filter(Boolean) : row.answer;
+      const answer = row.type === "checkbox" ? row.answer.split(";").filter(Boolean) : row.answer;
       const answerJson = JSON.stringify(answer);
-      await query.bulkUpdate(
-        'answer',
-        { answer: answerJson },
-        { id: row.id },
-        { transaction },
-      );
+      await query.bulkUpdate("answer", { answer: answerJson }, { id: row.id }, { transaction });
     }
   },
 });

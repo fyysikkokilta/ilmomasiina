@@ -1,8 +1,8 @@
-import { Static, Type } from '@sinclair/typebox';
+import { Static, Type } from "@sinclair/typebox";
 
 /** Type of an event category. */
 export const eventCategory = Type.String({
-  description: 'Category tag for events.',
+  description: "Category tag for events.",
 });
 
 /** Response schema for fetching event categories. */

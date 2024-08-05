@@ -1,5 +1,5 @@
-import { QuestionType } from '../enum';
-import EventAttributes from './event';
+import { QuestionType } from "../enum";
+import EventAttributes from "./event";
 
 export default interface QuestionAttributes {
   id: string;
@@ -9,5 +9,5 @@ export default interface QuestionAttributes {
   options: string[] | null;
   required: boolean;
   public: boolean;
-  eventId: EventAttributes['id'];
+  eventId: EventAttributes["id"];
 }

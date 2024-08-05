@@ -1,28 +1,28 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from "fastify";
 
-import type { SignupPathParams } from '@tietokilta/ilmomasiina-models';
-import { AuditEvent } from '@tietokilta/ilmomasiina-models';
-import { AuditLogger } from '../../auditlog';
-import { getSequelize } from '../../models';
-import { Event } from '../../models/event';
-import { Quota } from '../../models/quota';
-import { Signup } from '../../models/signup';
-import { refreshSignupPositions } from './computeSignupPosition';
-import { signupsAllowed } from './createNewSignup';
-import { NoSuchSignup, SignupsClosed } from './errors';
+import type { SignupPathParams } from "@tietokilta/ilmomasiina-models";
+import { AuditEvent } from "@tietokilta/ilmomasiina-models";
+import { AuditLogger } from "../../auditlog";
+import { getSequelize } from "../../models";
+import { Event } from "../../models/event";
+import { Quota } from "../../models/quota";
+import { Signup } from "../../models/signup";
+import { refreshSignupPositions } from "./computeSignupPosition";
+import { signupsAllowed } from "./createNewSignup";
+import { NoSuchSignup, SignupsClosed } from "./errors";
 
 /** Requires admin authentication OR editTokenVerification */
 async function deleteSignup(id: string, auditLogger: AuditLogger, admin: boolean = false): Promise<void> {
   await getSequelize().transaction(async (transaction) => {
-    const signup = await Signup.scope('active').findByPk(id, {
+    const signup = await Signup.scope("active").findByPk(id, {
       include: [
         {
           model: Quota,
-          attributes: ['id'],
+          attributes: ["id"],
           include: [
             {
               model: Event,
-              attributes: ['id', 'title', 'registrationStartDate', 'registrationEndDate', 'openQuotaSize'],
+              attributes: ["id", "title", "registrationStartDate", "registrationEndDate", "openQuotaSize"],
             },
           ],
         },
@@ -30,10 +30,10 @@ async function deleteSignup(id: string, auditLogger: AuditLogger, admin: boolean
       transaction,
     });
     if (signup === null) {
-      throw new NoSuchSignup('No signup found with id');
+      throw new NoSuchSignup("No signup found with id");
     }
     if (!admin && !signupsAllowed(signup.quota!.event!)) {
-      throw new SignupsClosed('Signups closed for this event.');
+      throw new SignupsClosed("Signups closed for this event.");
     }
 
     // Delete the DB object

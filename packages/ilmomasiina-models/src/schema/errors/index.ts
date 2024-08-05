@@ -1,8 +1,8 @@
-import { Static, Type } from '@sinclair/typebox';
+import { Static, Type } from "@sinclair/typebox";
 
-import { ErrorCode } from '../../enum';
-import { questionID } from '../question/attributes';
-import { quotaID } from '../quota/attributes';
+import { ErrorCode } from "../../enum";
+import { questionID } from "../question/attributes";
+import { quotaID } from "../quota/attributes";
 
 /** Response schema for a generic error. */
 export const errorResponse = Type.Object({
@@ -16,17 +16,15 @@ export const editConflictError = Type.Intersect([
   errorResponse,
   Type.Object({
     updatedAt: Type.String({
-      format: 'date-time',
-      description: 'Last update time of the event on the server.',
+      format: "date-time",
+      description: "Last update time of the event on the server.",
     }),
-    deletedQuotas: Type.Array(
-      quotaID,
-      { description: 'IDs of quotas that are already deleted on the server.' },
-    ),
-    deletedQuestions: Type.Array(
-      questionID,
-      { description: 'IDs of questions that are already deleted on the server.' },
-    ),
+    deletedQuotas: Type.Array(quotaID, {
+      description: "IDs of quotas that are already deleted on the server.",
+    }),
+    deletedQuestions: Type.Array(questionID, {
+      description: "IDs of questions that are already deleted on the server.",
+    }),
   }),
 ]);
 
@@ -35,7 +33,7 @@ export const wouldMoveSignupsToQueueError = Type.Intersect([
   errorResponse,
   Type.Object({
     count: Type.Integer({
-      description: 'Number of signups that would end up back in the queue if the action is executed.',
+      description: "Number of signups that would end up back in the queue if the action is executed.",
     }),
   }),
 ]);

@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 
-import { Form, InputGroup } from 'react-bootstrap';
+import { Form, InputGroup } from "react-bootstrap";
 
-import appPaths, { urlPrefix } from '../../../paths';
+import appPaths, { urlPrefix } from "../../../paths";
 
 export default (props: any) => {
-  const domain = /^https?:\/\//.test(urlPrefix) ? urlPrefix.replace(/^https?:\/\//, '') : window.location.host;
-  const prefix = domain + appPaths.eventDetails('');
+  const domain = /^https?:\/\//.test(urlPrefix) ? urlPrefix.replace(/^https?:\/\//, "") : window.location.host;
+  const prefix = domain + appPaths.eventDetails("");
   return (
     <InputGroup>
       <InputGroup.Prepend>

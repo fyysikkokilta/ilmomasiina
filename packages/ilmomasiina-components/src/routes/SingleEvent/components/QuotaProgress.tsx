@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
-import { ProgressBar } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
+import { ProgressBar } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   max: number;
@@ -18,13 +18,13 @@ const QuotaProgress = ({ max, title, value }: Props) => {
         now={Math.min(value, max)}
         max={max}
         className="ilmo--signup-progress"
-        label={(
+        label={
           <>
             {value}
             &ensp;/&ensp;
-            {max !== Infinity ? max : <span title={t('singleEvent.quotaCounts.unlimited')}>&infin;</span>}
+            {max !== Infinity ? max : <span title={t("singleEvent.quotaCounts.unlimited")}>&infin;</span>}
           </>
-        )}
+        }
       />
     </div>
   );

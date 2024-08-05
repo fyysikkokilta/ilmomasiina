@@ -1,5 +1,5 @@
-import { SignupStatus } from '../enum';
-import QuotaAttributes from './quota';
+import { SignupStatus } from "../enum";
+import QuotaAttributes from "./quota";
 
 export default interface SignupAttributes {
   id: string;
@@ -12,5 +12,5 @@ export default interface SignupAttributes {
   status: SignupStatus | null;
   position: number | null;
   createdAt: Date;
-  quotaId: QuotaAttributes['id'];
+  quotaId: QuotaAttributes["id"];
 }

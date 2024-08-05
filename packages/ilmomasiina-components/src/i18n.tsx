@@ -1,12 +1,12 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren } from "react";
 
-import { createInstance } from 'i18next';
-import { I18nextProvider } from 'react-i18next';
+import { createInstance } from "i18next";
+import { I18nextProvider } from "react-i18next";
 
-import * as en from './locales/en.json';
-import * as fi from './locales/fi.json';
+import * as en from "./locales/en.json";
+import * as fi from "./locales/fi.json";
 
-export const defaultNS = ['components'] as const;
+export const defaultNS = ["components"] as const;
 export const resources = {
   // this way we generate typescript errors if not exact match
   fi: fi as typeof en,
@@ -17,7 +17,7 @@ export { resources as i18nResources };
 
 const i18n = createInstance({
   resources,
-  fallbackLng: 'fi',
+  fallbackLng: "fi",
   defaultNS,
   interpolation: {
     // for React
@@ -28,9 +28,5 @@ const i18n = createInstance({
 export default i18n;
 
 export function I18nProvider({ children }: PropsWithChildren<{}>) {
-  return (
-    <I18nextProvider i18n={i18n}>
-      {children}
-    </I18nextProvider>
-  );
+  return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }

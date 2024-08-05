@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 /** Returns an AbortSignal and a function that aborts the signal. */
 export function abortable(): [AbortSignal, () => void] {
@@ -15,29 +15,32 @@ export function useAbortableEffect(effect: (signal: AbortSignal) => void, deps?:
     const [signal, abort] = abortable();
     effect(signal);
     return abort;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
 
-export type PromiseState<R> = {
-  result: undefined;
-  error: undefined;
-  pending: true;
-} | {
-  result: R;
-  error: undefined;
-  pending: false;
-} | {
-  result: undefined;
-  error: object;
-  pending: false;
-};
+export type PromiseState<R> =
+  | {
+      result: undefined;
+      error: undefined;
+      pending: true;
+    }
+  | {
+      result: R;
+      error: undefined;
+      pending: false;
+    }
+  | {
+      result: undefined;
+      error: object;
+      pending: false;
+    };
 
 /** Wraps a Promise, ignoring DOMExceptions with name='AbortError' as if the promise was left pending. */
 export function ignoreAbort<R>(promise: Promise<R>): Promise<R> {
   return new Promise((resolve, reject) => {
     promise.then(resolve, (error) => {
-      if (error instanceof DOMException && error.name === 'AbortError') return;
+      if (error instanceof DOMException && error.name === "AbortError") return;
       reject(error);
     });
   });
@@ -80,7 +83,7 @@ export function useAbortablePromise<R>(effect: (signal: AbortSignal) => Promise<
         });
       },
     );
-    signal.addEventListener('abort', () => {
+    signal.addEventListener("abort", () => {
       if (pendingPromise.current !== promise) return;
       pendingPromise.current = undefined;
       setState({
@@ -89,7 +92,7 @@ export function useAbortablePromise<R>(effect: (signal: AbortSignal) => Promise<
         pending: true,
       });
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return state;
 }

@@ -1,11 +1,11 @@
-import React, { PropsWithChildren, useMemo } from 'react';
+import React, { PropsWithChildren, useMemo } from "react";
 
-import type { UserEventResponse } from '@tietokilta/ilmomasiina-models';
-import apiFetch, { ApiError } from '../../api';
-import { useAbortablePromise } from '../../utils/abortable';
-import { getSignupsByQuota, QuotaSignups } from '../../utils/signupUtils';
-import { createStateContext } from '../../utils/stateContext';
-import useShallowMemo from '../../utils/useShallowMemo';
+import type { UserEventResponse } from "@tietokilta/ilmomasiina-models";
+import apiFetch, { ApiError } from "../../api";
+import { useAbortablePromise } from "../../utils/abortable";
+import { getSignupsByQuota, QuotaSignups } from "../../utils/signupUtils";
+import { createStateContext } from "../../utils/stateContext";
+import useShallowMemo from "../../utils/useShallowMemo";
 
 export interface SingleEventProps {
   slug: string;
@@ -20,12 +20,10 @@ type State = {
 
 const { Provider, useStateContext } = createStateContext<State>();
 export { useStateContext as useSingleEventContext };
-export { beginSignup } from './actions';
+export { beginSignup } from "./actions";
 
 export function useSingleEventState({ slug }: SingleEventProps) {
-  const fetchEvent = useAbortablePromise(async (signal) => (
-    await apiFetch(`events/${slug}`, { signal }) as UserEventResponse
-  ), [slug]);
+  const fetchEvent = useAbortablePromise((signal) => apiFetch<UserEventResponse>(`events/${slug}`, { signal }), [slug]);
 
   const event = fetchEvent.result;
 
@@ -41,9 +39,5 @@ export function useSingleEventState({ slug }: SingleEventProps) {
 
 export function SingleEventProvider({ slug, children }: PropsWithChildren<SingleEventProps>) {
   const state = useSingleEventState({ slug });
-  return (
-    <Provider value={state}>
-      {children}
-    </Provider>
-  );
+  return <Provider value={state}>{children}</Provider>;
 }

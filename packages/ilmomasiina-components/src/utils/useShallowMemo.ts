@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from "react";
 
 /**
  * Modified from https://github.com/reduxjs/react-redux/blob/master/src/utils/shallowEqual.ts
@@ -8,7 +8,7 @@ import { useRef } from 'react';
 function shallowEqual(a: any, b: any) {
   if (Object.is(a, b)) return true;
 
-  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;
+  if (typeof a !== "object" || a === null || typeof b !== "object" || b === null) return false;
 
   const keysA = Object.keys(a);
   const keysB = Object.keys(b);

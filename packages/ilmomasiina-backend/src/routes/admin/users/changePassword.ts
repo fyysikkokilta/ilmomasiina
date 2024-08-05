@@ -1,11 +1,11 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { NotFound } from 'http-errors';
+import { FastifyReply, FastifyRequest } from "fastify";
+import { NotFound } from "http-errors";
 
-import { AuditEvent, ErrorCode, UserChangePasswordSchema } from '@tietokilta/ilmomasiina-models';
-import AdminPasswordAuth from '../../../authentication/adminPasswordAuth';
-import { getSequelize } from '../../../models';
-import { User } from '../../../models/user';
-import CustomError from '../../../util/customError';
+import { AuditEvent, ErrorCode, UserChangePasswordSchema } from "@tietokilta/ilmomasiina-models";
+import AdminPasswordAuth from "../../../authentication/adminPasswordAuth";
+import { getSequelize } from "../../../models";
+import { User } from "../../../models/user";
+import CustomError from "../../../util/customError";
 
 class WrongOldPassword extends CustomError {
   constructor(message: string) {
@@ -21,23 +21,20 @@ export default async function changePassword(
 
   await getSequelize().transaction(async (transaction) => {
     // Try to fetch existing user
-    const existing = await User.findByPk(
-      request.sessionData.user,
-      { attributes: ['id', 'email', 'password'], transaction },
-    );
+    const existing = await User.findByPk(request.sessionData.user, {
+      attributes: ["id", "email", "password"],
+      transaction,
+    });
 
     if (!existing) {
-      throw new NotFound('User does not exist');
+      throw new NotFound("User does not exist");
     } else {
       // Verify old password
       if (!AdminPasswordAuth.verifyHash(request.body.oldPassword, existing.password)) {
-        throw new WrongOldPassword('Incorrect password');
+        throw new WrongOldPassword("Incorrect password");
       }
       // Update user with a new password
-      await existing.update(
-        { password: AdminPasswordAuth.createHash(request.body.newPassword) },
-        { transaction },
-      );
+      await existing.update({ password: AdminPasswordAuth.createHash(request.body.newPassword) }, { transaction });
 
       await request.logEvent(AuditEvent.CHANGE_PASSWORD, {
         extra: {

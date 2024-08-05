@@ -1,22 +1,20 @@
-import React from 'react';
+import React from "react";
 
-import { Container } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Container } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
-import branding from '../../branding';
-import appPaths from '../../paths';
+import branding from "../../branding";
+import appPaths from "../../paths";
 
-import './Footer.scss';
+import "./Footer.scss";
 
 const Footer = () => {
   const { t } = useTranslation();
   return (
     <footer>
       <Container>
-        <Link to={appPaths.adminEventsList}>
-          {t('footer.admin')}
-        </Link>
+        <Link to={appPaths.adminEventsList}>{t("footer.admin")}</Link>
         {branding.footerGdprText && (
           <a href={branding.footerGdprLink} target="_blank" rel="noreferrer">
             {branding.footerGdprText}

@@ -1,26 +1,26 @@
-import moment from 'moment-timezone';
-import { Transaction, WhereOptions } from 'sequelize';
+import moment from "moment-timezone";
+import { Transaction, WhereOptions } from "sequelize";
 
-import { AuditEvent, SignupStatus } from '@tietokilta/ilmomasiina-models';
-import { internalAuditLogger } from '../../auditlog';
-import config from '../../config';
-import i18n from '../../i18n';
-import EmailService from '../../mail';
-import { getSequelize } from '../../models';
-import { Event } from '../../models/event';
-import { Quota } from '../../models/quota';
-import { Signup } from '../../models/signup';
-import { WouldMoveSignupsToQueue } from '../admin/events/errors';
+import { AuditEvent, SignupStatus } from "@tietokilta/ilmomasiina-models";
+import { internalAuditLogger } from "../../auditlog";
+import config from "../../config";
+import i18n from "../../i18n";
+import EmailService from "../../mail";
+import { getSequelize } from "../../models";
+import { Event } from "../../models/event";
+import { Quota } from "../../models/quota";
+import { Signup } from "../../models/signup";
+import { WouldMoveSignupsToQueue } from "../admin/events/errors";
 
-async function sendPromotedFromQueueMail(signup: Signup, eventId: Event['id']) {
+async function sendPromotedFromQueueMail(signup: Signup, eventId: Event["id"]) {
   if (signup.email === null) return;
 
   // Re-fetch event for all attributes
   const event = await Event.findByPk(eventId);
-  if (event === null) throw new Error('event missing when sending queue email');
+  if (event === null) throw new Error("event missing when sending queue email");
 
   const lng = signup.language ?? undefined;
-  const dateFormat = i18n.t('dateFormat.general', { lng });
+  const dateFormat = i18n.t("dateFormat.general", { lng });
   const params = {
     event,
     date: event.date && moment(event.date).tz(config.timezone).format(dateFormat),
@@ -42,42 +42,40 @@ export async function refreshSignupPositions(
 ): Promise<Signup[]> {
   // Wrap in transaction if not given
   if (!transaction) {
-    return getSequelize().transaction(
-      async (trans) => refreshSignupPositions(eventRef, trans),
-    );
+    return getSequelize().transaction(async (trans) => refreshSignupPositions(eventRef, trans));
   }
 
   // Lock event to prevent simultaneous changes
   const event = await Event.findByPk(eventRef.id, {
-    attributes: ['id', 'title', 'openQuotaSize'],
+    attributes: ["id", "title", "openQuotaSize"],
     transaction,
     lock: Transaction.LOCK.UPDATE,
   });
   if (!event) {
-    throw new Error('event missing from DB');
+    throw new Error("event missing from DB");
   }
-  const signups = await Signup.scope('active').findAll({
-    attributes: ['id', 'quotaId', 'firstName', 'lastName', 'email', 'status', 'position', 'language'],
+  const signups = await Signup.scope("active").findAll({
+    attributes: ["id", "quotaId", "firstName", "lastName", "email", "status", "position", "language"],
     include: [
       {
         model: Quota,
-        attributes: ['id', 'size'],
+        attributes: ["id", "size"],
       },
     ],
     where: {
-      '$quota.eventId$': event.id,
+      "$quota.eventId$": event.id,
     } as WhereOptions,
     // Honor creation time, tie-break by random ID in case of same millisecond
     order: [
-      ['createdAt', 'ASC'],
-      ['id', 'ASC'],
+      ["createdAt", "ASC"],
+      ["id", "ASC"],
     ],
     lock: Transaction.LOCK.UPDATE,
     transaction,
   });
 
   // Assign each signup to a quota or the queue.
-  const quotaSignups = new Map<Quota['id'], number>();
+  const quotaSignups = new Map<Quota["id"], number>();
   let inOpenQuota = 0;
   let inQueue = 0;
   let movedToQueue = 0;
@@ -116,27 +114,28 @@ export async function refreshSignupPositions(
   }
 
   // If a signup was just promoted from the queue, send an email about it asynchronously.
-  await Promise.all(result.map(async ({ signup, status }) => {
-    if (signup.status === 'in-queue' && status !== 'in-queue') {
-      sendPromotedFromQueueMail(signup, event.id);
+  await Promise.all(
+    result.map(async ({ signup, status }) => {
+      if (signup.status === "in-queue" && status !== "in-queue") {
+        sendPromotedFromQueueMail(signup, event.id);
 
-      await internalAuditLogger(AuditEvent.PROMOTE_SIGNUP, {
-        signup,
-        event,
-        transaction,
-      });
-    }
-  }));
+        await internalAuditLogger(AuditEvent.PROMOTE_SIGNUP, {
+          signup,
+          event,
+          transaction,
+        });
+      }
+    }),
+  );
 
   // Store changes in database, if any.
-  await Promise.all(result.map(async ({ signup, status, position }) => {
-    if (signup.status !== status || signup.position !== position) {
-      await signup.update(
-        { status, position },
-        { transaction },
-      );
-    }
-  }));
+  await Promise.all(
+    result.map(async ({ signup, status, position }) => {
+      if (signup.status !== status || signup.position !== position) {
+        await signup.update({ status, position }, { transaction });
+      }
+    }),
+  );
 
   return result.map(({ signup }) => signup);
 }
@@ -144,10 +143,10 @@ export async function refreshSignupPositions(
 /**
  * Like `refreshSignupPositions`, but returns the status for the given signup.
  */
-export async function refreshSignupPositionsAndGet(event: Event, signupId: Signup['id']) {
+export async function refreshSignupPositionsAndGet(event: Event, signupId: Signup["id"]) {
   const result = await refreshSignupPositions(event);
   const signup = result.find(({ id }) => id === signupId);
-  if (!signup) throw new Error('failed to compute status');
+  if (!signup) throw new Error("failed to compute status");
   const { status, position } = signup;
   return { status, position };
 }

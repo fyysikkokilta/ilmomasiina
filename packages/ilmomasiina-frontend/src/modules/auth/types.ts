@@ -7,4 +7,4 @@ export interface AuthState {
   loggedIn: boolean;
 }
 
-export type { AuthActions } from './actions';
+export type { AuthActions } from "./actions";

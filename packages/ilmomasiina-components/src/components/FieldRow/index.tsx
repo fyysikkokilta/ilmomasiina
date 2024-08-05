@@ -1,31 +1,32 @@
-import React, { ComponentType, ReactNode } from 'react';
+import React, { ComponentType, ReactNode } from "react";
 
-import { Form } from 'react-bootstrap';
-import { useField, UseFieldConfig } from 'react-final-form';
+import { Form } from "react-bootstrap";
+import { useField, UseFieldConfig } from "react-final-form";
 
-import BaseFieldRow, { BaseFieldRowProps } from '../BaseFieldRow';
+import BaseFieldRow, { BaseFieldRowProps } from "../BaseFieldRow";
 
-type Props = Omit<BaseFieldRowProps, 'error' | 'children'> & Pick<UseFieldConfig<any>, 'type'> & {
-  /** The name of the field in the data. */
-  name: string;
-  /** Passed as `controlId` if no `controlId` is separately set. */
-  id?: string;
-  /** Overrides the real error message if the field has errors. */
-  alternateError?: string;
-  /** Passed as `label` to the field component. Intended for checkboxes. */
-  checkLabel?: ReactNode;
-  /** The component or element to use as the field. */
-  as?: ComponentType<any> | string;
-  /** useField() config. */
-  config?: UseFieldConfig<any>;
-  /** If given, this is used as the field. */
-  children?: ReactNode;
-};
+type Props = Omit<BaseFieldRowProps, "error" | "children"> &
+  Pick<UseFieldConfig<any>, "type"> & {
+    /** The name of the field in the data. */
+    name: string;
+    /** Passed as `controlId` if no `controlId` is separately set. */
+    id?: string;
+    /** Overrides the real error message if the field has errors. */
+    alternateError?: string;
+    /** Passed as `label` to the field component. Intended for checkboxes. */
+    checkLabel?: ReactNode;
+    /** The component or element to use as the field. */
+    as?: ComponentType<any> | string;
+    /** useField() config. */
+    config?: UseFieldConfig<any>;
+    /** If given, this is used as the field. */
+    children?: ReactNode;
+  };
 
 /** react-final-field field row component */
 export default function FieldRow<P = unknown>({
   name,
-  label = '',
+  label = "",
   help,
   required = false,
   alternateError,
@@ -40,7 +41,10 @@ export default function FieldRow<P = unknown>({
   config,
   ...props
 }: Props & P) {
-  const { input, meta: { error, invalid } } = useField(name, { type, ...config });
+  const {
+    input,
+    meta: { error, invalid },
+  } = useField(name, { type, ...config });
 
   let field: ReactNode;
   if (children) {

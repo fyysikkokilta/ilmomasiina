@@ -1,17 +1,16 @@
-import { Static, Type } from '@sinclair/typebox';
+import { Static, Type } from "@sinclair/typebox";
 
-import { adminListEventAttributes, eventIdentity, userListEventAttributes } from '../event/attributes';
-import { quotaWithSignupCount } from '../quotaWithSignups';
+import { adminListEventAttributes, eventIdentity, userListEventAttributes } from "../event/attributes";
+import { quotaWithSignupCount } from "../quotaWithSignups";
 
 /** Schema for an item of an event list from the admin API. */
 const adminEventListItemSchema = Type.Intersect([
   eventIdentity,
   adminListEventAttributes,
   Type.Object({
-    quotas: Type.Array(
-      quotaWithSignupCount,
-      { description: 'The quotas in this event, with signup counts.' },
-    ),
+    quotas: Type.Array(quotaWithSignupCount, {
+      description: "The quotas in this event, with signup counts.",
+    }),
   }),
 ]);
 
@@ -23,10 +22,9 @@ const userEventListItemSchema = Type.Intersect([
   eventIdentity,
   userListEventAttributes,
   Type.Object({
-    quotas: Type.Array(
-      quotaWithSignupCount,
-      { description: 'The quotas in this event, with signup counts.' },
-    ),
+    quotas: Type.Array(quotaWithSignupCount, {
+      description: "The quotas in this event, with signup counts.",
+    }),
   }),
 ]);
 
@@ -35,9 +33,11 @@ export const userEventListResponse = Type.Array(userEventListItemSchema);
 
 /** Query parameters applicable to the public event list API. */
 export const eventListQuery = Type.Object({
-  category: Type.Optional(Type.String({
-    description: 'If set, only events with the provided category are included.',
-  })),
+  category: Type.Optional(
+    Type.String({
+      description: "If set, only events with the provided category are included.",
+    }),
+  ),
 });
 
 /** Query parameters applicable to the public event list API. */

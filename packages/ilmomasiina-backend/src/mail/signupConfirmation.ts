@@ -1,10 +1,10 @@
-import moment from 'moment-timezone';
+import moment from "moment-timezone";
 
-import config from '../config';
-import i18n from '../i18n';
-import { Signup } from '../models/signup';
-import { generateToken } from '../routes/signups/editTokens';
-import EmailService from '.';
+import config from "../config";
+import i18n from "../i18n";
+import { Signup } from "../models/signup";
+import { generateToken } from "../routes/signups/editTokens";
+import EmailService from ".";
 
 export default async function sendSignupConfirmationMail(signup: Signup) {
   if (signup.email === null) return;
@@ -18,28 +18,23 @@ export default async function sendSignupConfirmationMail(signup: Signup) {
   const questions = await event.getQuestions();
 
   // Show name only if filled
-  const fullName = `${signup.firstName ?? ''} ${signup.lastName ?? ''}`.trim();
+  const fullName = `${signup.firstName ?? ""} ${signup.lastName ?? ""}`.trim();
 
   const questionFields = questions
-    .map((question) => <const>[
-      question,
-      answers.find((answer) => answer.questionId === question.id),
-    ])
+    .map((question) => <const>[question, answers.find((answer) => answer.questionId === question.id)])
     .filter(([, answer]) => answer)
     .map(([question, answer]) => ({
       label: question.question,
-      answer: Array.isArray(answer!.answer) ? answer!.answer.join(', ') : answer!.answer,
+      answer: Array.isArray(answer!.answer) ? answer!.answer.join(", ") : answer!.answer,
     }));
 
   const edited = answers.some((answer) => answer.createdAt.getTime() !== answer.updatedAt.getTime());
 
-  const dateFormat = i18n.t('dateFormat.general', { lng });
+  const dateFormat = i18n.t("dateFormat.general", { lng });
   const date = event.date && moment(event.date).tz(config.timezone).format(dateFormat);
 
   const editToken = generateToken(signup.id);
-  const cancelLink = config.editSignupUrl
-    .replace(/\{id\}/g, signup.id)
-    .replace(/\{editToken\}/g, editToken);
+  const cancelLink = config.editSignupUrl.replace(/\{id\}/g, signup.id).replace(/\{editToken\}/g, editToken);
 
   const params = {
     name: fullName,

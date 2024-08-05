@@ -10,8 +10,8 @@ import {
   MOVE_TO_QUEUE_CANCELED,
   MOVE_TO_QUEUE_WARNING,
   RESET,
-} from './actionTypes';
-import type { EditorActions, EditorState } from './types';
+} from "./actionTypes";
+import type { EditorActions, EditorState } from "./types";
 
 const initialState: EditorState = {
   event: null,
@@ -22,10 +22,7 @@ const initialState: EditorState = {
   editConflictModal: null,
 };
 
-export default function reducer(
-  state = initialState,
-  action: EditorActions,
-): EditorState {
+export default function reducer(state = initialState, action: EditorActions): EditorState {
   switch (action.type) {
     case RESET:
       return initialState;
@@ -44,7 +41,7 @@ export default function reducer(
     case EVENT_SLUG_CHECKING:
       return {
         ...state,
-        slugAvailability: 'checking',
+        slugAvailability: "checking",
       };
     case EVENT_SLUG_CHECKED:
       return {

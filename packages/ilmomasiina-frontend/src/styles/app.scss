@@ -4,8 +4,10 @@
   // Override Bootstrap theme colors
   $primary: $primary,
   $secondary: $secondary,
-  $red: $red, // further assigned to $danger by Bootstrap
-  $green: $green, // further assigned to $success by Bootstrap
+  // further assigned to $danger by Bootstrap
+  $red: $red,
+  // further assigned to $success by Bootstrap
+  $green: $green,
   $text-muted: $text-muted,
 
   // Just for the sake of Athene legacy
@@ -16,7 +18,7 @@
   $line-height-base: 1.618,
   $h1-font-size: 2rem,
   $h2-font-size: 1.45rem,
-  $h3-font-size: 1.15rem,
+  $h3-font-size: 1.15rem
 );
 
 @use "widgets";

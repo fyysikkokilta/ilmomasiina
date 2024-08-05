@@ -1,6 +1,6 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren } from "react";
 
-import { FullPaths, PathsContext } from '@tietokilta/ilmomasiina-components';
+import { FullPaths, PathsContext } from "@tietokilta/ilmomasiina-components";
 
 export const urlPrefix = PATH_PREFIX;
 
@@ -24,7 +24,5 @@ export default appPaths;
 export const apiUrl = `${urlPrefix}/api`;
 
 export const PathsProvider = ({ children }: PropsWithChildren<{}>) => (
-  <PathsContext.Provider value={appPaths}>
-    {children}
-  </PathsContext.Provider>
+  <PathsContext.Provider value={appPaths}>{children}</PathsContext.Provider>
 );

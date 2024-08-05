@@ -1,7 +1,7 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from "fastify";
 
-import type { CheckSlugParams, CheckSlugResponse } from '@tietokilta/ilmomasiina-models';
-import { Event } from '../../../models/event';
+import type { CheckSlugParams, CheckSlugResponse } from "@tietokilta/ilmomasiina-models";
+import { Event } from "../../../models/event";
 
 export default async function checkSlugAvailability(
   request: FastifyRequest<{ Params: CheckSlugParams }>,
@@ -9,7 +9,7 @@ export default async function checkSlugAvailability(
 ): Promise<CheckSlugResponse> {
   const event = await Event.findOne({
     where: request.params,
-    attributes: ['id', 'title'],
+    attributes: ["id", "title"],
   });
 
   response.status(200);

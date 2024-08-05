@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
-import { useFormState } from 'react-final-form';
-import { Trans, useTranslation } from 'react-i18next';
+import { useFormState } from "react-final-form";
+import { Trans, useTranslation } from "react-i18next";
 
-import ConfirmButton from '../../../components/ConfirmButton';
-import { useEditSignupContext } from '../../../modules/editSignup';
+import ConfirmButton from "../../../components/ConfirmButton";
+import { useEditSignupContext } from "../../../modules/editSignup";
 
 const DELETE_CONFIRM_MS = 4000;
 
@@ -21,21 +21,15 @@ const DeleteSignup = ({ deleting, onDelete }: Props) => {
 
   return (
     <div className="ilmo--delete-container">
-      <h2>{t('editSignup.delete.action')}</h2>
+      <h2>{t("editSignup.delete.action")}</h2>
       <p>
         <Trans t={t} i18nKey="editSignup.delete.info1">
-          {'Are you sure you want to delete your sign up to '}
-          <strong>
-            {{ event: event!.title }}
-          </strong>
-          ?
+          {"Are you sure you want to delete your sign up to "}
+          <strong>{{ event: event!.title }}</strong>?
         </Trans>
       </p>
       <p>
-        {/* eslint-disable-next-line max-len */}
-        {t('editSignup.delete.info2')}
-        {' '}
-        <strong>{t('editSignup.delete.info3')}</strong>
+        {t("editSignup.delete.info2")} <strong>{t("editSignup.delete.info3")}</strong>
       </p>
       <ConfirmButton
         type="button"
@@ -43,9 +37,9 @@ const DeleteSignup = ({ deleting, onDelete }: Props) => {
         onClick={onDelete}
         variant="danger"
         confirmDelay={DELETE_CONFIRM_MS}
-        confirmLabel={t('editSignup.delete.action.confirm')}
+        confirmLabel={t("editSignup.delete.action.confirm")}
       >
-        {t('editSignup.delete.action')}
+        {t("editSignup.delete.action")}
       </ConfirmButton>
     </div>
   );

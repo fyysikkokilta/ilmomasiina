@@ -1,12 +1,7 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 
-import { Card } from 'react-bootstrap';
-import {
-  Offset,
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-} from 'react-sortable-hoc';
+import { Card } from "react-bootstrap";
+import { Offset, SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
 
 const DragHandle = SortableHandle(() => <span className="handler" />);
 
@@ -30,12 +25,7 @@ type SortableItemsProps = {
 const Sortable = SortableContainer(({ collection, items }: SortableItemsProps) => (
   <div className="sortable">
     {items.map((value, index) => (
-      <SortableItem
-        collection={collection}
-        key={value.key}
-        index={index}
-        value={value}
-      />
+      <SortableItem collection={collection} key={value.key} index={index} value={value} />
     ))}
   </div>
 ));

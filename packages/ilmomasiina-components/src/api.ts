@@ -1,7 +1,7 @@
-import { ErrorCode } from '@tietokilta/ilmomasiina-models';
+import { ErrorCode } from "@tietokilta/ilmomasiina-models";
 
 export interface FetchOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: any;
   headers?: Record<string, string>;
   signal?: AbortSignal;
@@ -15,7 +15,7 @@ export class ApiError extends Error {
   constructor(status: number, response: any) {
     super(response.message);
     this.status = status;
-    this.name = 'ApiError';
+    this.name = "ApiError";
     this.code = response.code;
     this.response = response;
   }
@@ -33,20 +33,21 @@ export class ApiError extends Error {
   }
 }
 
-let apiUrl = '/api';
+let apiUrl = "/api";
 
 export function configureApi(url: string) {
   apiUrl = url;
 }
 
-export default async function apiFetch<T = unknown>(uri: string, {
-  method = 'GET', body, headers, signal,
-}: FetchOptions = {}) {
+export default async function apiFetch<T = unknown>(
+  uri: string,
+  { method = "GET", body, headers, signal }: FetchOptions = {},
+) {
   const allHeaders = {
-    ...headers || {},
+    ...(headers || {}),
   };
   if (body !== undefined) {
-    allHeaders['Content-Type'] = 'application/json; charset=utf-8';
+    allHeaders["Content-Type"] = "application/json; charset=utf-8";
   }
 
   const response = await fetch(`${apiUrl}/${uri}`, {

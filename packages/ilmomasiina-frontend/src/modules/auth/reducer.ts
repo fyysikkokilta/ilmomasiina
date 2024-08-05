@@ -1,5 +1,5 @@
-import { LOGIN_SUCCEEDED, RESET } from './actionTypes';
-import type { AuthActions, AuthState } from './types';
+import { LOGIN_SUCCEEDED, RESET } from "./actionTypes";
+import type { AuthActions, AuthState } from "./types";
 
 const initialState: AuthState = {
   accessToken: undefined,
@@ -7,7 +7,7 @@ const initialState: AuthState = {
 };
 
 function getTokenExpiry(jwt: string): number {
-  const parts = jwt.split('.');
+  const parts = jwt.split(".");
 
   try {
     const payload = JSON.parse(window.atob(parts[1]));
@@ -17,16 +17,13 @@ function getTokenExpiry(jwt: string): number {
     }
   } catch {
     // eslint-disable-next-line no-console
-    console.error('Invalid jwt token received!');
+    console.error("Invalid jwt token received!");
   }
 
   return 0;
 }
 
-export default function reducer(
-  state = initialState,
-  action: AuthActions,
-): AuthState {
+export default function reducer(state = initialState, action: AuthActions): AuthState {
   switch (action.type) {
     case RESET:
       return initialState;

@@ -1,8 +1,8 @@
-import { Static, Type } from '@sinclair/typebox';
+import { Static, Type } from "@sinclair/typebox";
 
-import { userEventForSignup } from '../event';
-import { quota } from '../quota';
-import { editableSignupAttributes, signupDynamicAttributes, signupIdentity } from '../signup/attributes';
+import { userEventForSignup } from "../event";
+import { quota } from "../quota";
+import { editableSignupAttributes, signupDynamicAttributes, signupIdentity } from "../signup/attributes";
 
 // This is here because it depends on quota, causing an import cycle.
 /** Schema for fetching a signup for editing. */

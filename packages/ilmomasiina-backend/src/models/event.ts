@@ -1,23 +1,48 @@
-import moment from 'moment';
+import moment from "moment";
 import {
-  DataTypes, HasManyAddAssociationMixin, HasManyAddAssociationsMixin, HasManyCountAssociationsMixin,
-  HasManyCreateAssociationMixin, HasManyGetAssociationsMixin, HasManyHasAssociationMixin, HasManyHasAssociationsMixin,
-  HasManyRemoveAssociationMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin, Model, Op, Optional,
+  DataTypes,
+  HasManyAddAssociationMixin,
+  HasManyAddAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyRemoveAssociationsMixin,
+  HasManySetAssociationsMixin,
+  Model,
+  Op,
+  Optional,
   Sequelize,
-} from 'sequelize';
+} from "sequelize";
 
-import type { EventAttributes } from '@tietokilta/ilmomasiina-models/dist/models';
-import type { Question } from './question';
-import type { Quota } from './quota';
-import { generateRandomId, RANDOM_ID_LENGTH } from './randomId';
+import type { EventAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
+import type { Question } from "./question";
+import type { Quota } from "./quota";
+import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
 
 // Drop updatedAt so we don't need to define it manually in Event.init()
-interface EventManualAttributes extends Omit<EventAttributes, 'updatedAt'> {}
+interface EventManualAttributes extends Omit<EventAttributes, "updatedAt"> {}
 
 export interface EventCreationAttributes
-  extends Optional<EventManualAttributes, 'id' | 'openQuotaSize' | 'description' | 'price' | 'location'
-  | 'facebookUrl' | 'webpageUrl' | 'category' | 'draft' | 'listed' | 'signupsPublic' | 'nameQuestion'
-  | 'emailQuestion' | 'verificationEmail'> {}
+  extends Optional<
+    EventManualAttributes,
+    | "id"
+    | "openQuotaSize"
+    | "description"
+    | "price"
+    | "location"
+    | "facebookUrl"
+    | "webpageUrl"
+    | "category"
+    | "draft"
+    | "listed"
+    | "signupsPublic"
+    | "nameQuestion"
+    | "emailQuestion"
+    | "verificationEmail"
+  > {}
 
 export class Event extends Model<EventManualAttributes, EventCreationAttributes> implements EventAttributes {
   public id!: string;
@@ -44,25 +69,25 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
   public questions?: Question[];
   public getQuestions!: HasManyGetAssociationsMixin<Question>;
   public countQuestions!: HasManyCountAssociationsMixin;
-  public hasQuestion!: HasManyHasAssociationMixin<Question, Question['id']>;
-  public hasQuestions!: HasManyHasAssociationsMixin<Question, Question['id']>;
-  public setQuestions!: HasManySetAssociationsMixin<Question, Question['id']>;
-  public addQuestion!: HasManyAddAssociationMixin<Question, Question['id']>;
-  public addQuestions!: HasManyAddAssociationsMixin<Question, Question['id']>;
-  public removeQuestion!: HasManyRemoveAssociationMixin<Question, Question['id']>;
-  public removeQuestions!: HasManyRemoveAssociationsMixin<Question, Question['id']>;
+  public hasQuestion!: HasManyHasAssociationMixin<Question, Question["id"]>;
+  public hasQuestions!: HasManyHasAssociationsMixin<Question, Question["id"]>;
+  public setQuestions!: HasManySetAssociationsMixin<Question, Question["id"]>;
+  public addQuestion!: HasManyAddAssociationMixin<Question, Question["id"]>;
+  public addQuestions!: HasManyAddAssociationsMixin<Question, Question["id"]>;
+  public removeQuestion!: HasManyRemoveAssociationMixin<Question, Question["id"]>;
+  public removeQuestions!: HasManyRemoveAssociationsMixin<Question, Question["id"]>;
   public createQuestion!: HasManyCreateAssociationMixin<Question>;
 
   public quotas?: Quota[];
   public getQuotas!: HasManyGetAssociationsMixin<Quota>;
   public countQuotas!: HasManyCountAssociationsMixin;
-  public hasQuota!: HasManyHasAssociationMixin<Quota, Quota['id']>;
-  public hasQuotas!: HasManyHasAssociationsMixin<Quota, Quota['id']>;
-  public setQuotas!: HasManySetAssociationsMixin<Quota, Quota['id']>;
-  public addQuota!: HasManyAddAssociationMixin<Quota, Quota['id']>;
-  public addQuotas!: HasManyAddAssociationsMixin<Quota, Quota['id']>;
-  public removeQuota!: HasManyRemoveAssociationMixin<Quota, Quota['id']>;
-  public removeQuotas!: HasManyRemoveAssociationsMixin<Quota, Quota['id']>;
+  public hasQuota!: HasManyHasAssociationMixin<Quota, Quota["id"]>;
+  public hasQuotas!: HasManyHasAssociationsMixin<Quota, Quota["id"]>;
+  public setQuotas!: HasManySetAssociationsMixin<Quota, Quota["id"]>;
+  public addQuota!: HasManyAddAssociationMixin<Quota, Quota["id"]>;
+  public addQuotas!: HasManyAddAssociationsMixin<Quota, Quota["id"]>;
+  public removeQuota!: HasManyRemoveAssociationMixin<Quota, Quota["id"]>;
+  public removeQuotas!: HasManyRemoveAssociationsMixin<Quota, Quota["id"]>;
   public createQuota!: HasManyCreateAssociationMixin<Quota>;
 
   public readonly createdAt!: Date;
@@ -130,7 +155,7 @@ export default function setupEventModel(sequelize: Sequelize) {
       category: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: '',
+        defaultValue: "",
       },
       draft: {
         type: DataTypes.BOOLEAN,
@@ -163,19 +188,19 @@ export default function setupEventModel(sequelize: Sequelize) {
     },
     {
       sequelize,
-      modelName: 'event',
+      modelName: "event",
       freezeTableName: true,
       paranoid: true,
       validate: {
         hasDateOrRegistration() {
           if (this.date === null && this.registrationStartDate === null) {
-            throw new Error('either date or registrationStartDate/registrationEndDate must be set');
+            throw new Error("either date or registrationStartDate/registrationEndDate must be set");
           }
           if (this.date === null && this.endDate !== null) {
-            throw new Error('endDate may only be set with date');
+            throw new Error("endDate may only be set with date");
           }
           if ((this.registrationStartDate === null) !== (this.registrationEndDate === null)) {
-            throw new Error('only neither or both of registrationStartDate and registrationEndDate may be set');
+            throw new Error("only neither or both of registrationStartDate and registrationEndDate may be set");
           }
         },
       },
@@ -190,20 +215,14 @@ export default function setupEventModel(sequelize: Sequelize) {
               [Op.or]: {
                 // closed less than a week ago
                 registrationEndDate: {
-                  [Op.gt]: moment()
-                    .subtract(7, 'days')
-                    .toDate(),
+                  [Op.gt]: moment().subtract(7, "days").toDate(),
                 },
                 // or happened less than a week ago
                 date: {
-                  [Op.gt]: moment()
-                    .subtract(7, 'days')
-                    .toDate(),
+                  [Op.gt]: moment().subtract(7, "days").toDate(),
                 },
                 endDate: {
-                  [Op.gt]: moment()
-                    .subtract(7, 'days')
-                    .toDate(),
+                  [Op.gt]: moment().subtract(7, "days").toDate(),
                 },
               },
             },
@@ -215,7 +234,9 @@ export default function setupEventModel(sequelize: Sequelize) {
         // to avoid the slug being reserved after deletion.
         async beforeDestroy(instance, options) {
           await instance.update(
-            { slug: `${instance.slug.substring(0, 100)}-deleted-${Date.now()}` },
+            {
+              slug: `${instance.slug.substring(0, 100)}-deleted-${Date.now()}`,
+            },
             { transaction: options.transaction },
           );
         },

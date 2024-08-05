@@ -1,10 +1,10 @@
-import { Type } from '@sinclair/typebox';
+import { Type } from "@sinclair/typebox";
 
-import { Nullable } from '../utils';
+import { Nullable } from "../utils";
 
 export const quotaID = Type.String({
-  title: 'QuotaID',
-  description: 'Quota ID. Randomly generated alphanumeric string.',
+  title: "QuotaID",
+  description: "Quota ID. Randomly generated alphanumeric string.",
   // TODO: Add validation? max-length?
 });
 
@@ -16,10 +16,9 @@ export const quotaIdentity = Type.Object({
 /** Editable attributes of a quota. */
 export const quotaAttributes = Type.Object({
   title: Type.String({
-    description: 'Quota name.',
+    description: "Quota name.",
   }),
-  size: Nullable(
-    Type.Integer({ minimum: 1 }),
-    { description: 'Maximum number of signups in the quota. If null, the size is unlimited.' },
-  ),
+  size: Nullable(Type.Integer({ minimum: 1 }), {
+    description: "Maximum number of signups in the quota. If null, the size is unlimited.",
+  }),
 });

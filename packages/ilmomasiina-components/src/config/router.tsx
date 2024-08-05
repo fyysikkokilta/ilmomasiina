@@ -1,9 +1,9 @@
-import React, { AnchorHTMLAttributes, ComponentType, useEffect } from 'react';
+import React, { AnchorHTMLAttributes, ComponentType, useEffect } from "react";
 
 /** <Link> props that aim to be compatible with multiple routers, including `react-router-dom`, `@reach/router`
  * and `gatsby`.
  */
-export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
   to: string;
   /* eslint-disable-next-line react/no-unused-prop-types */
   replace?: boolean;
@@ -39,7 +39,7 @@ function DefaultLink({ to, children }: LinkProps) {
 let config: RouterConfig = {
   Link: DefaultLink,
   useParams: () => {
-    throw new Error('useParams not configured');
+    throw new Error("useParams not configured");
   },
   useNavigate: () => (url) => {
     window.location.href = url;
@@ -67,7 +67,7 @@ export function Navigate({ to, replace }: LinkProps) {
 
   useEffect(() => {
     navigate(to, { replace });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [to]);
 
   return null;

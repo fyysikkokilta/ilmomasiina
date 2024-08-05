@@ -1,20 +1,20 @@
-import React from 'react';
+import React from "react";
 
-import { Form } from 'react-bootstrap';
-import { UseFieldConfig } from 'react-final-form';
-import { useTranslation } from 'react-i18next';
+import { Form } from "react-bootstrap";
+import { UseFieldConfig } from "react-final-form";
+import { useTranslation } from "react-i18next";
 
-import { FieldRow } from '@tietokilta/ilmomasiina-components';
-import DateTimePicker from './DateTimePicker';
-import { useFieldValue } from './hooks';
-import Quotas from './Quotas';
+import { FieldRow } from "@tietokilta/ilmomasiina-components";
+import DateTimePicker from "./DateTimePicker";
+import { useFieldValue } from "./hooks";
+import Quotas from "./Quotas";
 
 const numberConfig: UseFieldConfig<number | null> = {
   parse: (value) => (value ? Number(value) : null),
 };
 
 const QuotasTab = () => {
-  const useOpenQuota = useFieldValue<boolean>('useOpenQuota');
+  const useOpenQuota = useFieldValue<boolean>("useOpenQuota");
   const { t } = useTranslation();
   return (
     <div>
@@ -22,41 +22,39 @@ const QuotasTab = () => {
         name="registrationStartDate"
         id="registrationStartDate"
         as={DateTimePicker}
-        label={t('editor.quotas.registrationStartDate')}
+        label={t("editor.quotas.registrationStartDate")}
         required
       />
       <FieldRow
         name="registrationEndDate"
         id="registrationEndDate"
         as={DateTimePicker}
-        label={t('editor.quotas.registrationEndDate')}
+        label={t("editor.quotas.registrationEndDate")}
         required
       />
       <FieldRow
         name="signupsPublic"
-        label={t('editor.quotas.signupsPublic')}
+        label={t("editor.quotas.signupsPublic")}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel={t('editor.quotas.signupsPublic.check')}
+        checkLabel={t("editor.quotas.signupsPublic.check")}
       />
       <hr />
       <Quotas />
       <FieldRow
         name="useOpenQuota"
-        label={t('editor.quotas.openQuota')}
+        label={t("editor.quotas.openQuota")}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel={t('editor.quotas.openQuota.check')}
-        help={
-          t('editor.quotas.openQuota.info')
-        }
+        checkLabel={t("editor.quotas.openQuota.check")}
+        help={t("editor.quotas.openQuota.info")}
       />
       {useOpenQuota && (
         <FieldRow
           name="openQuotaSize"
-          label={t('editor.quotas.openQuotaSize')}
+          label={t("editor.quotas.openQuotaSize")}
           type="number"
           config={numberConfig}
           min="0"

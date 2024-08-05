@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from "react";
 
 /** Works like useCallback, but always returns a stable callback.
  *

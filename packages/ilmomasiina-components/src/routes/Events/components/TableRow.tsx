@@ -1,8 +1,8 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
-import { SignupStateText } from '../../../utils/signupStateText';
+import { SignupStateText } from "../../../utils/signupStateText";
 
 type Props = {
   className: string;
@@ -13,9 +13,7 @@ type Props = {
   quotaSize?: number | null;
 };
 
-const TableRow = ({
-  className, title, date, signupStatus, signupCount, quotaSize,
-}: Props) => {
+const TableRow = ({ className, title, date, signupStatus, signupCount, quotaSize }: Props) => {
   const { t } = useTranslation();
   return (
     <tr className={className}>
@@ -29,14 +27,11 @@ const TableRow = ({
         <span className="ilmo--desktop-only">{signupStatus?.shortLabel}</span>
         <span className="ilmo--mobile-only">{signupStatus?.fullLabel || signupStatus?.shortLabel}</span>
       </td>
-      <td
-        key="signups"
-        className="ilmo--signup-count"
-      >
-        {signupCount !== undefined && <span className="ilmo--mobile-only">{`${t('events.signupCount')} `}</span>}
+      <td key="signups" className="ilmo--signup-count">
+        {signupCount !== undefined && <span className="ilmo--mobile-only">{`${t("events.signupCount")} `}</span>}
         {signupCount}
         {quotaSize && <>&ensp;/&ensp;</>}
-        {quotaSize || ''}
+        {quotaSize || ""}
       </td>
     </tr>
   );

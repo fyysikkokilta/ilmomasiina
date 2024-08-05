@@ -1,5 +1,5 @@
-import { configureApi } from '../api';
-import { configureRouter, RouterConfig } from './router';
+import { configureApi } from "../api";
+import { configureRouter, RouterConfig } from "./router";
 
 export type { RouterConfig };
 
@@ -12,7 +12,7 @@ export interface IlmoConfig {
   timezone?: string;
 }
 
-let configuredTimezone = 'Europe/Helsinki';
+let configuredTimezone = "Europe/Helsinki";
 
 export function configure(config: IlmoConfig) {
   if (config.api !== undefined) configureApi(config.api);

@@ -1,13 +1,13 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from "react-bootstrap";
 
 type Props = {
   children: ReactNode;
   className?: string;
 };
 
-const NarrowContainer = ({ children, className = '' }: Props) => (
+const NarrowContainer = ({ children, className = "" }: Props) => (
   <Row className={`ilmo--narrow-container ${className}`}>
     <Col xs="12" md="10" lg="8">
       {children}

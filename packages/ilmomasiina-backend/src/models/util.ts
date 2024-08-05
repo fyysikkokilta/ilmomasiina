@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { getSequelize } from '.';
+import { getSequelize } from ".";
 
 /**
  * Portable way to sort NULLs first across databases.
@@ -10,8 +10,8 @@ import { getSequelize } from '.';
  * https://www.sqlite.org/datatype3.html#comparisons
  */
 export function ascNullsFirst() {
-  if (getSequelize().getDialect() === 'postgres') {
-    return 'ASC NULLS FIRST';
+  if (getSequelize().getDialect() === "postgres") {
+    return "ASC NULLS FIRST";
   }
-  return 'ASC';
+  return "ASC";
 }

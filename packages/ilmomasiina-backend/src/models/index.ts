@@ -1,23 +1,23 @@
-import debug from 'debug';
-import { Sequelize } from 'sequelize';
-import { SequelizeStorage, Umzug } from 'umzug';
+import debug from "debug";
+import { Sequelize } from "sequelize";
+import { SequelizeStorage, Umzug } from "umzug";
 
-import setupAnswerModel, { Answer } from './answer';
-import setupAuditLogModel from './auditlog';
-import sequelizeConfig from './config';
-import setupEventModel, { Event } from './event';
-import migrations from './migrations';
-import setupQuestionModel, { Question } from './question';
-import setupQuotaModel, { Quota } from './quota';
-import setupSignupModel, { Signup } from './signup';
-import setupUserModel from './user';
+import setupAnswerModel, { Answer } from "./answer";
+import setupAuditLogModel from "./auditlog";
+import sequelizeConfig from "./config";
+import setupEventModel, { Event } from "./event";
+import migrations from "./migrations";
+import setupQuestionModel, { Question } from "./question";
+import setupQuotaModel, { Quota } from "./quota";
+import setupSignupModel, { Signup } from "./signup";
+import setupUserModel from "./user";
 
-const debugLog = debug('app:db');
+const debugLog = debug("app:db");
 
 let sequelize: Sequelize | null = null;
 
 export function getSequelize() {
-  if (!sequelize) throw new Error('setupDatabase() has not been called');
+  if (!sequelize) throw new Error("setupDatabase() has not been called");
   return sequelize;
 }
 
@@ -33,7 +33,7 @@ async function runMigrations() {
   if (!sequelize) throw new Error();
   const storage = new SequelizeStorage({ sequelize });
 
-  debugLog('Running database migrations');
+  debugLog("Running database migrations");
   const umzug = new Umzug({
     migrations,
     storage,
@@ -46,7 +46,7 @@ async function runMigrations() {
 export default async function setupDatabase() {
   if (sequelize) return sequelize;
 
-  debugLog('Connecting to database');
+  debugLog("Connecting to database");
   sequelize = new Sequelize(sequelizeConfig.default);
   try {
     await sequelize.authenticate();
@@ -70,7 +70,7 @@ export default async function setupDatabase() {
     foreignKey: {
       allowNull: false,
     },
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   });
   Question.belongsTo(Event);
 
@@ -78,7 +78,7 @@ export default async function setupDatabase() {
     foreignKey: {
       allowNull: false,
     },
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   });
   Quota.belongsTo(Event);
 
@@ -86,7 +86,7 @@ export default async function setupDatabase() {
     foreignKey: {
       allowNull: false,
     },
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   });
   Signup.belongsTo(Quota);
 
@@ -94,7 +94,7 @@ export default async function setupDatabase() {
     foreignKey: {
       allowNull: false,
     },
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   });
   Answer.belongsTo(Signup);
 
@@ -102,7 +102,7 @@ export default async function setupDatabase() {
     foreignKey: {
       allowNull: false,
     },
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   });
   Answer.belongsTo(Question);
 

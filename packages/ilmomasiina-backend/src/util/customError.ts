@@ -1,4 +1,4 @@
-import { ErrorCode } from '@tietokilta/ilmomasiina-models';
+import { ErrorCode } from "@tietokilta/ilmomasiina-models";
 
 export default abstract class CustomError extends Error {
   public readonly statusCode: number;

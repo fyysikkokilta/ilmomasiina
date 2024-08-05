@@ -1,6 +1,6 @@
-import type { SignupForEditResponse } from '@tietokilta/ilmomasiina-models';
-import { ApiError } from '../../api';
-import { createStateContext } from '../../utils/stateContext';
+import type { SignupForEditResponse } from "@tietokilta/ilmomasiina-models";
+import { ApiError } from "../../api";
+import { createStateContext } from "../../utils/stateContext";
 
 export type State = Partial<SignupForEditResponse> & {
   isNew?: boolean;

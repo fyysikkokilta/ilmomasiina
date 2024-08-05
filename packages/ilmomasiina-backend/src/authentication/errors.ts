@@ -1,5 +1,5 @@
-import { ErrorCode } from '@tietokilta/ilmomasiina-models';
-import CustomError from '../util/customError';
+import { ErrorCode } from "@tietokilta/ilmomasiina-models";
+import CustomError from "../util/customError";
 
 // eslint-disable-next-line import/prefer-default-export
 export class BadSession extends CustomError {

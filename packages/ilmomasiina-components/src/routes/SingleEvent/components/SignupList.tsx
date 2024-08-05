@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 
-import filter from 'lodash-es/filter';
-import { Table } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
+import filter from "lodash-es/filter";
+import { Table } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
-import { useSingleEventContext } from '../../../modules/singleEvent';
-import { OPENQUOTA, QuotaSignups, WAITLIST } from '../../../utils/signupUtils';
-import SignupListRow from './SignupListRow';
+import { useSingleEventContext } from "../../../modules/singleEvent";
+import { OPENQUOTA, QuotaSignups, WAITLIST } from "../../../utils/signupUtils";
+import SignupListRow from "./SignupListRow";
 
 type Props = {
   quota: QuotaSignups;
@@ -21,30 +21,24 @@ const SignupList = ({ quota }: Props) => {
     <div className="ilmo--quota-signups">
       <h3>{quota.title}</h3>
       {!signups?.length ? (
-        <p>{t('singleEvent.signups.emptyQuota')}</p>
+        <p>{t("singleEvent.signups.emptyQuota")}</p>
       ) : (
         <div className="table-responsive">
           <Table size="sm">
             <thead className="thead-light">
               <tr>
-                <th key="position">{t('singleEvent.signups.position')}</th>
+                <th key="position">{t("singleEvent.signups.position")}</th>
                 {nameQuestion && (
                   <th key="attendee" style={{ minWidth: 90 }}>
-                    {t('singleEvent.signups.name')}
+                    {t("singleEvent.signups.name")}
                   </th>
                 )}
-                {filter(questions, 'public').map((question) => (
-                  <th key={question.id}>
-                    {question.question}
-                  </th>
+                {filter(questions, "public").map((question) => (
+                  <th key={question.id}>{question.question}</th>
                 ))}
-                {showQuotas && (
-                  <th key="quota">
-                    {t('singleEvent.signups.quota')}
-                  </th>
-                )}
+                {showQuotas && <th key="quota">{t("singleEvent.signups.quota")}</th>}
                 <th key="datetime" style={{ minWidth: 130 }}>
-                  {t('singleEvent.signups.signupTime')}
+                  {t("singleEvent.signups.signupTime")}
                 </th>
               </tr>
             </thead>

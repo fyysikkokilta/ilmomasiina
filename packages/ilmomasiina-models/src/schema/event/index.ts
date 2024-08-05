@@ -1,8 +1,8 @@
-import { Static, Type } from '@sinclair/typebox';
+import { Static, Type } from "@sinclair/typebox";
 
-import { question, questionCreate, questionUpdate } from '../question';
-import { quotaCreate, quotaUpdate } from '../quota';
-import { adminQuotaWithSignups, userQuotaWithSignups } from '../quotaWithSignups';
+import { question, questionCreate, questionUpdate } from "../question";
+import { quotaCreate, quotaUpdate } from "../quota";
+import { adminQuotaWithSignups, userQuotaWithSignups } from "../quotaWithSignups";
 import {
   adminFullEventAttributes,
   eventDynamicAttributes,
@@ -10,23 +10,21 @@ import {
   eventIdentity,
   eventSlug,
   userFullEventAttributes,
-} from './attributes';
+} from "./attributes";
 
 /** Response schema for fetching or modifying an event in the admin API. */
-export const adminEventResponse = Type.Intersect(
-  [
-    eventIdentity,
-    adminFullEventAttributes,
-    Type.Object({
-      questions: Type.Array(question),
-      quotas: Type.Array(adminQuotaWithSignups),
-      updatedAt: Type.String({
-        description: 'Last update time of the event. Used for edit conflict handling.',
-        format: 'date-time',
-      }),
+export const adminEventResponse = Type.Intersect([
+  eventIdentity,
+  adminFullEventAttributes,
+  Type.Object({
+    questions: Type.Array(question),
+    quotas: Type.Array(adminQuotaWithSignups),
+    updatedAt: Type.String({
+      description: "Last update time of the event. Used for edit conflict handling.",
+      format: "date-time",
     }),
-  ],
-);
+  }),
+]);
 
 /** Response schema for fetching an event from the public API. */
 export const userEventResponse = Type.Intersect([
@@ -49,22 +47,25 @@ export const eventCreateBody = Type.Intersect([
 ]);
 
 /** Request body for editing an existing event. */
-export const eventUpdateBody = Type.Partial(Type.Intersect([
-  adminFullEventAttributes,
-  Type.Object({
-    quotas: Type.Array(quotaUpdate),
-    questions: Type.Array(questionUpdate),
-    moveSignupsToQueue: Type.Boolean({
-      default: false,
-      description: 'Whether to allow moving signups to the queue, if caused by quota changes.',
+export const eventUpdateBody = Type.Partial(
+  Type.Intersect([
+    adminFullEventAttributes,
+    Type.Object({
+      quotas: Type.Array(quotaUpdate),
+      questions: Type.Array(questionUpdate),
+      moveSignupsToQueue: Type.Boolean({
+        default: false,
+        description: "Whether to allow moving signups to the queue, if caused by quota changes.",
+      }),
+      updatedAt: Type.String({
+        format: "date-time",
+        description:
+          "Last update time of the event. An edit conflict is detected if this does not match the update " +
+          "date on the server.",
+      }),
     }),
-    updatedAt: Type.String({
-      format: 'date-time',
-      description: 'Last update time of the event. An edit conflict is detected if this does not match the update '
-        + 'date on the server.',
-    }),
-  }),
-]));
+  ]),
+);
 
 /** Response schema when an event is fetched as part of an editable signup. */
 export const userEventForSignup = Type.Intersect([

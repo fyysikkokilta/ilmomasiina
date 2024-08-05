@@ -1,7 +1,7 @@
-import { Type } from '@sinclair/typebox';
+import { Type } from "@sinclair/typebox";
 
 export const userID = Type.Integer({
-  title: 'UserID',
+  title: "UserID",
 });
 
 /** Non-editable identity attributes of a user. */
@@ -12,8 +12,8 @@ export const userIdentity = Type.Object({
 /** Editable attributes of a user. */
 export const userAttributes = Type.Object({
   email: Type.String({
-    format: 'email',
-    description: 'Email address, used as username.',
+    format: "email",
+    description: "Email address, used as username.",
     // TODO: Add validation RegExp for email
   }),
 });

@@ -1,16 +1,16 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes } from "sequelize";
 
-import { defineMigration } from './util';
+import { defineMigration } from "./util";
 
 // Constant from ../randomId
 const RANDOM_ID_LENGTH = 12;
 
 export default defineMigration({
-  name: '0000-initial',
+  name: "0000-initial",
   async up({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
     await query.createTable(
-      'event',
+      "event",
       {
         id: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
@@ -56,7 +56,7 @@ export default defineMigration({
         category: {
           type: DataTypes.STRING,
           allowNull: false,
-          defaultValue: '',
+          defaultValue: "",
         },
         draft: {
           type: DataTypes.BOOLEAN,
@@ -101,7 +101,7 @@ export default defineMigration({
       { transaction },
     );
     await query.createTable(
-      'quota',
+      "quota",
       {
         id: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
@@ -111,11 +111,11 @@ export default defineMigration({
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'event',
-            key: 'id',
+            model: "event",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         order: {
           type: DataTypes.INTEGER,
@@ -143,7 +143,7 @@ export default defineMigration({
       { transaction },
     );
     await query.createTable(
-      'signup',
+      "signup",
       {
         id: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
@@ -153,11 +153,11 @@ export default defineMigration({
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'quota',
-            key: 'id',
+            model: "quota",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         firstName: {
           type: DataTypes.STRING,
@@ -176,7 +176,7 @@ export default defineMigration({
           type: DataTypes.DATE(3),
         },
         status: {
-          type: DataTypes.ENUM('in-quota', 'in-open', 'in-queue'),
+          type: DataTypes.ENUM("in-quota", "in-open", "in-queue"),
         },
         position: {
           type: DataTypes.INTEGER,
@@ -196,7 +196,7 @@ export default defineMigration({
       { transaction },
     );
     await query.createTable(
-      'question',
+      "question",
       {
         id: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
@@ -206,11 +206,11 @@ export default defineMigration({
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'event',
-            key: 'id',
+            model: "event",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         order: {
           type: DataTypes.INTEGER,
@@ -221,7 +221,7 @@ export default defineMigration({
           allowNull: false,
         },
         type: {
-          type: DataTypes.ENUM('text', 'textarea', 'number', 'select', 'checkbox'),
+          type: DataTypes.ENUM("text", "textarea", "number", "select", "checkbox"),
           allowNull: false,
         },
         options: {
@@ -253,7 +253,7 @@ export default defineMigration({
       { transaction },
     );
     await query.createTable(
-      'answer',
+      "answer",
       {
         id: {
           type: DataTypes.INTEGER.UNSIGNED,
@@ -264,21 +264,21 @@ export default defineMigration({
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'question',
-            key: 'id',
+            model: "question",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         signupId: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'signup',
-            key: 'id',
+            model: "signup",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         answer: {
           type: DataTypes.STRING,
@@ -299,7 +299,7 @@ export default defineMigration({
       { transaction },
     );
     await query.createTable(
-      'user',
+      "user",
       {
         id: {
           type: DataTypes.INTEGER.UNSIGNED,

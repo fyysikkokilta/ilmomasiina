@@ -1,14 +1,14 @@
-import React, { useCallback } from 'react';
+import React, { useCallback } from "react";
 
-import * as Sentry from '@sentry/browser';
-import ReactDOM from 'react-dom';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import * as Sentry from "@sentry/browser";
+import ReactDOM from "react-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 
-import './i18n';
+import "./i18n";
 
-import { configure } from '@tietokilta/ilmomasiina-components';
-import AppContainer from './containers/AppContainer';
-import { apiUrl } from './paths';
+import { configure } from "@tietokilta/ilmomasiina-components";
+import AppContainer from "./containers/AppContainer";
+import { apiUrl } from "./paths";
 
 if (PROD && SENTRY_DSN) {
   Sentry.init({ dsn: SENTRY_DSN });
@@ -27,7 +27,4 @@ configure({
   timezone: TIMEZONE,
 });
 
-ReactDOM.render(
-  <AppContainer />,
-  document.getElementById('root'),
-);
+ReactDOM.render(<AppContainer />, document.getElementById("root"));

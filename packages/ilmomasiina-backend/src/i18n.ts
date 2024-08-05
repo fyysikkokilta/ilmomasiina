@@ -1,8 +1,8 @@
-import i18n from 'i18next';
+import i18n from "i18next";
 
-import config from './config';
-import * as en from './locales/en.json';
-import * as fi from './locales/fi.json';
+import config from "./config";
+import * as en from "./locales/en.json";
+import * as fi from "./locales/fi.json";
 
 export const resources = {
   // this way we generate typescript errors if not exact match

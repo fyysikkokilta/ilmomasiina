@@ -1,9 +1,9 @@
-import { TFunction, TOptions } from 'i18next';
+import { TFunction, TOptions } from "i18next";
 
-import { ApiError } from '../api';
+import { ApiError } from "../api";
 
 function errorString(
-  part: 'title' | 'description',
+  part: "title" | "description",
   t: TFunction,
   error: ApiError,
   prefix: string | undefined,
@@ -13,12 +13,12 @@ function errorString(
   const types: string[] = [];
   if (error.code) types.push(error.code);
   if (error.status) types.push(String(error.status));
-  types.push('default');
+  types.push("default");
 
   // First try e.g. editSignup.errors.default, then errors.default
   const prefixes: string[] = [];
   if (prefix) prefixes.push(prefix);
-  prefixes.push('errors');
+  prefixes.push("errors");
 
   // Order, same examples:
   // - editSignup.errors.SignupsClosed
@@ -41,7 +41,7 @@ function errorString(
  * @param params Optional parameters for the translation function.
  */
 export function errorTitle(t: TFunction, error: ApiError, prefix?: string, params?: TOptions) {
-  return errorString('title', t, error, prefix, params);
+  return errorString("title", t, error, prefix, params);
 }
 
 /** Localizes an error description.
@@ -53,5 +53,5 @@ export function errorTitle(t: TFunction, error: ApiError, prefix?: string, param
  * @param params Optional parameters for the translation function.
  */
 export function errorDesc(t: TFunction, error: ApiError, prefix?: string, params?: TOptions) {
-  return errorString('description', t, error, prefix, params);
+  return errorString("description", t, error, prefix, params);
 }
