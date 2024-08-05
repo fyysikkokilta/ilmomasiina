@@ -104,6 +104,7 @@ export default async function updateEvent(
         const questionAttribs = {
           ...question,
           order,
+          options: question.options?.length ? question.options : [],
         };
         // Update if an id was provided
         if (question.existing) {
