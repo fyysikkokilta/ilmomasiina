@@ -68,7 +68,17 @@ const EditFormBody = ({ form }: FormRenderProps<EditorEvent>) => {
   ), [onSave, onSaveToggleDraft, onMoveToQueueProceed, activeTab, setActiveTab]);
 };
 
-const mutators = { ...arrayMutators };
+const mutators = {
+  ...arrayMutators,
+  // The default remove() mutator deletes the entire field if the array becomes empty.
+  // This is written based on final-form-arrays's source code to undo that stupidity.
+  // See https://github.com/final-form/final-form-arrays/blob/master/src/remove.js
+  remove: ([name, index]: [string, number], state, tools) => {
+    const returnValue = arrayMutators.remove([name, index], state, tools);
+    tools.changeValue(state, name, (value) => value ?? []);
+    return returnValue;
+  },
+} satisfies typeof arrayMutators;
 
 const EditForm = () => {
   const initialValues = useTypedSelector(selectFormData);

@@ -66,7 +66,7 @@ const EditConflictModal = ({ onSave }: Props) => {
     // We still need to re-create the questions and quotas that were deleted, by removing their old IDs.
     form.change(
       'questions',
-      questions?.map((question) => {
+      questions.map((question) => {
         if (!question.id || !deletedQuestions.includes(question.id)) return question;
         return {
           ...question,

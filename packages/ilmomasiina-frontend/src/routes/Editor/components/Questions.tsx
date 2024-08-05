@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import {
   Button, Col, Form, FormCheckProps, InputGroup, Row,
@@ -10,6 +10,7 @@ import { SortEnd } from 'react-sortable-hoc';
 
 import { FieldRow } from '@tietokilta/ilmomasiina-components';
 import useEvent from '@tietokilta/ilmomasiina-components/dist/utils/useEvent';
+import useShallowMemo from '@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo';
 import { QuestionType } from '@tietokilta/ilmomasiina-models';
 import { EditorQuestion } from '../../../modules/editor/types';
 import { useFieldValue } from './hooks';
@@ -154,9 +155,13 @@ const Questions = () => {
   });
 
   const updateOrder = useEvent(({ newIndex, oldIndex }: SortEnd) => fields.move(oldIndex, newIndex));
-  const questionItems = fields.map((name, i) => (
-    <QuestionRow key={fields.value[i].key} name={name} index={i} remove={fields.remove} />
-  ));
+
+  const keys = useShallowMemo(fields.value.map((item) => item.key));
+  const questionItems = useMemo(() => fields.map((name, i) => (
+    <QuestionRow key={keys[i]} name={name} index={i} remove={fields.remove} />
+  // This list only invalidates when the question positions or count change.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  )), [keys]);
 
   return (
     <>
