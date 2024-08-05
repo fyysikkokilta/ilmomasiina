@@ -36,15 +36,16 @@ export default function FieldRow<P = unknown>({
   as: Component = Form.Control,
   children,
   type,
-  id = name,
-  controlId = id,
+  id,
+  controlId = id ?? name,
   config,
   ...props
 }: Props & P) {
   const {
     input,
-    meta: { error, invalid },
+    meta: { error: validationError, submitError, invalid },
   } = useField(name, { type, ...config });
+  const error = submitError || validationError;
 
   let field: ReactNode;
   if (children) {
@@ -54,7 +55,16 @@ export default function FieldRow<P = unknown>({
     // and calls it "label", but we still want to call the other one "label" for all other types of field. Therefore
     // we pass "checkLabel" to the field here.
     const overrideProps = checkLabel !== undefined ? { label: checkLabel } : {};
-    field = <Component required={required} {...props} id={id} {...input} {...overrideProps} />;
+    field = (
+      <Component
+        required={required}
+        isInvalid={invalid}
+        {...props}
+        id={id}
+        {...input}
+        {...overrideProps}
+      />
+    );
   }
 
   return (

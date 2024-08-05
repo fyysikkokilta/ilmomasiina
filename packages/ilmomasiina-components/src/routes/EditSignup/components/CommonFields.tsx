@@ -1,13 +1,16 @@
 import React from "react";
 
 import { Form } from "react-bootstrap";
+import { useFormState } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
 import FieldRow from "../../../components/FieldRow";
 import { useEditSignupContext } from "../../../modules/editSignup";
+import fieldError from "./fieldError";
 
 const CommonFields = () => {
   const { event, signup, registrationClosed } = useEditSignupContext();
+  const { submitErrors } = useFormState({ subscription: { submitErrors: true } });
   const isNew = !signup!.confirmed;
   const { t } = useTranslation();
   return (
@@ -21,6 +24,7 @@ const CommonFields = () => {
             placeholder={t("editSignup.fields.firstName.placeholder")}
             required
             readOnly={!isNew || registrationClosed}
+            alternateError={fieldError(t, submitErrors?.firstName)}
           />
           <FieldRow
             name="lastName"
@@ -29,6 +33,7 @@ const CommonFields = () => {
             placeholder={t("editSignup.fields.lastName.placeholder")}
             required
             readOnly={!isNew || registrationClosed}
+            alternateError={fieldError(t, submitErrors?.lastName)}
           />
           <FieldRow
             name="namePublic"
@@ -48,6 +53,7 @@ const CommonFields = () => {
           placeholder={t("editSignup.fields.email.placeholder")}
           required
           readOnly={!isNew || registrationClosed}
+          alternateError={fieldError(t, submitErrors?.email)}
         />
       )}
     </>

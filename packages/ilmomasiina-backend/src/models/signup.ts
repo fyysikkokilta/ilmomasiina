@@ -41,7 +41,10 @@ export interface SignupCreationAttributes
     | "createdAt"
   > {}
 
-export class Signup extends Model<SignupAttributes, SignupCreationAttributes> implements SignupAttributes {
+export class Signup
+  extends Model<SignupAttributes, SignupCreationAttributes>
+  implements SignupAttributes
+{
   public id!: string;
   public firstName!: string | null;
   public lastName!: string | null;
@@ -72,6 +75,9 @@ export class Signup extends Model<SignupAttributes, SignupCreationAttributes> im
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  public static readonly MAX_NAME_LENGTH = 255;
+  public static readonly MAX_EMAIL_LENGTH = 255; // TODO
 }
 
 export default function setupSignupModel(sequelize: Sequelize) {

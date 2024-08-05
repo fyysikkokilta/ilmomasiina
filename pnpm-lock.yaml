@@ -80,6 +80,9 @@ importers:
       '@tietokilta/ilmomasiina-models':
         specifier: workspace:*
         version: link:../ilmomasiina-models
+      '@types/validator':
+        specifier: ^13.12.0
+        version: 13.12.0
       ajv:
         specifier: ^8.12.0
         version: 8.12.0
@@ -152,6 +155,9 @@ importers:
       umzug:
         specifier: ^3.7.0
         version: 3.8.0(@types/node@20.12.12)
+      validator:
+        specifier: ^13.12.0
+        version: 13.12.0
     devDependencies:
       '@faker-js/faker':
         specifier: ^8.4.1
@@ -1341,8 +1347,8 @@ packages:
   '@types/unist@2.0.6':
     resolution: {integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==}
 
-  '@types/validator@13.11.10':
-    resolution: {integrity: sha512-e2PNXoXLr6Z+dbfx5zSh9TRlXJrELycxiaXznp4S5+D2M3b9bqJEitNHA5923jhnB2zzFiZHa2f0SI1HoIahpg==}
+  '@types/validator@13.12.0':
+    resolution: {integrity: sha512-nH45Lk7oPIJ1RVOF6JgFI6Dy0QpHEzq4QecZhvguxYPDwT8c93prCMqAtiIttm39voZ+DDR+qkNnMpJmMBRqag==}
 
   '@types/warning@3.0.0':
     resolution: {integrity: sha512-t/Tvs5qR47OLOr+4E9ckN8AmP2Tf16gWq+/qA4iUGS/OOyHVO8wv2vjJuX8SNOUTJyWb+2t7wJm6cXILFnOROA==}
@@ -2370,6 +2376,9 @@ packages:
     peerDependencies:
       eslint: ^7.32.0 || ^8.2.0
       eslint-plugin-import: ^2.25.2
+    peerDependenciesMeta:
+      eslint:
+        optional: true
 
   eslint-config-airbnb-typescript@17.1.0:
     resolution: {integrity: sha512-GPxI5URre6dDpJ0CtcthSZVBAfI+Uw7un5OYNVxP2EYi3H81Jw701yFP7AU+/vCE7xBtFmjge7kfhhk4+RAiig==}
@@ -4814,10 +4823,6 @@ packages:
     resolution: {integrity: sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==}
     engines: {node: '>= 0.10'}
 
-  validator@13.7.0:
-    resolution: {integrity: sha512-nYXQLCBkpJ8X6ltALua9dRrZDHVYxjJ1wgskNt1lH9fzGjs3tgojGSCBjmEPwkWS1y29+DrizMTW19Pr9uB2nw==}
-    engines: {node: '>= 0.10'}
-
   value-equal@1.0.1:
     resolution: {integrity: sha512-NOJ6JZCAWr0zlxZt+xqCHNTEKOsrks2HQd4MqhP1qy4z1SkbEP467eNx6TgDKXMvUOb+OENfJCZwM+16n7fRfw==}
 
@@ -5858,7 +5863,7 @@ snapshots:
 
   '@types/unist@2.0.6': {}
 
-  '@types/validator@13.11.10': {}
+  '@types/validator@13.12.0': {}
 
   '@types/warning@3.0.0': {}
 
@@ -6915,11 +6920,12 @@ snapshots:
   eslint-config-airbnb-base@15.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.2.2))(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
       confusing-browser-globals: 1.0.11
-      eslint: 8.57.0
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.2.2))(eslint@8.57.0)
       object.assign: 4.1.4
       object.entries: 1.1.7
       semver: 6.3.1
+    optionalDependencies:
+      eslint: 8.57.0
 
   eslint-config-airbnb-typescript@17.1.0(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.2.2))(eslint@8.57.0)(typescript@5.2.2))(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.2.2))(eslint-plugin-import@2.29.1(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.2.2))(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
@@ -9350,7 +9356,7 @@ snapshots:
   sequelize@6.37.3(mysql2@3.9.7)(pg-hstore@2.3.4)(pg@8.11.5):
     dependencies:
       '@types/debug': 4.1.12
-      '@types/validator': 13.11.10
+      '@types/validator': 13.12.0
       debug: 4.3.4
       dottie: 2.0.6
       inflection: 1.13.4
@@ -9854,8 +9860,6 @@ snapshots:
 
   validator@13.12.0: {}
 
-  validator@13.7.0: {}
-
   value-equal@1.0.1: {}
 
   vary@1.1.2: {}
@@ -10116,7 +10120,7 @@ snapshots:
     dependencies:
       lodash.get: 4.4.2
       lodash.isequal: 4.5.0
-      validator: 13.7.0
+      validator: 13.12.0
     optionalDependencies:
       commander: 9.5.0
 
