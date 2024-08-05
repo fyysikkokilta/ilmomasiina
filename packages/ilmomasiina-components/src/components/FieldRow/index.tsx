@@ -36,7 +36,7 @@ export default function FieldRow<P = unknown>({
   as: Component = Form.Control,
   children,
   type,
-  id,
+  id = name,
   controlId = id,
   config,
   ...props
