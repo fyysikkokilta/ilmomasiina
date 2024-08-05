@@ -48,7 +48,7 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
       {showQuota && <td>{quotaName || ""}</td>}
       <td>
         {actionDateFormat.format(new Date(createdAt))}
-        <span className="ilmo--hover-only">{msDateFormat.format(new Date(createdAt))}</span>
+        <span className="ilmo--hover-only">.{msDateFormat.format(new Date(createdAt))}</span>
       </td>
     </tr>
   );
