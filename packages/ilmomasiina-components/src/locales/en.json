@@ -1,6 +1,6 @@
 {
   "components": {
-    "dateFormat.dateTimeSep": "at",
+    "dateFormat.locale": "en-FI",
     "editSignup.backToEvent": "Back to event page",
     "editSignup.action.cancel": "Cancel",
     "editSignup.action.edit": "Update",

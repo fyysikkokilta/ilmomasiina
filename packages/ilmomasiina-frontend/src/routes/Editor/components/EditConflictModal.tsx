@@ -1,10 +1,10 @@
 import React from "react";
 
-import moment from "moment-timezone";
 import { Button, Modal } from "react-bootstrap";
 import { useForm } from "react-final-form";
 import { Trans, useTranslation } from "react-i18next";
 
+import { useActionDateTimeFormatter } from "@tietokilta/ilmomasiina-components/dist/utils/dateFormat";
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import { EditConflictError } from "@tietokilta/ilmomasiina-models";
 import { editConflictDismissed, reloadEvent } from "../../../modules/editor/actions";
@@ -45,6 +45,7 @@ const EditConflictModal = ({ onSave }: Props) => {
   const dispatch = useTypedDispatch();
   const modal = useTypedSelector((state) => state.editor.editConflictModal);
   const { t } = useTranslation();
+  const actionDateFormat = useActionDateTimeFormatter();
 
   const deletedQuestions = modal?.deletedQuestions || [];
   const deletedQuotas = modal?.deletedQuotas || [];
@@ -105,11 +106,7 @@ const EditConflictModal = ({ onSave }: Props) => {
             }
           >
             {"Another user or tab has edited this event at "}
-            <strong>
-              {{
-                time: modal && moment(modal.updatedAt).tz(TIMEZONE).format("DD.MM.YYYY HH:mm:ss"),
-              }}
-            </strong>
+            <strong>{{ time: modal && actionDateFormat.format(new Date(modal.updatedAt)) }}</strong>
             .
           </Trans>
         </p>

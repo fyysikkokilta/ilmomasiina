@@ -29,7 +29,7 @@
     }
   },
   "exclude": ["dist"],
-  "include": ["src", "vite.config.ts", "rollupMomentPlugin.ts"],
+  "include": ["src", "vite.config.ts"],
   "references": [
     { "path": "../ilmomasiina-components" },
     { "path": "../ilmomasiina-models" }

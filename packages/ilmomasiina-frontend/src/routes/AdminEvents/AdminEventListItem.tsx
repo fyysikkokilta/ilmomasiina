@@ -1,12 +1,12 @@
 import React, { MouseEvent } from "react";
 
 import sumBy from "lodash-es/sumBy";
-import moment from "moment-timezone";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { ApiError } from "@tietokilta/ilmomasiina-components";
+import { useEventDateFormatter } from "@tietokilta/ilmomasiina-components/dist/utils/dateFormat";
 import { errorDesc } from "@tietokilta/ilmomasiina-components/dist/utils/errorMessage";
 import type { AdminEventListItem as AdminEventListItemSchema } from "@tietokilta/ilmomasiina-models";
 import { deleteEvent, getAdminEvents } from "../../modules/adminEvents/actions";
@@ -24,6 +24,7 @@ const AdminEventListItem = ({ event }: Props) => {
   const { id, title, slug, date, draft, listed, quotas } = event;
 
   const { t } = useTranslation();
+  const eventDateFormat = useEventDateFormatter();
 
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
@@ -58,7 +59,7 @@ const AdminEventListItem = ({ event }: Props) => {
       <td>
         <Link to={appPaths.adminEditEvent(id)}>{title}</Link>
       </td>
-      <td>{date ? moment(date).tz(TIMEZONE).format("DD.MM.YYYY") : ""}</td>
+      <td>{date ? eventDateFormat.format(new Date(date)) : ""}</td>
       <td>{status}</td>
       <td>{sumBy(quotas, "signupCount")}</td>
       <td>

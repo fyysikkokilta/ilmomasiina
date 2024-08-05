@@ -1,16 +1,15 @@
 import React, { useContext } from "react";
 
-import moment from "moment-timezone";
 import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { timezone } from "../../../config";
 import { linkComponent } from "../../../config/router";
 import AuthContext from "../../../contexts/auth";
 import { usePaths } from "../../../contexts/paths";
 import { useSingleEventContext } from "../../../modules/singleEvent";
+import { useEventDateTimeFormatter } from "../../../utils/dateFormat";
 
 const EventDescription = () => {
   const event = useSingleEventContext().event!;
@@ -18,6 +17,7 @@ const EventDescription = () => {
   const Link = linkComponent();
   const paths = usePaths();
   const { t } = useTranslation();
+  const eventDateFormat = useEventDateTimeFormatter();
   return (
     <>
       <nav className="ilmo--title-nav">
@@ -36,18 +36,16 @@ const EventDescription = () => {
         )}
         {event.date && (
           <p>
-            <strong>{event.endDate ? t("singleEvent.info.startDate") : t("singleEvent.info.date")}</strong>{" "}
-            {moment(event.date)
-              .tz(timezone())
-              .format(`D.M.Y [${t("dateFormat.dateTimeSep")}] HH:mm`)}
+            <strong>
+              {event.endDate ? t("singleEvent.info.startDate") : t("singleEvent.info.date")}
+            </strong>{" "}
+            {eventDateFormat.format(new Date(event.date))}
           </p>
         )}
         {event.endDate && (
           <p>
             <strong>{t("singleEvent.info.endDate")}</strong>{" "}
-            {moment(event.endDate)
-              .tz(timezone())
-              .format(`D.M.Y [${t("dateFormat.dateTimeSep")}] HH:mm`)}
+            {eventDateFormat.format(new Date(event.endDate))}
           </p>
         )}
         {event.location && (

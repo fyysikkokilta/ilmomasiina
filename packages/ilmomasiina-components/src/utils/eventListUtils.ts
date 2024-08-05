@@ -1,6 +1,5 @@
 import every from "lodash-es/every";
 import sumBy from "lodash-es/sumBy";
-import moment, { Moment } from "moment-timezone";
 
 import type {
   EventID,
@@ -21,7 +20,7 @@ export type EventRow = {
   type: "event";
   slug: EventSlug;
   title: string;
-  date: Moment | null;
+  date: Date | null;
   signupState: SignupStateInfo;
   signupCount?: number;
   quotaSize?: number | null;
@@ -39,7 +38,16 @@ export type TableRow = EventRow | QuotaRow;
 
 /** Converts an event to rows to be shown in the event list. */
 export function eventToRows(event: UserEventListItem, { compact }: EventTableOptions = {}) {
-  const { id, slug, title, date, registrationStartDate, registrationEndDate, quotas, openQuotaSize } = event;
+  const {
+    id,
+    slug,
+    title,
+    date,
+    registrationStartDate,
+    registrationEndDate,
+    quotas,
+    openQuotaSize,
+  } = event;
   const state = signupState(registrationStartDate, registrationEndDate);
 
   // Event row
@@ -50,7 +58,7 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
       signupState: state,
       slug,
       title,
-      date: date ? moment(date) : null,
+      date: date ? new Date(date) : null,
       signupCount: quotas.length < 2 ? sumBy(quotas, "signupCount") : undefined,
       quotaSize: quotas.length === 1 ? quotas[0].size : undefined,
       totalSignupCount: sumBy(quotas, "signupCount") ?? 0,
@@ -74,7 +82,9 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
     );
   }
 
-  const overflow = sumBy(quotas, (quota) => (quota.size ? Math.max(0, quota.signupCount - quota.size) : 0));
+  const overflow = sumBy(quotas, (quota) =>
+    quota.size ? Math.max(0, quota.signupCount - quota.size) : 0,
+  );
 
   // Open quota
   if (openQuotaSize > 0) {

@@ -76,8 +76,7 @@ module.exports = {
         "**/test/**",
         "**/vite.config.ts",
         "**/vitest.config.ts",
-        "**/.eslintrc.js",
-        "**/rollupMomentPlugin.ts"
+        "**/.eslintrc.js"
       ],
     }],
     // Sort imports: React first, then npm packages, then local files, then CSS.

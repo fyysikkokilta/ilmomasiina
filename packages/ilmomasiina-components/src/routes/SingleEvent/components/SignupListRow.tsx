@@ -2,11 +2,13 @@ import React from "react";
 
 import filter from "lodash-es/filter";
 import find from "lodash-es/find";
-import moment from "moment-timezone";
 import { useTranslation } from "react-i18next";
 
-import { timezone } from "../../../config";
 import { useSingleEventContext } from "../../../modules/singleEvent";
+import {
+  useActionDateTimeFormatter,
+  useMillisecondsDateTimeFormatter,
+} from "../../../utils/dateFormat";
 import { SignupWithQuota, stringifyAnswer } from "../../../utils/signupUtils";
 
 type Props = {
@@ -20,6 +22,8 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
 
   const { questions, nameQuestion } = useSingleEventContext().event!;
   const { t } = useTranslation();
+  const actionDateFormat = useActionDateTimeFormatter();
+  const msDateFormat = useMillisecondsDateTimeFormatter();
 
   let fullName;
   if (!confirmed) {
@@ -33,14 +37,18 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
   return (
     <tr className={!confirmed ? "ilmo--unconfirmed" : ""}>
       <td>{`${index}.`}</td>
-      {nameQuestion && <td className={!confirmed || !namePublic ? "ilmo--hidden-name" : ""}>{fullName}</td>}
+      {nameQuestion && (
+        <td className={!confirmed || !namePublic ? "ilmo--hidden-name" : ""}>{fullName}</td>
+      )}
       {filter(questions, "public").map((question) => (
-        <td key={question.id}>{stringifyAnswer(find(answers, { questionId: question.id })?.answer || "")}</td>
+        <td key={question.id}>
+          {stringifyAnswer(find(answers, { questionId: question.id })?.answer || "")}
+        </td>
       ))}
       {showQuota && <td>{quotaName || ""}</td>}
       <td>
-        {moment(createdAt).tz(timezone()).format("DD.MM.YYYY HH:mm:ss")}
-        <span className="ilmo--hover-only">{moment(createdAt).tz(timezone()).format(".SSS")}</span>
+        {actionDateFormat.format(new Date(createdAt))}
+        <span className="ilmo--hover-only">{msDateFormat.format(new Date(createdAt))}</span>
       </td>
     </tr>
   );

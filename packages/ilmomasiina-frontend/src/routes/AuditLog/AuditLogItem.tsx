@@ -1,9 +1,9 @@
 import React from "react";
 
-import moment from "moment-timezone";
 import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import { useActionDateTimeFormatter } from "@tietokilta/ilmomasiina-components/dist/utils/dateFormat";
 import type { AuditLogItemSchema } from "@tietokilta/ilmomasiina-models";
 import { AuditEvent } from "@tietokilta/ilmomasiina-models";
 import appPaths from "../../paths";
@@ -45,7 +45,9 @@ function useItemDescription(item: AuditLogItemSchema) {
         <Trans t={t} i18nKey={ACTION_STRINGS[item.action]}>
           created event
           {item.eventId ? (
-            <Link to={appPaths.adminEditEvent(item.eventId as any)}>{{ event: item.eventName ?? "" }}</Link>
+            <Link to={appPaths.adminEditEvent(item.eventId as any)}>
+              {{ event: item.eventName ?? "" }}
+            </Link>
           ) : (
             { event: item.eventName ?? "" }
           )}
@@ -60,7 +62,9 @@ function useItemDescription(item: AuditLogItemSchema) {
           {{ signup: `${item.signupId} (${item.signupName})` }}
           in event
           {item.eventId ? (
-            <Link to={appPaths.adminEditEvent(item.eventId)}>{{ event: item.eventName ?? "" }}</Link>
+            <Link to={appPaths.adminEditEvent(item.eventId)}>
+              {{ event: item.eventName ?? "" }}
+            </Link>
           ) : (
             { event: item.eventName ?? "" }
           )}
@@ -79,9 +83,10 @@ function useItemDescription(item: AuditLogItemSchema) {
 
 const AuditLogItem = ({ item }: Props) => {
   const desc = useItemDescription(item);
+  const actionDateFormat = useActionDateTimeFormatter();
   return (
     <tr>
-      <td>{moment(item.createdAt).tz(TIMEZONE).format("YYYY-MM-DD HH:mm:ss")}</td>
+      <td>{actionDateFormat.format(new Date(item.createdAt))}</td>
       <td>{item.user || "-"}</td>
       <td>{item.ipAddress || "-"}</td>
       <td>{desc}</td>

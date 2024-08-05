@@ -4,25 +4,30 @@ import { Spinner, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { ErrorCode } from "@tietokilta/ilmomasiina-models";
-import { timezone } from "../../config";
 import { linkComponent, Navigate } from "../../config/router";
 import { usePaths } from "../../contexts/paths";
 import { I18nProvider } from "../../i18n";
 import { EventListProps, EventListProvider, useEventListContext } from "../../modules/events";
+import { useEventDateFormatter } from "../../utils/dateFormat";
 import { errorDesc, errorTitle } from "../../utils/errorMessage";
 import { EventRow, eventsToRows, QuotaRow } from "../../utils/eventListUtils";
 import { useSignupStateText } from "../../utils/signupStateText";
 import TableRow from "./components/TableRow";
 
-const ListEventRow = ({ row: { slug, title, date, signupState, signupCount, quotaSize } }: { row: EventRow }) => {
+const ListEventRow = ({
+  row: { slug, title, date, signupState, signupCount, quotaSize },
+}: {
+  row: EventRow;
+}) => {
   const Link = linkComponent();
   const paths = usePaths();
   const stateText = useSignupStateText(signupState);
+  const eventDateFormat = useEventDateFormatter();
   return (
     <TableRow
       className={stateText.class}
       title={<Link to={paths.eventDetails(slug)}>{title}</Link>}
-      date={date ? date.tz(timezone()).format("DD.MM.YYYY") : ""}
+      date={date ? eventDateFormat.format(date) : ""}
       signupStatus={stateText}
       signupCount={signupCount}
       quotaSize={quotaSize}
@@ -47,7 +52,10 @@ const EventListView = () => {
   const { t } = useTranslation();
   const paths = usePaths();
 
-  const tableRows = useMemo(() => eventsToRows(events ?? []).filter((row) => row.type !== "waitlist"), [events]);
+  const tableRows = useMemo(
+    () => eventsToRows(events ?? []).filter((row) => row.type !== "waitlist"),
+    [events],
+  );
 
   // If initial setup is needed and is possible on this frontend, redirect to that page.
   if (error && error.code === ErrorCode.INITIAL_SETUP_NEEDED && paths.hasAdmin) {
@@ -86,7 +94,11 @@ const EventListView = () => {
         </thead>
         <tbody>
           {tableRows.map((row) =>
-            row.type === "event" ? <ListEventRow key={row.id} row={row} /> : <ListQuotaRow key={row.id} row={row} />,
+            row.type === "event" ? (
+              <ListEventRow key={row.id} row={row} />
+            ) : (
+              <ListQuotaRow key={row.id} row={row} />
+            ),
           )}
         </tbody>
       </Table>

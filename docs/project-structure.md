@@ -85,7 +85,6 @@ Libraries:
 - [React Router](https://reactrouter.com/)
 - [i18next](https://www.i18next.com/) for internationalization
 - [Formik](https://formik.org/)
-- [MomentJS](https://momentjs.com/) - will transition to something else in the future
 
 ## Frontend serving
 

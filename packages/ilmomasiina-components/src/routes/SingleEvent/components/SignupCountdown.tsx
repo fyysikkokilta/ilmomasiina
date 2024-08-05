@@ -1,6 +1,5 @@
 import React from "react";
 
-import moment from "moment";
 import Countdown from "react-countdown";
 
 import { useSingleEventContext } from "../../../modules/singleEvent";
@@ -8,9 +7,7 @@ import SignupButton from "./SignupButton";
 
 const SignupCountdown = () => {
   const event = useSingleEventContext().event!;
-  const openingTime = moment()
-    .add(event.millisTillOpening || 0, "ms")
-    .toDate();
+  const openingTime = new Date(Date.now() + (event.millisTillOpening || 0));
 
   return (
     <Countdown

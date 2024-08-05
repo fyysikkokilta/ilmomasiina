@@ -45,7 +45,7 @@ const AuditLogPagination = () => {
         &ndash;
         {{ last: value + LOGS_PER_PAGE }}
         {" out of "}
-        {{ total: auditLog?.count || "?" }}
+        {{ total: auditLog?.count ?? "?" }}
       </Trans>
       <Button
         className="ml-3"

@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+import { useActionDateTimeFormatter } from "@tietokilta/ilmomasiina-components/dist/utils/dateFormat";
 import {
   convertSignupsToCSV,
   FormattedSignup,
@@ -25,6 +26,7 @@ const SignupRow = ({ position, signup }: SignupProps) => {
   const event = useTypedSelector((state) => state.editor.event)!;
   const dispatch = useTypedDispatch();
   const { t } = useTranslation();
+  const actionDateFormat = useActionDateTimeFormatter();
 
   const onDelete = useEvent(async () => {
     // eslint-disable-next-line no-alert
@@ -52,7 +54,7 @@ const SignupRow = ({ position, signup }: SignupProps) => {
       {event.questions.map((question) => (
         <td key={question.id}>{stringifyAnswer(signup.answers[question.id])}</td>
       ))}
-      <td key="timestamp">{signup.createdAt}</td>
+      <td key="timestamp">{actionDateFormat.format(signup.createdAt)}</td>
       <td key="delete">
         <Button type="button" variant="danger" onClick={onDelete}>
           {t("editor.signups.action.delete")}

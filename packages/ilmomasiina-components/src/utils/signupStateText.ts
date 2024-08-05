@@ -1,5 +1,6 @@
-import moment, { Moment } from "moment-timezone";
 import { useTranslation } from "react-i18next";
+
+import { useEventDateTimeFormatter } from "./dateFormat";
 
 export enum SignupState {
   disabled = "disabled",
@@ -10,8 +11,8 @@ export enum SignupState {
 
 export type SignupStateInfo =
   | { state: SignupState.disabled }
-  | { state: SignupState.not_opened; opens: Moment }
-  | { state: SignupState.open; closes: Moment }
+  | { state: SignupState.not_opened; opens: Date }
+  | { state: SignupState.open; closes: Date }
   | { state: SignupState.closed };
 
 export function signupState(starts: string | null, closes: string | null): SignupStateInfo {
@@ -19,15 +20,15 @@ export function signupState(starts: string | null, closes: string | null): Signu
     return { state: SignupState.disabled };
   }
 
-  const signupOpens = moment(starts);
-  const signupCloses = moment(closes);
-  const now = moment();
+  const signupOpens = new Date(starts);
+  const signupCloses = new Date(closes);
+  const now = new Date();
 
-  if (signupOpens.isSameOrAfter(now)) {
+  if (now < signupOpens) {
     return { state: SignupState.not_opened, opens: signupOpens };
   }
 
-  if (signupCloses.isSameOrAfter(now)) {
+  if (now < signupCloses) {
     return { state: SignupState.open, closes: signupCloses };
   }
 
@@ -42,7 +43,7 @@ export interface SignupStateText {
 
 export function useSignupStateText(state: SignupStateInfo): SignupStateText {
   const { t } = useTranslation();
-  const timeFormat = `D.M.Y [${t("dateFormat.dateTimeSep")}] HH:mm`;
+  const eventDateFormat = useEventDateTimeFormatter();
 
   switch (state.state) {
     case SignupState.disabled:
@@ -53,20 +54,20 @@ export function useSignupStateText(state: SignupStateInfo): SignupStateText {
     case SignupState.not_opened:
       return {
         shortLabel: t("signupState.notOpened.short", {
-          date: moment(state.opens).format(timeFormat),
+          date: eventDateFormat.format(new Date(state.opens)),
         }),
         fullLabel: t("signupState.notOpened", {
-          date: moment(state.opens).format(timeFormat),
+          date: eventDateFormat.format(new Date(state.opens)),
         }),
         class: "ilmo--signup-not-opened",
       };
     case SignupState.open:
       return {
         shortLabel: t("signupState.open.short", {
-          date: moment(state.closes).format(timeFormat),
+          date: eventDateFormat.format(new Date(state.closes)),
         }),
         fullLabel: t("signupState.open.short", {
-          date: moment(state.closes).format(timeFormat),
+          date: eventDateFormat.format(new Date(state.closes)),
         }),
         class: "ilmo--signup-opened",
       };
