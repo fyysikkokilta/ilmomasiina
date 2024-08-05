@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {
-  DataTypes, HasManyAddAssociationMixin, HasManyAddAssociationsMixin, HasManyCountAssociationsMixin,
+  DataTypes, fn, HasManyAddAssociationMixin, HasManyAddAssociationsMixin, HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin, HasManyGetAssociationsMixin, HasManyHasAssociationMixin, HasManyHasAssociationsMixin,
   HasManyRemoveAssociationMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin, Model, Op, Optional,
   Sequelize,
@@ -209,6 +209,16 @@ export default function setupEventModel(sequelize: Sequelize) {
             },
           },
         }),
+      },
+      hooks: {
+        // Events use paranoid mode, so we need to change the slug when deleting
+        // to avoid the slug being reserved after deletion.
+        async beforeDestroy(instance, options) {
+          await instance.update(
+            { slug: `${instance.slug.substring(0, 100)}-deleted-${Date.now()}` },
+            { transaction: options.transaction },
+          );
+        },
       },
     },
   );
