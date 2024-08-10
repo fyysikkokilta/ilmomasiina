@@ -106,8 +106,7 @@ const EditConflictModal = ({ onSave }: Props) => {
             }
           >
             {"Another user or tab has edited this event at "}
-            <strong>{{ time: modal && actionDateFormat.format(new Date(modal.updatedAt)) }}</strong>
-            .
+            <strong>{{ time: modal && actionDateFormat.format(new Date(modal.updatedAt)) }}</strong>.
           </Trans>
         </p>
         {modal && <DeletedQuotasAndQuestions modal={modal} />}

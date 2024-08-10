@@ -45,9 +45,7 @@ function useItemDescription(item: AuditLogItemSchema) {
         <Trans t={t} i18nKey={ACTION_STRINGS[item.action]}>
           created event
           {item.eventId ? (
-            <Link to={appPaths.adminEditEvent(item.eventId as any)}>
-              {{ event: item.eventName ?? "" }}
-            </Link>
+            <Link to={appPaths.adminEditEvent(item.eventId as any)}>{{ event: item.eventName ?? "" }}</Link>
           ) : (
             { event: item.eventName ?? "" }
           )}
@@ -62,9 +60,7 @@ function useItemDescription(item: AuditLogItemSchema) {
           {{ signup: `${item.signupId} (${item.signupName})` }}
           in event
           {item.eventId ? (
-            <Link to={appPaths.adminEditEvent(item.eventId)}>
-              {{ event: item.eventName ?? "" }}
-            </Link>
+            <Link to={appPaths.adminEditEvent(item.eventId)}>{{ event: item.eventName ?? "" }}</Link>
           ) : (
             { event: item.eventName ?? "" }
           )}

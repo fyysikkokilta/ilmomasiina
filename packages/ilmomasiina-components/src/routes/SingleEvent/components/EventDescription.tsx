@@ -36,16 +36,13 @@ const EventDescription = () => {
         )}
         {event.date && (
           <p>
-            <strong>
-              {event.endDate ? t("singleEvent.info.startDate") : t("singleEvent.info.date")}
-            </strong>{" "}
+            <strong>{event.endDate ? t("singleEvent.info.startDate") : t("singleEvent.info.date")}</strong>{" "}
             {eventDateFormat.format(new Date(event.date))}
           </p>
         )}
         {event.endDate && (
           <p>
-            <strong>{t("singleEvent.info.endDate")}</strong>{" "}
-            {eventDateFormat.format(new Date(event.endDate))}
+            <strong>{t("singleEvent.info.endDate")}</strong> {eventDateFormat.format(new Date(event.endDate))}
           </p>
         )}
         {event.location && (

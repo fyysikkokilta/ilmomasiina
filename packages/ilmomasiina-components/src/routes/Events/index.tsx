@@ -14,11 +14,7 @@ import { EventRow, eventsToRows, QuotaRow } from "../../utils/eventListUtils";
 import { useSignupStateText } from "../../utils/signupStateText";
 import TableRow from "./components/TableRow";
 
-const ListEventRow = ({
-  row: { slug, title, date, signupState, signupCount, quotaSize },
-}: {
-  row: EventRow;
-}) => {
+const ListEventRow = ({ row: { slug, title, date, signupState, signupCount, quotaSize } }: { row: EventRow }) => {
   const Link = linkComponent();
   const paths = usePaths();
   const stateText = useSignupStateText(signupState);
@@ -52,10 +48,7 @@ const EventListView = () => {
   const { t } = useTranslation();
   const paths = usePaths();
 
-  const tableRows = useMemo(
-    () => eventsToRows(events ?? []).filter((row) => row.type !== "waitlist"),
-    [events],
-  );
+  const tableRows = useMemo(() => eventsToRows(events ?? []).filter((row) => row.type !== "waitlist"), [events]);
 
   // If initial setup is needed and is possible on this frontend, redirect to that page.
   if (error && error.code === ErrorCode.INITIAL_SETUP_NEEDED && paths.hasAdmin) {
@@ -94,11 +87,7 @@ const EventListView = () => {
         </thead>
         <tbody>
           {tableRows.map((row) =>
-            row.type === "event" ? (
-              <ListEventRow key={row.id} row={row} />
-            ) : (
-              <ListQuotaRow key={row.id} row={row} />
-            ),
+            row.type === "event" ? <ListEventRow key={row.id} row={row} /> : <ListQuotaRow key={row.id} row={row} />,
           )}
         </tbody>
       </Table>

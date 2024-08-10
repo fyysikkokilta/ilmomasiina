@@ -24,11 +24,10 @@ export type AnyEventSchema = AdminEventResponse | UserEventResponse;
 export type AnySignupSchema = AdminSignupSchema | PublicSignupSchema;
 
 /** Grabs the signup type from {Admin,User}EventSchema and adds some extra information. */
-export type SignupWithQuota<Ev extends AnyEventSchema = AnyEventSchema> =
-  Ev["quotas"][number]["signups"][number] & {
-    quotaId: QuotaID;
-    quotaName: string;
-  };
+export type SignupWithQuota<Ev extends AnyEventSchema = AnyEventSchema> = Ev["quotas"][number]["signups"][number] & {
+  quotaId: QuotaID;
+  quotaName: string;
+};
 
 function getSignupsAsList<Ev extends AnyEventSchema>(event: Ev): SignupWithQuota<Ev>[] {
   return event.quotas.flatMap(
@@ -43,9 +42,7 @@ function getSignupsAsList<Ev extends AnyEventSchema>(event: Ev): SignupWithQuota
 
 /** Computes the number of signups in the open quota and queue. */
 export function countOverflowSignups(quotas: QuotaWithSignupCount[], openQuotaSize: number) {
-  const overflow = sumBy(quotas, (quota) =>
-    Math.max(0, quota.signupCount - (quota.size ?? Infinity)),
-  );
+  const overflow = sumBy(quotas, (quota) => Math.max(0, quota.signupCount - (quota.size ?? Infinity)));
   return {
     openQuotaCount: Math.min(overflow, openQuotaSize),
     queueCount: Math.max(overflow - openQuotaSize, 0),
@@ -65,17 +62,12 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
   const signups = getSignupsAsList(event);
   const quotas = [
     ...event.quotas.map((quota) => {
-      const quotaSignups = signups.filter(
-        (signup) => signup.quotaId === quota.id && signup.status === "in-quota",
-      );
+      const quotaSignups = signups.filter((signup) => signup.quotaId === quota.id && signup.status === "in-quota");
       return {
         ...quota,
         signups: quotaSignups,
         // Trust signupCount and size, unless we have concrete information that more signups exist
-        signupCount: Math.max(
-          quotaSignups.length,
-          Math.min(quota.signupCount, quota.size ?? Infinity),
-        ),
+        signupCount: Math.max(quotaSignups.length, Math.min(quota.signupCount, quota.size ?? Infinity)),
       };
     }),
   ];
@@ -141,10 +133,7 @@ export type FormattedSignup = {
 export function getSignupsForAdminList(event: AdminEventResponse): FormattedSignup[] {
   const signupsArray = getSignupsAsList(event);
   const sorted = orderBy(signupsArray, [
-    (signup) =>
-      [SignupStatus.IN_QUOTA, SignupStatus.IN_OPEN_QUOTA, SignupStatus.IN_QUEUE, null].indexOf(
-        signup.status,
-      ),
+    (signup) => [SignupStatus.IN_QUOTA, SignupStatus.IN_OPEN_QUOTA, SignupStatus.IN_QUEUE, null].indexOf(signup.status),
     "createdAt",
   ]);
 
@@ -170,10 +159,7 @@ export function stringifyAnswer(answer: string | string[] | undefined) {
 }
 
 /** Converts an array of signup rows from `getSignupsForAdminList` to a an array of CSV cells. */
-export function convertSignupsToCSV(
-  event: AdminEventResponse,
-  signups: FormattedSignup[],
-): string[][] {
+export function convertSignupsToCSV(event: AdminEventResponse, signups: FormattedSignup[]): string[][] {
   const dateFormat = getCsvDateTimeFormatter();
   return [
     // Headers

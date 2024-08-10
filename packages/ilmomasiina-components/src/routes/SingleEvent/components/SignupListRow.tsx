@@ -5,10 +5,7 @@ import find from "lodash-es/find";
 import { useTranslation } from "react-i18next";
 
 import { useSingleEventContext } from "../../../modules/singleEvent";
-import {
-  useActionDateTimeFormatter,
-  useMillisecondsDateTimeFormatter,
-} from "../../../utils/dateFormat";
+import { useActionDateTimeFormatter, useMillisecondsDateTimeFormatter } from "../../../utils/dateFormat";
 import { SignupWithQuota, stringifyAnswer } from "../../../utils/signupUtils";
 
 type Props = {
@@ -37,13 +34,9 @@ const SignupListRow = ({ showQuota, signup, index }: Props) => {
   return (
     <tr className={!confirmed ? "ilmo--unconfirmed" : ""}>
       <td>{`${index}.`}</td>
-      {nameQuestion && (
-        <td className={!confirmed || !namePublic ? "ilmo--hidden-name" : ""}>{fullName}</td>
-      )}
+      {nameQuestion && <td className={!confirmed || !namePublic ? "ilmo--hidden-name" : ""}>{fullName}</td>}
       {filter(questions, "public").map((question) => (
-        <td key={question.id}>
-          {stringifyAnswer(find(answers, { questionId: question.id })?.answer || "")}
-        </td>
+        <td key={question.id}>{stringifyAnswer(find(answers, { questionId: question.id })?.answer || "")}</td>
       ))}
       {showQuota && <td>{quotaName || ""}</td>}
       <td>

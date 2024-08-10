@@ -38,16 +38,7 @@ export type TableRow = EventRow | QuotaRow;
 
 /** Converts an event to rows to be shown in the event list. */
 export function eventToRows(event: UserEventListItem, { compact }: EventTableOptions = {}) {
-  const {
-    id,
-    slug,
-    title,
-    date,
-    registrationStartDate,
-    registrationEndDate,
-    quotas,
-    openQuotaSize,
-  } = event;
+  const { id, slug, title, date, registrationStartDate, registrationEndDate, quotas, openQuotaSize } = event;
   const state = signupState(registrationStartDate, registrationEndDate);
 
   // Event row
@@ -82,9 +73,7 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
     );
   }
 
-  const overflow = sumBy(quotas, (quota) =>
-    quota.size ? Math.max(0, quota.signupCount - quota.size) : 0,
-  );
+  const overflow = sumBy(quotas, (quota) => (quota.size ? Math.max(0, quota.signupCount - quota.size) : 0));
 
   // Open quota
   if (openQuotaSize > 0) {
