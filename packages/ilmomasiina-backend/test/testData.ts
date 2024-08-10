@@ -1,10 +1,15 @@
 import { faker } from "@faker-js/faker";
 import { range } from "lodash";
 import moment from "moment";
-import { UniqueConstraintError } from "sequelize";
+import { Optional, UniqueConstraintError } from "sequelize";
 
 import { QuestionType, QuotaID } from "@tietokilta/ilmomasiina-models";
-import { EventAttributes, SignupAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
+import {
+  EventAttributes,
+  QuestionAttributes,
+  QuotaAttributes,
+  SignupAttributes,
+} from "@tietokilta/ilmomasiina-models/dist/models";
 import config from "../src/config";
 import { Answer, AnswerCreationAttributes } from "../src/models/answer";
 import { Event } from "../src/models/event";
@@ -27,8 +32,101 @@ type TestEventOptions = {
   signupState?: "not-open" | "open" | "closed";
   questionCount?: number;
   quotaCount?: number;
-  signupCount?: number;
+  quotaOverrides?: Partial<QuotaAttributes>;
+  questionOverrides?: Partial<QuestionAttributes>;
 };
+
+type TestEventAttribs = Optional<EventAttributes, "id" | "updatedAt">;
+
+/** Generates randomized attributes for a test event. The event is not saved.
+ *
+ * @param options Options for the event generation.
+ * @returns Event attributes. Does not include questions or quotas.
+ */
+export function testEventAttributes({
+  hasDate = true,
+  inPast = false,
+  hasSignup = true,
+  signupState = inPast ? "closed" : "open",
+}: TestEventOptions = {}) {
+  const title = faker.lorem.words({ min: 1, max: 5 });
+  const attribs: TestEventAttribs = {
+    title,
+    slug: faker.helpers.slugify(title),
+    date: null,
+    endDate: null,
+    registrationStartDate: null,
+    registrationEndDate: null,
+    openQuotaSize: hasSignup ? faker.number.int({ min: 0, max: 50 }) : 0,
+    description: faker.lorem.paragraphs({ min: 1, max: 5 }),
+    price: faker.finance.amount({ symbol: "€" }),
+    location: faker.location.streetAddress(),
+    facebookUrl: faker.internet.url(),
+    webpageUrl: faker.internet.url(),
+    category: faker.lorem.words({ min: 1, max: 2 }),
+    draft: false,
+    listed: true,
+    nameQuestion: true, // to be tested separately
+    emailQuestion: true,
+    signupsPublic: false,
+    verificationEmail: faker.lorem.paragraphs({ min: 1, max: 5 }),
+    defaultLanguage: "en",
+    languages: {},
+  };
+  if (hasDate) {
+    if (inPast) {
+      attribs.endDate = faker.date.recent({ refDate: moment().subtract(inPast, "days").toDate() });
+      attribs.date = faker.date.recent({ refDate: attribs.endDate });
+    } else {
+      attribs.date = faker.date.soon();
+      attribs.endDate = faker.date.soon({ refDate: attribs.date });
+    }
+  }
+  if (hasSignup) {
+    if (inPast && signupState === "closed") {
+      attribs.registrationEndDate = faker.date.recent({
+        refDate: moment().subtract(inPast, "days").toDate(),
+      });
+      attribs.registrationStartDate = faker.date.recent({ refDate: attribs.registrationEndDate });
+    } else if (signupState === "closed") {
+      attribs.registrationEndDate = faker.date.recent();
+      attribs.registrationStartDate = faker.date.recent({ refDate: attribs.registrationEndDate });
+    } else if (signupState === "not-open") {
+      attribs.registrationStartDate = faker.date.soon();
+      attribs.registrationEndDate = faker.date.soon({ refDate: attribs.registrationStartDate });
+    } else {
+      attribs.registrationStartDate = faker.date.recent();
+      attribs.registrationEndDate = faker.date.soon();
+    }
+  }
+  return attribs;
+}
+
+export function testQuestionOptions() {
+  return faker.helpers.multiple(() => faker.lorem.words({ min: 1, max: 3 }), {
+    count: { min: 1, max: 8 },
+  });
+}
+
+export function testQuestionAttributes() {
+  const attribs: Omit<QuestionCreationAttributes, "eventId" | "order"> = {
+    question: faker.lorem.words({ min: 1, max: 5 }),
+    type: faker.helpers.arrayElement(Object.values(QuestionType)),
+    required: faker.datatype.boolean(),
+    public: faker.datatype.boolean(),
+  };
+  if (attribs.type === QuestionType.SELECT || attribs.type === QuestionType.CHECKBOX) {
+    attribs.options = testQuestionOptions();
+  }
+  return attribs;
+}
+
+export function testQuotaAttributes() {
+  return {
+    title: faker.lorem.words({ min: 1, max: 5 }),
+    size: faker.helpers.maybe(() => faker.number.int({ min: 1, max: 50 }), { probability: 0.9 }) ?? null,
+  };
+}
 
 /**
  * Creates and saves a randomized test event.
@@ -37,66 +135,10 @@ type TestEventOptions = {
  * @param overrides Fields to set on the event right before saving.
  * @returns The created event, with `questions` and `quotas` populated.
  */
-export async function testEvent(
-  {
-    hasDate = true,
-    inPast = false,
-    hasSignup = true,
-    signupState = inPast ? "closed" : "open",
-    questionCount = faker.number.int({ min: 1, max: 5 }),
-    quotaCount = faker.number.int({ min: 1, max: 4 }),
-  }: TestEventOptions = {},
-  overrides: Partial<EventAttributes> = {},
-) {
-  const title = faker.lorem.words({ min: 1, max: 5 });
-  const event = new Event({
-    title,
-    slug: faker.helpers.slugify(title),
-    description: faker.lorem.paragraphs({ min: 1, max: 5 }),
-    price: faker.finance.amount({ symbol: "€" }),
-    location: faker.location.streetAddress(),
-    facebookUrl: faker.internet.url(),
-    webpageUrl: faker.internet.url(),
-    category: faker.lorem.words({ min: 1, max: 2 }),
-    draft: false,
-    verificationEmail: faker.lorem.paragraphs({ min: 1, max: 5 }),
-    defaultLanguage: "en",
-    languages: {},
-  });
-  if (hasDate) {
-    if (inPast) {
-      event.endDate = faker.date.recent({
-        refDate: moment().subtract(inPast, "days").toDate(),
-      });
-      event.date = faker.date.recent({ refDate: event.endDate });
-    } else {
-      event.date = faker.date.soon();
-      event.endDate = faker.date.soon({ refDate: event.date });
-    }
-  }
-  if (hasSignup) {
-    if (inPast && signupState === "closed") {
-      event.registrationEndDate = faker.date.recent({
-        refDate: moment().subtract(inPast, "days").toDate(),
-      });
-      event.registrationStartDate = faker.date.recent({
-        refDate: event.registrationEndDate,
-      });
-    } else if (signupState === "closed") {
-      event.registrationEndDate = faker.date.recent();
-      event.registrationStartDate = faker.date.recent({
-        refDate: event.registrationEndDate,
-      });
-    } else if (signupState === "not-open") {
-      event.registrationStartDate = faker.date.soon();
-      event.registrationEndDate = faker.date.soon({
-        refDate: event.registrationStartDate,
-      });
-    } else {
-      event.registrationStartDate = faker.date.recent();
-      event.registrationEndDate = faker.date.soon();
-    }
-  }
+export async function testEvent(options: TestEventOptions = {}, overrides: Partial<EventAttributes> = {}) {
+  const { questionCount = faker.number.int({ min: 1, max: 5 }), quotaCount = faker.number.int({ min: 1, max: 4 }) } =
+    options;
+  const event = new Event(testEventAttributes(options));
   event.set(overrides);
   try {
     await event.save();
@@ -110,32 +152,19 @@ export async function testEvent(
     }
   }
   event.questions = await Question.bulkCreate(
-    range(questionCount).map((i) => {
-      const question: QuestionCreationAttributes = {
-        eventId: event.id,
-        order: i,
-        question: faker.lorem.words({ min: 1, max: 5 }),
-        type: faker.helpers.arrayElement(Object.values(QuestionType)),
-        required: faker.datatype.boolean(),
-        public: faker.datatype.boolean(),
-      };
-      if (question.type === QuestionType.SELECT || question.type === QuestionType.CHECKBOX) {
-        question.options = faker.helpers.multiple(() => faker.lorem.words({ min: 1, max: 3 }), {
-          count: { min: 1, max: 8 },
-        });
-      }
-      return question;
-    }),
+    range(questionCount).map((i) => ({
+      eventId: event.id,
+      order: i,
+      ...testQuestionAttributes(),
+      ...options.questionOverrides,
+    })),
   );
   event.quotas = await Quota.bulkCreate(
     range(quotaCount).map((i) => ({
       eventId: event.id,
       order: i,
-      title: faker.lorem.words({ min: 1, max: 5 }),
-      size:
-        faker.helpers.maybe(() => faker.number.int({ min: 1, max: 50 }), {
-          probability: 0.9,
-        }) ?? null,
+      ...testQuotaAttributes(),
+      ...options.quotaOverrides,
     })),
   );
   return event;
