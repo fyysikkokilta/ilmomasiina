@@ -37,7 +37,7 @@ export default async function sendSignupConfirmationMail(signup: Signup) {
   const cancelLink = config.editSignupUrl
     .replace(/\{id\}/g, signup.id)
     .replace(/\{editToken\}/g, editToken)
-    .replace(/\{lang\}/g, signup.language ?? config.mailDefaultLang);
+    .replace(/\{lang\}/g, signup.language || config.mailDefaultLang);
 
   const params = {
     name: fullName,

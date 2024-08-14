@@ -96,7 +96,7 @@ export default class EmailService {
       const email = new Email(TEMPLATE_OPTIONS);
       const brandedParams = {
         ...params,
-        siteUrl: config.adminUrl,
+        siteUrl: config.adminUrl.replace(/\{lang\}/g, language || config.mailDefaultLang),
         branding: {
           footerText: config.brandingMailFooterText,
           footerLink: config.brandingMailFooterLink,
@@ -116,7 +116,7 @@ export default class EmailService {
       const email = new Email(TEMPLATE_OPTIONS);
       const brandedParams = {
         ...params,
-        siteUrl: config.adminUrl,
+        siteUrl: config.adminUrl.replace(/\{lang\}/g, language || config.mailDefaultLang),
         branding: {
           footerText: config.brandingMailFooterText,
           footerLink: config.brandingMailFooterLink,
