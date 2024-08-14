@@ -83,8 +83,14 @@ const config = {
   brandingMailFooterLink: envString("BRANDING_MAIL_FOOTER_LINK"),
   /** Calendar name included in iCalendar exports. */
   icalCalendarName: envString("BRANDING_ICAL_CALENDAR_NAME", "Ilmomasiina"),
-  /** Default language for emails, if no language is known for the signup. */
+  /** Default language for emails, if no language is known for the signup.
+   *
+   * Also used for URLs in iCalendar.
+   */
   mailDefaultLang: envString("MAIL_DEFAULT_LANG", "fi"),
+
+  /** Domain name used for iCalendar UIDs. */
+  icalUidDomain: envString("ICAL_UID_DOMAIN", null),
 
   /** Timezone used for emails. */
   timezone: envString("APP_TIMEZONE", "Europe/Helsinki"),
@@ -95,20 +101,27 @@ const config = {
    * @example "http://example.com/ilmo"
    */
   baseUrl: envString("BASE_URL"),
-  /** URL template for an event details page. Used for iCalendar exports. Contains `{slug}`.
+  /** URL template for an event details page. Used for iCalendar exports. Contains `{slug}`, may contain `{lang}`.
    *
    * This is intended for custom frontends; the default is for the frontend included in the repo.
    *
    * @example "http://example.com/events/{slug}"
    */
   eventDetailsUrl: envString("EVENT_DETAILS_URL", `${envString("BASE_URL")}/events/{slug}`),
-  /** URL template for a signup edit page. Used for emails. Contains `{id}` and `{editToken}`.
+  /** URL template for a signup edit page. Used for emails. Contains `{id}` and `{editToken}`, may contain `{lang}`.
    *
    * This is intended for custom frontends; the default is for the frontend included in the repo.
    *
    * @example "http://example.com/signup/{id}/{editToken}"
    */
   editSignupUrl: envString("EDIT_SIGNUP_URL", `${envString("BASE_URL")}/signup/{id}/{editToken}`),
+  /** URL template for the admin main page. Used for emails. May contain `{lang}`.
+   *
+   * This is intended for custom frontends; the default is for the frontend included in the repo.
+   *
+   * @example "http://example.com/{lang}/admin"
+   */
+  adminUrl: envString("ADMIN_URL", `${envString("BASE_URL")}/admin`),
 
   /** SMTP server hostname. */
   smtpHost: envString("SMTP_HOST", null),

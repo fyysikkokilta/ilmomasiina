@@ -18,7 +18,7 @@ function dateToArray(date: Date) {
 /** Domain name for generating iCalendar UIDs.
  * @see https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.4.7
  */
-const uidDomain = new URL(config.baseUrl ?? "http://localhost").hostname;
+const uidDomain = config.icalUidDomain || new URL(config.baseUrl ?? "http://localhost").hostname;
 
 export async function eventsAsICal() {
   const events = await Event.scope("user").findAll({
@@ -48,7 +48,7 @@ export async function eventsAsICal() {
       description: event.description || undefined, // TODO convert markdown
       location: event.location || undefined,
       categories: event.category ? [event.category] : undefined,
-      url: config.eventDetailsUrl.replace(/\{slug\}/g, event.slug),
+      url: config.eventDetailsUrl.replace(/\{slug\}/g, event.slug).replace(/\{lang\}/g, config.mailDefaultLang),
     })),
   );
 
