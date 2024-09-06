@@ -16,6 +16,7 @@ export interface ConfirmationMailParams {
     label: string;
     answer: string;
   }[];
+  queuePosition: number | null;
   edited: boolean;
   date: string | null;
   event: Event;

@@ -18,10 +18,10 @@ export default async function updateSignup(
   request: FastifyRequest<{ Params: SignupPathParams; Body: SignupUpdateBody }>,
   reply: FastifyReply,
 ): Promise<SignupUpdateResponse> {
-  const updatedSignup = await getSequelize().transaction(async (transaction) => {
+  const { updatedSignup, edited } = await getSequelize().transaction(async (transaction) => {
     // Retrieve event data and lock the row for editing
     const signup = await Signup.scope("active").findByPk(request.params.id, {
-      attributes: ["id", "quotaId", "confirmedAt", "firstName", "lastName", "email", "language"],
+      attributes: ["id", "quotaId", "confirmedAt", "firstName", "lastName", "email", "language", "status", "position"],
       transaction,
       lock: Transaction.LOCK.UPDATE,
     });
@@ -156,11 +156,11 @@ export default async function updateSignup(
       transaction,
     });
 
-    return signup;
+    return { updatedSignup: signup, edited: !notConfirmedYet };
   });
 
   // Send the confirmation email
-  sendSignupConfirmationMail(updatedSignup);
+  sendSignupConfirmationMail(updatedSignup, edited);
 
   // Return data
   reply.status(200);

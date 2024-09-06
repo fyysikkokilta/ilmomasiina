@@ -1,8 +1,12 @@
 extends ../layout.pug
 
 block mainContent
-  div.content-block
-    p.bodyText #{event.verificationEmail}
+  if event.verificationEmail
+    div.content-block
+      p.bodyText #{event.verificationEmail}
+  if queuePosition
+    div.content-block
+      p.bodyText #[strong Olet jonossa sijalla #{queuePosition}.] Jos saat paikan jonosta, sinulle lähetetään ilmoitus sähköpostitse.
   div.content-block
     p.bodyText Tapahtuman tiedot:
     ul
