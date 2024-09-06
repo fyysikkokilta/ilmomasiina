@@ -1,8 +1,12 @@
 extends ../layout.pug
 
 block mainContent
-  div.content-block
-    p.bodyText #{event.verificationEmail}
+  if event.verificationEmail
+    div.content-block
+      p.bodyText #{event.verificationEmail}
+  if queuePosition
+    div.content-block
+      p.bodyText #[strong You are in the queue in position #{queuePosition}.] If you get accepted from the queue, you will be notified by email.
   div.content-block
     p.bodyText Event details:
     ul
