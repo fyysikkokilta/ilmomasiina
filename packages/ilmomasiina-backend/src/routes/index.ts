@@ -285,6 +285,7 @@ async function setupPublicRoutes(fastifyInstance: FastifyInstance, opts: RouteOp
         response: {
           ...errorResponses,
           200: schema.signupUpdateResponse,
+          400: Type.Union([schema.signupValidationError, schema.errorResponse]),
         },
       },
       // Require valid edit token:
@@ -402,7 +403,10 @@ async function setupPublicRoutes(fastifyInstance: FastifyInstance, opts: RouteOp
   );
 }
 
-export default async function setupRoutes(instance: FastifyInstance, opts: RouteOptions): Promise<void> {
+export default async function setupRoutes(
+  instance: FastifyInstance,
+  opts: RouteOptions,
+): Promise<void> {
   addLogEventHook(instance);
 
   await instance.register(setupAdminRoutes, { ...opts, prefix: "/admin" });

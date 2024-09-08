@@ -1,9 +1,14 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { BadRequest } from "http-errors";
 import { Transaction } from "sequelize";
+import { isEmail } from "validator";
 
-import type { SignupPathParams, SignupUpdateBody, SignupUpdateResponse } from "@tietokilta/ilmomasiina-models";
-import { AuditEvent } from "@tietokilta/ilmomasiina-models";
+import type {
+  SignupPathParams,
+  SignupUpdateBody,
+  SignupUpdateResponse,
+  SignupValidationErrors,
+} from "@tietokilta/ilmomasiina-models";
+import { AuditEvent, SignupFieldError } from "@tietokilta/ilmomasiina-models";
 import sendSignupConfirmationMail from "../../mail/signupConfirmation";
 import { getSequelize } from "../../models";
 import { Answer } from "../../models/answer";
@@ -11,7 +16,7 @@ import { Event } from "../../models/event";
 import { Question } from "../../models/question";
 import { Signup } from "../../models/signup";
 import { signupsAllowed } from "./createNewSignup";
-import { NoSuchSignup, SignupsClosed } from "./errors";
+import { NoSuchSignup, SignupsClosed, SignupValidationError } from "./errors";
 
 /** Requires editTokenVerification */
 export default async function updateSignup(
@@ -51,19 +56,35 @@ export default async function updateSignup(
     const notConfirmedYet = !signup.confirmedAt;
     const questions = event.questions!;
 
+    const errors: SignupValidationErrors = {};
+
     // Check that required common fields are present (if first time confirming)
     let nameFields = {};
     if (notConfirmedYet && event.nameQuestion) {
       const { firstName, lastName } = request.body;
-      if (!firstName) throw new BadRequest("Missing first name");
-      if (!lastName) throw new BadRequest("Missing last name");
+      if (!firstName) {
+        errors.firstName = SignupFieldError.MISSING;
+      } else if (firstName.length > Signup.MAX_NAME_LENGTH) {
+        errors.firstName = SignupFieldError.TOO_LONG;
+      }
+      if (!lastName) {
+        errors.lastName = SignupFieldError.MISSING;
+      } else if (lastName.length > Signup.MAX_NAME_LENGTH) {
+        errors.lastName = SignupFieldError.TOO_LONG;
+      }
       nameFields = { firstName, lastName };
     }
 
     let emailField = {};
     if (notConfirmedYet && event.emailQuestion) {
       const { email } = request.body;
-      if (!email) throw new BadRequest("Missing email");
+      if (!email) {
+        errors.email = SignupFieldError.MISSING;
+      } else if (email.length > Signup.MAX_EMAIL_LENGTH) {
+        errors.email = SignupFieldError.TOO_LONG;
+      } else if (!isEmail(email)) {
+        errors.email = SignupFieldError.INVALID_EMAIL;
+      }
       emailField = { email };
     }
 
@@ -77,50 +98,58 @@ export default async function updateSignup(
     const newAnswers = questions.map((question) => {
       // Fetch the answer to this question from the request body
       let answer = request.body.answers?.find((a) => a.questionId === question.id)?.answer;
+      let error: SignupFieldError | undefined;
 
       if (!answer || !answer.length) {
         // Disallow empty answers to required questions
         if (question.required) {
-          throw new BadRequest(`Missing answer for question ${question.question}`);
+          error = SignupFieldError.MISSING;
         }
         // Normalize empty answers to "" or [], depending on question type
         answer = question.type === "checkbox" ? [] : "";
       } else if (question.type === "checkbox") {
         // Ensure checkbox answers are arrays
         if (!Array.isArray(answer)) {
-          throw new BadRequest(`Invalid answer to question ${question.question}`);
+          error = SignupFieldError.WRONG_TYPE;
+        } else {
+          // Check that all checkbox answers are valid
+          answer.forEach((option) => {
+            if (!question.options!.includes(option)) {
+              error = SignupFieldError.NOT_AN_OPTION;
+            }
+          });
         }
-        // Check that all checkbox answers are valid
-        answer.forEach((option) => {
-          if (!question.options!.includes(option)) {
-            throw new BadRequest(`Invalid answer to question ${question.question}`);
-          }
-        });
       } else {
         // Don't allow arrays for non-checkbox questions
         if (typeof answer !== "string") {
-          throw new BadRequest(`Invalid answer to question ${question.question}`);
-        }
-        switch (question.type) {
-          case "text":
-          case "textarea":
-            break;
-          case "number":
-            // Check that a numeric answer is valid
-            if (!Number.isFinite(parseFloat(answer))) {
-              throw new BadRequest(`Invalid answer to question ${question.question}`);
+          error = SignupFieldError.WRONG_TYPE;
+        } else {
+          switch (question.type) {
+            case "text":
+            case "textarea":
+              break;
+            case "number":
+              // Check that a numeric answer is valid
+              if (!Number.isFinite(parseFloat(answer))) {
+                error = SignupFieldError.NOT_A_NUMBER;
+              }
+              break;
+            case "select": {
+              // Check that the select answer is valid
+              if (!question.options!.includes(answer)) {
+                error = SignupFieldError.NOT_AN_OPTION;
+              }
+              break;
             }
-            break;
-          case "select": {
-            // Check that the select answer is valid
-            if (!question.options!.includes(answer)) {
-              throw new BadRequest(`Invalid answer to question ${question.question}`);
-            }
-            break;
+            default:
+              throw new Error("Invalid question type");
           }
-          default:
-            throw new Error("Invalid question type");
         }
+      }
+
+      if (error) {
+        errors.answers ??= {};
+        errors.answers[question.id] = error;
       }
 
       return {
@@ -129,6 +158,10 @@ export default async function updateSignup(
         signupId: signup.id,
       };
     });
+
+    if (Object.keys(errors).length > 0) {
+      throw new SignupValidationError("Errors validating signup", errors);
+    }
 
     // Update fields for the signup (name and email only editable on first confirmation)
     const updatedFields = {

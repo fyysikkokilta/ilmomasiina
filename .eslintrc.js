@@ -52,6 +52,10 @@ module.exports = {
     "radix": ["error", "as-needed"],
     // ...I know what I'm doing.
     "no-control-regex": "off",
+    // In some cases, especially if you want to comment the logic, it's much
+    // clearer to write it like a binary tree:
+    // if { if { } else { } } else { if { } else { } }
+    "no-lonely-if": "off",
     // Not usable with formik.
     "react/jsx-props-no-spreading": "off",
     // TypeScript validates prop types, no need for this.

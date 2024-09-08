@@ -52,6 +52,7 @@
     "@fastify/type-provider-typebox": "^4.0.0",
     "@sinclair/typebox": "^0.32.14",
     "@tietokilta/ilmomasiina-models": "workspace:*",
+    "@types/validator": "^13.12.0",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "base32-encode": "^1.2.0",
@@ -75,7 +76,8 @@
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.1",
-    "umzug": "^3.7.0"
+    "umzug": "^3.7.0",
+    "validator": "^13.12.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",

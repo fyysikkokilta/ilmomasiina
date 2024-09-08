@@ -38,7 +38,11 @@ export default function BaseFieldRow({
       </Form.Label>
       <Col sm="9">
         {children}
-        {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
+        {error && (
+          // Use text-danger instead of invalid-feedback here. invalid-feedback is hidden automatically when the
+          // previous element isn't .is-invalid, but that doesn't work with checkbox arrays.
+          <Form.Text className="text-danger">{error}</Form.Text>
+        )}
         {extraFeedback}
         {help && <Form.Text muted>{help}</Form.Text>}
       </Col>

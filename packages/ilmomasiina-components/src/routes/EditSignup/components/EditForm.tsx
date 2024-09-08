@@ -6,11 +6,20 @@ import { Form, FormRenderProps, useFormState } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import type { SignupUpdateBody } from "@tietokilta/ilmomasiina-models";
+import {
+  ErrorCode,
+  QuestionID,
+  SignupUpdateBody,
+  SignupValidationError,
+} from "@tietokilta/ilmomasiina-models";
 import { ApiError } from "../../../api";
 import { linkComponent, useNavigate } from "../../../config/router";
 import { usePaths } from "../../../contexts/paths";
-import { useDeleteSignup, useEditSignupContext, useUpdateSignup } from "../../../modules/editSignup";
+import {
+  useDeleteSignup,
+  useEditSignupContext,
+  useUpdateSignup,
+} from "../../../modules/editSignup";
 import { errorDesc } from "../../../utils/errorMessage";
 import useEvent from "../../../utils/useEvent";
 import CommonFields from "./CommonFields";
@@ -73,7 +82,12 @@ const EditFormSubmit = ({ disabled }: { disabled: boolean }) => {
   );
 };
 
-type BodyProps = FormRenderProps<SignupUpdateBody> & {
+// react-final-form works better when we convert answers to an object
+type SignupFormData = Omit<SignupUpdateBody, "answers"> & {
+  answers: Record<QuestionID, string | string[]>;
+};
+
+type BodyProps = FormRenderProps<SignupFormData> & {
   deleting: boolean;
   onDelete: () => void;
 };
@@ -115,13 +129,28 @@ const EditForm = () => {
     i18n: { language },
   } = useTranslation();
 
-  const onSubmit = useEvent(async (answers: SignupUpdateBody) => {
-    const progressToast = toast.loading(isNew ? t("editSignup.status.signup") : t("editSignup.status.edit"));
+  // Convert answers to object form for react-final-form.
+  const initialValues = useMemo(
+    () => ({
+      ...signup,
+      answers: Object.fromEntries(
+        signup!.answers.map(({ questionId, answer }) => [questionId, answer]),
+      ),
+    }),
+    [signup],
+  );
+
+  const onSubmit = useEvent(async (formData: SignupFormData) => {
+    const progressToast = toast.loading(
+      isNew ? t("editSignup.status.signup") : t("editSignup.status.edit"),
+    );
+    // Convert answers back from object to array.
+    const answers = Object.entries(formData.answers).map(([questionId, answer]) => ({
+      questionId,
+      answer,
+    }));
     try {
-      await updateSignup({
-        ...answers,
-        language,
-      });
+      await updateSignup({ ...formData, answers, language });
       toast.update(progressToast, {
         render: isNew ? t("editSignup.status.signupSuccess") : t("editSignup.status.editSuccess"),
         type: toast.TYPE.SUCCESS,
@@ -136,14 +165,23 @@ const EditForm = () => {
       return undefined;
     } catch (error) {
       toast.update(progressToast, {
-        render: errorDesc(t, error as ApiError, isNew ? "editSignup.signupError" : "editSignup.editError"),
+        render: errorDesc(
+          t,
+          error as ApiError,
+          isNew ? "editSignup.signupError" : "editSignup.editError",
+        ),
         type: toast.TYPE.ERROR,
         autoClose: 5000,
         closeButton: true,
         closeOnClick: true,
         isLoading: false,
       });
-      return { [FORM_ERROR]: error };
+      // Augment the submit errors object if the error is a submit validation error.
+      const errors =
+        error instanceof ApiError && error.code === ErrorCode.SIGNUP_VALIDATION_ERROR
+          ? (error.response! as SignupValidationError).errors
+          : null;
+      return { [FORM_ERROR]: error, ...errors };
     }
   });
 
@@ -175,7 +213,7 @@ const EditForm = () => {
   });
 
   return (
-    <Form<SignupUpdateBody> onSubmit={onSubmit} initialValues={signup!}>
+    <Form<SignupFormData> onSubmit={onSubmit} initialValues={initialValues}>
       {(props) => <EditFormBody {...props} deleting={deleting} onDelete={onDelete} />}
     </Form>
   );
