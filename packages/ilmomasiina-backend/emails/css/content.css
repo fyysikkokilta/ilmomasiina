@@ -25,6 +25,9 @@
 .alert.alert-good {
   background-color: #79b654;
 }
+.alert.alert-neutral {
+  background-color: #0a0d10;
+}
 
 .bodyText {
   color: black;
