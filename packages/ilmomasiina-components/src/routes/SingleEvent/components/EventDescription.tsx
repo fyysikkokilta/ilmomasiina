@@ -13,6 +13,7 @@ import { useEventDateTimeFormatter } from "../../../utils/dateFormat";
 
 const EventDescription = () => {
   const event = useSingleEventContext().event!;
+  const { preview } = useSingleEventContext();
   const { loggedIn } = useContext(AuthContext);
   const Link = linkComponent();
   const paths = usePaths();
@@ -22,7 +23,7 @@ const EventDescription = () => {
     <>
       <nav className="ilmo--title-nav">
         <h1>{event.title}</h1>
-        {loggedIn && paths.hasAdmin && (
+        {loggedIn && !preview && paths.hasAdmin && (
           <Button as={Link} variant="primary" to={paths.adminEditEvent(event.id)}>
             {t("singleEvent.editEvent")}
           </Button>

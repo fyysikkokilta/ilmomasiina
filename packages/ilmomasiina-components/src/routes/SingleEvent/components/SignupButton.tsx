@@ -26,6 +26,7 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
   const navigate = useNavigate();
   const paths = usePaths();
   const { registrationStartDate, registrationEndDate, quotas } = useSingleEventContext().event!;
+  const { preview } = useSingleEventContext();
   const eventState = signupState(registrationStartDate, registrationEndDate);
   const [submitting, setSubmitting] = useState(false);
   const isOnly = quotas.length === 1;
@@ -72,7 +73,7 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
           key={quota.id}
           type="button"
           variant="secondary"
-          disabled={!isOpen || submitting}
+          disabled={!isOpen || preview || submitting}
           className="ilmo--signup-button"
           onClick={() => onClick(quota.id)}
         >

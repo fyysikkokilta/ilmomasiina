@@ -35,9 +35,19 @@ export type EditorQuota = QuotaUpdate & {
 /** Root form data type for event editor */
 export interface EditorEvent
   extends Omit<
-    EventUpdateBody,
-    "quotas" | "questions" | "date" | "endDate" | "registrationStartDate" | "registrationEndDate"
-  > {
+      Required<EventUpdateBody>,
+      // Omit fields we'll overwrite for editing states that aren't valid in the API
+      | "quotas"
+      | "questions"
+      | "date"
+      | "endDate"
+      | "registrationStartDate"
+      | "registrationEndDate"
+      // Omit fields we want to keep optional
+      | "moveSignupsToQueue"
+    >,
+    // Add optional fields
+    Pick<EventUpdateBody, "moveSignupsToQueue"> {
   eventType: EditorEventType;
 
   date: Date | undefined;
@@ -50,6 +60,9 @@ export interface EditorEvent
   quotas: EditorQuota[];
   useOpenQuota: boolean;
 }
+
+/** Stricter version of EventUpdateBody with fields we guarantee to return from `editorEventToServer`. */
+export type ConvertedEditorEvent = Omit<Required<EventUpdateBody>, "moveSignupsToQueue">;
 
 export type { EditorActions } from "./actions";
 export { EditorEventType } from "./actions";

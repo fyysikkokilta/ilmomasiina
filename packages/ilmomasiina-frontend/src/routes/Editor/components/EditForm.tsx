@@ -23,6 +23,7 @@ import EditorTabHeader, { EditorTab } from "./EditorTabHeader";
 import EditorToolbar from "./EditorToolbar";
 import EmailsTab from "./EmailsTab";
 import MoveToQueueWarning from "./MoveToQueueWarning";
+import PreviewTab from "./PreviewTab";
 import QuestionsTab from "./QuestionsTab";
 import QuotasTab from "./QuotasTab";
 import SignupsTab from "./SignupsTab";
@@ -60,6 +61,7 @@ const EditFormBody = ({ form }: FormRenderProps<EditorEvent>) => {
             <EditorTabBody id={EditorTab.QUOTAS} activeTab={activeTab} component={QuotasTab} />
             <EditorTabBody id={EditorTab.QUESTIONS} activeTab={activeTab} component={QuestionsTab} />
             <EditorTabBody id={EditorTab.EMAILS} activeTab={activeTab} component={EmailsTab} />
+            <EditorTabBody id={EditorTab.PREVIEW} activeTab={activeTab} component={PreviewTab} />
             <EditorTabBody id={EditorTab.SIGNUPS} activeTab={activeTab} component={SignupsTab} />
           </div>
         </BsForm>

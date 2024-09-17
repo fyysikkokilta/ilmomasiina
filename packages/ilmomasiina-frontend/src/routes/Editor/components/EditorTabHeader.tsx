@@ -11,6 +11,7 @@ export enum EditorTab {
   QUOTAS = "quotas",
   QUESTIONS = "questions",
   EMAILS = "emails",
+  PREVIEW = "preview",
   SIGNUPS = "signups",
 }
 
@@ -19,8 +20,11 @@ const tabTitles = {
   [EditorTab.QUOTAS]: "editor.tabs.quotas",
   [EditorTab.QUESTIONS]: "editor.tabs.questions",
   [EditorTab.EMAILS]: "editor.tabs.emails",
+  [EditorTab.PREVIEW]: "editor.tabs.preview",
   [EditorTab.SIGNUPS]: "editor.tabs.signups",
 } as const;
+
+const needSignup = [EditorTab.QUOTAS, EditorTab.QUESTIONS, EditorTab.EMAILS, EditorTab.SIGNUPS];
 
 type TabProps = Props & {
   id: EditorTab;
@@ -55,8 +59,8 @@ const EditorTabHeader = ({ activeTab, setActiveTab }: Props) => {
   return (
     <Nav variant="tabs" activeKey={activeTab} role="tablist">
       {Object.values(EditorTab)
-        // Only show Basic details for ONLY_EVENT events.
-        .filter((id) => id === EditorTab.BASIC_DETAILS || eventType !== EditorEventType.ONLY_EVENT)
+        // Only show some tabs for ONLY_EVENT events.
+        .filter((id) => eventType !== EditorEventType.ONLY_EVENT || !needSignup.includes(id))
         .map((id) => (
           <Tab key={id} id={id} activeTab={activeTab} setActiveTab={setActiveTab} />
         ))}

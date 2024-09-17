@@ -140,6 +140,7 @@
     "editor.tabs.quotas": "Signup settings",
     "editor.tabs.questions": "Questions",
     "editor.tabs.emails": "Confirmation emails",
+    "editor.tabs.preview": "Preview",
     "editor.tabs.signups": "Signups",
     "editor.basic.name": "Event name",
     "editor.basic.name.missing": "* Title is mandatory",

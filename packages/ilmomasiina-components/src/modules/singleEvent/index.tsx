@@ -16,11 +16,14 @@ type State = {
   signupsByQuota?: QuotaSignups[];
   pending: boolean;
   error?: ApiError;
+  preview?: boolean;
 };
 
 const { Provider, useStateContext } = createStateContext<State>();
 export { useStateContext as useSingleEventContext };
 export { beginSignup } from "./actions";
+export type { State as SingleEventState };
+export { Provider as SingleEventContextProvider };
 
 export function useSingleEventState({ slug }: SingleEventProps) {
   const fetchEvent = useAbortablePromise((signal) => apiFetch<UserEventResponse>(`events/${slug}`, { signal }), [slug]);

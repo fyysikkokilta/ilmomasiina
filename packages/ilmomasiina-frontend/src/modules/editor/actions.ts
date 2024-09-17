@@ -6,7 +6,6 @@ import {
   EditConflictError,
   ErrorCode,
   EventID,
-  EventUpdateBody,
   SignupID,
 } from "@tietokilta/ilmomasiina-models";
 import adminApiFetch from "../../api";
@@ -24,7 +23,7 @@ import {
   MOVE_TO_QUEUE_WARNING,
   RESET,
 } from "./actionTypes";
-import type { EditorEvent } from "./types";
+import type { ConvertedEditorEvent, EditorEvent } from "./types";
 
 export enum EditorEventType {
   ONLY_EVENT = "event",
@@ -187,7 +186,7 @@ export const serverEventToEditor = (event: AdminEventResponse): EditorEvent => (
   })),
 });
 
-const editorEventToServer = (form: EditorEvent): EventUpdateBody => ({
+export const editorEventToServer = (form: EditorEvent): ConvertedEditorEvent => ({
   ...form,
   date: form.eventType === EditorEventType.ONLY_SIGNUP ? null : (form.date?.toISOString() ?? null),
   endDate: form.eventType === EditorEventType.ONLY_SIGNUP ? null : (form.endDate?.toISOString() ?? null),

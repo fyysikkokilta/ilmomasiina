@@ -140,6 +140,7 @@
     "editor.tabs.quotas": "Ilmoittautumisasetukset",
     "editor.tabs.questions": "Kysymykset",
     "editor.tabs.emails": "Vahvistusviestit",
+    "editor.tabs.preview": "Esikatsele",
     "editor.tabs.signups": "Ilmoittautuneet",
     "editor.basic.name": "Tapahtuman nimi",
     "editor.basic.name.missing": "* Otsikko vaaditaan",
