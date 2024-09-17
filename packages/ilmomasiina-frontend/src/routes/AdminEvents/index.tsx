@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { BaseSyntheticEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button, Spinner } from "react-bootstrap";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { shallowEqual } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -10,12 +10,19 @@ import requireAuth from "../../containers/requireAuth";
 import { getAdminEvents, resetState } from "../../modules/adminEvents/actions";
 import appPaths from "../../paths";
 import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
+import { isEventInPast } from "../../utils/eventState";
 import AdminEventListItem from "./AdminEventListItem";
 
 const AdminEventsList = () => {
   const dispatch = useTypedDispatch();
   const { events, loadError } = useTypedSelector((state) => state.adminEvents, shallowEqual);
+  const [showPast, setShowPast] = useState(false);
   const { t } = useTranslation();
+
+  const togglePast = useCallback((evt: BaseSyntheticEvent) => {
+    evt.preventDefault();
+    setShowPast((prev) => !prev);
+  }, []);
 
   useEffect(() => {
     dispatch(getAdminEvents());
@@ -23,6 +30,12 @@ const AdminEventsList = () => {
       dispatch(resetState());
     };
   }, [dispatch]);
+
+  const shownEvents = useMemo(() => {
+    const filtered = events?.filter((event) => isEventInPast(event) === showPast);
+    // Additionally, reverse events when viewing past events, so the newest event comes first.
+    return showPast ? filtered?.reverse() : filtered;
+  }, [events, showPast]);
 
   if (loadError) {
     return (
@@ -33,7 +46,7 @@ const AdminEventsList = () => {
     );
   }
 
-  if (!events) {
+  if (!shownEvents) {
     return (
       <>
         <h1>{t("adminEvents.title")}</h1>
@@ -45,7 +58,10 @@ const AdminEventsList = () => {
   return (
     <>
       <nav className="ilmo--title-nav">
-        <h1>{t("adminEvents.title")}</h1>
+        <h1>{showPast ? t("adminEvents.title.past") : t("adminEvents.title")}</h1>
+        <Button variant="secondary" onClick={togglePast}>
+          {showPast ? t("adminEvents.nav.upcoming") : t("adminEvents.nav.past")}
+        </Button>
         <Button as={Link} variant="secondary" to={appPaths.adminUsersList}>
           {t("adminEvents.nav.users")}
         </Button>
@@ -67,9 +83,24 @@ const AdminEventsList = () => {
           </tr>
         </thead>
         <tbody>
-          {events.map((event) => (
+          {shownEvents.map((event) => (
             <AdminEventListItem key={event.id} event={event} />
           ))}
+          {!shownEvents.length && (
+            <tr>
+              <td colSpan={5}>
+                <Trans t={t} i18nKey={showPast ? "adminEvents.noEvents.past" : "adminEvents.noEvents.upcoming"}>
+                  No (type) events to show. Would you like to
+                  {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                  <a href="#" onClick={togglePast} role="button">
+                    view (other type) events
+                  </a>
+                  or
+                  <Link to={appPaths.adminEditEvent("new")}>create a new event</Link>?
+                </Trans>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </>
