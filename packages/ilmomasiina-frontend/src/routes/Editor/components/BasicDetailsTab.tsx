@@ -137,6 +137,35 @@ const BasicDetailsTab = () => {
           help={t("editor.basic.endDate.info")}
         />
       )}
+      {eventType !== EditorEventType.ONLY_EVENT && (
+        <FieldRow
+          name="registrationStartDate"
+          id="registrationStartDate"
+          as={DateTimePicker}
+          label={t("editor.basic.registrationStartDate")}
+          required
+        />
+      )}
+      {eventType !== EditorEventType.ONLY_EVENT && (
+        <FieldRow
+          name="registrationEndDate"
+          id="registrationEndDate"
+          as={DateTimePicker}
+          label={t("editor.basic.registrationEndDate")}
+          required
+        />
+      )}
+      {eventType !== EditorEventType.ONLY_EVENT && (
+        <FieldRow
+          name="signupsPublic"
+          label={t("editor.basic.signupsPublic")}
+          as={Form.Check}
+          type="checkbox"
+          checkAlign
+          checkLabel={t("editor.basic.signupsPublic.check")}
+          help={t("editor.basic.signupsPublic.info")}
+        />
+      )}
       <FieldRow
         name="category"
         label={t("editor.basic.category")}
