@@ -33,9 +33,11 @@ export default function BaseFieldRow({
 }: BaseFieldRowProps) {
   return (
     <Form.Group as={Row} controlId={controlId}>
-      <Form.Label column sm="3" data-required={required} className={checkAlign ? "pt-0" : ""}>
-        {label}
-      </Form.Label>
+      <Col sm="3" className="ilmo--label-column">
+        <Form.Label data-required={required} className={`col-form-label ${checkAlign ? "pt-0" : ""}`}>
+          {label}
+        </Form.Label>
+      </Col>
       <Col sm="9">
         {children}
         {error && (
