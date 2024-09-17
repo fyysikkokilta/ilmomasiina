@@ -1,8 +1,8 @@
 import { push } from "connected-react-router";
 import { toast } from "react-toastify";
 
-import { ApiError, apiFetch } from "@tietokilta/ilmomasiina-components";
-import { AdminLoginResponse, ErrorCode } from "@tietokilta/ilmomasiina-models";
+import { apiFetch } from "@tietokilta/ilmomasiina-components";
+import { AdminLoginResponse } from "@tietokilta/ilmomasiina-models";
 import i18n from "../../i18n";
 import appPaths from "../../paths";
 import type { DispatchAction, GetState } from "../../store/types";
@@ -87,7 +87,8 @@ const RENEW_LOGIN_THRESHOLD = 5 * 60 * 1000;
 
 export const renewLogin = () => async (dispatch: DispatchAction, getState: GetState) => {
   const { accessToken } = getState().auth;
-  if (!accessToken || Date.now() < accessToken.expiresAt - RENEW_LOGIN_THRESHOLD) return;
+  if (!accessToken || Date.now() < accessToken.expiresAt - RENEW_LOGIN_THRESHOLD || Date.now() > accessToken.expiresAt)
+    return;
 
   try {
     if (accessToken) {
@@ -101,10 +102,6 @@ export const renewLogin = () => async (dispatch: DispatchAction, getState: GetSt
       }
     }
   } catch (err) {
-    if (err instanceof ApiError && err.code === ErrorCode.BAD_SESSION) {
-      dispatch(loginExpired());
-    } else {
-      throw err;
-    }
+    // Ignore errors from login renewal - loginExpired() will trigger via requireAuth.
   }
 };
