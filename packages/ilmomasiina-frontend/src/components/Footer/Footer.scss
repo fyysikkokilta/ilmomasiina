@@ -1,18 +1,17 @@
 @use "@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
 
 footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
   padding: 1em 0;
   background: $secondary-background;
   color: $secondary-text-color;
-  text-align: center;
+
+  .container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
 
   a {
-    display: inline-block;
-    color: $secondary-text-color;
-    margin-left: 10px;
-    margin-right: 10px;
+    color: inherit;
   }
 }

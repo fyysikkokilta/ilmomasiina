@@ -34,9 +34,7 @@ html {
 .layout-wrapper {
   display: flex;
   flex-direction: column;
-  position: relative;
   min-height: 100vh;
-  padding-bottom: 4em;
 
   > .container {
     flex: 1 0 auto;
