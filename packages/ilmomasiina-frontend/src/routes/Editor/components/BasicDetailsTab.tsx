@@ -56,6 +56,9 @@ const SlugAvailability = () => {
     }, SLUG_CHECK_DELAY);
   }, [dispatch, slug]);
 
+  if (!slug) {
+    return null;
+  }
   if (slugAvailability === "checking") {
     return <Form.Text>{t("editor.basic.url.checking")}</Form.Text>;
   }
