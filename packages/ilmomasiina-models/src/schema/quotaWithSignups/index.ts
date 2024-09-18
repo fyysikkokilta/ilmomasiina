@@ -4,7 +4,7 @@ import { quota } from "../quota";
 import { adminSignupSchema, publicSignupSchema } from "../signup";
 
 /** Schema for a quota with a count of its signups. */
-export const quotaWithSignupCount = Type.Intersect([
+export const quotaWithSignupCount = Type.Composite([
   quota,
   Type.Object({
     signupCount: Type.Integer({
@@ -14,7 +14,7 @@ export const quotaWithSignupCount = Type.Intersect([
 ]);
 
 /** Schema for a quota with public information of its signups. */
-export const userQuotaWithSignups = Type.Intersect([
+export const userQuotaWithSignups = Type.Composite([
   quotaWithSignupCount,
   Type.Object({
     signups: Type.Array(publicSignupSchema, {
@@ -24,7 +24,7 @@ export const userQuotaWithSignups = Type.Intersect([
 ]);
 
 /** Schema for a quota with full information of its signups. */
-export const adminQuotaWithSignups = Type.Intersect([
+export const adminQuotaWithSignups = Type.Composite([
   quotaWithSignupCount,
   Type.Object({
     signups: Type.Array(adminSignupSchema, {
