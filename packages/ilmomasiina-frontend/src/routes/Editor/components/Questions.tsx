@@ -11,11 +11,12 @@ import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import useShallowMemo from "@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo";
 import { QuestionType, questionUpdate } from "@tietokilta/ilmomasiina-models";
 import { EditorQuestion } from "../../../modules/editor/types";
+import useEditorErrors from "./errors";
 import { useFieldValue } from "./hooks";
 import SelectBox from "./SelectBox";
 import Sortable from "./Sortable";
 
-const maxOptionsPerQuestion = questionUpdate.properties.options.maxItems ?? Infinity;
+export const maxOptionsPerQuestion = questionUpdate.properties.options.maxItems ?? Infinity;
 
 type OptionProps = {
   name: string;
@@ -33,11 +34,12 @@ const renderCheck = ({ input, meta, ...props }: FieldRenderProps<boolean> & Chec
 
 const OptionRow = ({ name, index, remove }: OptionProps) => {
   const { t } = useTranslation();
+  const formatError = useEditorErrors();
 
   const removeThis = useEvent(() => remove(index));
 
   return (
-    <FieldRow name={name} type="text" label={t("editor.questions.questionOptions")} required>
+    <FieldRow name={name} type="text" label={t("editor.questions.questionOptions")} required formatError={formatError}>
       <InputGroup>
         <Field name={name} required maxLength={255}>
           {renderInput}
@@ -63,6 +65,7 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
   const {
     mutators: { push },
   } = useForm();
+  const formatError = useEditorErrors();
 
   const removeThis = useEvent(() => remove(index));
 
@@ -79,6 +82,7 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
           label={t("editor.questions.questionText")}
           required
           maxLength={255}
+          formatError={formatError}
         />
         <FieldRow
           name={`${name}.type`}
@@ -92,6 +96,7 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
             [QuestionType.SELECT, t("editor.questions.questionType.select")],
             [QuestionType.CHECKBOX, t("editor.questions.questionType.checkbox")],
           ]}
+          formatError={formatError}
         />
         {(type === "select" || type === "checkbox") && (
           <FieldArray name={`${name}.options`}>

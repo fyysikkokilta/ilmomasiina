@@ -10,7 +10,7 @@ import FieldRow from "../../../components/FieldRow";
 import { useEditSignupContext } from "../../../modules/editSignup";
 import { stringifyAnswer } from "../../../utils/signupUtils";
 import useEvent from "../../../utils/useEvent";
-import fieldError from "./fieldError";
+import useFieldErrors from "./fieldError";
 
 type QuestionFieldProps = {
   name: string;
@@ -21,26 +21,23 @@ type QuestionFieldProps = {
 const QuestionField = ({ name, question, disabled }: QuestionFieldProps) => {
   const {
     input: { value, onChange },
-    meta: { invalid, submitError },
+    meta: { invalid },
   } = useField<string | string[]>(`${name}.${question.id}`);
   const currentAnswerString = stringifyAnswer(value);
   const currentAnswerArray = useMemo(() => (Array.isArray(value) ? value : []), [value]);
 
   const { t } = useTranslation();
+  const formatError = useFieldErrors();
 
   // We need to wrap onChange, as react-final-form complains if we pass radios to it without type="radio".
   // If we pass type="radio", it doesn't provide us with the value of the field.
-  const onFieldChange = useEvent(
-    (evt: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-      onChange(evt.currentTarget.value);
-    },
-  );
+  const onFieldChange = useEvent((evt: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    onChange(evt.currentTarget.value);
+  });
 
   const onCheckboxChange = useEvent((evt: ChangeEvent<HTMLInputElement>) => {
     const { checked, value: option } = evt.currentTarget;
-    const newAnswers = checked
-      ? [...currentAnswerArray, option]
-      : without(currentAnswerArray, option);
+    const newAnswers = checked ? [...currentAnswerArray, option] : without(currentAnswerArray, option);
     onChange(newAnswers);
   });
 
@@ -162,7 +159,7 @@ const QuestionField = ({ name, question, disabled }: QuestionFieldProps) => {
       required={question.required}
       help={help}
       checkAlign={isCheckboxes}
-      alternateError={fieldError(t, submitError)}
+      formatError={formatError}
     >
       {input}
     </FieldRow>
@@ -179,12 +176,7 @@ const QuestionFields = ({ name }: Props) => {
     // TODO: add proper validation
     <>
       {event!.questions.map((question) => (
-        <QuestionField
-          key={question.id}
-          name={name}
-          question={question}
-          disabled={registrationClosed}
-        />
+        <QuestionField key={question.id} name={name} question={question} disabled={registrationClosed} />
       ))}
     </>
   );

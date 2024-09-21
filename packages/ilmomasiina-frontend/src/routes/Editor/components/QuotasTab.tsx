@@ -5,6 +5,7 @@ import { UseFieldConfig } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
 import { FieldRow } from "@tietokilta/ilmomasiina-components";
+import useEditorErrors from "./errors";
 import { useFieldValue } from "./hooks";
 import Quotas from "./Quotas";
 
@@ -15,6 +16,7 @@ const numberConfig: UseFieldConfig<number | null> = {
 const QuotasTab = () => {
   const useOpenQuota = useFieldValue<boolean>("useOpenQuota");
   const { t } = useTranslation();
+  const formatError = useEditorErrors();
   return (
     <div>
       <Quotas />
@@ -26,6 +28,7 @@ const QuotasTab = () => {
         checkAlign
         checkLabel={t("editor.quotas.openQuota.check")}
         help={t("editor.quotas.openQuota.info")}
+        formatError={formatError}
       />
       {useOpenQuota && (
         <FieldRow
@@ -35,6 +38,7 @@ const QuotasTab = () => {
           config={numberConfig}
           min="0"
           required
+          formatError={formatError}
         />
       )}
     </div>

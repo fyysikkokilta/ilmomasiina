@@ -16,6 +16,8 @@ import { selectFormData } from "../../../modules/editor/selectors";
 import type { EditorEvent } from "../../../modules/editor/types";
 import appPaths from "../../../paths";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import convertZodError from "../../../utils/convertZodError";
+import editorSchema from "../schema";
 import BasicDetailsTab from "./BasicDetailsTab";
 import EditConflictModal from "./EditConflictModal";
 import EditorTabBody from "./EditorTabBody";
@@ -85,6 +87,11 @@ const mutators = {
   },
 } satisfies typeof arrayMutators;
 
+function validate(event: EditorEvent) {
+  const result = editorSchema.safeParse(event);
+  return result.success ? undefined : convertZodError(result.error);
+}
+
 const EditForm = () => {
   const initialValues = useTypedSelector(selectFormData);
   const dispatch = useTypedDispatch();
@@ -122,7 +129,7 @@ const EditForm = () => {
   });
 
   return (
-    <Form<EditorEvent> onSubmit={onSubmit} initialValues={initialValues} mutators={mutators}>
+    <Form<EditorEvent> onSubmit={onSubmit} initialValues={initialValues} mutators={mutators} validate={validate}>
       {(props) => <EditFormBody {...props} />}
     </Form>
   );

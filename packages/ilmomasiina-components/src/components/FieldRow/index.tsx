@@ -11,8 +11,8 @@ type BaseProps = Omit<BaseFieldRowProps, "error" | "children"> &
     name: string;
     /** Passed as `controlId` if no `controlId` is separately set. */
     id?: string;
-    /** Overrides the real error message if the field has errors. */
-    alternateError?: string;
+    /** Formats a field error. */
+    formatError?: (error: any) => ReactNode;
     /** Passed as `label` to the field component. Intended for checkboxes. */
     checkLabel?: ReactNode;
     /** useField() config. */
@@ -56,7 +56,7 @@ export default function FieldRow<C extends As>({
   label = "",
   help,
   required = false,
-  alternateError,
+  formatError,
   extraFeedback,
   checkAlign,
   checkLabel,
@@ -92,7 +92,7 @@ export default function FieldRow<C extends As>({
       label={label}
       help={help}
       required={required}
-      error={invalid && (alternateError || error)}
+      error={invalid && (formatError ? formatError(error) : error)}
       extraFeedback={extraFeedback}
       checkAlign={checkAlign}
     >

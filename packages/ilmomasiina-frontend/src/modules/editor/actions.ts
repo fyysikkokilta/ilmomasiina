@@ -35,8 +35,8 @@ export const defaultEvent = (): EditorEvent => ({
   eventType: EditorEventType.EVENT_WITH_SIGNUP,
   title: "",
   slug: "",
-  date: undefined,
-  endDate: undefined,
+  date: null,
+  endDate: null,
   webpageUrl: "",
   facebookUrl: "",
   category: "",
@@ -45,8 +45,8 @@ export const defaultEvent = (): EditorEvent => ({
   price: "",
   signupsPublic: false,
 
-  registrationStartDate: undefined,
-  registrationEndDate: undefined,
+  registrationStartDate: null,
+  registrationEndDate: null,
 
   openQuotaSize: 0,
   useOpenQuota: false,
@@ -170,10 +170,10 @@ function eventType(event: AdminEventResponse): EditorEventType {
 export const serverEventToEditor = (event: AdminEventResponse): EditorEvent => ({
   ...event,
   eventType: eventType(event),
-  date: event.date ? new Date(event.date) : undefined,
-  endDate: event.endDate ? new Date(event.endDate) : undefined,
-  registrationStartDate: event.registrationStartDate ? new Date(event.registrationStartDate) : undefined,
-  registrationEndDate: event.registrationEndDate ? new Date(event.registrationEndDate) : undefined,
+  date: event.date ? new Date(event.date) : null,
+  endDate: event.endDate ? new Date(event.endDate) : null,
+  registrationStartDate: event.registrationStartDate ? new Date(event.registrationStartDate) : null,
+  registrationEndDate: event.registrationEndDate ? new Date(event.registrationEndDate) : null,
   quotas: event.quotas.map((quota) => ({
     ...quota,
     key: quota.id,
@@ -195,7 +195,7 @@ export const editorEventToServer = (form: EditorEvent): ConvertedEditorEvent => 
   registrationEndDate:
     form.eventType === EditorEventType.ONLY_EVENT ? null : (form.registrationEndDate?.toISOString() ?? null),
   quotas: form.quotas,
-  openQuotaSize: form.useOpenQuota ? form.openQuotaSize : 0,
+  openQuotaSize: form.useOpenQuota && form.openQuotaSize ? form.openQuotaSize : 0,
   questions: form.questions.map((question) => ({
     ...question,
     options: question.type === "select" || question.type === "checkbox" ? question.options : null,
