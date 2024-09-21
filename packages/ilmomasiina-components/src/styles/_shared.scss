@@ -18,7 +18,8 @@
   column-gap: $spacer * 0.5;
 
   :first-child {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   // on narrow screens, always wrap the button(s)
