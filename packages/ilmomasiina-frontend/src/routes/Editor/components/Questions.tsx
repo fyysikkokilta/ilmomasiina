@@ -9,11 +9,13 @@ import { SortEnd } from "react-sortable-hoc";
 import { FieldRow } from "@tietokilta/ilmomasiina-components";
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import useShallowMemo from "@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo";
-import { QuestionType } from "@tietokilta/ilmomasiina-models";
+import { QuestionType, questionUpdate } from "@tietokilta/ilmomasiina-models";
 import { EditorQuestion } from "../../../modules/editor/types";
 import { useFieldValue } from "./hooks";
 import SelectBox from "./SelectBox";
 import Sortable from "./Sortable";
+
+const maxOptionsPerQuestion = questionUpdate.properties.options.maxItems ?? Infinity;
 
 type OptionProps = {
   name: string;
@@ -37,7 +39,7 @@ const OptionRow = ({ name, index, remove }: OptionProps) => {
   return (
     <FieldRow name={name} type="text" label={t("editor.questions.questionOptions")} required>
       <InputGroup>
-        <Field name={name} required>
+        <Field name={name} required maxLength={255}>
           {renderInput}
         </Field>
         <InputGroup.Append>
@@ -71,7 +73,13 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
   return (
     <Row className="question-body px-0">
       <Col xs="12" sm="9" xl="10">
-        <FieldRow name={`${name}.question`} type="text" label={t("editor.questions.questionText")} required />
+        <FieldRow
+          name={`${name}.question`}
+          type="text"
+          label={t("editor.questions.questionText")}
+          required
+          maxLength={255}
+        />
         <FieldRow
           name={`${name}.type`}
           label={t("editor.questions.questionType")}
@@ -86,21 +94,25 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
           ]}
         />
         {(type === "select" || type === "checkbox") && (
-          <>
-            <FieldArray name={`${name}.options`}>
-              {({ fields }) =>
-                fields.map((optName, i) => <OptionRow key={optName} name={optName} index={i} remove={fields.remove} />)
-              }
-            </FieldArray>
-            <Row>
-              <Col sm="3" />
-              <Col sm="9">
-                <Button variant="secondary" type="button" onClick={addOption}>
-                  {t("editor.questions.questionOptions.add")}
-                </Button>
-              </Col>
-            </Row>
-          </>
+          <FieldArray name={`${name}.options`}>
+            {({ fields }) => (
+              <>
+                {fields.map((optName, i) => (
+                  <OptionRow key={optName} name={optName} index={i} remove={fields.remove} />
+                ))}
+                {fields.value.length < maxOptionsPerQuestion && (
+                  <Row>
+                    <Col sm="3" />
+                    <Col sm="9">
+                      <Button variant="secondary" type="button" onClick={addOption}>
+                        {t("editor.questions.questionOptions.add")}
+                      </Button>
+                    </Col>
+                  </Row>
+                )}
+              </>
+            )}
+          </FieldArray>
         )}
       </Col>
       <Col xs="12" sm="3" xl="2" className="event-editor--question-buttons">

@@ -42,6 +42,7 @@ const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
             .join(" ")}
           type="text"
           required
+          maxLength={255}
         />
         <FieldRow
           name={`${name}.size`}

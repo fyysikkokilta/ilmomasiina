@@ -1,11 +1,11 @@
-import React, { ComponentType, ReactNode } from "react";
+import React, { ComponentPropsWithoutRef, ComponentType, JSX, ReactNode } from "react";
 
-import { Form } from "react-bootstrap";
+import { Form, FormControlProps } from "react-bootstrap";
 import { useField, UseFieldConfig } from "react-final-form";
 
 import BaseFieldRow, { BaseFieldRowProps } from "../BaseFieldRow";
 
-type Props = Omit<BaseFieldRowProps, "error" | "children"> &
+type BaseProps = Omit<BaseFieldRowProps, "error" | "children"> &
   Pick<UseFieldConfig<any>, "type"> & {
     /** The name of the field in the data. */
     name: string;
@@ -15,16 +15,43 @@ type Props = Omit<BaseFieldRowProps, "error" | "children"> &
     alternateError?: string;
     /** Passed as `label` to the field component. Intended for checkboxes. */
     checkLabel?: ReactNode;
-    /** The component or element to use as the field. */
-    as?: ComponentType<any> | string;
     /** useField() config. */
     config?: UseFieldConfig<any>;
-    /** If given, this is used as the field. */
-    children?: ReactNode;
   };
 
+// These typings do the best attempt we can do with merged props.
+// Ideally, with TypeScript, we should provide a render function, but I'll defer that change
+// to when we get rid of react-bootstrap altogether.
+
+// react-bootstrap's typing for Form.Control is extremely broad, so only allow <input> props.
+type InputProps = ComponentPropsWithoutRef<"input">;
+
+// Props with neither `children` nor `as`, assume `Form.Control`.
+type PropsWithFormControl = BaseProps & {
+  children?: undefined;
+  as?: undefined;
+} & Omit<FormControlProps & InputProps, keyof BaseProps | "as" | "children">;
+
+// Props with `children` given, no extra props to pass through.
+type PropsWithChildren = BaseProps & {
+  /** If given, this is used as the field. */
+  children: ReactNode;
+  as?: undefined;
+};
+
+type As = keyof JSX.IntrinsicElements | ComponentType<any>;
+
+// Props with a custom `as` component.
+type PropsWithAs<C extends As> = BaseProps & {
+  /** The component or element to use as the field. */
+  as: C;
+  children?: undefined;
+} & Omit<ComponentPropsWithoutRef<C>, keyof BaseProps | "as" | "children">;
+
+type Props<C extends As> = PropsWithFormControl | PropsWithChildren | PropsWithAs<C>;
+
 /** react-final-field field row component */
-export default function FieldRow<P = unknown>({
+export default function FieldRow<C extends As>({
   name,
   label = "",
   help,
@@ -33,14 +60,14 @@ export default function FieldRow<P = unknown>({
   extraFeedback,
   checkAlign,
   checkLabel,
-  as: Component = Form.Control,
+  as,
   children,
   type,
   id,
   controlId = id ?? name,
   config,
   ...props
-}: Props & P) {
+}: Props<C>) {
   const {
     input,
     meta: { error: validationError, submitError, invalid },
@@ -55,16 +82,8 @@ export default function FieldRow<P = unknown>({
     // and calls it "label", but we still want to call the other one "label" for all other types of field. Therefore
     // we pass "checkLabel" to the field here.
     const overrideProps = checkLabel !== undefined ? { label: checkLabel } : {};
-    field = (
-      <Component
-        required={required}
-        isInvalid={invalid}
-        {...props}
-        id={id}
-        {...input}
-        {...overrideProps}
-      />
-    );
+    const Component = (as ?? Form.Control) as ComponentType<any>;
+    field = <Component required={required} isInvalid={invalid} {...props} id={id} {...input} {...overrideProps} />;
   }
 
   return (

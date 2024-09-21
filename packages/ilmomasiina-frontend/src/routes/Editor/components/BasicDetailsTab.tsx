@@ -88,12 +88,19 @@ const BasicDetailsTab = () => {
 
   return (
     <div>
-      <FieldRow name="title" label={t("editor.basic.name")} required alternateError={t("editor.basic.name.missing")} />
+      <FieldRow
+        name="title"
+        label={t("editor.basic.name")}
+        required
+        maxLength={255}
+        alternateError={t("editor.basic.name.missing")}
+      />
       <GenerateSlug />
       <FieldRow
         name="slug"
         label={t("editor.basic.url")}
         required
+        maxLength={255}
         alternateError={t("editor.basic.url.missing")}
         extraFeedback={<SlugAvailability />}
         as={SlugField}
@@ -175,10 +182,12 @@ const BasicDetailsTab = () => {
         as={Combobox}
         data={allCategories || []}
         busy={allCategories === null}
+        inputProps={{ maxLength: 255 }}
       />
-      <FieldRow name="webpageUrl" label={t("editor.basic.homePage")} />
-      <FieldRow name="facebookUrl" label={t("editor.basic.facebook")} />
-      <FieldRow name="location" label={t("editor.basic.location")} />
+      <FieldRow name="webpageUrl" label={t("editor.basic.homePage")} maxLength={255} />
+      <FieldRow name="facebookUrl" label={t("editor.basic.facebook")} maxLength={255} />
+      <FieldRow name="location" label={t("editor.basic.location")} maxLength={255} />
+      <FieldRow name="price" label={t("editor.basic.price")} maxLength={255} />
       <FieldRow
         name="description"
         label={t("editor.basic.description")}
