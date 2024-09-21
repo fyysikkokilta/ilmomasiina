@@ -53,6 +53,7 @@ const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
           help={t("editor.quotas.quotaSize.info")}
           type="number"
           min={1}
+          placeholder={t("editor.quotas.quotaSize.unlimited")}
           config={numberConfig}
           formatError={formatError}
         />

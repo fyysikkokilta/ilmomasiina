@@ -184,6 +184,7 @@
     "editor.quotas.quotaName.reorder": "You can reorder quotas by dragging from the handles on the left.",
     "editor.quotas.quotaSize": "Quota size",
     "editor.quotas.quotaSize.info": "If the quota size is unlimited, leave the field empty.",
+    "editor.quotas.quotaSize.unlimited": "unlimited",
     "editor.quotas.openQuota": "Open quota",
     "editor.quotas.openQuota.check": "Include an additional open quota",
     "editor.quotas.openQuota.info": "Signups that did not fit in their own quota will be automatically placed in the open quota, in the order of signups.",

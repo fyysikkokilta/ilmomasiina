@@ -37,6 +37,7 @@ const QuotasTab = () => {
           type="number"
           config={numberConfig}
           min="0"
+          placeholder="0" // if this is left empty, it's set to null and disabled
           required
           formatError={formatError}
         />
