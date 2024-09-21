@@ -13,7 +13,7 @@ export type SignupStateInfo =
   | { state: SignupState.disabled }
   | { state: SignupState.not_opened; opens: Date }
   | { state: SignupState.open; closes: Date }
-  | { state: SignupState.closed };
+  | { state: SignupState.closed; closed: Date };
 
 export function signupState(starts: string | null, closes: string | null): SignupStateInfo {
   if (starts === null || closes === null) {
@@ -32,7 +32,7 @@ export function signupState(starts: string | null, closes: string | null): Signu
     return { state: SignupState.open, closes: signupCloses };
   }
 
-  return { state: SignupState.closed };
+  return { state: SignupState.closed, closed: signupCloses };
 }
 
 export interface SignupStateText {
@@ -66,14 +66,19 @@ export function useSignupStateText(state: SignupStateInfo): SignupStateText {
         shortLabel: t("signupState.open.short", {
           date: eventDateFormat.format(new Date(state.closes)),
         }),
-        fullLabel: t("signupState.open.short", {
+        fullLabel: t("signupState.open", {
           date: eventDateFormat.format(new Date(state.closes)),
         }),
         class: "ilmo--signup-opened",
       };
     case SignupState.closed:
       return {
-        shortLabel: t("signupState.closed"),
+        shortLabel: t("signupState.closed.short", {
+          date: eventDateFormat.format(new Date(state.closed)),
+        }),
+        fullLabel: t("signupState.closed", {
+          date: eventDateFormat.format(new Date(state.closed)),
+        }),
         class: "ilmo--signup-closed",
       };
     default:
