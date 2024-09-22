@@ -16,7 +16,7 @@ type State = {
   signupsByQuota?: QuotaSignups[];
   pending: boolean;
   error?: ApiError;
-  preview?: boolean;
+  preview?: { setPreviewingForm: (form: boolean) => void };
 };
 
 const { Provider, useStateContext } = createStateContext<State>();

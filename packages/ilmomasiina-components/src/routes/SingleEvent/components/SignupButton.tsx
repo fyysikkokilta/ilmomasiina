@@ -68,18 +68,22 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
           <span style={{ color: "green" }}>{` (${seconds} s)`}</span>
         )}
       </p>
-      {quotas.map((quota) => (
-        <Button
-          key={quota.id}
-          type="button"
-          variant="secondary"
-          disabled={!isOpen || preview || submitting}
-          className="ilmo--signup-button"
-          onClick={() => onClick(quota.id)}
-        >
-          {isOnly ? t("singleEvent.signupButton.singleQuota") : t("singleEvent.signupButton", { quota: quota.title })}
-        </Button>
-      ))}
+      {preview ? (
+        <Button onClick={() => preview.setPreviewingForm(true)}>{t("singleEvent.signupButton.preview")}</Button>
+      ) : (
+        quotas.map((quota) => (
+          <Button
+            key={quota.id}
+            type="button"
+            variant="secondary"
+            disabled={!isOpen || submitting}
+            className="ilmo--signup-button"
+            onClick={() => onClick(quota.id)}
+          >
+            {isOnly ? t("singleEvent.signupButton.singleQuota") : t("singleEvent.signupButton", { quota: quota.title })}
+          </Button>
+        ))
+      )}
     </div>
   );
 };
