@@ -9,13 +9,15 @@ import { OPENQUOTA, QuotaSignups, WAITLIST } from "../../../utils/signupUtils";
 import SignupListRow from "./SignupListRow";
 
 type Props = {
+  isSingleQuota: boolean;
   quota: QuotaSignups;
 };
 
-const SignupList = ({ quota }: Props) => {
+const SignupList = ({ isSingleQuota, quota }: Props) => {
   const { signups } = quota;
   const { questions, nameQuestion } = useSingleEventContext().event!;
-  const showQuotas = quota.id === OPENQUOTA || quota.id === WAITLIST;
+  const isSpecialQuota = quota.id === OPENQUOTA || quota.id === WAITLIST;
+  const showQuotas = !isSingleQuota && isSpecialQuota;
   const { t } = useTranslation();
   return (
     <div className="ilmo--quota-signups">
