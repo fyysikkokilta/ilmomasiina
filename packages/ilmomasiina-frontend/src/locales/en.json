@@ -148,7 +148,7 @@
     "editor.errors.tooLong": "Enter at most {{maximum}} characters",
     "editor.errors.tooSmall": "The value must be at least {{minimum}}",
     "editor.errors.tooLarge": "The value must be at most {{maximum}}",
-    "editor.errors.invalidSlug": "Only the characters A-Z, a-z, - and _ are allowed",
+    "editor.errors.invalidSlug": "Only the characters A-Z, a-z, 0-9, - and _ are allowed",
     "editor.errors.optionsTooLong": "The combined answer options are too long",
     "editor.errors.generic": "Invalid value: {{error}}",
     "editor.basic.name": "Event name",

@@ -148,7 +148,7 @@
     "editor.errors.tooLong": "Syötä enintään {{maximum}} merkkiä",
     "editor.errors.tooSmall": "Arvon tulee olla vähintään {{minimum}}",
     "editor.errors.tooLarge": "Arvon tulee olla enintään {{maximum}}",
-    "editor.errors.invalidSlug": "URL-osoitteessa voi käyttää vain merkkejä A-Z, a-z, - ja _",
+    "editor.errors.invalidSlug": "URL-osoitteessa voi käyttää vain merkkejä A-Z, a-z, 0-9, - ja _",
     "editor.errors.dateInverted": "Tapahtuma ei voi päättyä ennen kuin se alkaa",
     "editor.errors.registrationDateInverted": "Ilmoittautuminen ei voi päättyä ennen kuin se alkaa",
     "editor.errors.optionsTooLong": "Vastausvaihtoehdot ovat yhteensä liian pitkät",
