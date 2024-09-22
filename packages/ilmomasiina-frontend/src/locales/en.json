@@ -131,6 +131,7 @@
     "editor.status.published": "Published",
     "editor.status.createSuccess": "Event created successfully!",
     "editor.status.saveSuccess": "Changes saved successfully!",
+    "editor.saveInvalid": "The event has errors. Correct them and try saving again.",
     "editor.saveError.default.description": "Failed to save the event.",
     "editor.action.publish": "Publish",
     "editor.action.saveDraft": "Save as draft",

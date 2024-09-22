@@ -90,7 +90,7 @@ const BasicDetailsTab = () => {
 
   return (
     <div>
-      <FieldRow name="title" label={t("editor.basic.name")} required maxLength={255} />
+      <FieldRow name="title" label={t("editor.basic.name")} required maxLength={255} formatError={formatError} />
       <GenerateSlug />
       <FieldRow
         name="slug"

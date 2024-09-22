@@ -131,6 +131,7 @@
     "editor.status.published": "Julkaistu",
     "editor.status.createSuccess": "Tapahtuma luotiin onnistuneesti!",
     "editor.status.saveSuccess": "Muutoksesi tallennettiin onnistuneesti!",
+    "editor.saveInvalid": "Tapahtumassa on virheitä. Korjaa virheet ja yritä tallentamista uudelleen.",
     "editor.saveError.default.description": "Tapahtuman päivittäminen epäonnistui.",
     "editor.action.publish": "Julkaise",
     "editor.action.saveDraft": "Tallenna luonnoksena",

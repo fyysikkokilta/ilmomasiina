@@ -32,22 +32,31 @@ import SignupsTab from "./SignupsTab";
 
 const EditFormBody = ({ form }: FormRenderProps<EditorEvent>) => {
   const [activeTab, setActiveTab] = useState<EditorTab>(EditorTab.BASIC_DETAILS);
+  const { t } = useTranslation();
 
   const isDraft = useTypedSelector((state) => state.editor.event?.draft || state.editor.isNew);
 
+  const doSubmit = useEvent(() => {
+    // submit() returns a Promise if validation succeeds.
+    if (form.submit() == null && form.getState().hasValidationErrors) {
+      toast.error(t("editor.saveInvalid"), {
+        autoClose: 2000,
+      });
+    }
+  });
   const onSave = useEvent((evt?: BaseSyntheticEvent) => {
     evt?.preventDefault();
     form.change("moveSignupsToQueue", false);
-    form.submit();
+    doSubmit();
   });
   const onSaveToggleDraft = useEvent(() => {
     form.change("moveSignupsToQueue", false);
     form.change("draft", !isDraft);
-    form.submit();
+    doSubmit();
   });
   const onMoveToQueueProceed = useEvent(() => {
     form.change("moveSignupsToQueue", true);
-    form.submit();
+    doSubmit();
   });
 
   // Memoizing this render step seems to stop everything from rerendering unnecessarily, resulting in
