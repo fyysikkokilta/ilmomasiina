@@ -6,14 +6,15 @@
 // For Bootstrap components, the overrides are made in ilmomasiina-frontend/src/styles/app.scss.
 // If you want to override more colors, you'll also need to add them to the @use there.
 
-// The colors here are inherited from Athene's code and will remain in place while mainline
-// Ilmomasiina uses Bootstrap 4.
-
 $primary: #0a0d10 !default;
 $secondary: #0a0d10 !default;
 $red: #d74949 !default; // further assigned to $danger by Bootstrap
 $green: #319236 !default; // further assigned to $success by Bootstrap
 $text-muted: #888 !default;
+
+// Links are impossible to see with Tietokilta's black $primary.
+// You can disable this if you use something light.
+$force-link-underline: true !default;
 
 // Additional colors, only used by Ilmomasiina's SCSS.
 
