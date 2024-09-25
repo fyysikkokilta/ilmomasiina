@@ -24,7 +24,7 @@
     font-weight: 400;
   }
 
-  .col-form-label.col-sm-3 {
+  .ilmo--label-column {
     @include media-breakpoint-up(sm) {
       text-align: right;
     }

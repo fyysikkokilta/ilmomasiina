@@ -10,6 +10,7 @@ import { FieldRow } from "@tietokilta/ilmomasiina-components";
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import useShallowMemo from "@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo";
 import { EditorQuota } from "../../../modules/editor/types";
+import useEditorErrors from "./errors";
 import Sortable from "./Sortable";
 
 type QuotaRowProps = {
@@ -25,6 +26,7 @@ const numberConfig: UseFieldConfig<number | null> = {
 
 const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
   const { t } = useTranslation();
+  const formatError = useEditorErrors();
 
   const removeThis = useEvent(() => remove(index));
 
@@ -42,6 +44,8 @@ const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
             .join(" ")}
           type="text"
           required
+          maxLength={255}
+          formatError={formatError}
         />
         <FieldRow
           name={`${name}.size`}
@@ -49,7 +53,9 @@ const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
           help={t("editor.quotas.quotaSize.info")}
           type="number"
           min={1}
+          placeholder={t("editor.quotas.quotaSize.unlimited")}
           config={numberConfig}
+          formatError={formatError}
         />
       </Col>
       {index > 0 && (

@@ -6,6 +6,18 @@
   border-right: 1px solid grey;
 }
 
+.event-editor--tab-error {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 3px;
+  vertical-align: middle;
+  background-image: escape-svg($form-feedback-icon-invalid);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+}
+
 .sortable-item {
   flex-direction: row !important;
   margin-bottom: 1rem;
@@ -105,4 +117,8 @@
 
 .event-editor--animated {
   transition: all 0.3s ease;
+}
+
+.event-editor--preview .ilmo--title-nav h1 {
+  margin-top: 0;
 }

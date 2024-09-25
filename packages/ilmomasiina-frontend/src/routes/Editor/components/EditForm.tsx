@@ -16,6 +16,8 @@ import { selectFormData } from "../../../modules/editor/selectors";
 import type { EditorEvent } from "../../../modules/editor/types";
 import appPaths from "../../../paths";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import convertZodError from "../../../utils/convertZodError";
+import editorSchema from "../schema";
 import BasicDetailsTab from "./BasicDetailsTab";
 import EditConflictModal from "./EditConflictModal";
 import EditorTabBody from "./EditorTabBody";
@@ -23,28 +25,38 @@ import EditorTabHeader, { EditorTab } from "./EditorTabHeader";
 import EditorToolbar from "./EditorToolbar";
 import EmailsTab from "./EmailsTab";
 import MoveToQueueWarning from "./MoveToQueueWarning";
+import PreviewTab from "./PreviewTab";
 import QuestionsTab from "./QuestionsTab";
 import QuotasTab from "./QuotasTab";
 import SignupsTab from "./SignupsTab";
 
 const EditFormBody = ({ form }: FormRenderProps<EditorEvent>) => {
   const [activeTab, setActiveTab] = useState<EditorTab>(EditorTab.BASIC_DETAILS);
+  const { t } = useTranslation();
 
   const isDraft = useTypedSelector((state) => state.editor.event?.draft || state.editor.isNew);
 
+  const doSubmit = useEvent(() => {
+    // submit() returns a Promise if validation succeeds.
+    if (form.submit() == null && form.getState().hasValidationErrors) {
+      toast.error(t("editor.saveInvalid"), {
+        autoClose: 2000,
+      });
+    }
+  });
   const onSave = useEvent((evt?: BaseSyntheticEvent) => {
     evt?.preventDefault();
     form.change("moveSignupsToQueue", false);
-    form.submit();
+    doSubmit();
   });
   const onSaveToggleDraft = useEvent(() => {
     form.change("moveSignupsToQueue", false);
     form.change("draft", !isDraft);
-    form.submit();
+    doSubmit();
   });
   const onMoveToQueueProceed = useEvent(() => {
     form.change("moveSignupsToQueue", true);
-    form.submit();
+    doSubmit();
   });
 
   // Memoizing this render step seems to stop everything from rerendering unnecessarily, resulting in
@@ -60,6 +72,7 @@ const EditFormBody = ({ form }: FormRenderProps<EditorEvent>) => {
             <EditorTabBody id={EditorTab.QUOTAS} activeTab={activeTab} component={QuotasTab} />
             <EditorTabBody id={EditorTab.QUESTIONS} activeTab={activeTab} component={QuestionsTab} />
             <EditorTabBody id={EditorTab.EMAILS} activeTab={activeTab} component={EmailsTab} />
+            <EditorTabBody id={EditorTab.PREVIEW} activeTab={activeTab} component={PreviewTab} />
             <EditorTabBody id={EditorTab.SIGNUPS} activeTab={activeTab} component={SignupsTab} />
           </div>
         </BsForm>
@@ -82,6 +95,11 @@ const mutators = {
     return returnValue;
   },
 } satisfies typeof arrayMutators;
+
+function validate(event: EditorEvent) {
+  const result = editorSchema.safeParse(event);
+  return result.success ? undefined : convertZodError(result.error);
+}
 
 const EditForm = () => {
   const initialValues = useTypedSelector(selectFormData);
@@ -120,7 +138,7 @@ const EditForm = () => {
   });
 
   return (
-    <Form<EditorEvent> onSubmit={onSubmit} initialValues={initialValues} mutators={mutators}>
+    <Form<EditorEvent> onSubmit={onSubmit} initialValues={initialValues} mutators={mutators} validate={validate}>
       {(props) => <EditFormBody {...props} />}
     </Form>
   );

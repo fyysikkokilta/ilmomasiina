@@ -7,7 +7,9 @@ import { Nullable } from "../utils";
 export const signupID = Type.String({
   title: "SignupID",
   description: "Signup ID. Randomly generated alphanumeric string.",
-  // TODO: Validation? max-length?
+  minLength: 1,
+  maxLength: 32,
+  pattern: "^[a-z0-9]+$",
 });
 
 export const signupIdentity = Type.Object({
@@ -25,20 +27,33 @@ export const editToken = Type.String({
 /** Answer to a single signup question */
 export const signupAnswer = Type.Object({
   questionId: questionID,
-  answer: Type.Union([Type.String(), Type.Array(Type.String())], {
-    description: "Answer to the question.",
-  }),
+  answer: Type.Union(
+    [
+      Type.String({ maxLength: 255 }),
+      Type.Array(
+        Type.String({ maxLength: 255 }),
+        // This was a practical limit before an explicit limitation was added, so seems reasonable to set it here.
+        { maxItems: 64 },
+      ),
+    ],
+    {
+      description: "Answer to the question.",
+    },
+  ),
 });
 
 /** Editable attributes of a signup. */
 export const editableSignupAttributes = Type.Object({
-  firstName: Nullable(Type.String(), {
+  firstName: Nullable(Type.String({ maxLength: 255 }), {
     description: "First name of the attendee. Null if not set yet.",
   }),
-  lastName: Nullable(Type.String(), {
+  lastName: Nullable(Type.String({ maxLength: 255 }), {
     description: "Last name of the attendee. Null if not set yet.",
   }),
-  email: Nullable(Type.String(), {
+  // This does not have format: "email", as we validate it within updateSignup instead.
+  // If it was added, it would have to be unioned with Type.Literal("") to account for events without an email field.
+  // (Ideally, clients would send null instead of "" in those cases, but we don't want to break existing uses.)
+  email: Nullable(Type.String({ maxLength: 255 }), {
     description: "Email of the attendee. Null if not set yet.",
   }),
   namePublic,
@@ -49,10 +64,10 @@ export const editableSignupAttributes = Type.Object({
 
 /** Editable attributes of a signup with non-public information removed. */
 export const publicEditableSignupAttributes = Type.Object({
-  firstName: Nullable(Type.String(), {
+  firstName: Nullable(Type.String({ maxLength: 255 }), {
     description: "First name of the attendee. Null if not set yet or not public.",
   }),
-  lastName: Nullable(Type.String(), {
+  lastName: Nullable(Type.String({ maxLength: 255 }), {
     description: "Fast name of the attendee. Null if not set yet or not public.",
   }),
   namePublic,
@@ -62,7 +77,7 @@ export const publicEditableSignupAttributes = Type.Object({
 });
 
 /** Non-editable, automatically updated signup attributes. */
-export const signupDynamicAttributes = Type.Object({
+export const dynamicSignupAttributes = Type.Object({
   status: Nullable(Type.Enum(SignupStatus, { title: "SignupStatus" }), {
     description: "Status of the signup. If null, the status has not been computed yet.",
   }),

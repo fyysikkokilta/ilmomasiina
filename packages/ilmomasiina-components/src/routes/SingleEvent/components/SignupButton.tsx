@@ -26,6 +26,7 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
   const navigate = useNavigate();
   const paths = usePaths();
   const { registrationStartDate, registrationEndDate, quotas } = useSingleEventContext().event!;
+  const { preview } = useSingleEventContext();
   const eventState = signupState(registrationStartDate, registrationEndDate);
   const [submitting, setSubmitting] = useState(false);
   const isOnly = quotas.length === 1;
@@ -67,18 +68,22 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
           <span style={{ color: "green" }}>{` (${seconds} s)`}</span>
         )}
       </p>
-      {quotas.map((quota) => (
-        <Button
-          key={quota.id}
-          type="button"
-          variant="secondary"
-          disabled={!isOpen || submitting}
-          className="ilmo--signup-button"
-          onClick={() => onClick(quota.id)}
-        >
-          {isOnly ? t("singleEvent.signupButton.singleQuota") : t("singleEvent.signupButton", { quota: quota.title })}
-        </Button>
-      ))}
+      {preview ? (
+        <Button onClick={() => preview.setPreviewingForm(true)}>{t("singleEvent.signupButton.preview")}</Button>
+      ) : (
+        quotas.map((quota) => (
+          <Button
+            key={quota.id}
+            type="button"
+            variant="secondary"
+            disabled={!isOpen || submitting}
+            className="ilmo--signup-button"
+            onClick={() => onClick(quota.id)}
+          >
+            {isOnly ? t("singleEvent.signupButton.singleQuota") : t("singleEvent.signupButton", { quota: quota.title })}
+          </Button>
+        ))
+      )}
     </div>
   );
 };

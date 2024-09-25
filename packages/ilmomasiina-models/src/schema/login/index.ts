@@ -1,13 +1,11 @@
 import { Static, Type } from "@sinclair/typebox";
 
+import { password, userEmail } from "../user/attributes";
+
 /** Request body for login. */
 export const adminLoginBody = Type.Object({
-  email: Type.String({
-    description: "Email address.",
-  }),
-  password: Type.String({
-    description: "Plaintext password.",
-  }),
+  email: userEmail,
+  password,
 });
 /** Response schema for a successful login. */
 export const adminLoginResponse = Type.Object({

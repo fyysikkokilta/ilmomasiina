@@ -8,6 +8,7 @@ export type State = Partial<SignupForEditResponse> & {
   error?: ApiError;
   editToken: string;
   registrationClosed: boolean;
+  preview?: { setPreviewingForm: (form: boolean) => void };
 };
 
 export const { Provider, useStateContext, createThunk } = createStateContext<State>();

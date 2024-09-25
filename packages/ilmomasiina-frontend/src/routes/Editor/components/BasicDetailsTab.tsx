@@ -10,6 +10,7 @@ import { checkingSlugAvailability, checkSlugAvailability, loadCategories } from 
 import { EditorEventType } from "../../../modules/editor/types";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
 import DateTimePicker from "./DateTimePicker";
+import useEditorErrors from "./errors";
 import { useFieldTouched, useFieldValue } from "./hooks";
 import SelectBox from "./SelectBox";
 import SlugField from "./SlugField";
@@ -56,6 +57,9 @@ const SlugAvailability = () => {
     }, SLUG_CHECK_DELAY);
   }, [dispatch, slug]);
 
+  if (!slug) {
+    return null;
+  }
   if (slugAvailability === "checking") {
     return <Form.Text>{t("editor.basic.url.checking")}</Form.Text>;
   }
@@ -74,6 +78,7 @@ const BasicDetailsTab = () => {
   const dispatch = useTypedDispatch();
   const allCategories = useTypedSelector((state) => state.editor.allCategories);
   const { t } = useTranslation();
+  const formatError = useEditorErrors();
 
   const eventType = useFieldValue<EditorEventType>("eventType");
   const date = useFieldValue<Date | null>("date");
@@ -85,15 +90,16 @@ const BasicDetailsTab = () => {
 
   return (
     <div>
-      <FieldRow name="title" label={t("editor.basic.name")} required alternateError={t("editor.basic.name.missing")} />
+      <FieldRow name="title" label={t("editor.basic.name")} required maxLength={255} formatError={formatError} />
       <GenerateSlug />
       <FieldRow
         name="slug"
         label={t("editor.basic.url")}
         required
-        alternateError={t("editor.basic.url.missing")}
+        maxLength={255}
         extraFeedback={<SlugAvailability />}
         as={SlugField}
+        formatError={formatError}
       />
       <FieldRow
         name="listed"
@@ -103,6 +109,7 @@ const BasicDetailsTab = () => {
         checkAlign
         checkLabel={t("editor.basic.listed.check")}
         help={t("editor.basic.listed.info")}
+        formatError={formatError}
       />
       <FieldRow
         name="eventType"
@@ -113,6 +120,7 @@ const BasicDetailsTab = () => {
           [EditorEventType.EVENT_WITH_SIGNUP, t("editor.basic.type.eventWithSignup")],
           [EditorEventType.ONLY_SIGNUP, t("editor.basic.type.onlySignup")],
         ]}
+        formatError={formatError}
       />
       {eventType !== EditorEventType.ONLY_SIGNUP && (
         <FieldRow
@@ -123,7 +131,7 @@ const BasicDetailsTab = () => {
           selectsStart
           endDate={endDate}
           required
-          alternateError={t("editor.basic.startDate.missing")}
+          formatError={formatError}
         />
       )}
       {eventType !== EditorEventType.ONLY_SIGNUP && (
@@ -135,6 +143,39 @@ const BasicDetailsTab = () => {
           selectsEnd
           startDate={date}
           help={t("editor.basic.endDate.info")}
+          formatError={formatError}
+        />
+      )}
+      {eventType !== EditorEventType.ONLY_EVENT && (
+        <FieldRow
+          name="registrationStartDate"
+          id="registrationStartDate"
+          as={DateTimePicker}
+          label={t("editor.basic.registrationStartDate")}
+          required
+          formatError={formatError}
+        />
+      )}
+      {eventType !== EditorEventType.ONLY_EVENT && (
+        <FieldRow
+          name="registrationEndDate"
+          id="registrationEndDate"
+          as={DateTimePicker}
+          label={t("editor.basic.registrationEndDate")}
+          required
+          formatError={formatError}
+        />
+      )}
+      {eventType !== EditorEventType.ONLY_EVENT && (
+        <FieldRow
+          name="signupsPublic"
+          label={t("editor.basic.signupsPublic")}
+          as={Form.Check}
+          type="checkbox"
+          checkAlign
+          checkLabel={t("editor.basic.signupsPublic.check")}
+          help={t("editor.basic.signupsPublic.info")}
+          formatError={formatError}
         />
       )}
       <FieldRow
@@ -143,16 +184,20 @@ const BasicDetailsTab = () => {
         as={Combobox}
         data={allCategories || []}
         busy={allCategories === null}
+        inputProps={{ maxLength: 255 }}
+        formatError={formatError}
       />
-      <FieldRow name="webpageUrl" label={t("editor.basic.homePage")} />
-      <FieldRow name="facebookUrl" label={t("editor.basic.facebook")} />
-      <FieldRow name="location" label={t("editor.basic.location")} />
+      <FieldRow name="webpageUrl" label={t("editor.basic.homePage")} maxLength={255} formatError={formatError} />
+      <FieldRow name="facebookUrl" label={t("editor.basic.facebook")} maxLength={255} formatError={formatError} />
+      <FieldRow name="location" label={t("editor.basic.location")} maxLength={255} formatError={formatError} />
+      <FieldRow name="price" label={t("editor.basic.price")} maxLength={255} formatError={formatError} />
       <FieldRow
         name="description"
         label={t("editor.basic.description")}
         help={t("editor.basic.description.info")}
         as={Textarea}
         rows={8}
+        formatError={formatError}
       />
     </div>
   );

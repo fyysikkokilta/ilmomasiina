@@ -9,17 +9,21 @@ export const userIdentity = Type.Object({
   id: userID,
 });
 
-/** Editable attributes of a user. */
-export const userAttributes = Type.Object({
-  email: Type.String({
-    format: "email",
-    description: "Email address, used as username.",
-    // TODO: Add validation RegExp for email
-  }),
+/** Email address of a user, used as username. */
+export const userEmail = Type.String({
+  format: "email",
+  description: "Email address, used as username.",
+  minLength: 1,
+  maxLength: 255,
 });
 
-/** Password of a user. */
+/** Current password of a user. */
 export const password = Type.String({
-  minLength: 10,
+  minLength: 1,
   maxLength: 255,
+});
+
+/** Creation attributes of a user. */
+export const userAttributes = Type.Object({
+  email: userEmail,
 });

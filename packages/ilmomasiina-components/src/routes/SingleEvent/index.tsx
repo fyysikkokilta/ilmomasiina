@@ -55,7 +55,7 @@ const SingleEventView = () => {
         <>
           <h2>{t("singleEvent.signups.title")}</h2>
           {signupsByQuota!.map((quota) => (
-            <SignupList key={quota.id} quota={quota} />
+            <SignupList key={quota.id} quota={quota} isSingleQuota={event!.quotas.length === 1} />
           ))}
         </>
       )}

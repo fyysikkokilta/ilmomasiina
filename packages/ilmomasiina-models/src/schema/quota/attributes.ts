@@ -17,6 +17,8 @@ export const quotaIdentity = Type.Object({
 export const quotaAttributes = Type.Object({
   title: Type.String({
     description: "Quota name.",
+    minLength: 1,
+    maxLength: 255,
   }),
   size: Nullable(Type.Integer({ minimum: 1 }), {
     description: "Maximum number of signups in the quota. If null, the size is unlimited.",

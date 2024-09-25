@@ -12,7 +12,8 @@ export interface EditSignupProps {
   editToken: string;
 }
 
-export { useStateContext as useEditSignupContext } from "./state";
+export { useStateContext as useEditSignupContext, Provider as EditSignupContextProvider } from "./state";
+export type { State as EditSignupState } from "./state";
 export { useDeleteSignup, useUpdateSignup } from "./actions";
 
 export function useEditSignupState({ id, editToken }: EditSignupProps) {
