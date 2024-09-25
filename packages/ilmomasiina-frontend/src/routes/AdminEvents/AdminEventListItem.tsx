@@ -12,7 +12,7 @@ import type { AdminEventListItem as AdminEventListItemSchema } from "@tietokilta
 import { deleteEvent, getAdminEvents } from "../../modules/adminEvents/actions";
 import appPaths from "../../paths";
 import { useTypedDispatch } from "../../store/reducers";
-import { isEventInPast } from "../../utils/eventState";
+import { isEventHiddenFromUsersDueToAge } from "../../utils/eventState";
 
 type Props = {
   event: AdminEventListItemSchema;
@@ -46,10 +46,10 @@ const AdminEventListItem = ({ event }: Props) => {
   let status;
   if (draft) {
     status = t("adminEvents.status.draft");
-  } else if (isEventInPast(event)) {
+  } else if (isEventHiddenFromUsersDueToAge(event)) {
     status = date === null ? t("adminEvents.status.closed") : t("adminEvents.status.ended");
   } else if (!listed) {
-    status = t("adminEvents.status.hidden");
+    status = <Link to={appPaths.eventDetails(slug)}>{t("adminEvents.status.hidden")}</Link>;
   } else {
     status = <Link to={appPaths.eventDetails(slug)}>{t("adminEvents.status.published")}</Link>;
   }
