@@ -1,6 +1,17 @@
 # Changelog
 
-This document contains the version history of Ilmomasiina.
+## 2.0.0-alpha31
+
+- **Feature:** The event editor now gives per-field validation feedback and limits e.g. field lengths
+- **Feature:** Events can now be previewed from the event editor
+- **Feature:** Past events are now shown in a separate list for admins
+- **Feature:** The event editor now allows setting a price for events (only a string, no special handling)
+- Links are now easier to see with dark theme colors
+- Signup start/end time and signup publicity are now part of "basic details" in the event editor
+- The signup closure date is now shown in various places after signup closes
+- Quota name is no longer shown in signup lists when there's only one quota
+- Quota size fields now have placeholders to indicate what empty means
+- TypeBox schemas now use Composite instead of Intersect for cleaner schemas
 
 ## 2.0.0-alpha30
 
