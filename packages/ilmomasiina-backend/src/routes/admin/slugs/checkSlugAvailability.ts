@@ -10,6 +10,7 @@ export default async function checkSlugAvailability(
   const event = await Event.findOne({
     where: request.params,
     attributes: ["id", "title"],
+    paranoid: false,
   });
 
   response.status(200);
