@@ -1,118 +1,106 @@
-import React from 'react';
+import React, { useMemo } from "react";
 
-import { useField } from 'formik';
-import {
-  Button, Col, Form, Row,
-} from 'react-bootstrap';
-import { SortEnd } from 'react-sortable-hoc';
+import { Button, Col, Row } from "react-bootstrap";
+import { UseFieldConfig } from "react-final-form";
+import { FieldArrayRenderProps, useFieldArray } from "react-final-form-arrays";
+import { useTranslation } from "react-i18next";
+import { SortEnd } from "react-sortable-hoc";
 
-import { FieldRow } from '@tietokilta/ilmomasiina-components';
-import { EditorQuota } from '../../../modules/editor/types';
-import Sortable from './Sortable';
+import { FieldRow } from "@tietokilta/ilmomasiina-components";
+import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
+import useShallowMemo from "@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo";
+import { EditorQuota } from "../../../modules/editor/types";
+import useEditorErrors from "./errors";
+import Sortable from "./Sortable";
+
+type QuotaRowProps = {
+  name: string;
+  index: number;
+  isOnly: boolean;
+  remove: FieldArrayRenderProps<EditorQuota, HTMLElement>["fields"]["remove"];
+};
+
+const numberConfig: UseFieldConfig<number | null> = {
+  parse: (value) => (value ? Number(value) : null),
+};
+
+const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
+  const { t } = useTranslation();
+  const formatError = useEditorErrors();
+
+  const removeThis = useEvent(() => remove(index));
+
+  return (
+    <Row className="quota-body">
+      <Col xs="12" sm="10">
+        <FieldRow
+          name={`${name}.title`}
+          label={t("editor.quotas.quotaName")}
+          help={[
+            isOnly ? t("editor.quotas.quotaName.singleQuota") : "",
+            index === 0 ? t("editor.quotas.quotaName.reorder") : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          type="text"
+          required
+          maxLength={255}
+          formatError={formatError}
+        />
+        <FieldRow
+          name={`${name}.size`}
+          label={t("editor.quotas.quotaSize")}
+          help={t("editor.quotas.quotaSize.info")}
+          type="number"
+          min={1}
+          placeholder={t("editor.quotas.quotaSize.unlimited")}
+          config={numberConfig}
+          formatError={formatError}
+        />
+      </Col>
+      {index > 0 && (
+        <Col xs="12" sm="2" className="no-focus">
+          <Button type="button" variant="danger" onClick={removeThis}>
+            {t("editor.quotas.deleteQuota")}
+          </Button>
+        </Col>
+      )}
+    </Row>
+  );
+};
 
 const Quotas = () => {
-  const [{ value: quotas }, , { setValue }] = useField<EditorQuota[]>('quotas');
+  const { t } = useTranslation();
 
-  function addQuota() {
-    setValue([
-      ...quotas,
-      {
-        key: `new-${Math.random()}`,
-        title: '',
-        size: null,
-      },
-    ]);
-  }
+  const { fields } = useFieldArray<EditorQuota>("quotas");
 
-  function updateOrder({ newIndex, oldIndex }: SortEnd) {
-    const newQuotas = quotas.slice();
-    const [elementToMove] = newQuotas.splice(oldIndex, 1);
-    newQuotas.splice(newIndex, 0, elementToMove);
-    setValue(newQuotas);
-  }
-
-  const quotaItems = quotas.map((quota, index) => {
-    const thisQuota = quota.key;
-
-    function updateField<F extends keyof EditorQuota>(field: F, value: EditorQuota[F]) {
-      setValue(quotas.map((item) => {
-        if (item.key === thisQuota) {
-          if (field === 'size' && !value) {
-            return {
-              ...item,
-              [field]: null,
-            };
-          }
-          return {
-            ...item,
-            [field]: value,
-          };
-        }
-        return item;
-      }));
-    }
-
-    function removeQuota() {
-      setValue(quotas.filter((_quota, i) => i !== index));
-    }
-
-    return (
-      <Row key={quota.key} className="quota-body">
-        <Col xs="12" sm="10">
-          <FieldRow
-            name={`quota-${quota.key}-title`}
-            label="Kiintiön nimi"
-            help={
-              (quotas.length === 1
-                ? 'Jos kiintiöitä on vain yksi, voit antaa sen nimeksi esim. tapahtuman nimen. '
-                : '')
-                + (index === 0 ? 'Voit järjestellä kiintiöitä raahaamalla niitä vasemmalta.' : '')
-            }
-            required
-          >
-            <Form.Control
-              type="text"
-              required
-              value={quota.title}
-              onChange={(e) => updateField('title', e.target.value)}
-            />
-          </FieldRow>
-          <FieldRow
-            name={`quota-${quota.key}-max-attendees`}
-            label="Kiintiön koko"
-            help="Jos kiintiön kokoa ei ole rajoitettu, jätä kenttä tyhjäksi."
-          >
-            <Form.Control
-              type="number"
-              min={1}
-              required
-              value={quota.size || ''}
-              onChange={(e) => updateField('size', Number(e.target.value))}
-            />
-          </FieldRow>
-        </Col>
-        {index > 0 && (
-          <Col xs="12" sm="2" className="no-focus">
-            <Button type="button" variant="danger" onClick={removeQuota}>
-              Poista kiintiö
-            </Button>
-          </Col>
-        )}
-      </Row>
-    );
+  const addQuota = useEvent(() => {
+    fields.push({
+      key: `new-${Math.random()}`,
+      title: "",
+      size: null,
+    });
   });
+
+  const updateOrder = useEvent(({ newIndex, oldIndex }: SortEnd) => fields.move(oldIndex, newIndex));
+
+  const keys = useShallowMemo(fields.value.map((item) => item.key));
+  const quotaItems = useMemo(
+    () =>
+      fields.map((name, i) => (
+        <QuotaRow key={keys[i]} name={name} index={i} remove={fields.remove} isOnly={fields.length === 1} />
+      )),
+    // This list only invalidates when the question positions or count change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [keys],
+  );
 
   return (
     <>
-      <Sortable
-        collection="quotas"
-        items={quotaItems}
-        onSortEnd={updateOrder}
-        useDragHandle
-      />
+      <Sortable collection="quotas" items={quotaItems} onSortEnd={updateOrder} useDragHandle />
       <div className="text-center mb-3">
         <Button type="button" variant="primary" onClick={addQuota}>
-          Lisää kiintiö
+          {t("editor.quotas.addQuota")}
         </Button>
       </div>
     </>

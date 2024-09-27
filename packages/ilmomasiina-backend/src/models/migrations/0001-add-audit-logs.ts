@@ -1,15 +1,16 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { RunnableMigration } from 'umzug';
+import { DataTypes } from "sequelize";
+
+import { defineMigration } from "./util";
 
 // Constant from ../randomId
 const RANDOM_ID_LENGTH = 12;
 
-const migration: RunnableMigration<Sequelize> = {
-  name: '0001-add-audit-logs',
-  async up({ context: sequelize }) {
+export default defineMigration({
+  name: "0001-add-audit-logs",
+  async up({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
     await query.createTable(
-      'auditlog',
+      "auditlog",
       {
         id: {
           type: DataTypes.INTEGER.UNSIGNED,
@@ -57,8 +58,7 @@ const migration: RunnableMigration<Sequelize> = {
           allowNull: false,
         },
       },
+      { transaction },
     );
   },
-};
-
-export default migration;
+});

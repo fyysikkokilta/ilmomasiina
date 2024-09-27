@@ -1,25 +1,24 @@
-import React from 'react';
+import React from "react";
 
-import { Spinner } from 'react-bootstrap';
+import { Spinner } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
-import { useParams } from '../../config/router';
-import { EditSignupProps, EditSignupProvider, useEditSignupContext } from '../../modules/editSignup';
-import EditForm from './components/EditForm';
-import NarrowContainer from './components/NarrowContainer';
+import { useParams } from "../../config/router";
+import { I18nProvider } from "../../i18n";
+import { EditSignupProps, EditSignupProvider, useEditSignupContext } from "../../modules/editSignup";
+import { errorDesc, errorTitle } from "../../utils/errorMessage";
+import EditForm from "./components/EditForm";
+import NarrowContainer from "./components/NarrowContainer";
 
 const EditSignupView = () => {
   const { error, pending } = useEditSignupContext();
+  const { t } = useTranslation();
 
   if (error) {
     return (
       <NarrowContainer className="ilmo--status-container">
-        <h1>Hups, jotain meni pieleen / Something went wrong</h1>
-        <p>
-          Ilmoittautumistasi ei löytynyt. Se saattaa olla jo poistettu, tai
-          sitten jotain muuta kummallista tapahtui. Jos ilmoittautumisesi ei
-          ole vielä poistunut, yritä kohta uudestaan. /
-          Registration was not found. It may be already removed.
-        </p>
+        <h1>{errorTitle(t, error, "editSignup.loadError")}</h1>
+        <p>{errorDesc(t, error, "editSignup.loadError")}</p>
       </NarrowContainer>
     );
   }
@@ -66,7 +65,9 @@ const EditSignup = () => {
   const { id, editToken } = useParams<EditSignupProps>();
   return (
     <EditSignupProvider id={id} editToken={editToken}>
-      <EditSignupView />
+      <I18nProvider>
+        <EditSignupView />
+      </I18nProvider>
     </EditSignupProvider>
   );
 };

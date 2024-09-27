@@ -1,12 +1,10 @@
-import {
-  DataTypes, Model, Optional, Sequelize,
-} from 'sequelize';
+import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
-import type { AuditEvent } from '@tietokilta/ilmomasiina-models';
-import type { AuditLogAttributes } from '@tietokilta/ilmomasiina-models/dist/models';
-import { RANDOM_ID_LENGTH } from './randomId';
+import type { AuditEvent } from "@tietokilta/ilmomasiina-models";
+import type { AuditLogAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
+import { RANDOM_ID_LENGTH } from "./randomId";
 
-export interface AuditLogCreationAttributes extends Optional<AuditLogAttributes, 'id'> {}
+export interface AuditLogCreationAttributes extends Optional<AuditLogAttributes, "id"> {}
 
 export class AuditLog extends Model<AuditLogAttributes, AuditLogCreationAttributes> implements AuditLogAttributes {
   public id!: number;
@@ -66,7 +64,7 @@ export default function setupAuditLogModel(sequelize: Sequelize) {
     },
     {
       sequelize,
-      modelName: 'auditlog',
+      modelName: "auditlog",
       freezeTableName: true,
     },
   );

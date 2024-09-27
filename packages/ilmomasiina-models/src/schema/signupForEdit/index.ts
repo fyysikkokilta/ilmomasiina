@@ -1,18 +1,18 @@
-import { Static, Type } from '@sinclair/typebox';
+import { Static, Type } from "@sinclair/typebox";
 
-import { userEventForSignup } from '../event';
-import { quota } from '../quota';
-import { editableSignupAttributes, signupDynamicAttributes, signupIdentity } from '../signup/attributes';
+import { userEventForSignup } from "../event";
+import { quota } from "../quota";
+import { dynamicSignupAttributes, editableSignupAttributes, signupIdentity } from "../signup/attributes";
 
 // This is here because it depends on quota, causing an import cycle.
 /** Schema for fetching a signup for editing. */
-export const signupForEdit = Type.Intersect([
+export const signupForEdit = Type.Composite([
   signupIdentity,
   editableSignupAttributes,
   Type.Object({
     quota,
   }),
-  signupDynamicAttributes,
+  dynamicSignupAttributes,
 ]);
 
 /** Response schema for fetching a signup for editing. */

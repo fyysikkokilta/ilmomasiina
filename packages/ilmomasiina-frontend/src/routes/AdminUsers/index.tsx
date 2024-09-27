@@ -1,22 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 
-import { Spinner } from 'react-bootstrap';
-import { shallowEqual } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Spinner } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
+import { shallowEqual } from "react-redux";
+import { Link } from "react-router-dom";
 
-import requireAuth from '../../containers/requireAuth';
-import { getUsers, resetState } from '../../modules/adminUsers/actions';
-import appPaths from '../../paths';
-import { useTypedDispatch, useTypedSelector } from '../../store/reducers';
-import AdminUserListItem from './AdminUserListItem';
-import ChangePasswordForm from './ChangePasswordForm';
-import UserForm from './UserForm';
-
-// import './AdminUsersList.scss';
+import { errorDesc, errorTitle } from "@tietokilta/ilmomasiina-components/dist/utils/errorMessage";
+import requireAuth from "../../containers/requireAuth";
+import { getUsers, resetState } from "../../modules/adminUsers/actions";
+import appPaths from "../../paths";
+import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
+import AdminUserListItem from "./AdminUserListItem";
+import ChangePasswordForm from "./ChangePasswordForm";
+import UserForm from "./UserForm";
 
 const AdminUsersList = () => {
   const dispatch = useTypedDispatch();
-  const { users, usersLoadError } = useTypedSelector((state) => state.adminUsers, shallowEqual);
+  const { users, loadError } = useTypedSelector((state) => state.adminUsers, shallowEqual);
+  const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(getUsers());
@@ -25,11 +26,11 @@ const AdminUsersList = () => {
     };
   }, [dispatch]);
 
-  if (usersLoadError) {
+  if (loadError) {
     return (
       <>
-        <h1>Hups, jotain meni pieleen</h1>
-        <p>Käyttäjien lataus epäonnistui</p>
+        <h1>{errorTitle(t, loadError, "adminUsers.loadError")}</h1>
+        <p>{errorDesc(t, loadError, "adminUsers.loadError")}</p>
       </>
     );
   }
@@ -42,23 +43,20 @@ const AdminUsersList = () => {
         <table className="table">
           <thead>
             <tr>
-              <th>Sähköposti</th>
-              <th>Toiminnot</th>
+              <th>{t("adminUsers.column.email")}</th>
+              <th>{t("adminUsers.column.actions")}</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
-              <AdminUserListItem
-                key={user.id}
-                user={user}
-              />
+              <AdminUserListItem key={user.id} user={user} />
             ))}
           </tbody>
         </table>
 
-        <h1>Luo uusi käyttäjä</h1>
+        <h1>{t("adminUsers.createUser")}</h1>
         <UserForm />
-        <h1>Vaihda salasanasi</h1>
+        <h1>{t("adminUsers.changePassword")}</h1>
         <ChangePasswordForm />
       </>
     );
@@ -66,8 +64,8 @@ const AdminUsersList = () => {
 
   return (
     <>
-      <Link to={appPaths.adminEventsList}>&#8592; Takaisin</Link>
-      <h1>Käyttäjien hallinta</h1>
+      <Link to={appPaths.adminEventsList}>&#8592; {t("adminUsers.returnToEvents")}</Link>
+      <h1>{t("adminUsers.title")}</h1>
       {content}
     </>
   );

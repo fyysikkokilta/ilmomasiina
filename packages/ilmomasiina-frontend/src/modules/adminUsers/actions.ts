@@ -1,121 +1,97 @@
+import type { ApiError } from "@tietokilta/ilmomasiina-components";
 import type {
-  UserChangePasswordSchema, UserID, UserInviteSchema, UserListResponse,
-} from '@tietokilta/ilmomasiina-models';
-import adminApiFetch from '../../api';
-import type { DispatchAction, GetState } from '../../store/types';
-import {
-  RESET,
-  USER_CREATE_FAILED,
-  USER_CREATED,
-  USER_CREATING,
-  USERS_LOAD_FAILED,
-  USERS_LOADED,
-} from './actionTypes';
+  UserChangePasswordSchema,
+  UserID,
+  UserInviteSchema,
+  UserListResponse,
+} from "@tietokilta/ilmomasiina-models";
+import adminApiFetch from "../../api";
+import type { DispatchAction, GetState } from "../../store/types";
+import { RESET, USERS_LOAD_FAILED, USERS_LOADED } from "./actionTypes";
 
-export const resetState = () => <const>{
-  type: RESET,
-};
+export const resetState = () =>
+  <const>{
+    type: RESET,
+  };
 
-export const usersLoaded = (users: UserListResponse) => <const>{
-  type: USERS_LOADED,
-  payload: users,
-};
+export const usersLoaded = (users: UserListResponse) =>
+  <const>{
+    type: USERS_LOADED,
+    payload: users,
+  };
 
-export const usersLoadFailed = () => <const>{
-  type: USERS_LOAD_FAILED,
-};
-
-export const userCreating = () => <const>{
-  type: USER_CREATING,
-};
-
-export const userCreateFailed = () => <const>{
-  type: USER_CREATE_FAILED,
-};
-
-export const userCreated = () => <const>{
-  type: USER_CREATED,
-};
+export const usersLoadFailed = (error: ApiError) =>
+  <const>{
+    type: USERS_LOAD_FAILED,
+    payload: error,
+  };
 
 export type AdminUsersActions =
   | ReturnType<typeof usersLoaded>
   | ReturnType<typeof usersLoadFailed>
-  | ReturnType<typeof userCreateFailed>
-  | ReturnType<typeof userCreating>
-  | ReturnType<typeof userCreated>
   | ReturnType<typeof resetState>;
 
 export const getUsers = () => async (dispatch: DispatchAction, getState: GetState) => {
   const { accessToken } = getState().auth;
   try {
-    const response = await adminApiFetch('admin/users', { accessToken }, dispatch);
-    dispatch(usersLoaded(response as UserListResponse));
+    const response = await adminApiFetch<UserListResponse>("admin/users", { accessToken }, dispatch);
+    dispatch(usersLoaded(response));
   } catch (e) {
-    dispatch(usersLoadFailed());
+    dispatch(usersLoadFailed(e as ApiError));
   }
 };
 
 export const createUser = (data: UserInviteSchema) => async (dispatch: DispatchAction, getState: GetState) => {
-  dispatch(userCreating());
-
   const { accessToken } = getState().auth;
 
-  try {
-    await adminApiFetch('admin/users', {
+  await adminApiFetch(
+    "admin/users",
+    {
       accessToken,
-      method: 'POST',
+      method: "POST",
       body: data,
-    }, dispatch);
-    dispatch(userCreated());
-    return true;
-  } catch (e) {
-    dispatch(userCreateFailed());
-    return false;
-  }
+    },
+    dispatch,
+  );
 };
 
 export const deleteUser = (id: UserID) => async (dispatch: DispatchAction, getState: GetState) => {
   const { accessToken } = getState().auth;
 
-  try {
-    await adminApiFetch(`admin/users/${id}`, {
+  await adminApiFetch(
+    `admin/users/${id}`,
+    {
       accessToken,
-      method: 'DELETE',
-    }, dispatch);
-    return true;
-  } catch (e) {
-    return false;
-  }
+      method: "DELETE",
+    },
+    dispatch,
+  );
 };
 
 export const resetUserPassword = (id: UserID) => async (dispatch: DispatchAction, getState: GetState) => {
   const { accessToken } = getState().auth;
 
-  try {
-    await adminApiFetch(`admin/users/${id}/resetpassword`, {
+  await adminApiFetch(
+    `admin/users/${id}/resetpassword`,
+    {
       accessToken,
-      method: 'POST',
-    }, dispatch);
-    return true;
-  } catch (e) {
-    return false;
-  }
+      method: "POST",
+    },
+    dispatch,
+  );
 };
 
-export const changePassword = (data: UserChangePasswordSchema) => async (
-  dispatch: DispatchAction,
-  getState: GetState,
-) => {
-  const { accessToken } = getState().auth;
+export const changePassword =
+  (data: UserChangePasswordSchema) => async (dispatch: DispatchAction, getState: GetState) => {
+    const { accessToken } = getState().auth;
 
-  try {
-    await adminApiFetch('admin/users/self/changepassword', {
-      accessToken,
-      method: 'POST',
-      body: data,
-    }, dispatch);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+    await adminApiFetch(
+      "admin/users/self/changepassword",
+      {
+        accessToken,
+        method: "POST",
+        body: data,
+      },
+      dispatch,
+    );
+  };

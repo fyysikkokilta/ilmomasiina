@@ -1,6 +1,6 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren } from "react";
 
-import { FullPaths, PathsContext } from '@tietokilta/ilmomasiina-components';
+import { FullPaths, PathsContext } from "@tietokilta/ilmomasiina-components";
 
 export const urlPrefix = PATH_PREFIX;
 
@@ -12,6 +12,7 @@ const appPaths: FullPaths = {
   editSignup: (id, editToken) => `${urlPrefix}/signup/${id}/${editToken}`,
 
   adminLogin: `${urlPrefix}/login`,
+  adminInitialSetup: `${urlPrefix}/setup`,
   adminEventsList: `${urlPrefix}/admin`,
   adminEditEvent: (id) => `${urlPrefix}/admin/edit/${id}`,
   adminUsersList: `${urlPrefix}/admin/users`,
@@ -23,7 +24,5 @@ export default appPaths;
 export const apiUrl = `${urlPrefix}/api`;
 
 export const PathsProvider = ({ children }: PropsWithChildren<{}>) => (
-  <PathsContext.Provider value={appPaths}>
-    {children}
-  </PathsContext.Provider>
+  <PathsContext.Provider value={appPaths}>{children}</PathsContext.Provider>
 );

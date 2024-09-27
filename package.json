@@ -1,12 +1,12 @@
 {
   "name": "ilmomasiina",
-  "version": "2.0.0-alpha11",
+  "version": "2.0.0-alpha31",
   "private": true,
   "license": "MIT",
   "engines": {
-    "node": "^16",
-    "npm": "^7"
+    "node": "^20"
   },
+  "packageManager": "pnpm@9.1.1",
   "scripts": {
     "bootstrap": "pnpm install",
     "clean": "pnpm run -r clean",
@@ -14,8 +14,10 @@
     "start": "pnpm run -r --parallel start",
     "lint": "eslint packages",
     "lint:fix": "npm run lint -- --fix",
+    "format": "prettier -w packages/*/{src,test}/**/*.{ts,tsx,scss}",
     "typecheck": "pnpm run -r --workspace-concurrency=1 typecheck",
-    "test": "pnpm run -r test"
+    "test": "pnpm run -r test",
+    "test:backend": "pnpm run --filter ilmomasiina-backend test"
   },
   "repository": {
     "type": "git",
@@ -25,20 +27,21 @@
     "url": "https://github.com/Fyysikkokilta/ilmomasiina/issues"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.48.2",
-    "@typescript-eslint/parser": "^5.48.2",
-    "eslint": "^8.32.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jest": "^26.9.0",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^27.9.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-react": "^7.32.1",
+    "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-simple-import-sort": "^7.0.0",
-    "pnpm": "^7.25.0",
-    "typescript": "~4.9"
+    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "prettier": "^3.3.3",
+    "typescript": "~5.2.2"
   },
   "browserslist": {
     "production": [
@@ -64,6 +67,9 @@
         "popper.js",
         "eslint"
       ]
+    },
+    "overrides": {
+      "@types/react": "^17.0.47"
     }
   }
 }

@@ -1,13 +1,13 @@
-import { QuestionType } from '../enum';
-import EventAttributes from './event';
+import { QuestionType } from "../enum";
+import EventAttributes from "./event";
 
 export default interface QuestionAttributes {
   id: string;
   order: number;
   question: string;
   type: QuestionType;
-  options: string | null;
+  options: string[] | null;
   required: boolean;
   public: boolean;
-  eventId: EventAttributes['id'];
+  eventId: EventAttributes["id"];
 }

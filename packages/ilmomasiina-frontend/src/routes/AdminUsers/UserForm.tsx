@@ -1,13 +1,17 @@
-import React from 'react';
+import React from "react";
 
-import { Field, Formik, FormikHelpers } from 'formik';
-import {
-  Button, Form, Spinner,
-} from 'react-bootstrap';
-import { toast } from 'react-toastify';
+import { FormApi } from "final-form";
+import { Button, Form as BsForm, FormControl, Spinner } from "react-bootstrap";
+import { Form } from "react-final-form";
+import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
-import { createUser, getUsers } from '../../modules/adminUsers/actions';
-import { useTypedDispatch } from '../../store/reducers';
+import { ApiError } from "@tietokilta/ilmomasiina-components";
+import { errorDesc } from "@tietokilta/ilmomasiina-components/dist/utils/errorMessage";
+import branding from "../../branding";
+import FieldFormGroup from "../../components/FieldFormGroup";
+import { createUser, getUsers } from "../../modules/adminUsers/actions";
+import { useTypedDispatch } from "../../store/reducers";
 
 type FormData = {
   email: string;
@@ -15,46 +19,53 @@ type FormData = {
 
 const UserForm = () => {
   const dispatch = useTypedDispatch();
+  const { t } = useTranslation();
 
-  const onSubmit = async (data: FormData, { setSubmitting, resetForm }: FormikHelpers<FormData>) => {
-    // TODO: better error handling
-    const success = await dispatch(createUser(data));
-    if (success) {
+  const onSubmit = async (data: FormData, form: FormApi<FormData>) => {
+    try {
+      await dispatch(createUser(data));
       dispatch(getUsers());
-      resetForm();
-      toast.success('Käyttäjän luominen onnistui,', { autoClose: 2000 });
-    } else {
-      toast.error('Käyttäjän luominen epäonnistui.', { autoClose: 2000 });
+      form.restart();
+      toast.success(t("adminUsers.createUser.success", { email: data.email }), {
+        autoClose: 2000,
+      });
+    } catch (err) {
+      toast.error(
+        errorDesc(t, err as ApiError, "adminUsers.createUser.errors", {
+          email: data.email,
+        }),
+        { autoClose: 5000 },
+      );
     }
-    setSubmitting(false);
   };
 
   return (
-    <Formik
+    <Form<FormData>
       initialValues={{
-        email: '',
+        email: "",
       }}
       onSubmit={onSubmit}
     >
-      {({ isSubmitting, handleSubmit }) => (
-        <Form
-          className="ilmo--form"
-          onSubmit={handleSubmit}
-        >
-          <Field
-            as={Form.Control}
-            name="email"
-            id="email"
-            type="email"
-            placeholder="Sähköposti"
-            aria-label="Sähköposti"
-          />
-          <Button type="submit" variant="secondary" disabled={isSubmitting}>
-            {isSubmitting ? <Spinner animation="border" /> : 'Luo uusi käyttäjä'}
+      {({ submitting, handleSubmit }) => (
+        <BsForm className="ilmo--form" onSubmit={handleSubmit}>
+          <FieldFormGroup name="email" label={t("adminUsers.createUser.email")}>
+            {({ input, meta: { touched, error } }) => (
+              <FormControl
+                {...input}
+                type="email"
+                required
+                isInvalid={touched && error}
+                placeholder={branding.loginPlaceholderEmail}
+              />
+            )}
+          </FieldFormGroup>
+          <p>{t("adminUsers.createUser.passwordInfo")}</p>
+          <Button type="submit" variant="secondary" disabled={submitting}>
+            {submitting ? <Spinner animation="border" /> : t("adminUsers.createUser.submit")}
           </Button>
-        </Form>
+        </BsForm>
       )}
-    </Formik>
+    </Form>
   );
 };
 

@@ -1,7 +1,7 @@
-import { createSelector } from 'reselect';
+import { createSelector } from "reselect";
 
-import { AppState } from '../../store/types';
-import { defaultEvent, serverEventToEditor } from './actions';
+import { AppState } from "../../store/types";
+import { defaultEvent, serverEventToEditor } from "./actions";
 
 // eslint-disable-next-line import/prefer-default-export
 export const selectFormData = createSelector(

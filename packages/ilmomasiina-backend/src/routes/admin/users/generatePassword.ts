@@ -1,6 +1,6 @@
-import { randomInt } from 'crypto';
+import { randomInt } from "crypto";
 
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyzåäö0123456789';
+const ALPHABET = "abcdefghijklmnopqrstuvwxyzåäö0123456789";
 const GENERATED_PASSWORD_LENGTH = 24;
 
 /** Generates a random password.
@@ -14,5 +14,5 @@ export default function generatePassword(): string {
     chars.push(ALPHABET[randomInt(0, ALPHABET.length)]);
   }
 
-  return chars.join('');
+  return chars.join("");
 }

@@ -1,11 +1,9 @@
-import { Static, Type } from '@sinclair/typebox';
+import { Static, Type } from "@sinclair/typebox";
 
-import {
-  password, userAttributes, userID, userIdentity,
-} from './attributes';
+import { password, userAttributes, userID, userIdentity } from "./attributes";
 
 /** Request body for creating an admin user. */
-export const userCreateSchema = Type.Intersect([
+export const userCreateSchema = Type.Composite([
   userAttributes,
   Type.Object({
     password,
@@ -13,21 +11,16 @@ export const userCreateSchema = Type.Intersect([
 ]);
 
 /** Request body for inviting an admin user. */
-export const userInviteSchema = Type.Intersect([
-  userAttributes,
-]);
+export const userInviteSchema = Type.Composite([userAttributes]);
 
 /** Request body for changing the user's own password. */
 export const userChangePasswordSchema = Type.Object({
-  oldPassword: Type.String(),
+  oldPassword: password,
   newPassword: password,
 });
 
 /** Schema for a user. */
-export const userSchema = Type.Intersect([
-  userIdentity,
-  userAttributes,
-]);
+export const userSchema = Type.Composite([userIdentity, userAttributes]);
 
 /** Response schema for fetching a list of users. */
 export const userListResponse = Type.Array(userSchema);

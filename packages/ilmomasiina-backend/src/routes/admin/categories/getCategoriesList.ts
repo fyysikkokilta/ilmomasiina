@@ -1,15 +1,15 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from "fastify";
 
-import type { CategoriesResponse } from '@tietokilta/ilmomasiina-models';
-import { Event } from '../../../models/event';
+import type { CategoriesResponse } from "@tietokilta/ilmomasiina-models";
+import { Event } from "../../../models/event";
 
 export default async function getCategoriesList(
   request: FastifyRequest,
   response: FastifyReply,
 ): Promise<CategoriesResponse> {
   const results = await Event.findAll({
-    attributes: ['category'],
-    group: ['category'],
+    attributes: ["category"],
+    group: ["category"],
   });
 
   const categories = results.map((event) => event.category);

@@ -1,58 +1,45 @@
-import React from 'react';
+import React from "react";
 
-import { useFormikContext } from 'formik';
-import { Form } from 'react-bootstrap';
+import { Form } from "react-bootstrap";
+import { UseFieldConfig } from "react-final-form";
+import { useTranslation } from "react-i18next";
 
-import { FieldRow } from '@tietokilta/ilmomasiina-components';
-import { EditorEvent } from '../../../modules/editor/types';
-import DateTimePicker from './DateTimePicker';
-import Quotas from './Quotas';
+import { FieldRow } from "@tietokilta/ilmomasiina-components";
+import useEditorErrors from "./errors";
+import { useFieldValue } from "./hooks";
+import Quotas from "./Quotas";
+
+const numberConfig: UseFieldConfig<number | null> = {
+  parse: (value) => (value ? Number(value) : null),
+};
 
 const QuotasTab = () => {
-  const { values: { useOpenQuota } } = useFormikContext<EditorEvent>();
+  const useOpenQuota = useFieldValue<boolean>("useOpenQuota");
+  const { t } = useTranslation();
+  const formatError = useEditorErrors();
   return (
     <div>
-      <FieldRow
-        name="registrationStartDate"
-        as={DateTimePicker}
-        label="Ilmo alkaa"
-        required
-      />
-      <FieldRow
-        name="registrationEndDate"
-        as={DateTimePicker}
-        label="Ilmo päättyy"
-        required
-      />
-      <FieldRow
-        name="signupsPublic"
-        label="Julkisuus"
-        as={Form.Check}
-        type="checkbox"
-        checkAlign
-        checkLabel="Ilmoittautumiset ovat julkisia"
-      />
-      <hr />
       <Quotas />
       <FieldRow
         name="useOpenQuota"
-        label="Avoin kiintiö"
+        label={t("editor.quotas.openQuota")}
         as={Form.Check}
         type="checkbox"
         checkAlign
-        checkLabel="Käytä lisäksi yhteistä kiintiötä"
-        help={
-          'Avoimeen kiintiöön sijoitetaan automaattisesti ilmoittautumisjärjestyksessä ensimmäiset ilmoittautujat, '
-          + 'jotka eivät mahdu valitsemaansa kiintiöön.'
-        }
+        checkLabel={t("editor.quotas.openQuota.check")}
+        help={t("editor.quotas.openQuota.info")}
+        formatError={formatError}
       />
       {useOpenQuota && (
         <FieldRow
           name="openQuotaSize"
-          label="Avoimen kiintiön koko"
+          label={t("editor.quotas.openQuotaSize")}
           type="number"
+          config={numberConfig}
           min="0"
+          placeholder="0" // if this is left empty, it's set to null and disabled
           required
+          formatError={formatError}
         />
       )}
     </div>

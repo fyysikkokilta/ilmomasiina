@@ -1,14 +1,14 @@
-import debug from 'debug';
-import _ from 'lodash';
-import moment from 'moment';
-import { Op } from 'sequelize';
+import debug from "debug";
+import _ from "lodash";
+import moment from "moment";
+import { Op } from "sequelize";
 
-import { Event } from '../models/event';
-import { Quota } from '../models/quota';
-import { Signup } from '../models/signup';
-import { refreshSignupPositions } from '../routes/signups/computeSignupPosition';
+import { Event } from "../models/event";
+import { Quota } from "../models/quota";
+import { Signup } from "../models/signup";
+import { refreshSignupPositions } from "../routes/signups/computeSignupPosition";
 
-const debugLog = debug('app:cron:unconfirmed');
+const debugLog = debug("app:cron:unconfirmed");
 
 export default async function deleteUnconfirmedSignups() {
   const signups = await Signup.findAll({
@@ -20,18 +20,18 @@ export default async function deleteUnconfirmedSignups() {
         },
         // Over 30 minutes old
         createdAt: {
-          [Op.lt]: moment().subtract(30, 'minutes').toDate(),
+          [Op.lt]: moment().subtract(30, "minutes").toDate(),
         },
       },
     },
     include: [
       {
         model: Quota,
-        attributes: ['id'],
+        attributes: ["id"],
         include: [
           {
             model: Event,
-            attributes: ['id', 'openQuotaSize'],
+            attributes: ["id", "openQuotaSize"],
           },
         ],
       },
@@ -41,14 +41,17 @@ export default async function deleteUnconfirmedSignups() {
   });
 
   if (signups.length === 0) {
-    debugLog('No unconfirmed signups to delete');
+    debugLog("No unconfirmed signups to delete");
     return;
   }
 
   const signupIds = signups.map((signup) => signup.id);
-  const uniqueEvents = _.uniqBy(signups.map((signup) => signup.quota!.event!), 'id');
+  const uniqueEvents = _.uniqBy(
+    signups.map((signup) => signup.quota!.event!),
+    "id",
+  );
 
-  console.info(`Deleting unconfirmed signups: ${signupIds.join(', ')}`);
+  console.info(`Deleting unconfirmed signups: ${signupIds.join(", ")}`);
   try {
     await Signup.destroy({
       where: { id: signupIds },
@@ -60,7 +63,7 @@ export default async function deleteUnconfirmedSignups() {
       // eslint-disable-next-line no-await-in-loop
       await refreshSignupPositions(event);
     }
-    debugLog('Unconfirmed signups deleted');
+    debugLog("Unconfirmed signups deleted");
   } catch (error) {
     console.error(error);
   }

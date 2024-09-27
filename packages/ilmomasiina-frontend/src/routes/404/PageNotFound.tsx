@@ -1,19 +1,21 @@
-import React from 'react';
+import React from "react";
 
-import { Link } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
-import appPaths from '../../paths';
+import appPaths from "../../paths";
 
-const PageNotFound = () => (
-  <div className="ilmo--status-container">
-    <h1>404</h1>
-    <p>
-      Sivua ei löydy.
-    </p>
-    <p>
-      <Link to={appPaths.eventsList}>Palaa tapahtumalistaukseen</Link>
-    </p>
-  </div>
-);
+const PageNotFound = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="ilmo--status-container">
+      <h1>{t("errors.404.title")}</h1>
+      <p>{t("errors.404.description")}</p>
+      <p>
+        <Link to={appPaths.eventsList}>{t("errors.returnToEvents")}</Link>
+      </p>
+    </div>
+  );
+};
 
 export default PageNotFound;

@@ -12,15 +12,14 @@ services:
       context: .
       dockerfile: "Dockerfile"
       args:
-        - API_URL=${API_URL}
-        - SENTRY_DSN=${SENTRY_DSN}
-        - PREFIX_URL=${PREFIX_URL}
-        - BRANDING_LOGO_URL=${BRANDING_LOGO_URL}
-        - BRANDING_HEADER_TITLE_TEXT=${BRANDING_HEADER_TITLE_TEXT}
-        - BRANDING_FOOTER_GDPR_TEXT=${BRANDING_FOOTER_GDPR_TEXT}
-        - BRANDING_FOOTER_GDPR_LINK=${BRANDING_FOOTER_GDPR_LINK}
-        - BRANDING_FOOTER_HOME_TEXT=${BRANDING_FOOTER_HOME_TEXT}
-
+        #- PATH_PREFIX=
+        #- API_URL=
+        - BRANDING_HEADER_TITLE_TEXT=Tietokillan ilmomasiina
+        - BRANDING_FOOTER_GDPR_TEXT=Tietosuoja
+        - BRANDING_FOOTER_GDPR_LINK=https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/
+        - BRANDING_FOOTER_HOME_TEXT=Tietokilta.fi
+        - BRANDING_FOOTER_HOME_LINK=https://tietokilta.fi
+        - BRANDING_LOGIN_PLACEHOLDER_EMAIL=admin@tietokilta.fi
     restart: always
     environment:
       - NODE_ENV=production

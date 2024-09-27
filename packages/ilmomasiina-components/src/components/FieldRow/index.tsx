@@ -1,45 +1,78 @@
-import React, { ComponentType, ReactNode } from 'react';
+import React, { ComponentPropsWithoutRef, ComponentType, JSX, ReactNode } from "react";
 
-import { Field, useFormikContext } from 'formik';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Form, FormControlProps } from "react-bootstrap";
+import { useField, UseFieldConfig } from "react-final-form";
 
-type Props = {
-  /** The name of the field in the Formik data. */
-  name: string;
-  /** The label placed in the left column. */
-  label?: string;
-  /** The help string placed below the field. */
-  help?: ReactNode;
-  /** Whether the field is required. */
-  required?: boolean;
-  /** Overrides the real error message if the field has errors. */
-  alternateError?: string;
-  /** Extra feedback rendered below the field. Bring your own `Form.Control.Feedback`. */
-  extraFeedback?: ReactNode;
-  /** `true` to adjust the vertical alignment of the left column label for checkboxes/radios. */
-  checkAlign?: boolean;
-  /** Passed as `label` to the field component. Intended for checkboxes. */
-  checkLabel?: ReactNode;
-  /** The component or element to use as the field. Passed to Formik's `Field`. */
-  as?: ComponentType<any> | string;
+import BaseFieldRow, { BaseFieldRowProps } from "../BaseFieldRow";
+
+type BaseProps = Omit<BaseFieldRowProps, "error" | "children"> &
+  Pick<UseFieldConfig<any>, "type"> & {
+    /** The name of the field in the data. */
+    name: string;
+    /** Passed as `controlId` if no `controlId` is separately set. */
+    id?: string;
+    /** Formats a field error. */
+    formatError?: (error: any) => ReactNode;
+    /** Passed as `label` to the field component. Intended for checkboxes. */
+    checkLabel?: ReactNode;
+    /** useField() config. */
+    config?: UseFieldConfig<any>;
+  };
+
+// These typings do the best attempt we can do with merged props.
+// Ideally, with TypeScript, we should provide a render function, but I'll defer that change
+// to when we get rid of react-bootstrap altogether.
+
+// react-bootstrap's typing for Form.Control is extremely broad, so only allow <input> props.
+type InputProps = ComponentPropsWithoutRef<"input">;
+
+// Props with neither `children` nor `as`, assume `Form.Control`.
+type PropsWithFormControl = BaseProps & {
+  children?: undefined;
+  as?: undefined;
+} & Omit<FormControlProps & InputProps, keyof BaseProps | "as" | "children">;
+
+// Props with `children` given, no extra props to pass through.
+type PropsWithChildren = BaseProps & {
   /** If given, this is used as the field. */
-  children?: ReactNode;
+  children: ReactNode;
+  as?: undefined;
 };
 
-export default function FieldRow<P = unknown>({
+type As = keyof JSX.IntrinsicElements | ComponentType<any>;
+
+// Props with a custom `as` component.
+type PropsWithAs<C extends As> = BaseProps & {
+  /** The component or element to use as the field. */
+  as: C;
+  children?: undefined;
+} & Omit<ComponentPropsWithoutRef<C>, keyof BaseProps | "as" | "children">;
+
+type Props<C extends As> = PropsWithFormControl | PropsWithChildren | PropsWithAs<C>;
+
+/** react-final-field field row component */
+export default function FieldRow<C extends As>({
   name,
-  label = '',
+  label = "",
   help,
   required = false,
-  alternateError,
+  formatError,
   extraFeedback,
   checkAlign,
   checkLabel,
-  as = Form.Control,
+  as,
   children,
+  type,
+  id,
+  controlId = id ?? name,
+  config,
   ...props
-}: Props & P) {
-  const { errors } = useFormikContext<any>();
+}: Props<C>) {
+  const {
+    input,
+    meta: { error: validationError, submitError, invalid },
+  } = useField(name, { type, ...config });
+  const error = submitError || validationError;
 
   let field: ReactNode;
   if (children) {
@@ -48,24 +81,22 @@ export default function FieldRow<P = unknown>({
     // Checkboxes have two labels: in the left column and next to the checkbox. Form.Check handles the latter for us
     // and calls it "label", but we still want to call the other one "label" for all other types of field. Therefore
     // we pass "checkLabel" to the field here.
-    let fieldProps = props;
-    if (checkLabel !== undefined) {
-      fieldProps = { ...props, label: checkLabel };
-    }
-    field = <Field as={as} name={name} required={required} {...fieldProps} />;
+    const overrideProps = checkLabel !== undefined ? { label: checkLabel } : {};
+    const Component = (as ?? Form.Control) as ComponentType<any>;
+    field = <Component required={required} isInvalid={invalid} {...props} id={id} {...input} {...overrideProps} />;
   }
 
   return (
-    <Form.Group as={Row} controlId={name}>
-      <Form.Label column sm="3" data-required={required} className={checkAlign ? 'pt-0' : ''}>{label}</Form.Label>
-      <Col sm="9">
-        {field}
-        <Form.Control.Feedback type="invalid">
-          {errors[name] && (alternateError || errors[name])}
-        </Form.Control.Feedback>
-        {extraFeedback}
-        {help && <Form.Text muted>{help}</Form.Text>}
-      </Col>
-    </Form.Group>
+    <BaseFieldRow
+      controlId={controlId}
+      label={label}
+      help={help}
+      required={required}
+      error={invalid && (formatError ? formatError(error) : error)}
+      extraFeedback={extraFeedback}
+      checkAlign={checkAlign}
+    >
+      {field}
+    </BaseFieldRow>
   );
 }

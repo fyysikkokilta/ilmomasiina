@@ -11,6 +11,15 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/issues/2094
     "EXPERIMENTAL_useSourceOfProjectReferenceRedirect": true
   },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    ".eslintrc.js",
+    "jest.config.js",
+    "*.scss",
+    "*.json"
+  ],
   "settings": {
     "react": {
       "pragma": "React",
@@ -20,7 +29,8 @@ module.exports = {
   "extends": [
     "airbnb",
     "airbnb/hooks",
-    "airbnb-typescript"
+    "airbnb-typescript",
+    "prettier"
   ],
   "plugins": [
     "@typescript-eslint",
@@ -32,9 +42,6 @@ module.exports = {
     "browser": true
   },
   "rules": {
-    "max-len": ["error", 120, 2],
-    "@typescript-eslint/semi": ["error", "always"],
-    "@typescript-eslint/quotes": ["error", "single"],
     // To allow grouping of class members - especially for Models.
     "@typescript-eslint/lines-between-class-members": "off",
     // Doesn't increase code quality with redux.
@@ -45,6 +52,10 @@ module.exports = {
     "radix": ["error", "as-needed"],
     // ...I know what I'm doing.
     "no-control-regex": "off",
+    // In some cases, especially if you want to comment the logic, it's much
+    // clearer to write it like a binary tree:
+    // if { if { } else { } } else { if { } else { } }
+    "no-lonely-if": "off",
     // Not usable with formik.
     "react/jsx-props-no-spreading": "off",
     // TypeScript validates prop types, no need for this.
@@ -63,6 +74,15 @@ module.exports = {
       namedComponents: ["function-declaration", "arrow-function"],
       unnamedComponents: "arrow-function",
     }],
+    // Allow dev deps in test files.
+    "import/no-extraneous-dependencies": ["error", {
+      devDependencies: [
+        "**/test/**",
+        "**/vite.config.ts",
+        "**/vitest.config.ts",
+        "**/.eslintrc.js"
+      ],
+    }],
     // Sort imports: React first, then npm packages, then local files, then CSS.
     "simple-import-sort/imports": [
       "error",
@@ -78,6 +98,35 @@ module.exports = {
           ["css$"]
         ]
       }
-    ]
+    ],
+    // Prevent imports from "src/...". VS Code adds these automatically, but they
+    // break when compiled.
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [{
+          group: ["src/*"],
+          message: "This import will break when compiled by tsc. Use a relative path instead, or \"../src/\" in test files."
+        }],
+      },
+    ],
+    // Removing for..of loops from this rule. Vite already targets modern browsers, so for..of doesn't require
+    // transpilation. Array.forEach doesn't work at all with async.
+    // Modified from https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/style.js
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ForInStatement",
+        "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
+      },
+      {
+        "selector": "LabeledStatement",
+        "message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+      },
+      {
+        "selector": "WithStatement",
+        "message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+      }
+    ],
   }
 };

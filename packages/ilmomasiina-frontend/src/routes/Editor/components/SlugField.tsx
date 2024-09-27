@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { ComponentPropsWithoutRef } from "react";
 
-import { Form, InputGroup } from 'react-bootstrap';
+import { Form, FormControlProps, InputGroup } from "react-bootstrap";
 
-import { urlPrefix } from '../../../paths';
+import appPaths, { urlPrefix } from "../../../paths";
 
-export default (props: any) => {
-  const domain = /^https?:\/\//.test(urlPrefix) ? urlPrefix.replace(/^https?:\/\//, '') : window.location.host;
-  const prefix = `${domain}/event/`;
+export default (props: FormControlProps & ComponentPropsWithoutRef<"input">) => {
+  const domain = /^https?:\/\//.test(urlPrefix) ? urlPrefix.replace(/^https?:\/\//, "") : window.location.host;
+  const prefix = domain + appPaths.eventDetails("");
   return (
     <InputGroup>
       <InputGroup.Prepend>

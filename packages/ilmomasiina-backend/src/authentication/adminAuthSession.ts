@@ -1,26 +1,31 @@
-import {
-  createSigner, createVerifier, SignerSync, VerifierSync,
-} from 'fast-jwt';
-import { FastifyRequest } from 'fastify';
-import { Unauthorized } from 'http-errors';
+import { createSigner, createVerifier, SignerSync, VerifierSync } from "fast-jwt";
+import { FastifyRequest } from "fastify";
 
-import type { UserID, UserSchema } from '@tietokilta/ilmomasiina-models';
+import type { UserID, UserSchema } from "@tietokilta/ilmomasiina-models";
+import config from "../config";
+import { BadSession } from "./errors";
 
 export interface AdminTokenData {
   user: UserID;
-  email: UserSchema['email'];
+  email: UserSchema["email"];
 }
 
 export default class AdminAuthSession {
   /** Session lifetime in seconds */
-  static TTL = 7 * 24 * 60 * 60;  // 7 days
+  static TTL = config.nodeEnv === "development" ? 365 * 24 * 60 * 60 : 60 * 60 * 3;
 
   private readonly sign: typeof SignerSync;
   private readonly verify: typeof VerifierSync;
 
   constructor(secret: string) {
-    this.sign = createSigner({ key: secret, expiresIn: AdminAuthSession.TTL * 1000 });
-    this.verify = createVerifier({ key: secret, maxAge: AdminAuthSession.TTL * 1000 });
+    this.sign = createSigner({
+      key: secret,
+      expiresIn: AdminAuthSession.TTL * 1000,
+    });
+    this.verify = createVerifier({
+      key: secret,
+      maxAge: AdminAuthSession.TTL * 1000,
+    });
   }
 
   /**
@@ -34,7 +39,7 @@ export default class AdminAuthSession {
 
   /**
    * Verifies the incoming request authorization.
-   * Throws an Unauthorized error if session is not valid.
+   * Throws a BadSession error if session is not valid.
    *
    * @param request incoming request
    */
@@ -42,16 +47,17 @@ export default class AdminAuthSession {
     const header = request.headers.authorization; // Yes, Fastify converts header names to lowercase :D
 
     if (!header) {
-      throw new Unauthorized('Missing Authorization header');
+      throw new BadSession("Missing Authorization header");
     }
 
     const token = Array.isArray(header) ? header[0] : header;
 
-    try { // Try to verify token
+    try {
+      // Try to verify token
       const data = this.verify(token);
-      return { user: parseInt(data.user), email: data.email || '' };
+      return { user: parseInt(data.user), email: data.email || "" };
     } catch {
-      throw new Unauthorized('Invalid session');
+      throw new BadSession("Invalid session");
     }
   }
 }

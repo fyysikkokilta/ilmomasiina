@@ -1,6 +1,6 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext } from "react";
 
-export const MISSING = Symbol('missing');
+export const MISSING = Symbol("missing");
 
 /** Creates a React context and an associated hook that only works inside the Provider. */
 export function createStateContext<State>() {
@@ -9,7 +9,7 @@ export function createStateContext<State>() {
   /** React hook that fetches the state via a context. */
   function useStateContext() {
     const context = useContext(Context);
-    if (context === MISSING) throw new Error('useStateContext used outside corresponding Provider');
+    if (context === MISSING) throw new Error("useStateContext used outside corresponding Provider");
     return context;
   }
 

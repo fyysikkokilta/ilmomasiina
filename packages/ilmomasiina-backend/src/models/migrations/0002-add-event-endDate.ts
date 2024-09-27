@@ -1,18 +1,18 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { RunnableMigration } from 'umzug';
+import { DataTypes } from "sequelize";
 
-const migration: RunnableMigration<Sequelize> = {
-  name: '0002-add-event-endDate',
-  async up({ context: sequelize }) {
+import { defineMigration } from "./util";
+
+export default defineMigration({
+  name: "0002-add-event-endDate",
+  async up({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
     await query.addColumn(
-      'event',
-      'endDate',
+      "event",
+      "endDate",
       {
         type: DataTypes.DATE,
       },
+      { transaction },
     );
   },
-};
-
-export default migration;
+});

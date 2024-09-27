@@ -1,15 +1,16 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { RunnableMigration } from 'umzug';
+import { DataTypes } from "sequelize";
+
+import { defineMigration } from "./util";
 
 // Constant from ../randomId
 const RANDOM_ID_LENGTH = 12;
 
-const migration: RunnableMigration<Sequelize> = {
-  name: '0000-initial',
-  async up({ context: sequelize }) {
+export default defineMigration({
+  name: "0000-initial",
+  async up({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
     await query.createTable(
-      'event',
+      "event",
       {
         id: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
@@ -55,7 +56,7 @@ const migration: RunnableMigration<Sequelize> = {
         category: {
           type: DataTypes.STRING,
           allowNull: false,
-          defaultValue: '',
+          defaultValue: "",
         },
         draft: {
           type: DataTypes.BOOLEAN,
@@ -97,9 +98,10 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
-      'quota',
+      "quota",
       {
         id: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
@@ -109,11 +111,11 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'event',
-            key: 'id',
+            model: "event",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         order: {
           type: DataTypes.INTEGER,
@@ -138,9 +140,10 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
-      'signup',
+      "signup",
       {
         id: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
@@ -150,11 +153,11 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'quota',
-            key: 'id',
+            model: "quota",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         firstName: {
           type: DataTypes.STRING,
@@ -173,7 +176,7 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE(3),
         },
         status: {
-          type: DataTypes.ENUM('in-quota', 'in-open', 'in-queue'),
+          type: DataTypes.ENUM("in-quota", "in-open", "in-queue"),
         },
         position: {
           type: DataTypes.INTEGER,
@@ -190,9 +193,10 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
-      'question',
+      "question",
       {
         id: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
@@ -202,11 +206,11 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'event',
-            key: 'id',
+            model: "event",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         order: {
           type: DataTypes.INTEGER,
@@ -217,7 +221,7 @@ const migration: RunnableMigration<Sequelize> = {
           allowNull: false,
         },
         type: {
-          type: DataTypes.ENUM('text', 'textarea', 'number', 'select', 'checkbox'),
+          type: DataTypes.ENUM("text", "textarea", "number", "select", "checkbox"),
           allowNull: false,
         },
         options: {
@@ -246,9 +250,10 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
-      'answer',
+      "answer",
       {
         id: {
           type: DataTypes.INTEGER.UNSIGNED,
@@ -259,21 +264,21 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'question',
-            key: 'id',
+            model: "question",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         signupId: {
           type: DataTypes.CHAR(RANDOM_ID_LENGTH),
           allowNull: false,
           references: {
-            model: 'signup',
-            key: 'id',
+            model: "signup",
+            key: "id",
           },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
         },
         answer: {
           type: DataTypes.STRING,
@@ -291,9 +296,10 @@ const migration: RunnableMigration<Sequelize> = {
           type: DataTypes.DATE,
         },
       },
+      { transaction },
     );
     await query.createTable(
-      'user',
+      "user",
       {
         id: {
           type: DataTypes.INTEGER.UNSIGNED,
@@ -318,8 +324,7 @@ const migration: RunnableMigration<Sequelize> = {
           allowNull: false,
         },
       },
+      { transaction },
     );
   },
-};
-
-export default migration;
+});

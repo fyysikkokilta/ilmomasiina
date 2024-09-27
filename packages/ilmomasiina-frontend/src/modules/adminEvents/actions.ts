@@ -1,24 +1,25 @@
-import type { AdminEventListResponse, EventID } from '@tietokilta/ilmomasiina-models';
-import adminApiFetch from '../../api';
-import type { DispatchAction, GetState } from '../../store/types';
-import {
-  EVENTS_LOAD_FAILED,
-  EVENTS_LOADED,
-  RESET,
-} from './actionTypes';
+import type { ApiError } from "@tietokilta/ilmomasiina-components";
+import type { AdminEventListResponse, EventID } from "@tietokilta/ilmomasiina-models";
+import adminApiFetch from "../../api";
+import type { DispatchAction, GetState } from "../../store/types";
+import { EVENTS_LOAD_FAILED, EVENTS_LOADED, RESET } from "./actionTypes";
 
-export const resetState = () => <const>{
-  type: RESET,
-};
+export const resetState = () =>
+  <const>{
+    type: RESET,
+  };
 
-export const eventsLoaded = (events: AdminEventListResponse) => <const>{
-  type: EVENTS_LOADED,
-  payload: events,
-};
+export const eventsLoaded = (events: AdminEventListResponse) =>
+  <const>{
+    type: EVENTS_LOADED,
+    payload: events,
+  };
 
-export const eventsLoadFailed = () => <const>{
-  type: EVENTS_LOAD_FAILED,
-};
+export const eventsLoadFailed = (error: ApiError) =>
+  <const>{
+    type: EVENTS_LOAD_FAILED,
+    payload: error,
+  };
 
 export type AdminEventsActions =
   | ReturnType<typeof eventsLoaded>
@@ -26,24 +27,23 @@ export type AdminEventsActions =
   | ReturnType<typeof resetState>;
 
 export const getAdminEvents = () => async (dispatch: DispatchAction, getState: GetState) => {
-  const { accessToken } = getState().auth;
   try {
-    const response = await adminApiFetch('admin/events', { accessToken }, dispatch);
-    dispatch(eventsLoaded(response as AdminEventListResponse));
+    const { accessToken } = getState().auth;
+    const response = await adminApiFetch<AdminEventListResponse>("admin/events", { accessToken }, dispatch);
+    dispatch(eventsLoaded(response));
   } catch (e) {
-    dispatch(eventsLoadFailed());
+    dispatch(eventsLoadFailed(e as ApiError));
   }
 };
 
 export const deleteEvent = (id: EventID) => async (dispatch: DispatchAction, getState: GetState) => {
   const { accessToken } = getState().auth;
-  try {
-    await adminApiFetch(`admin/events/${id}`, {
+  await adminApiFetch(
+    `admin/events/${id}`,
+    {
       accessToken,
-      method: 'DELETE',
-    }, dispatch);
-    return true;
-  } catch (e) {
-    return false;
-  }
+      method: "DELETE",
+    },
+    dispatch,
+  );
 };

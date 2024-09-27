@@ -1,30 +1,37 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { BadRequest, Forbidden, NotFound } from 'http-errors';
-import { Transaction } from 'sequelize';
+import { FastifyReply, FastifyRequest } from "fastify";
+import { Transaction } from "sequelize";
+import { isEmail } from "validator";
 
-import type { SignupPathParams, SignupUpdateBody, SignupUpdateResponse } from '@tietokilta/ilmomasiina-models';
-import { AuditEvent } from '@tietokilta/ilmomasiina-models';
-import sendSignupConfirmationEmail from '../../mail/signupConfirmation';
-import { Answer } from '../../models/answer';
-import { Event } from '../../models/event';
-import { Question } from '../../models/question';
-import { Signup } from '../../models/signup';
-import { signupsAllowed } from './createNewSignup';
+import type {
+  SignupPathParams,
+  SignupUpdateBody,
+  SignupUpdateResponse,
+  SignupValidationErrors,
+} from "@tietokilta/ilmomasiina-models";
+import { AuditEvent, SignupFieldError } from "@tietokilta/ilmomasiina-models";
+import sendSignupConfirmationMail from "../../mail/signupConfirmation";
+import { getSequelize } from "../../models";
+import { Answer } from "../../models/answer";
+import { Event } from "../../models/event";
+import { Question } from "../../models/question";
+import { Signup } from "../../models/signup";
+import { signupsAllowed } from "./createNewSignup";
+import { NoSuchSignup, SignupsClosed, SignupValidationError } from "./errors";
 
 /** Requires editTokenVerification */
 export default async function updateSignup(
-  request: FastifyRequest<{ Params: SignupPathParams, Body: SignupUpdateBody }>,
+  request: FastifyRequest<{ Params: SignupPathParams; Body: SignupUpdateBody }>,
   reply: FastifyReply,
 ): Promise<SignupUpdateResponse> {
-  const updatedSignup = await Signup.sequelize!.transaction(async (transaction) => {
+  const { updatedSignup, edited } = await getSequelize().transaction(async (transaction) => {
     // Retrieve event data and lock the row for editing
-    const signup = await Signup.scope('active').findByPk(request.params.id, {
-      attributes: ['id', 'quotaId', 'confirmedAt', 'firstName', 'lastName', 'email'],
+    const signup = await Signup.scope("active").findByPk(request.params.id, {
+      attributes: ["id", "quotaId", "confirmedAt", "firstName", "lastName", "email", "language", "status", "position"],
       transaction,
       lock: Transaction.LOCK.UPDATE,
     });
     if (signup === null) {
-      throw new NotFound('Signup expired or already deleted');
+      throw new NoSuchSignup("Signup expired or already deleted");
     }
 
     const quota = await signup.getQuota({
@@ -42,75 +49,107 @@ export default async function updateSignup(
     });
     const event = quota.event!;
     if (!signupsAllowed(event)) {
-      throw new Forbidden('Signups closed for this event.');
+      throw new SignupsClosed("Signups closed for this event.");
     }
 
     /** Is this signup already confirmed (i.e. is this the first update for this signup) */
     const notConfirmedYet = !signup.confirmedAt;
     const questions = event.questions!;
 
+    const errors: SignupValidationErrors = {};
+
     // Check that required common fields are present (if first time confirming)
     let nameFields = {};
     if (notConfirmedYet && event.nameQuestion) {
       const { firstName, lastName } = request.body;
-      if (!firstName) throw new BadRequest('Missing first name');
-      if (!lastName) throw new BadRequest('Missing last name');
+      if (!firstName) {
+        errors.firstName = SignupFieldError.MISSING;
+      } else if (firstName.length > Signup.MAX_NAME_LENGTH) {
+        errors.firstName = SignupFieldError.TOO_LONG;
+      }
+      if (!lastName) {
+        errors.lastName = SignupFieldError.MISSING;
+      } else if (lastName.length > Signup.MAX_NAME_LENGTH) {
+        errors.lastName = SignupFieldError.TOO_LONG;
+      }
       nameFields = { firstName, lastName };
     }
 
     let emailField = {};
     if (notConfirmedYet && event.emailQuestion) {
       const { email } = request.body;
-      if (!email) throw new BadRequest('Missing email');
+      if (!email) {
+        errors.email = SignupFieldError.MISSING;
+      } else if (email.length > Signup.MAX_EMAIL_LENGTH) {
+        errors.email = SignupFieldError.TOO_LONG;
+      } else if (!isEmail(email)) {
+        errors.email = SignupFieldError.INVALID_EMAIL;
+      }
       emailField = { email };
+    }
+
+    // Update signup language if provided
+    let languageField = {};
+    if (request.body.language) {
+      languageField = { language: request.body.language };
     }
 
     // Check that all questions are answered with a valid answer
     const newAnswers = questions.map((question) => {
-      const answer = request.body.answers
-        ?.find((a) => a.questionId === question.id)
-        ?.answer
-        || '';
+      // Fetch the answer to this question from the request body
+      let answer = request.body.answers?.find((a) => a.questionId === question.id)?.answer;
+      let error: SignupFieldError | undefined;
 
-      if (!answer) {
+      if (!answer || !answer.length) {
+        // Disallow empty answers to required questions
         if (question.required) {
-          throw new BadRequest(`Missing answer for question ${question.question}`);
+          error = SignupFieldError.MISSING;
+        }
+        // Normalize empty answers to "" or [], depending on question type
+        answer = question.type === "checkbox" ? [] : "";
+      } else if (question.type === "checkbox") {
+        // Ensure checkbox answers are arrays
+        if (!Array.isArray(answer)) {
+          error = SignupFieldError.WRONG_TYPE;
+        } else {
+          // Check that all checkbox answers are valid
+          answer.forEach((option) => {
+            if (!question.options!.includes(option)) {
+              error = SignupFieldError.NOT_AN_OPTION;
+            }
+          });
         }
       } else {
-        switch (question.type) {
-          case 'text':
-          case 'textarea':
-            break;
-          case 'number':
-            // Check that a numeric answer is valid
-            if (!Number.isFinite(parseFloat(answer))) {
-              throw new BadRequest(`Invalid answer to question ${question.question}`);
-            }
-            break;
-          case 'select': {
-            // Check that the select answer is valid
-            const options = question.options!.split(';');
-
-            if (!options.includes(answer)) {
-              throw new BadRequest(`Invalid answer to question ${question.question}`);
-            }
-            break;
-          }
-          case 'checkbox': {
-            // Check that all checkbox answers are valid
-            const options = question.options!.split(';');
-            const answers = answer.split(';');
-
-            answers.forEach((option) => {
-              if (!options.includes(option)) {
-                throw new BadRequest(`Invalid answer to question ${question.question}`);
+        // Don't allow arrays for non-checkbox questions
+        if (typeof answer !== "string") {
+          error = SignupFieldError.WRONG_TYPE;
+        } else {
+          switch (question.type) {
+            case "text":
+            case "textarea":
+              break;
+            case "number":
+              // Check that a numeric answer is valid
+              if (!Number.isFinite(parseFloat(answer))) {
+                error = SignupFieldError.NOT_A_NUMBER;
               }
-            });
-            break;
+              break;
+            case "select": {
+              // Check that the select answer is valid
+              if (!question.options!.includes(answer)) {
+                error = SignupFieldError.NOT_AN_OPTION;
+              }
+              break;
+            }
+            default:
+              throw new Error("Invalid question type");
           }
-          default:
-            throw new Error('Invalid question type');
         }
+      }
+
+      if (error) {
+        errors.answers ??= {};
+        errors.answers[question.id] = error;
       }
 
       return {
@@ -120,10 +159,15 @@ export default async function updateSignup(
       };
     });
 
+    if (Object.keys(errors).length > 0) {
+      throw new SignupValidationError("Errors validating signup", errors);
+    }
+
     // Update fields for the signup (name and email only editable on first confirmation)
     const updatedFields = {
       ...nameFields,
       ...emailField,
+      ...languageField,
       namePublic: Boolean(request.body.namePublic),
       confirmedAt: new Date(),
     };
@@ -145,11 +189,11 @@ export default async function updateSignup(
       transaction,
     });
 
-    return signup;
+    return { updatedSignup: signup, edited: !notConfirmedYet };
   });
 
   // Send the confirmation email
-  await sendSignupConfirmationEmail(updatedSignup);
+  sendSignupConfirmationMail(updatedSignup, edited);
 
   // Return data
   reply.status(200);

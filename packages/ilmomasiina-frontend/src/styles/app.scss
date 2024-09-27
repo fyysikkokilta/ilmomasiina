@@ -1,12 +1,14 @@
-@use "~@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
+@use "@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
 
-@use "~bootstrap/scss/bootstrap" with (
-  // Colors
+@use "bootstrap/scss/bootstrap" with (
+  // Override Bootstrap theme colors
   $primary: $primary,
   $secondary: $secondary,
-  $text-muted: $text-muted,
+  // further assigned to $danger by Bootstrap
   $red: $red,
+  // further assigned to $success by Bootstrap
   $green: $green,
+  $text-muted: $text-muted,
 
   // Just for the sake of Athene legacy
   $btn-border-radius-lg: 2px,
@@ -18,11 +20,11 @@
   $line-height-base: 1.618,
   $h1-font-size: 2rem,
   $h2-font-size: 1.45rem,
-  $h3-font-size: 1.15rem,
+  $h3-font-size: 1.15rem
 );
 
 @use "widgets";
-@use "~@tietokilta/ilmomasiina-components/src/styles/all";
+@use "@tietokilta/ilmomasiina-components/src/styles/all";
 
 // Global layout
 
@@ -34,9 +36,7 @@ html {
 .layout-wrapper {
   display: flex;
   flex-direction: column;
-  position: relative;
   min-height: 100vh;
-  padding-bottom: 4em;
 
   > .container {
     flex: 1 0 auto;
@@ -48,6 +48,12 @@ footer {
 }
 
 // Typography
+
+@if $force-link-underline {
+  a {
+    text-decoration: underline;
+  }
+}
 
 h1 {
   font-weight: 800;
