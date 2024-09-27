@@ -143,7 +143,7 @@ const EditForm = () => {
     if (preview) return undefined;
     const progressToast = toast.loading(isNew ? t("editSignup.status.signup") : t("editSignup.status.edit"));
     // Convert answers back from object to array.
-    const answers = Object.entries(formData.answers).map(([questionId, answer]) => ({
+    const answers = Object.entries(formData.answers || {}).map(([questionId, answer]) => ({
       questionId,
       answer,
     }));
