@@ -31,11 +31,7 @@ const AdminEventsList = () => {
     };
   }, [dispatch]);
 
-  const shownEvents = useMemo(() => {
-    const filtered = events?.filter((event) => isEventInPast(event) === showPast);
-    // Additionally, reverse events when viewing past events, so the newest event comes first.
-    return showPast ? filtered?.reverse() : filtered;
-  }, [events, showPast]);
+  const shownEvents = useMemo(() => events?.filter((event) => isEventInPast(event) === showPast), [events, showPast]);
 
   if (loadError) {
     return (
