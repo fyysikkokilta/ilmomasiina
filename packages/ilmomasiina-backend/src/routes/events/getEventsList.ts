@@ -51,13 +51,15 @@ export async function getEventsListForUser(
     order: eventOrder(),
   });
 
-  const res = events.map((event) => ({
-    ...event.get({ plain: true }),
-    quotas: event.quotas!.map((quota) => ({
-      ...quota.get({ plain: true }),
-      signupCount: Number(quota.signupCount),
-    })),
-  }));
+  const res = events
+    .filter((event) => event.endDate === null || new Date(event.endDate) >= new Date())
+    .map((event) => ({
+      ...event.get({ plain: true }),
+      quotas: event.quotas!.map((quota) => ({
+        ...quota.get({ plain: true }),
+        signupCount: Number(quota.signupCount),
+      })),
+    }));
 
   reply.status(200);
   return res as StringifyApi<typeof res>;
