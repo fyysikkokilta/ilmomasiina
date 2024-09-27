@@ -75,6 +75,12 @@ const EventDescription = () => {
       </div>
       <div className="ilmo--event-description">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{event.description || ""}</ReactMarkdown>
+        <hr />
+        <p>
+          {t("singleEvent.info.cancellation")}{" "}
+          <a href={t("singleEvent.info.cancellationLinkAddress")}>{t("singleEvent.info.cancellationLink")}</a>.
+        </p>
+        <hr />
       </div>
     </>
   );
