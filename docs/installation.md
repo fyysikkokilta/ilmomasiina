@@ -57,6 +57,7 @@ docker build \
   --build-arg BRANDING_FOOTER_GDPR_LINK='https://example.com' \
   --build-arg BRANDING_FOOTER_HOME_TEXT='Kotisivu' \
   --build-arg BRANDING_FOOTER_HOME_LINK='https://example.com' \
+  --build-arg BRANDING_LOGO_URL='./logo.png' \
   --build-arg BRANDING_LOGIN_PLACEHOLDER_EMAIL='admin@example.com' \
   -t ilmomasiina .
 ```

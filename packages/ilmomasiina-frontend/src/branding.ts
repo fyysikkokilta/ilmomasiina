@@ -4,6 +4,7 @@ export type Branding = {
   footerGdprLink: string;
   footerHomeText: string;
   footerHomeLink: string;
+  headerLogoUrl: string;
   loginPlaceholderEmail: string;
 };
 
@@ -16,6 +17,7 @@ const branding: Branding = {
   footerGdprLink: BRANDING_FOOTER_GDPR_LINK,
   footerHomeText: BRANDING_FOOTER_HOME_TEXT,
   footerHomeLink: BRANDING_FOOTER_HOME_LINK,
+  headerLogoUrl: BRANDING_LOGO_URL,
   loginPlaceholderEmail: BRANDING_LOGIN_PLACEHOLDER_EMAIL,
 };
 
