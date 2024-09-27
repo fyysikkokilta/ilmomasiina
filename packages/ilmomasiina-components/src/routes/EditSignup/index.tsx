@@ -31,33 +31,6 @@ const EditSignupView = () => {
     );
   }
 
-  // if (deleted) {
-  //   return (
-  //     <div className="ilmo--status-container">
-  //       <h1>Ilmoittautumisesi poistettiin onnistuneesti / Registration deleted successfully</h1>
-  //       <Button as={Link} to={paths().eventDetails(event!.slug)} variant="secondary">
-  //         Takaisin / Back
-  //       </Button>
-  //     </div>
-  //   );
-  // }
-
-  // if (event!.registrationEndDate === null || new Date(event!.registrationEndDate) < new Date()) {
-  //   return (
-  //     <NarrowContainer className="ilmo--status-container">
-  //       <h1>Hups, jotain meni pieleen / Something went wrong</h1>
-  //       <p>
-  //         Ilmoittautumistasi ei voi enää muokata tai perua, koska tapahtuman
-  //         ilmoittautuminen on sulkeutunut / Registration can't be edited or deleted
-  //         as the signup is already closed.
-  //       </p>
-  //       <Button as={Link} to={paths().eventsList} variant="secondary">
-  //         Takaisin etusivulle / Back to home page
-  //       </Button>
-  //     </NarrowContainer>
-  //   );
-  // }
-
   return <EditForm />;
 };
 
