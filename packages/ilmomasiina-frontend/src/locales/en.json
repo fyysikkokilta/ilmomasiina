@@ -201,7 +201,7 @@
     "editor.questions.nameQuestion.infoOff": "If names are collected, each participant can decide if their name is publicly visible.",
     "editor.questions.emailQuestion": "Email",
     "editor.questions.emailQuestion.check": "Collect email addresses",
-    "editor.questions.emailQuestion.infoOn": "Email will be a mandatory question. Participants will be sent a confirmation email and an email notification if they were got accepted from the queue.",
+    "editor.questions.emailQuestion.infoOn": "Email will be a mandatory question. Participants will be sent a confirmation email and an email notification if they got accepted from the queue.",
     "editor.questions.emailQuestion.infoOff": "If email addresses are not collected, participants will not get a confirmation email nor an email notification if they got accepted from the queue.",
     "editor.questions.addQuestion": "Add question",
     "editor.questions.deleteQuestion": "Delete question",
