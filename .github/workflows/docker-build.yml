@@ -7,7 +7,7 @@ env:
   # Change these to customize your build.
   branding_header_title_text: "Tietokillan ilmomasiina"
   branding_footer_gdpr_text: "Tietosuoja"
-  branding_footer_gdpr_link: "https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/"
+  branding_footer_gdpr_link: "https://tietokilta.fi/fi/kilta/ilmorekisteri"
   branding_footer_home_text: "Tietokilta.fi"
   branding_footer_home_link: "https://tietokilta.fi"
   branding_login_placeholder_email: "admin@tietokilta.fi"
