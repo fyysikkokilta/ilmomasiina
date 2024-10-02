@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0-alpha33
+
+- Fixed radio/checkbox field layout when answers are invalid
+
 ## 2.0.0-alpha32
 
 - Editor fields no longer incorrectly cause errors when cleared
