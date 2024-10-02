@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0-alpha32
+
+- Editor fields no longer incorrectly cause errors when cleared
+
 ## 2.0.0-alpha31
 
 - **Feature:** The event editor now gives per-field validation feedback and limits e.g. field lengths

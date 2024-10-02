@@ -1,5 +1,6 @@
 import React, { ComponentPropsWithoutRef, ComponentType, JSX, ReactNode } from "react";
 
+import identity from "lodash-es/identity";
 import { Form, FormControlProps } from "react-bootstrap";
 import { useField, UseFieldConfig } from "react-final-form";
 
@@ -71,7 +72,13 @@ export default function FieldRow<C extends As>({
   const {
     input,
     meta: { error: validationError, submitError, invalid },
-  } = useField(name, { type, ...config });
+  } = useField(name, {
+    type,
+    // react-final-form replaces empty strings by undefined for whatever reason.
+    // Override the default (but allow config to override this).
+    parse: identity,
+    ...config,
+  });
   const error = submitError || validationError;
 
   let field: ReactNode;

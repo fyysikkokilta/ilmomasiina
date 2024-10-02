@@ -1,5 +1,6 @@
 import React, { ChangeEvent, ReactNode, useMemo } from "react";
 
+import identity from "lodash-es/identity";
 import without from "lodash-es/without";
 import { Form } from "react-bootstrap";
 import { useField } from "react-final-form";
@@ -22,7 +23,7 @@ const QuestionField = ({ name, question, disabled }: QuestionFieldProps) => {
   const {
     input: { value, onChange },
     meta: { invalid },
-  } = useField<string | string[]>(`${name}.${question.id}`);
+  } = useField<string | string[]>(`${name}.${question.id}`, { parse: identity });
   const currentAnswerString = stringifyAnswer(value);
   const currentAnswerArray = useMemo(() => (Array.isArray(value) ? value : []), [value]);
 
