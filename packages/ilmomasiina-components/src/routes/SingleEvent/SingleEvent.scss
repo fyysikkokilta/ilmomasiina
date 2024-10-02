@@ -23,6 +23,13 @@
   }
 }
 
+@if $force-link-underline {
+  .ilmo--event-heading :link,
+  .ilmo--event-description :link {
+    text-decoration: underline;
+  }
+}
+
 .ilmo--quota-signups {
   margin: $spacer 0 3 * $spacer;
   overflow-x: scroll;

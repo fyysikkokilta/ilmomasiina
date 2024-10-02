@@ -3,6 +3,7 @@
 ## 2.0.0-alpha32
 
 - Editor fields no longer incorrectly cause errors when cleared
+- Underlines on links are now only used in select places when enabled
 
 ## 2.0.0-alpha31
 

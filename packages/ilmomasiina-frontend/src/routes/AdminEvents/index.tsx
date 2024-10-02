@@ -13,6 +13,8 @@ import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
 import { isEventInPast } from "../../utils/eventState";
 import AdminEventListItem from "./AdminEventListItem";
 
+import "./AdminEvents.scss";
+
 const AdminEventsList = () => {
   const dispatch = useTypedDispatch();
   const { events, loadError } = useTypedSelector((state) => state.adminEvents, shallowEqual);
@@ -72,7 +74,7 @@ const AdminEventsList = () => {
           {t("adminEvents.nav.newEvent")}
         </Button>
       </nav>
-      <table className="table">
+      <table className="table ilmo--admin-event-list">
         <thead>
           <tr>
             <th>{t("adminEvents.column.name")}</th>
