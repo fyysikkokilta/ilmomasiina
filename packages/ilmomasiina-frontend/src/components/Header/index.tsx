@@ -4,6 +4,7 @@ import { Button, Container, Navbar } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import logo from "../../assets/logo.svg";
 import branding from "../../branding";
 import i18n from "../../i18n";
 import { logout } from "../../modules/auth/actions";
@@ -24,6 +25,7 @@ const Header = () => {
     <Navbar>
       <Container>
         <Link to={appPaths.eventsList} className="navbar-brand mr-auto">
+          <img className="navbar-logo" src={logo} alt="Logo" />
           {branding.headerTitle}
         </Link>
         {language !== "fi" && (

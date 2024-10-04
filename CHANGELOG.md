@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0-alpha34
+
+- **BREAKING:** Add logo to Header - make sure to change or disable it on your instance
+
 ## 2.0.0-alpha33
 
 - Fixed radio/checkbox field layout when answers are invalid
