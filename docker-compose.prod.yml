@@ -22,12 +22,13 @@ services:
       args:
         #- PATH_PREFIX=
         #- API_URL=
-        - BRANDING_HEADER_TITLE_TEXT=Tietokillan ilmomasiina
+        - BRANDING_HEADER_TITLE_TEXT=Kilta ry ilmomasiina
+        - BRANDING_HEADER_TITLE_TEXT_SHORT=Ilmomasiina
         - BRANDING_FOOTER_GDPR_TEXT=Tietosuoja
-        - BRANDING_FOOTER_GDPR_LINK=https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/
-        - BRANDING_FOOTER_HOME_TEXT=Tietokilta.fi
-        - BRANDING_FOOTER_HOME_LINK=https://tietokilta.fi
-        - BRANDING_LOGIN_PLACEHOLDER_EMAIL=admin@tietokilta.fi
+        - BRANDING_FOOTER_GDPR_LINK=http://example.com/privacy
+        - BRANDING_FOOTER_HOME_TEXT=Example.com
+        - BRANDING_FOOTER_HOME_LINK=http://example.com
+        - BRANDING_LOGIN_PLACEHOLDER_EMAIL=admin@example.com
     restart: always
     depends_on:
       - database

@@ -1,5 +1,6 @@
 export type Branding = {
   headerTitle: string;
+  headerTitleShort: string;
   footerGdprText: string;
   footerGdprLink: string;
   footerHomeText: string;
@@ -12,6 +13,7 @@ export type Branding = {
 
 const branding: Branding = {
   headerTitle: BRANDING_HEADER_TITLE_TEXT,
+  headerTitleShort: BRANDING_HEADER_TITLE_TEXT_SHORT,
   footerGdprText: BRANDING_FOOTER_GDPR_TEXT,
   footerGdprLink: BRANDING_FOOTER_GDPR_LINK,
   footerHomeText: BRANDING_FOOTER_HOME_TEXT,

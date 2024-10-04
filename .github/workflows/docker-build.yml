@@ -6,6 +6,7 @@ env:
 
   # Change these to customize your build.
   branding_header_title_text: "Tietokillan ilmomasiina"
+  branding_header_title_text_short: "Ilmomasiina"
   branding_footer_gdpr_text: "Tietosuoja"
   branding_footer_gdpr_link: "https://tietokilta.fi/fi/kilta/ilmorekisteri"
   branding_footer_home_text: "Tietokilta.fi"
@@ -74,6 +75,7 @@ jobs:
           # Customize your build here
           build-args: |
             BRANDING_HEADER_TITLE_TEXT=${{ env.branding_header_title_text }}
+            BRANDING_HEADER_TITLE_TEXT_SHORT=${{ env.branding_header_title_text_short }}
             BRANDING_FOOTER_GDPR_TEXT=${{ env.branding_footer_gdpr_text }}
             BRANDING_FOOTER_GDPR_LINK=${{ env.branding_footer_gdpr_link }}
             BRANDING_FOOTER_HOME_TEXT=${{ env.branding_footer_home_text }}
