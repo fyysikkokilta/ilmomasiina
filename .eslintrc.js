@@ -17,6 +17,8 @@ module.exports = {
     "**/build/**",
     ".eslintrc.js",
     "jest.config.js",
+    "*.svg",
+    "*.png",
     "*.scss",
     "*.json"
   ],
