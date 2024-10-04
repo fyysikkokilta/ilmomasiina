@@ -3,6 +3,7 @@
 ## 2.0.0-alpha34
 
 - **BREAKING:** Add logo to Header - make sure to change or disable it on your instance
+- **BREAKING:** Add dark mode variants of favicons - make sure to update yours
 - Add shorter header text option for mobile, configurable via `BRANDING_HEADER_TITLE_TEXT_SHORT`
 
 ## 2.0.0-alpha33
