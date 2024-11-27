@@ -1,6 +1,9 @@
 extends ../layout.pug
 
 block mainContent
+  if type == "adminEdit"
+    div.content-block
+      p.bodyText #[strong An administrator has edited your signup.]
   if event.verificationEmail
     div.content-block
       p.bodyText #{event.verificationEmail}

@@ -21,14 +21,24 @@ export const signupCreateResponse = Type.Object({
   editToken,
 });
 
+const signupLanguage = Type.Object({
+  language: Type.String({
+    maxLength: 8,
+    description: "The language code used for emails related to this signup",
+  }),
+});
+
 /** Request body for editing an existing signup. */
-export const signupUpdateBody = Type.Partial(
+export const signupUpdateBody = Type.Partial(Type.Composite([editableSignupAttributes, signupLanguage]));
+
+/** Request body for editing an existing signup. */
+export const adminSignupUpdateBody = Type.Partial(
   Type.Composite([
     editableSignupAttributes,
+    signupLanguage,
     Type.Object({
-      language: Type.String({
-        maxLength: 8,
-        description: "The language code used for emails related to this signup",
+      sendEmail: Type.Boolean({
+        description: "Whether to send an edit confirmation for the edit",
       }),
     }),
   ]),
@@ -61,8 +71,10 @@ export type SignupCreateBody = Static<typeof signupCreateBody>;
 /** Response schema for successfully creating a signup. */
 export type SignupCreateResponse = Static<typeof signupCreateResponse>;
 
-/** Request body for editing an existing signup. */
+/** Request body for editing an existing signup as a regular user. */
 export type SignupUpdateBody = Static<typeof signupUpdateBody>;
+/** Request body for editing an existing signup as an admin. */
+export type AdminSignupUpdateBody = Static<typeof adminSignupUpdateBody>;
 /** Response schema for successfully editing a signup. */
 export type SignupUpdateResponse = Static<typeof signupUpdateResponse>;
 

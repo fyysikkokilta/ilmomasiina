@@ -17,7 +17,7 @@ export interface ConfirmationMailParams {
     answer: string;
   }[];
   queuePosition: number | null;
-  edited: boolean;
+  type: "signup" | "edit" | "adminEdit";
   date: string | null;
   event: Event;
   cancelLink: string;
@@ -82,7 +82,7 @@ export default class EmailService {
       };
       const { template, lng } = getTemplate(language, "confirmation");
       const html = await email.render(template, brandedParams);
-      const subject = i18next.t(params.edited ? "emails.editConfirmation.subject" : "emails.confirmation.subject", {
+      const subject = i18next.t(`emails.confirmation.${params.type}.subject`, {
         lng,
         event: params.event.title,
       });
