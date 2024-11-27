@@ -17,7 +17,8 @@ export interface ConfirmationMailParams {
     answer: string;
   }[];
   queuePosition: number | null;
-  type: "signup" | "edit" | "adminEdit";
+  type: "signup" | "edit";
+  admin: boolean;
   date: string | null;
   event: Event;
   cancelLink: string;

@@ -3,7 +3,6 @@
     "dateFormat.general": "DD.MM.YYYY HH:mm",
     "emails.confirmation.signup.subject": "Ilmoittautumisvahvistus: {{event}}",
     "emails.confirmation.edit.subject": "Muokkausvahvistus: {{event}}",
-    "emails.confirmation.adminEdit.subject": "Muokkausvahvistus: {{event}}",
     "emails.newUser.subject": "Käyttäjätunnukset Ilmomasiinaan",
     "emails.promotedFromQueue.subject": "Pääsit varasijalta tapahtumaan {{event}}",
     "emails.resetPassword.subject": "Salasanasi Ilmomasiinaan on nollattu"

@@ -3,6 +3,8 @@ import { Op, Transaction } from "sequelize";
 import { isEmail } from "validator";
 
 import type {
+  AdminSignupCreateBody,
+  AdminSignupSchema,
   AdminSignupUpdateBody,
   SignupID,
   SignupPathParams,
@@ -16,9 +18,11 @@ import { getSequelize } from "../../models";
 import { Answer, AnswerCreationAttributes } from "../../models/answer";
 import { Event } from "../../models/event";
 import { Question } from "../../models/question";
+import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";
+import { formatSignupForAdmin } from "../events/getEventDetails";
 import { signupEditable } from "./createNewSignup";
-import { NoSuchSignup, SignupsClosed, SignupValidationError } from "./errors";
+import { NoSuchQuota, NoSuchSignup, SignupsClosed, SignupValidationError } from "./errors";
 
 async function getSignupAndEventForUpdate(id: SignupID, transaction: Transaction) {
   // Retrieve event data and lock the row for editing
@@ -48,8 +52,8 @@ async function getSignupAndEventForUpdate(id: SignupID, transaction: Transaction
   return { signup, event };
 }
 
-/** Internal implementation. Performs no validation for admin editing purposes. */
-async function updateSignup(
+/** Internal function to update the contents of a signup. Performs no validation at all. */
+async function updateExistingSignup(
   signup: Signup,
   fields: Partial<Signup>,
   answers: AnswerCreationAttributes[],
@@ -75,11 +79,9 @@ async function updateSignup(
     transaction,
   });
   await Answer.bulkCreate(answers, { transaction });
-
-  return signup;
 }
 
-/** Requires editTokenVerification */
+/** Requires editTokenVerification and validates answers thoroughly */
 export async function updateSignupAsUser(
   request: FastifyRequest<{ Params: SignupPathParams; Body: SignupUpdateBody }>,
   reply: FastifyReply,
@@ -205,13 +207,13 @@ export async function updateSignupAsUser(
       throw new SignupValidationError("Errors validating signup", errors);
     }
 
-    const updated = await updateSignup(signup, fields, newAnswers, transaction);
+    await updateExistingSignup(signup, fields, newAnswers, transaction);
     await request.logEvent(AuditEvent.EDIT_SIGNUP, { signup, event, transaction });
-    return { updatedSignup: updated, edited: !notConfirmedYet };
+    return { updatedSignup: signup, edited: !notConfirmedYet };
   });
 
   // Send the confirmation email
-  sendSignupConfirmationMail(updatedSignup, edited ? "edit" : "signup");
+  sendSignupConfirmationMail(updatedSignup, edited ? "edit" : "signup", false);
 
   reply.status(200);
   return {
@@ -219,52 +221,85 @@ export async function updateSignupAsUser(
   };
 }
 
+/** Internal function that just converts the request body and then calls updateExistingSignup */
+async function updateExistingSignupAsAdmin(
+  signup: Signup,
+  event: Event,
+  body: AdminSignupUpdateBody,
+  transaction: Transaction,
+) {
+  // In admin mode, do bare minimum validation.
+  // The DB schema doesn't guarantee consistency anyway when questions are edited, which admins can also do.
+  const fields: Partial<Signup> = {};
+  if (body.firstName != null) fields.firstName = body.firstName;
+  if (body.lastName != null) fields.lastName = body.lastName;
+  if (body.namePublic != null) fields.namePublic = body.namePublic;
+  if (body.email != null) fields.email = body.email;
+  if (body.language != null) fields.language = body.language;
+
+  // Normalize answer types and only keep ones to existing questions
+  const newAnswers = event.questions!.map((question) => {
+    // Fetch the answer to this question from the request body
+    let answer = body.answers?.find((a) => a.questionId === question.id)?.answer;
+    if (!answer || !answer.length) {
+      // Normalize empty answers to "" or [], depending on question type
+      answer = question.type === "checkbox" ? [] : "";
+    } else if (question.type === "checkbox") {
+      // Forcibly convert checkbox answers to array
+      answer = !Array.isArray(answer) ? [answer] : answer;
+    } else {
+      // Forcibly convert non-checkbox answers to string
+      answer = Array.isArray(answer) ? answer.join(", ") : answer;
+    }
+    return {
+      questionId: question.id,
+      answer,
+      signupId: signup.id,
+    };
+  });
+
+  await updateExistingSignup(signup, fields, newAnswers, transaction);
+}
+
 export async function updateSignupAsAdmin(
   request: FastifyRequest<{ Params: SignupPathParams; Body: AdminSignupUpdateBody }>,
   reply: FastifyReply,
-): Promise<SignupUpdateResponse> {
+): Promise<AdminSignupSchema> {
   const updatedSignup = await getSequelize().transaction(async (transaction) => {
     const { signup, event } = await getSignupAndEventForUpdate(request.params.id, transaction);
-
-    // In admin mode, do bare minimum validation.
-    // The DB schema doesn't guarantee consistency anyway when questions are edited, which admins can also do.
-    const fields: Partial<Signup> = {};
-    if (request.body.firstName != null) fields.firstName = request.body.firstName;
-    if (request.body.lastName != null) fields.lastName = request.body.lastName;
-    if (request.body.namePublic != null) fields.namePublic = request.body.namePublic;
-    if (request.body.email != null) fields.email = request.body.email;
-    if (request.body.language != null) fields.language = request.body.language;
-
-    // Normalize answer types and only keep ones to existing questions
-    const newAnswers = event.questions!.map((question) => {
-      // Fetch the answer to this question from the request body
-      let answer = request.body.answers?.find((a) => a.questionId === question.id)?.answer;
-      if (!answer || !answer.length) {
-        // Normalize empty answers to "" or [], depending on question type
-        answer = question.type === "checkbox" ? [] : "";
-      } else if (question.type === "checkbox") {
-        // Forcibly convert checkbox answers to array
-        answer = !Array.isArray(answer) ? [answer] : answer;
-      } else {
-        // Forcibly convert non-checkbox answers to string
-        answer = Array.isArray(answer) ? answer.join(", ") : answer;
-      }
-      return {
-        questionId: question.id,
-        answer,
-        signupId: signup.id,
-      };
-    });
-
-    const updated = updateSignup(signup, fields, newAnswers, transaction);
+    await updateExistingSignupAsAdmin(signup, event, request.body, transaction);
     await request.logEvent(AuditEvent.EDIT_SIGNUP, { signup, event, transaction });
-    return updated;
+    return signup;
   });
 
-  if (request.body.sendEmail ?? true) sendSignupConfirmationMail(updatedSignup, "adminEdit");
+  // For clarity, always title the email "edit confirmation", even if the signup hadn't been confirmed yet.
+  if (request.body.sendEmail ?? true) sendSignupConfirmationMail(updatedSignup, "edit", true);
 
   reply.status(200);
-  return {
-    id: updatedSignup.id,
-  };
+  return formatSignupForAdmin(updatedSignup);
+}
+
+export async function createSignupAsAdmin(
+  request: FastifyRequest<{ Params: SignupPathParams; Body: AdminSignupCreateBody }>,
+  reply: FastifyReply,
+): Promise<AdminSignupSchema> {
+  const updatedSignup = await getSequelize().transaction(async (transaction) => {
+    // Find the given quota and event.
+    const quota = await Quota.findByPk(request.body.quotaId, {
+      attributes: [],
+      include: [{ model: Event }],
+      transaction,
+    });
+    if (!quota || !quota.event) throw new NoSuchQuota("Quota doesn't exist.");
+
+    const signup = await Signup.create({ quotaId: quota.id }, { transaction });
+    await updateExistingSignupAsAdmin(signup, quota.event, request.body, transaction);
+    await request.logEvent(AuditEvent.CREATE_SIGNUP, { signup, event: quota.event, transaction });
+    return signup;
+  });
+
+  if (request.body.sendEmail ?? true) sendSignupConfirmationMail(updatedSignup, "signup", true);
+
+  reply.status(200);
+  return formatSignupForAdmin(updatedSignup);
 }

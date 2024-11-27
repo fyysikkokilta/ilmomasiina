@@ -28,20 +28,23 @@ const signupLanguage = Type.Object({
   }),
 });
 
+const adminSignupUpdateOptions = Type.Object({
+  sendEmail: Type.Boolean({
+    description: "Whether to send an edit confirmation for the edit",
+  }),
+});
+
 /** Request body for editing an existing signup. */
 export const signupUpdateBody = Type.Partial(Type.Composite([editableSignupAttributes, signupLanguage]));
 
-/** Request body for editing an existing signup. */
+/** Request body for editing an existing signup as an admin. */
 export const adminSignupUpdateBody = Type.Partial(
-  Type.Composite([
-    editableSignupAttributes,
-    signupLanguage,
-    Type.Object({
-      sendEmail: Type.Boolean({
-        description: "Whether to send an edit confirmation for the edit",
-      }),
-    }),
-  ]),
+  Type.Composite([editableSignupAttributes, signupLanguage, adminSignupUpdateOptions]),
+);
+
+/** Request body for creating a signup as an admin. */
+export const adminSignupCreateBody = Type.Partial(
+  Type.Composite([signupCreateBody, editableSignupAttributes, signupLanguage, adminSignupUpdateOptions]),
 );
 
 /** Response schema for successfully editing a signup. */
@@ -66,7 +69,7 @@ export type SignupEditToken = Static<typeof editToken>;
 /** Path parameters necessary to fetch and manipulate signups. */
 export type SignupPathParams = Static<typeof signupPathParams>;
 
-/** Request body for creating a signup. */
+/** Request body for creating a signup as a regular user. */
 export type SignupCreateBody = Static<typeof signupCreateBody>;
 /** Response schema for successfully creating a signup. */
 export type SignupCreateResponse = Static<typeof signupCreateResponse>;
@@ -75,6 +78,8 @@ export type SignupCreateResponse = Static<typeof signupCreateResponse>;
 export type SignupUpdateBody = Static<typeof signupUpdateBody>;
 /** Request body for editing an existing signup as an admin. */
 export type AdminSignupUpdateBody = Static<typeof adminSignupUpdateBody>;
+/** Request body for creating a signup as an admin. */
+export type AdminSignupCreateBody = Static<typeof adminSignupCreateBody>;
 /** Response schema for successfully editing a signup. */
 export type SignupUpdateResponse = Static<typeof signupUpdateResponse>;
 

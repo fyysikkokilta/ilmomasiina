@@ -1,7 +1,10 @@
 extends ../layout.pug
 
 block mainContent
-  if type == "adminEdit"
+  if admin && type == "signup"
+    div.content-block
+      p.bodyText #[strong Ylläpitäjä on ilmoittanut sinut tapahtumaan.]
+  if admin && type == "edit"
     div.content-block
       p.bodyText #[strong Ylläpitäjä on muokannut ilmoittautumistasi.]
   if event.verificationEmail
