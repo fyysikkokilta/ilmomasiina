@@ -38,10 +38,9 @@ export const eventListQuery = Type.Object({
       description: "If set, only events with the provided category are included.",
     }),
   ),
-  since: Type.Optional(
-    Type.String({
-      description: "If set, only events starting after this date are included.",
-      format: "date-time",
+  maxAge: Type.Optional(
+    Type.Integer({
+      description: "If set to a number, only events at most that many days old are included.",
     }),
   ),
 });

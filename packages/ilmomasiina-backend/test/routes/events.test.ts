@@ -1,12 +1,12 @@
 import { sortBy } from "lodash";
 import { describe, expect, test } from "vitest";
 
-import { UserEventListResponse, UserEventResponse } from "@tietokilta/ilmomasiina-models";
+import { EventListQuery, UserEventListResponse, UserEventResponse } from "@tietokilta/ilmomasiina-models";
 import { Event } from "../../src/models/event";
 import { fetchSignups, testEvent, testSignups } from "../testData";
 
-async function fetchUserEventList(query?: { since?: string }) {
-  const response = await server.inject({ method: "GET", url: "/api/events", query });
+async function fetchUserEventList(query?: EventListQuery) {
+  const response = await server.inject({ method: "GET", url: "/api/events", query: query as Record<string, string> });
   return [response.json<UserEventListResponse>(), response] as const;
 }
 
@@ -70,7 +70,7 @@ describe("getEventDetails", () => {
   });
 
   test("does not return past events", async () => {
-    const event = await testEvent({ inPast: true });
+    const event = await testEvent({ inPast: 8 * 30 }); // past the default 6-month cutoff
     const [data, response] = await fetchUserEventDetails(event);
 
     expect(response.statusCode).toBe(404);
@@ -283,7 +283,7 @@ describe("getEventList", () => {
   });
 
   test("does not return past events", async () => {
-    await testEvent({ inPast: true });
+    await testEvent({ inPast: 8 * 30 }); // past the default 6-month cutoff
     const [data] = await fetchUserEventList();
 
     expect(data).toEqual([]);
@@ -296,20 +296,28 @@ describe("getEventList", () => {
     expect(data).toEqual([]);
   });
 
-  test("returns events since specified date", async () => {
-    const since = new Date();
-    await testEvent({ inPast: true });
-    const [data] = await fetchUserEventList({ since: since.toISOString() });
-    expect(data).toEqual([]);
+  test("respects maxAge parameter", async () => {
+    const alwaysVisible = await testEvent({ inPast: false }); // in future, so always visible
+    const defaultVisible = await testEvent({ inPast: 3 }); // in recent past, so visible by default
+    const oldButVisible = await testEvent({ inPast: 3 * 30 }); // within default 6-month cutoff, not visible by default
+    await testEvent({ inPast: 8 * 30 }); // past default 6-month cutoff
 
-    await testEvent({ hasDate: true });
-    const [data2] = await fetchUserEventList({ since: since.toISOString() });
-    expect(data2).toHaveLength(1);
+    const [data] = await fetchUserEventList();
+    expect(data.map((e) => e.slug).sort()).toEqual([alwaysVisible.slug, defaultVisible.slug].sort());
 
-    // 30 days in the future
-    const sinceFuture = new Date(since.getTime() + 2592000000);
-    const [data3] = await fetchUserEventList({ since: sinceFuture.toISOString() });
-    expect(data3).toEqual([]);
+    const [data2] = await fetchUserEventList({ maxAge: 0 });
+    expect(data2.map((e) => e.slug).sort()).toEqual([alwaysVisible.slug].sort());
+
+    const [data3] = await fetchUserEventList({ maxAge: 6 * 30 });
+    expect(data3.map((e) => e.slug).sort()).toEqual(
+      [alwaysVisible.slug, defaultVisible.slug, oldButVisible.slug].sort(),
+    );
+
+    // ensure the 6-month cutoff can't be bypassed
+    const [data4] = await fetchUserEventList({ maxAge: 12 * 30 });
+    expect(data4.map((e) => e.slug).sort()).toEqual(
+      [alwaysVisible.slug, defaultVisible.slug, oldButVisible.slug].sort(),
+    );
   });
 
   test("returns quotas in correct order", async () => {
