@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.0.0-alpha37
+
+- **BREAKING:** Past events are now accessed using the `maxAge` parameter instead of `since`
+- The cutoff for old event viewing by regular users is now configurable via `HIDE_EVENT_AFTER_DAYS`
+- Further bug fixes to past events
+- Add API for admins to create and edit signups
+
+## 2.0.0-alpha36
+
+- Bug fixes to past events
+
+## 2.0.0-alpha35
+
+- Bug fixes to past events
+
 ## 2.0.0-alpha34
 
 - **BREAKING:** Add logo to Header - make sure to change or disable it on your instance
@@ -8,6 +23,7 @@
 - Signups can now be edited for `SIGNUP_CONFIRM_MINS` minutes after creation, even if created just before an event's
   signup closes, if configured with `SIGNUP_CONFIRM_AFTER_CLOSE` (recommended).
 - The confirmation time limit for signups is now configurable via `SIGNUP_CONFIRM_MINS`
+- Past events within the last 6 months can now be listed by regular users via the `since` parameter
 - Add shorter header text option for mobile, configurable via `BRANDING_HEADER_TITLE_TEXT_SHORT`
 
 ## 2.0.0-alpha33
