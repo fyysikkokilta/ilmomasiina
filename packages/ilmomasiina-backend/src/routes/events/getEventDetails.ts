@@ -34,11 +34,7 @@ export const basicEventInfoCached = createCache({
   async get(eventSlug: EventSlug) {
     // First query general event information
     const event = await Event.scope("user").findOne({
-      where: {
-        slug: eventSlug,
-        // are not drafts,
-        draft: false,
-      },
+      where: [{ slug: eventSlug }],
       attributes: eventGetEventAttrs,
       include: [
         {
@@ -60,6 +56,7 @@ export const basicEventInfoCached = createCache({
     return {
       event: {
         ...event.get({ plain: true }),
+        effectiveEndDate: event.effectiveEndDate,
         questions: event.questions!.map((question) => question.get({ plain: true })),
       },
       publicQuestions,
@@ -73,44 +70,40 @@ export const eventDetailsForUserCached = createCache({
   async get(eventSlug: EventSlug) {
     const { event, publicQuestions } = await basicEventInfoCached(eventSlug);
 
-    // If registrationEndDate or endDate or date is more than a week ago, return nothing
-    const isOld =
-      event.registrationEndDate &&
-      moment(event.registrationEndDate).isBefore(moment().subtract(7, "days")) &&
-      event.date &&
-      moment(event.date).isBefore(moment().subtract(7, "days")) &&
-      event.endDate &&
-      moment(event.endDate).isBefore(moment().subtract(7, "days"));
+    // If event ended or registration closed than a week ago, don't return signups or quotas
+    const effectiveEnd = event.effectiveEndDate;
+    const isOld = effectiveEnd != null && effectiveEnd < moment().subtract(7, "days").valueOf();
 
-    // Query all quotas for the event
-    const quotas = isOld
-      ? []
-      : await Quota.findAll({
-          where: { eventId: event.id },
-          attributes: eventGetQuotaAttrs,
-          include: [
-            // Include all signups for the quota
-            {
-              model: Signup.scope("active"),
-              attributes: eventGetSignupAttrs,
-              required: false,
-              include: [
-                // ... and public answers of signups
-                {
-                  model: Answer,
-                  attributes: eventGetAnswerAttrs,
-                  required: false,
-                  where: { questionId: { [Op.in]: publicQuestions } },
-                },
-              ],
-            },
-          ],
-          // First sort by Quota order, then by signup creation date
-          order: [
-            ["order", "ASC"],
-            [Signup, "createdAt", "ASC"],
-          ],
-        });
+    let quotas: Quota[] = [];
+    if (!isOld) {
+      // Query all quotas for the event
+      quotas = await Quota.findAll({
+        where: { eventId: event.id },
+        attributes: eventGetQuotaAttrs,
+        include: [
+          // Include all signups for the quota
+          {
+            model: Signup.scope("active"),
+            attributes: eventGetSignupAttrs,
+            required: false,
+            include: [
+              // ... and public answers of signups
+              {
+                model: Answer,
+                attributes: eventGetAnswerAttrs,
+                required: false,
+                where: { questionId: { [Op.in]: publicQuestions } },
+              },
+            ],
+          },
+        ],
+        // First sort by Quota order, then by signup creation date
+        order: [
+          ["order", "ASC"],
+          [Signup, "createdAt", "ASC"],
+        ],
+      });
+    }
 
     return {
       event: {

@@ -22,7 +22,7 @@ export function testUser() {
 
 type TestEventOptions = {
   hasDate?: boolean;
-  inPast?: boolean;
+  inPast?: number | false;
   hasSignup?: boolean;
   signupState?: "not-open" | "open" | "closed";
   questionCount?: number;
@@ -64,7 +64,7 @@ export async function testEvent(
   if (hasDate) {
     if (inPast) {
       event.endDate = faker.date.recent({
-        refDate: moment().subtract(8, "months").toDate(),
+        refDate: moment().subtract(inPast, "days").toDate(),
       });
       event.date = faker.date.recent({ refDate: event.endDate });
     } else {
@@ -75,7 +75,7 @@ export async function testEvent(
   if (hasSignup) {
     if (inPast && signupState === "closed") {
       event.registrationEndDate = faker.date.recent({
-        refDate: moment().subtract(8, "months").toDate(),
+        refDate: moment().subtract(inPast, "days").toDate(),
       });
       event.registrationStartDate = faker.date.recent({
         refDate: event.registrationEndDate,

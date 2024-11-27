@@ -147,6 +147,8 @@ const config = {
 
   /** How long after an event's date to remove signup details. */
   anonymizeAfterDays: envInteger("ANONYMIZE_AFTER_DAYS", 180),
+  /** How long after an event's date it will become fully invisible to users. */
+  hideEventAfterDays: envInteger("HIDE_EVENT_AFTER_DAYS", 180),
   /** How long items stay in the database after deletion, in order to allow restoring accidentally deleted items. */
   deletionGracePeriod: envInteger("DELETION_GRACE_PERIOD_DAYS", 14),
 } as const;

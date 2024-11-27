@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { BadRequest } from "http-errors";
 import moment from "moment";
 import { col, fn, Op, Order, WhereOptions } from "sequelize";
 
@@ -22,43 +23,36 @@ function eventOrder(): Order {
   ];
 }
 
+type EventsListArgs = { category?: string; maxAge?: number };
+
+const DEFAULT_MAX_AGE_DAYS = 7; // days
+
 export const eventsListForUserCached = createCache({
   maxAgeMs: 1000,
   maxPendingAgeMs: 2000,
-  async get(options: { category?: string; since?: string }) {
-    const { category, since } = options;
-    // Default to 7 days ago
-    const sinceDate = since ? new Date(since) : undefined;
-    const filters: WhereOptions = {};
+  formatKey: ({ category, maxAge = DEFAULT_MAX_AGE_DAYS }: EventsListArgs) => `${category} ${maxAge}`,
+  async get({ category, maxAge = DEFAULT_MAX_AGE_DAYS }: EventsListArgs) {
+    const where: WhereOptions & unknown[] = [{ listed: true }];
+
     if (category) {
-      filters.category = category;
+      where.push({ category });
     }
-    if (since && !Number.isNaN(sinceDate)) {
-      filters.endDate = {
-        [Op.gte]: sinceDate,
-      };
-    } else {
-      filters[Op.or as any] = {
-        // closed less than 7 days ago
-        registrationEndDate: {
-          [Op.gt]: moment().subtract(7, "days").toDate(),
-        },
-        // or happened less than 7 days ago
-        date: {
-          [Op.gt]: moment().subtract(7, "days").toDate(),
-        },
-        endDate: {
-          [Op.gt]: moment().subtract(7, "days").toDate(),
-        },
-      };
-    }
-    const where = {
-      ...filters,
-    };
+
+    if (!Number.isFinite(maxAge) || maxAge < 0) throw new BadRequest("invalid maxAge");
+    const since = moment().subtract(Math.round(maxAge), "days").toDate();
+    where.push({
+      [Op.or]: {
+        // closed recently enough
+        registrationEndDate: { [Op.gt]: since },
+        // or happened recently enough
+        date: { [Op.gt]: since },
+        endDate: { [Op.gt]: since },
+      },
+    });
 
     const events = await Event.scope("user").findAll({
       attributes: eventListEventAttrs,
-      where: { listed: true, ...where },
+      where,
       // Include quotas of event and count of signups
       include: [
         {
@@ -97,7 +91,7 @@ export async function getEventsListForUser(
     throw new InitialSetupNeeded("Initial setup of Ilmomasiina is needed.");
   }
 
-  const res = await eventsListForUserCached({ category: request.query.category, since: request.query.since });
+  const res = await eventsListForUserCached({ category: request.query.category, maxAge: request.query.maxAge });
   reply.status(200);
   return res as StringifyApi<typeof res>;
 }
