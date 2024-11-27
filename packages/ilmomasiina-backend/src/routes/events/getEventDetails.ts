@@ -6,6 +6,7 @@ import { Op } from "sequelize";
 import type {
   AdminEventPathParams,
   AdminEventResponse,
+  AdminSignupSchema,
   EventID,
   EventSlug,
   UserEventPathParams,
@@ -162,6 +163,17 @@ export async function eventDetailsForUser(eventSlug: EventSlug): Promise<UserEve
   return res as unknown as StringifyApi<typeof res>;
 }
 
+/** Converts a signup with answers included to JSON for the admin API. */
+export function formatSignupForAdmin(signup: Signup): AdminSignupSchema {
+  const result = {
+    ...signup.get({ plain: true }),
+    status: signup.status,
+    answers: signup.answers!.map((answer) => answer.get({ plain: true })),
+    confirmed: Boolean(signup.confirmedAt),
+  };
+  return result as unknown as StringifyApi<typeof result>;
+}
+
 export async function eventDetailsForAdmin(eventID: EventID): Promise<AdminEventResponse> {
   // Admin queries include internal data such as confirmation email contents
   // Admin queries include emails and signup IDs
@@ -218,12 +230,7 @@ export async function eventDetailsForAdmin(eventID: EventID): Promise<AdminEvent
     updatedAt: event.updatedAt,
     quotas: quotas.map((quota) => ({
       ...quota.get({ plain: true }),
-      signups: quota.signups!.map((signup) => ({
-        ...signup.get({ plain: true }),
-        status: signup.status,
-        answers: signup.answers!.map((answer) => answer.get({ plain: true })),
-        confirmed: Boolean(signup.confirmedAt),
-      })),
+      signups: quota.signups!.map(formatSignupForAdmin),
       signupCount: quota.signups!.length,
     })),
   };

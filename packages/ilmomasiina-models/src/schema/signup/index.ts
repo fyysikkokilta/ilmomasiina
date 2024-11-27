@@ -21,17 +21,30 @@ export const signupCreateResponse = Type.Object({
   editToken,
 });
 
+const signupLanguage = Type.Object({
+  language: Type.String({
+    maxLength: 8,
+    description: "The language code used for emails related to this signup",
+  }),
+});
+
+const adminSignupUpdateOptions = Type.Object({
+  sendEmail: Type.Boolean({
+    description: "Whether to send an edit confirmation for the edit",
+  }),
+});
+
 /** Request body for editing an existing signup. */
-export const signupUpdateBody = Type.Partial(
-  Type.Composite([
-    editableSignupAttributes,
-    Type.Object({
-      language: Type.String({
-        maxLength: 8,
-        description: "The language code used for emails related to this signup",
-      }),
-    }),
-  ]),
+export const signupUpdateBody = Type.Partial(Type.Composite([editableSignupAttributes, signupLanguage]));
+
+/** Request body for editing an existing signup as an admin. */
+export const adminSignupUpdateBody = Type.Partial(
+  Type.Composite([editableSignupAttributes, signupLanguage, adminSignupUpdateOptions]),
+);
+
+/** Request body for creating a signup as an admin. */
+export const adminSignupCreateBody = Type.Partial(
+  Type.Composite([signupCreateBody, editableSignupAttributes, signupLanguage, adminSignupUpdateOptions]),
 );
 
 /** Response schema for successfully editing a signup. */
@@ -56,13 +69,17 @@ export type SignupEditToken = Static<typeof editToken>;
 /** Path parameters necessary to fetch and manipulate signups. */
 export type SignupPathParams = Static<typeof signupPathParams>;
 
-/** Request body for creating a signup. */
+/** Request body for creating a signup as a regular user. */
 export type SignupCreateBody = Static<typeof signupCreateBody>;
 /** Response schema for successfully creating a signup. */
 export type SignupCreateResponse = Static<typeof signupCreateResponse>;
 
-/** Request body for editing an existing signup. */
+/** Request body for editing an existing signup as a regular user. */
 export type SignupUpdateBody = Static<typeof signupUpdateBody>;
+/** Request body for editing an existing signup as an admin. */
+export type AdminSignupUpdateBody = Static<typeof adminSignupUpdateBody>;
+/** Request body for creating a signup as an admin. */
+export type AdminSignupCreateBody = Static<typeof adminSignupCreateBody>;
 /** Response schema for successfully editing a signup. */
 export type SignupUpdateResponse = Static<typeof signupUpdateResponse>;
 

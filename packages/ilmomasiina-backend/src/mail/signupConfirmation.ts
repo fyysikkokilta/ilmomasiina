@@ -5,9 +5,13 @@ import config from "../config";
 import i18n from "../i18n";
 import { Signup } from "../models/signup";
 import { generateToken } from "../routes/signups/editTokens";
-import EmailService from ".";
+import EmailService, { ConfirmationMailParams } from ".";
 
-export default async function sendSignupConfirmationMail(signup: Signup, edited: boolean) {
+export default async function sendSignupConfirmationMail(
+  signup: Signup,
+  type: ConfirmationMailParams["type"],
+  admin: boolean,
+) {
   if (signup.email === null) return;
 
   const lng = signup.language ?? undefined;
@@ -44,7 +48,8 @@ export default async function sendSignupConfirmationMail(signup: Signup, edited:
     quota: quota.title,
     answers: questionFields,
     queuePosition: signup.status === SignupStatus.IN_QUEUE ? signup.position : null,
-    edited,
+    type,
+    admin,
     date,
     event,
     cancelLink,
