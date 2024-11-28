@@ -38,7 +38,7 @@ jobs:
           errors=0
           for file in package.json packages/*/package.json
           do
-            if cat $file | jq .version | grep -Fqvx '"${{ github.ref_name }}"'
+            if cat $file | jq '"v" + .version' | grep -Fqvx '"${{ github.ref_name }}"'
             then
               echo "::error file=$file::The version here does not match the Git tag you pushed (${{ github.ref_name }}). This would cause no NPM packages to be published."
               errors=1
