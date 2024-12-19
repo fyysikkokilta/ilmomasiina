@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0-alpha38
+
+- Fix answers sticking around when updating a signup
+
 ## 2.0.0-alpha37
 
 - **BREAKING:** Past events are now accessed using the `maxAge` parameter instead of `since`
