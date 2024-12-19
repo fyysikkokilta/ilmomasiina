@@ -73,7 +73,7 @@ async function updateExistingSignup(
     where: {
       signupId: signup.id,
       questionId: {
-        [Op.notIn]: answers.map((answer) => answer.questionId),
+        [Op.in]: answers.map((answer) => answer.questionId),
       },
     },
     transaction,
