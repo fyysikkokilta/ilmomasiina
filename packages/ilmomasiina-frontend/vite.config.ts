@@ -29,9 +29,7 @@ const TIMEZONE = process.env.APP_TIMEZONE || "Europe/Helsinki";
  * Therefore we need to quote string values, which is easiest done using JSON.stringify.
  */
 function quoteValues(values: Record<string, string | number | boolean>) {
-  return Object.fromEntries(
-    Object.entries(values).map(([key, value]) => [key, JSON.stringify(value)]),
-  );
+  return Object.fromEntries(Object.entries(values).map(([key, value]) => [key, JSON.stringify(value)]));
 }
 
 export default defineConfig(({ mode }) => ({
@@ -63,13 +61,13 @@ export default defineConfig(({ mode }) => ({
     PATH_PREFIX,
     API_URL: process.env.API_URL || "",
     BRANDING_HEADER_TITLE_TEXT: process.env.BRANDING_HEADER_TITLE_TEXT || "Ilmomasiina",
+    BRANDING_HEADER_TITLE_TEXT_SHORT:
+      process.env.BRANDING_HEADER_TITLE_TEXT_SHORT || process.env.BRANDING_HEADER_TITLE_TEXT || "Ilmomasiina",
     BRANDING_FOOTER_GDPR_TEXT: process.env.BRANDING_FOOTER_GDPR_TEXT || "",
     BRANDING_FOOTER_GDPR_LINK: process.env.BRANDING_FOOTER_GDPR_LINK || "",
     BRANDING_FOOTER_HOME_TEXT: process.env.BRANDING_FOOTER_HOME_TEXT || "",
     BRANDING_FOOTER_HOME_LINK: process.env.BRANDING_FOOTER_HOME_LINK || "",
-    BRANDING_LOGO_URL: process.env.BRANDING_LOGO_URL || "",
-    BRANDING_LOGIN_PLACEHOLDER_EMAIL:
-      process.env.BRANDING_LOGIN_PLACEHOLDER_EMAIL || "admin@tietokilta.fi",
+    BRANDING_LOGIN_PLACEHOLDER_EMAIL: process.env.BRANDING_LOGIN_PLACEHOLDER_EMAIL || "admin@tietokilta.fi",
     TIMEZONE,
   }),
 

@@ -37,4 +37,10 @@
   .btn[disabled] {
     opacity: 0.35;
   }
+
+  // We use custom feedback elements instead of the ones provided by react-bootstrap, as the
+  // latter don't work with checkbox/radio arrays.
+  .invalid-feedback {
+    display: none !important;
+  }
 }

@@ -38,6 +38,11 @@ export const eventListQuery = Type.Object({
       description: "If set, only events with the provided category are included.",
     }),
   ),
+  maxAge: Type.Optional(
+    Type.Integer({
+      description: "If set to a number, only events at most that many days old are included.",
+    }),
+  ),
 });
 
 /** Query parameters applicable to the public event list API. */

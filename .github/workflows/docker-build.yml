@@ -6,11 +6,11 @@ env:
 
   # Change these to customize your build.
   branding_header_title_text: "Tietokillan ilmomasiina"
+  branding_header_title_text_short: "Ilmomasiina"
   branding_footer_gdpr_text: "Tietosuoja"
-  branding_footer_gdpr_link: "https://tietokilta.fi/kilta/hallinto/viralliset-asiat/rekisteriselosteet/"
+  branding_footer_gdpr_link: "https://tietokilta.fi/fi/kilta/ilmorekisteri"
   branding_footer_home_text: "Tietokilta.fi"
   branding_footer_home_link: "https://tietokilta.fi"
-  branding_logo_url: "https://tietokilta.fi/wp-content/uploads/2019/08/tietokilta_logo.png"
   branding_login_placeholder_email: "admin@tietokilta.fi"
 
 on:
@@ -25,9 +25,30 @@ jobs:
     name: Lint & type-check
     uses: ./.github/workflows/lint-test.yml
 
+  packagejson:
+    name: Check package.json versions
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Check package.json versions against tag
+        run: |
+          errors=0
+          for file in package.json packages/*/package.json
+          do
+            if cat $file | jq '"v" + .version' | grep -Fqvx '"${{ github.ref_name }}"'
+            then
+              echo "::error file=$file::The version here does not match the Git tag you pushed (${{ github.ref_name }}). This would cause no NPM packages to be published."
+              errors=1
+            fi
+          done
+          exit $errors
+
   docker:
     name: Push Docker image to GitHub Packages
-    needs: lint
+    needs: [lint, packagejson]
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -75,11 +96,11 @@ jobs:
           # Customize your build here
           build-args: |
             BRANDING_HEADER_TITLE_TEXT=${{ env.branding_header_title_text }}
+            BRANDING_HEADER_TITLE_TEXT_SHORT=${{ env.branding_header_title_text_short }}
             BRANDING_FOOTER_GDPR_TEXT=${{ env.branding_footer_gdpr_text }}
             BRANDING_FOOTER_GDPR_LINK=${{ env.branding_footer_gdpr_link }}
             BRANDING_FOOTER_HOME_TEXT=${{ env.branding_footer_home_text }}
             BRANDING_FOOTER_HOME_LINK=${{ env.branding_footer_home_link }}
-            BRANDING_LOGO_URL=${{ env.branding_logo_url }}
             BRANDING_LOGIN_PLACEHOLDER_EMAIL=${{ env.branding_login_placeholder_email }}
             VERSION=${{steps.get-version.outputs.version}}
     outputs:
@@ -106,7 +127,7 @@ jobs:
   # This is disabled on forks since you probably don't need to upload your own packages
   npm:
     name: Publish JS packages
-    needs: lint
+    needs: [lint, packagejson]
     permissions:
       packages: write
       contents: read

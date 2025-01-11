@@ -13,6 +13,7 @@ const ACTIONS = [
   [AuditEvent.PUBLISH_EVENT, "auditLog.filter.action.publishEvent"],
   [AuditEvent.UNPUBLISH_EVENT, "auditLog.filter.action.unpublishEvent"],
   [AuditEvent.DELETE_EVENT, "auditLog.filter.action.deleteEvent"],
+  [AuditEvent.CREATE_SIGNUP, "auditLog.filter.action.createSignup"],
   [AuditEvent.EDIT_SIGNUP, "auditLog.filter.action.editSignup"],
   [AuditEvent.DELETE_SIGNUP, "auditLog.filter.action.deleteSignup"],
   [AuditEvent.PROMOTE_SIGNUP, "auditLog.filter.action.promoteSignup"],

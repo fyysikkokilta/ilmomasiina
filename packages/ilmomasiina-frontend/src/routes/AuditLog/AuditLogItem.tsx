@@ -18,6 +18,7 @@ const ACTION_STRINGS = {
   [AuditEvent.PUBLISH_EVENT]: "auditLog.description.publishEvent",
   [AuditEvent.UNPUBLISH_EVENT]: "auditLog.description.unpublishEvent",
   [AuditEvent.DELETE_EVENT]: "auditLog.description.deleteEvent",
+  [AuditEvent.CREATE_SIGNUP]: "auditLog.description.createSignup",
   [AuditEvent.EDIT_SIGNUP]: "auditLog.description.editSignup",
   [AuditEvent.DELETE_SIGNUP]: "auditLog.description.deleteSignup",
   [AuditEvent.PROMOTE_SIGNUP]: "auditLog.description.promoteSignup",
@@ -51,6 +52,7 @@ function useItemDescription(item: AuditLogItemSchema) {
           )}
         </Trans>
       );
+    case AuditEvent.CREATE_SIGNUP:
     case AuditEvent.EDIT_SIGNUP:
     case AuditEvent.DELETE_SIGNUP:
     case AuditEvent.PROMOTE_SIGNUP:

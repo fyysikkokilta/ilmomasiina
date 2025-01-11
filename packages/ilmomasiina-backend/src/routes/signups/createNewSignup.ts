@@ -8,6 +8,7 @@ import { refreshSignupPositions } from "./computeSignupPosition";
 import { generateToken } from "./editTokens";
 import { NoSuchQuota, SignupsClosed } from "./errors";
 
+/** Checks whether signups can still be created. */
 export const signupsAllowed = (event: Event) => {
   if (event.registrationStartDate === null || event.registrationEndDate === null) {
     return false;
@@ -16,6 +17,10 @@ export const signupsAllowed = (event: Event) => {
   const now = new Date();
   return now >= event.registrationStartDate && now <= event.registrationEndDate;
 };
+
+/** Checks whether a signup is still editable. */
+export const signupEditable = (event: Event, signup: Signup) =>
+  signupsAllowed(event) || new Date() <= signup.editableAtLeastUntil;
 
 export default async function createSignup(
   request: FastifyRequest<{ Body: SignupCreateBody }>,
@@ -43,7 +48,10 @@ export default async function createSignup(
 
   // Create the signup.
   const newSignup = await Signup.create({ quotaId: request.body.quotaId });
-  await refreshSignupPositions(quota.event);
+
+  // Refresh signup positions. Ignore errors, but wait for this to complete, so that the user
+  // gets a status on their signup before it being returned.
+  await refreshSignupPositions(quota.event).catch((error) => console.error(error));
 
   const editToken = generateToken(newSignup.id);
 

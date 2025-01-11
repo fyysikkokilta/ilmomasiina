@@ -24,6 +24,9 @@ $force-link-underline: false !default;
 $secondary-background: #f1f1f1 !default;
 $secondary-text-color: #7a7a7a !default;
 
+// If you don't want a header logo, set this to false.
+$header-logo: true !default;
+
 // Import Bootstrap core mixins/variables/functions for use in Ilmomasiina's SCSS.
 
 @import "bootstrap/scss/functions";

@@ -26,3 +26,9 @@
     flex: 1 1;
   }
 }
+
+@if $force-link-underline {
+  .audit-log--table :link {
+    text-decoration: underline;
+  }
+}

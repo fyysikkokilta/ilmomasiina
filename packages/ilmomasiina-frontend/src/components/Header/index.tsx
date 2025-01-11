@@ -4,6 +4,7 @@ import { Button, Container, Navbar } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import logo from "../../assets/logo.svg";
 import branding from "../../branding";
 import i18n from "../../i18n";
 import { logout } from "../../modules/auth/actions";
@@ -22,10 +23,11 @@ const Header = () => {
 
   return (
     <Navbar>
-      <img alt="Logo" src={branding.headerLogoUrl} />
       <Container>
         <Link to={appPaths.eventsList} className="navbar-brand mr-auto">
-          {branding.headerTitle}
+          <img className="navbar-logo" src={logo} alt="Logo" />
+          <span className="d-none d-sm-inline">{branding.headerTitle}</span>
+          <span className="d-sm-none">{branding.headerTitleShort}</span>
         </Link>
         {language !== "fi" && (
           <Button onClick={() => i18n.changeLanguage("fi")}>{t("header.switchLanguage", { lng: "fi" })}</Button>

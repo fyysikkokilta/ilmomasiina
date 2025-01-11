@@ -10,10 +10,10 @@ build your own Docker image (if using Docker):
 
 - Hosting in a subfolder (instead of directly at `https://ilmo.your.domain/`)
 - Colors ([`packages/ilmomasiina-components/src/styles/_definitions.scss`](../packages/ilmomasiina-components/src/styles/_definitions.scss))
-- Header logo (TBD)
-- Header title (build args or [`packages/ilmomasiina-frontend/src/branding.ts`](../packages/ilmomasiina-frontend/src/branding.ts))
-- Footer links (as above)
+- Header logo (`packages/ilmomasiina-frontend/src/assets/logo.svg`) (can also be disabled from `_definitions.scss`)
 - Favicon (`packages/ilmomasiina-frontend/public/*.png`)
+- Header title (build args or [`packages/ilmomasiina-frontend/src/branding.ts`](../packages/ilmomasiina-frontend/src/branding.ts))
+- Footer links (build args or [`packages/ilmomasiina-frontend/src/branding.ts`](../packages/ilmomasiina-frontend/src/branding.ts))
 - Translations (`packages/ilmomasiina-*/src/locales/*.json`)
 
 You can of course make further UI changes, but that is not documented.
@@ -52,12 +52,12 @@ You can of course also build images locally.
 
 ```
 docker build \
-  --build-arg BRANDING_HEADER_TITLE_TEXT='Ilmomasiina' \
+  --build-arg BRANDING_HEADER_TITLE_TEXT='Kilta ry ilmomasiina' \
+  --build-arg BRANDING_HEADER_TITLE_TEXT_SHORT='Ilmomasiina' \
   --build-arg BRANDING_FOOTER_GDPR_TEXT='Tietosuoja' \
   --build-arg BRANDING_FOOTER_GDPR_LINK='https://example.com' \
   --build-arg BRANDING_FOOTER_HOME_TEXT='Kotisivu' \
   --build-arg BRANDING_FOOTER_HOME_LINK='https://example.com' \
-  --build-arg BRANDING_LOGO_URL='./logo.png' \
   --build-arg BRANDING_LOGIN_PLACEHOLDER_EMAIL='admin@example.com' \
   -t ilmomasiina .
 ```

@@ -18,6 +18,7 @@ import {
 } from "sequelize";
 
 import type { EventAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
+import config from "../config";
 import type { Question } from "./question";
 import type { Quota } from "./quota";
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
@@ -92,6 +93,15 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  /** Determines the effective end date of the event, matching the scope logic. */
+  public get effectiveEndDate() {
+    const endDates = [this.endDate, this.date, this.registrationEndDate]
+      .filter((date): date is Date => date != null)
+      .map((date) => date.getTime());
+    if (!endDates.length) return null;
+    return endDates.reduce((lhs, rhs) => Math.max(lhs, rhs));
+  }
 }
 
 export default function setupEventModel(sequelize: Sequelize) {
@@ -207,26 +217,26 @@ export default function setupEventModel(sequelize: Sequelize) {
       scopes: {
         // users can see events that:
         user: () => ({
-          where: {
-            [Op.and]: {
-              // are not drafts,
-              draft: false,
+          where: [
+            // are not drafts,
+            { draft: false },
+            {
               // and either:
               [Op.or]: {
-                // closed less than two days ago
+                // closed recently enough
                 registrationEndDate: {
-                  [Op.gt]: moment().subtract(2, "days").toDate(),
+                  [Op.gt]: moment().subtract(config.hideEventAfterDays, "days").toDate(),
                 },
-                // or happened less than two days ago
+                // or happened recently enough
                 date: {
-                  [Op.gt]: moment().subtract(2, "days").toDate(),
+                  [Op.gt]: moment().subtract(config.hideEventAfterDays, "days").toDate(),
                 },
                 endDate: {
-                  [Op.gt]: moment().subtract(2, "days").toDate(),
+                  [Op.gt]: moment().subtract(config.hideEventAfterDays, "days").toDate(),
                 },
               },
             },
-          },
+          ],
         }),
       },
       hooks: {

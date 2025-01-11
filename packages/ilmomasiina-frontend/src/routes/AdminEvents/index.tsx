@@ -13,6 +13,8 @@ import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
 import { isEventInPast } from "../../utils/eventState";
 import AdminEventListItem from "./AdminEventListItem";
 
+import "./AdminEvents.scss";
+
 const AdminEventsList = () => {
   const dispatch = useTypedDispatch();
   const { events, loadError } = useTypedSelector((state) => state.adminEvents, shallowEqual);
@@ -31,7 +33,11 @@ const AdminEventsList = () => {
     };
   }, [dispatch]);
 
-  const shownEvents = useMemo(() => events?.filter((event) => isEventInPast(event) === showPast), [events, showPast]);
+  const shownEvents = useMemo(() => {
+    const filtered = events?.filter((event) => isEventInPast(event) === showPast);
+    // Additionally, reverse events when viewing past events, so the newest event comes first.
+    return showPast ? filtered?.reverse() : filtered;
+  }, [events, showPast]);
 
   if (loadError) {
     return (
@@ -68,7 +74,7 @@ const AdminEventsList = () => {
           {t("adminEvents.nav.newEvent")}
         </Button>
       </nav>
-      <table className="table">
+      <table className="table ilmo--admin-event-list">
         <thead>
           <tr>
             <th>{t("adminEvents.column.name")}</th>

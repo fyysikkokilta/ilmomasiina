@@ -25,7 +25,7 @@ import createSignup from "./signups/createNewSignup";
 import { deleteSignupAsAdmin, deleteSignupAsUser } from "./signups/deleteSignup";
 import { requireValidEditToken } from "./signups/editTokens";
 import getSignupForEdit from "./signups/getSignupForEdit";
-import updateSignup from "./signups/updateSignup";
+import { createSignupAsAdmin, updateSignupAsAdmin, updateSignupAsUser } from "./signups/updateSignup";
 
 const errorResponses = {
   "4XX": schema.errorResponse,
@@ -138,6 +138,44 @@ async function setupAdminRoutes(fastifyInstance: FastifyInstance, opts: RouteOpt
   );
 
   /** Admin routes for signups */
+  server.post<{
+    Params: schema.SignupPathParams;
+    Body: schema.AdminSignupCreateBody;
+  }>(
+    "/signups",
+    {
+      schema: {
+        params: schema.signupPathParams,
+        body: schema.adminSignupCreateBody,
+        response: {
+          ...errorResponses,
+          200: schema.adminSignupSchema,
+          400: Type.Union([schema.signupValidationError, schema.errorResponse]),
+        },
+      },
+    },
+    createSignupAsAdmin,
+  );
+
+  server.patch<{
+    Params: schema.SignupPathParams;
+    Body: schema.AdminSignupUpdateBody;
+  }>(
+    "/signups/:id",
+    {
+      schema: {
+        params: schema.signupPathParams,
+        body: schema.adminSignupUpdateBody,
+        response: {
+          ...errorResponses,
+          200: schema.adminSignupSchema,
+          400: Type.Union([schema.signupValidationError, schema.errorResponse]),
+        },
+      },
+    },
+    updateSignupAsAdmin,
+  );
+
   server.delete<{ Params: schema.SignupPathParams }>(
     "/signups/:id",
     {
@@ -291,7 +329,7 @@ async function setupPublicRoutes(fastifyInstance: FastifyInstance, opts: RouteOp
       // Require valid edit token:
       preHandler: requireValidEditToken,
     },
-    updateSignup,
+    updateSignupAsUser,
   );
 
   server.delete<{ Params: schema.SignupPathParams }>(
@@ -403,10 +441,7 @@ async function setupPublicRoutes(fastifyInstance: FastifyInstance, opts: RouteOp
   );
 }
 
-export default async function setupRoutes(
-  instance: FastifyInstance,
-  opts: RouteOptions,
-): Promise<void> {
+export default async function setupRoutes(instance: FastifyInstance, opts: RouteOptions): Promise<void> {
   addLogEventHook(instance);
 
   await instance.register(setupAdminRoutes, { ...opts, prefix: "/admin" });

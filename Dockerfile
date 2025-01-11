@@ -6,8 +6,8 @@ RUN apk add --no-cache brotli
 ARG SENTRY_DSN
 ARG PATH_PREFIX
 ARG API_URL
-ARG BRANDING_LOGO_URL
 ARG BRANDING_HEADER_TITLE_TEXT
+ARG BRANDING_HEADER_TITLE_TEXT_SHORT
 ARG BRANDING_FOOTER_GDPR_TEXT
 ARG BRANDING_FOOTER_GDPR_LINK
 ARG BRANDING_FOOTER_HOME_TEXT
@@ -61,9 +61,6 @@ COPY --from=builder /opt/ilmomasiina/packages/ilmomasiina-backend/dist /opt/ilmo
 
 # Copy built frontend from build stage
 COPY --from=builder /opt/ilmomasiina/packages/ilmomasiina-frontend/build /opt/ilmomasiina/frontend
-
-# copy static files
-COPY packages/ilmomasiina-frontend/public/ /opt/ilmomasiina/frontend
 
 # Create user for running
 RUN adduser -D -h /opt/ilmomasiina ilmomasiina

@@ -22,13 +22,15 @@ const uidDomain = config.icalUidDomain || new URL(config.baseUrl ?? "http://loca
 
 export async function eventsAsICal() {
   const events = await Event.scope("user").findAll({
-    where: {
-      listed: true,
-      // only events, not signup-only
-      date: { [Op.ne]: null },
-      // ignore legacy events with no end date
-      endDate: { [Op.ne]: null },
-    },
+    where: [
+      {
+        listed: true,
+        // only events, not signup-only
+        date: { [Op.ne]: null },
+        // ignore legacy events with no end date
+        endDate: { [Op.ne]: null },
+      },
+    ],
     order: [
       ["date", "ASC"],
       ["registrationEndDate", "ASC"],

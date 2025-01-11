@@ -24,6 +24,12 @@ table.ilmo--event-list {
   }
 }
 
+@if $force-link-underline {
+  table.ilmo--event-list :link {
+    text-decoration: underline;
+  }
+}
+
 @include media-breakpoint-up(md) {
   table.ilmo--event-list td.ilmo--title {
     min-width: 300px;
