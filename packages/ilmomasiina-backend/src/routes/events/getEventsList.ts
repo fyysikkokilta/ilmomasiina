@@ -5,6 +5,7 @@ import { col, fn, Op, Order, WhereOptions } from "sequelize";
 
 import type { AdminEventListResponse, EventListQuery, UserEventListResponse } from "@tietokilta/ilmomasiina-models";
 import { adminEventListEventAttrs, eventListEventAttrs } from "@tietokilta/ilmomasiina-models/dist/attrs/event";
+import config from "../../config";
 import { Event } from "../../models/event";
 import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";
@@ -25,13 +26,11 @@ function eventOrder(): Order {
 
 type EventsListArgs = { category?: string; maxAge?: number };
 
-const DEFAULT_MAX_AGE_DAYS = 7; // days
-
 export const eventsListForUserCached = createCache({
   maxAgeMs: 1000,
   maxPendingAgeMs: 2000,
-  formatKey: ({ category, maxAge = DEFAULT_MAX_AGE_DAYS }: EventsListArgs) => `${category} ${maxAge}`,
-  async get({ category, maxAge = DEFAULT_MAX_AGE_DAYS }: EventsListArgs) {
+  formatKey: ({ category, maxAge = config.notShowEventAfterDays }: EventsListArgs) => `${category} ${maxAge}`,
+  async get({ category, maxAge = config.notShowEventAfterDays }: EventsListArgs) {
     const where: WhereOptions & unknown[] = [{ listed: true }];
 
     if (category) {

@@ -147,6 +147,8 @@ const config = {
 
   /** How long after an event's date to remove signup details. */
   anonymizeAfterDays: envInteger("ANONYMIZE_AFTER_DAYS", 180),
+  /** How long long after an event's date it will not be shown in the user event list. */
+  notShowEventAfterDays: envInteger("NOT_SHOW_EVENT_AFTER_DAYS", 7),
   /** How long after an event's date it will become fully invisible to users. */
   hideEventAfterDays: envInteger("HIDE_EVENT_AFTER_DAYS", 180),
   /** How long items stay in the database after deletion, in order to allow restoring accidentally deleted items. */

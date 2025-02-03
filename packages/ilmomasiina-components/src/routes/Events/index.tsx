@@ -95,8 +95,8 @@ const EventListView = () => {
   );
 };
 
-const EventList = ({ category }: EventListProps) => (
-  <EventListProvider category={category}>
+const EventList = ({ category, maxAge }: EventListProps) => (
+  <EventListProvider category={category} maxAge={maxAge}>
     <I18nProvider>
       <EventListView />
     </I18nProvider>

@@ -8,6 +8,7 @@ import useShallowMemo from "../../utils/useShallowMemo";
 
 export type EventListProps = {
   category?: string;
+  maxAge?: string;
 };
 
 type State = {
@@ -19,15 +20,18 @@ type State = {
 const { Provider, useStateContext } = createStateContext<State>();
 export { useStateContext as useEventListContext };
 
-export function useEventListState({ category }: EventListProps = {}) {
+export function useEventListState({ category, maxAge }: EventListProps = {}) {
   const fetchEvents = useAbortablePromise(
     (signal) => {
-      const query = category === undefined ? "" : `?${new URLSearchParams({ category })}`;
+      const queryKeys = new URLSearchParams();
+      if (category !== undefined) queryKeys.set("category", category);
+      if (maxAge !== undefined) queryKeys.set("maxAge", maxAge);
+      const query = queryKeys.keys().next().value ? `?${queryKeys.toString()}` : "";
       return apiFetch<UserEventListResponse>(`events${query}`, {
         signal,
       });
     },
-    [category],
+    [category, maxAge],
   );
 
   return useShallowMemo<State>({
@@ -37,7 +41,7 @@ export function useEventListState({ category }: EventListProps = {}) {
   });
 }
 
-export function EventListProvider({ category, children }: PropsWithChildren<EventListProps>) {
-  const state = useEventListState({ category });
+export function EventListProvider({ category, maxAge, children }: PropsWithChildren<EventListProps>) {
+  const state = useEventListState({ category, maxAge });
   return <Provider value={state}>{children}</Provider>;
 }
