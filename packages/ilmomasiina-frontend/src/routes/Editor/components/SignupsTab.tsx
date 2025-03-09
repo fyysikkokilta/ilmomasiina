@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
-import { Button } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { useActionDateTimeFormatter } from "@tietokilta/ilmomasiina-components/dist/utils/dateFormat";
@@ -13,6 +13,7 @@ import {
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import { deleteSignup, getEvent } from "../../../modules/editor/actions";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import CheckMembershipsTextArea from "./CheckMembershipsTextArea";
 import CSVLink, { CSVOptions } from "./CSVLink";
 
 import "../Editor.scss";
@@ -37,7 +38,7 @@ const SignupRow = ({ position, signup }: SignupProps) => {
     }
   });
 
-  const nameEmailCols = (event.nameQuestion ? 2 : 0) + (event.emailQuestion ? 1 : 0);
+  const nameEmailCols = (event.nameQuestion ? 2 : 0) + (event.emailQuestion ? 2 : 0);
 
   return (
     <tr className={!signup.confirmed ? "text-muted" : ""}>
@@ -45,6 +46,7 @@ const SignupRow = ({ position, signup }: SignupProps) => {
       {signup.confirmed && event.nameQuestion && <td key="firstName">{signup.firstName}</td>}
       {signup.confirmed && event.nameQuestion && <td key="lastName">{signup.lastName}</td>}
       {signup.confirmed && event.emailQuestion && <td key="email">{signup.email}</td>}
+      {signup.confirmed && event.emailQuestion && <td key="membership">{signup.isMember && "\u2705"}</td>}
       {!signup.confirmed && nameEmailCols && (
         <td colSpan={nameEmailCols} className="font-italic">
           {t("editor.signups.unconfirmed")}
@@ -67,11 +69,16 @@ const SignupRow = ({ position, signup }: SignupProps) => {
 const csvOptions: CSVOptions = { delimiter: "\t" };
 
 const SignupsTab = () => {
+  const [emails, setEmails] = useState<string[]>([]);
+
   const event = useTypedSelector((state) => state.editor.event);
 
-  const signups = useMemo(() => event && getSignupsForAdminList(event), [event]);
+  const signups = useMemo(() => event && getSignupsForAdminList(event, emails), [event, emails]);
 
-  const csvSignups = useMemo(() => event && convertSignupsToCSV(event, signups!), [event, signups]);
+  const csvSignups = useMemo(
+    () => event && convertSignupsToCSV(event, signups!, emails.length > 0),
+    [event, signups, emails],
+  );
 
   const { t } = useTranslation();
 
@@ -81,13 +88,20 @@ const SignupsTab = () => {
 
   return (
     <div>
-      <CSVLink
-        data={csvSignups!}
-        csvOptions={csvOptions}
-        download={t("editor.signups.download.filename", { event: event.title })}
-      >
-        {t("editor.signups.download")}
-      </CSVLink>
+      <Row>
+        <Col sm={6} className="mb-4">
+          <CSVLink
+            data={csvSignups!}
+            csvOptions={csvOptions}
+            download={t("editor.signups.download.filename", { event: event.title })}
+          >
+            {t("editor.signups.download")}
+          </CSVLink>
+        </Col>
+        <Col sm={6}>
+          <CheckMembershipsTextArea disabled={!event.emailQuestion} setEmails={setEmails} />
+        </Col>
+      </Row>
       <br />
       <br />
       <table className="event-editor--signup-table table table-condensed table-responsive">
@@ -97,6 +111,7 @@ const SignupsTab = () => {
             {event.nameQuestion && <th key="firstName">{t("editor.signups.column.firstName")}</th>}
             {event.nameQuestion && <th key="lastName">{t("editor.signups.column.lastName")}</th>}
             {event.emailQuestion && <th key="email">{t("editor.signups.column.email")}</th>}
+            {event.emailQuestion && <th key="membership">{t("editor.signups.column.membership")}</th>}
             <th key="quota">{t("editor.signups.column.quota")}</th>
             {event.questions.map((q) => (
               <th key={q.id}>{q.question}</th>

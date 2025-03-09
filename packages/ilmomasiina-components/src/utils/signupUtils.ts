@@ -127,10 +127,11 @@ export type FormattedSignup = {
   quota: string;
   createdAt: Date;
   confirmed: boolean;
+  isMember: boolean | null;
 };
 
 /** Formats all signups to an event into a single list. */
-export function getSignupsForAdminList(event: AdminEventResponse): FormattedSignup[] {
+export function getSignupsForAdminList(event: AdminEventResponse, emails: string[]): FormattedSignup[] {
   const signupsArray = getSignupsAsList(event);
   const sorted = orderBy(signupsArray, [
     (signup) => [SignupStatus.IN_QUOTA, SignupStatus.IN_OPEN_QUOTA, SignupStatus.IN_QUEUE, null].indexOf(signup.status),
@@ -147,6 +148,7 @@ export function getSignupsForAdminList(event: AdminEventResponse): FormattedSign
     return {
       ...signup,
       createdAt: new Date(signup.createdAt),
+      isMember: event.emailQuestion && signup.email ? emails.includes(signup.email) : null,
       quota: `${signup.quotaName}${quotaType}`,
       answers: getAnswersFromSignup(event, signup),
     };
@@ -159,13 +161,18 @@ export function stringifyAnswer(answer: string | string[] | undefined) {
 }
 
 /** Converts an array of signup rows from `getSignupsForAdminList` to a an array of CSV cells. */
-export function convertSignupsToCSV(event: AdminEventResponse, signups: FormattedSignup[]): string[][] {
+export function convertSignupsToCSV(
+  event: AdminEventResponse,
+  signups: FormattedSignup[],
+  hasEmails: boolean,
+): string[][] {
   const dateFormat = getCsvDateTimeFormatter();
   return [
     // Headers
     [
       ...(event.nameQuestion ? ["Etunimi", "Sukunimi"] : []),
       ...(event.emailQuestion ? ["Sähköpostiosoite"] : []),
+      ...(event.emailQuestion && hasEmails ? ["Jäsen"] : []),
       "Kiintiö",
       ...event.questions.map(({ question }) => question),
       "Ilmoittautumisaika",
@@ -174,6 +181,7 @@ export function convertSignupsToCSV(event: AdminEventResponse, signups: Formatte
     ...signups.map((signup) => [
       ...(event.nameQuestion ? [signup.firstName || "", signup.lastName || ""] : []),
       ...(event.emailQuestion ? [signup.email || ""] : []),
+      ...(event.emailQuestion && hasEmails ? [signup.isMember ? "Kyllä" : "Ei"] : []),
       signup.quota,
       ...event.questions.map((question) => stringifyAnswer(signup.answers[question.id])),
       dateFormat.format(signup.createdAt),

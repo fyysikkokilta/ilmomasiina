@@ -156,6 +156,8 @@
     "editor.errors.tooSmall": "The value must be at least {{minimum}}",
     "editor.errors.tooLarge": "The value must be at most {{maximum}}",
     "editor.errors.invalidSlug": "Only the characters A-Z, a-z, 0-9, - and _ are allowed",
+    "editor.errors.dateInverted": "Event cannot end before it starts",
+    "editor.errors.registrationDateInverted": "Signup cannot close before it opens",
     "editor.errors.optionsTooLong": "The combined answer options are too long",
     "editor.errors.generic": "Invalid value: {{error}}",
     "editor.basic.name": "Event name",
@@ -228,6 +230,7 @@
     "editor.signups.column.email": "Email",
     "editor.signups.column.quota": "Quota",
     "editor.signups.column.time": "Signup time",
+    "editor.signups.column.membership": "Membership",
     "editor.signups.column.delete": "Delete",
     "editor.signups.action.delete": "Delete",
     "editor.signups.action.delete.confirm": "Are you sure? This cannot be undone.",
@@ -245,6 +248,9 @@
     "editor.moveToQueue.info1": "The changes you're making to quotas would move at least {{number}} people, already accepted into the event, into the queue. These users will not be notified automatically.",
     "editor.moveToQueue.info2": "Are you sure you want to proceed?",
     "editor.moveToQueue.action.proceed": "Proceed",
-    "editor.moveToQueue.action.cancel": "Cancel"
+    "editor.moveToQueue.action.cancel": "Cancel",
+    "editor.checkMemberships.label": "Check memberships",
+    "editor.checkMemberships.placeholder": "Enter email addresses separated by line breaks",
+    "editor.checkMemberships.disabled": "Collecting email addresses is disabled"
   }
 }

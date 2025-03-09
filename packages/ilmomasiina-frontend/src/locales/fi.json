@@ -230,6 +230,7 @@
     "editor.signups.column.email": "Sähköposti",
     "editor.signups.column.quota": "Kiintiö",
     "editor.signups.column.time": "Ilmoittautumisaika",
+    "editor.signups.column.membership": "Jäsenyys",
     "editor.signups.column.delete": "Poista",
     "editor.signups.action.delete": "Poista",
     "editor.signups.action.delete.confirm": "Oletko varma? Poistamista ei voi perua.",
@@ -247,6 +248,9 @@
     "editor.moveToQueue.info1": "Tekemäsi muutokset kiintiöihin siirtävät vähintään {{number}} jo kiintiöön päässyttä ilmoittautumista jonoon. Käyttäjille ei ilmoiteta tästä automaattisesti.",
     "editor.moveToQueue.info2": "Haluatko varmasti jatkaa?",
     "editor.moveToQueue.action.proceed": "Jatka",
-    "editor.moveToQueue.action.cancel": "Peruuta"
+    "editor.moveToQueue.action.cancel": "Peruuta",
+    "editor.checkMemberships.label": "Tarkista jäsenyydet",
+    "editor.checkMemberships.placeholder": "Syötä sähköpostiosoitteet rivinvaihdolla eroteltuna",
+    "editor.checkMemberships.disabled": "Sähköpostiosoitteiden keräys on pois päältä"
   }
 }
