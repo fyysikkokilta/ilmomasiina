@@ -1,7 +1,7 @@
 import dotenvFlow from "dotenv-flow";
 import path from "path";
 
-import { envBoolean, envEnum, envInteger, envString, frontendFilesPath } from "./util/config";
+import { envArray, envBoolean, envEnum, envInteger, envString, frontendFilesPath } from "./util/config";
 
 // Vite/Vitest sets BASE_URL. This conflicts with our config, but isn't used
 // in tests, so just overwrite it.
@@ -139,6 +139,9 @@ const config = {
   mailgunDomain: envString("MAILGUN_DOMAIN", null),
   /** Host for Mailgun API server. */
   mailgunHost: envString("MAILGUN_HOST", "api.eu.mailgun.net"),
+
+  /** Blocked emails. */
+  blockedEmails: envArray("BLOCKED_EMAILS", []),
 
   /** How long each user has to edit their signup after creation. */
   signupConfirmMins: envInteger("SIGNUP_CONFIRM_MINS", 30),

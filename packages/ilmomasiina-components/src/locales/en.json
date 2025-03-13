@@ -55,6 +55,7 @@
     "editSignup.editError.400.description": "Editing failed. Make sure you have filled all mandatory fields and try again.",
     "editSignup.editError.default.description": "Editing failed.",
     "editSignup.signupError.SignupsClosed.description": "The signup for this event has closed, so your signup could no longer be saved.",
+    "editSignup.signupError.SignupBlocked.description": "Your signup has been blocked.",
     "editSignup.signupError.NoSuchSignup.description": "Your signup was not found. It might be already deleted.",
     "editSignup.signupError.400.description": "Signup failed. Make sure you have filled all mandatory fields and try again.",
     "editSignup.signupError.default.description": "Signup failed.",

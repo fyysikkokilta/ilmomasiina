@@ -55,6 +55,7 @@
     "editSignup.editError.400.description": "Muokkaus epäonnistui. Tarkista, että kaikki pakolliset kentät on täytetty ja yritä uudestaan.",
     "editSignup.editError.default.description": "Muokkaus epäonnistui.",
     "editSignup.signupError.SignupsClosed.description": "Tapahtuman ilmoittautuminen on sulkeutunut, joten ilmoittautumistasi ei voitu enää tallentaa.",
+    "editSignup.signupError.SignupBlocked.description": "Ilmoittautumisesi on estetty.",
     "editSignup.signupError.NoSuchSignup.description": "Ilmoittautumistasi ei löytynyt. Se saattaa olla jo poistettu.",
     "editSignup.signupError.400.description": "Ilmoittautuminen epäonnistui. Tarkista, että kaikki pakolliset kentät on täytetty ja yritä uudestaan.",
     "editSignup.signupError.default.description": "Ilmoittautuminen epäonnistui.",

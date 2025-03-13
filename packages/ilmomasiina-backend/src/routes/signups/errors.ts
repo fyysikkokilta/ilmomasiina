@@ -28,3 +28,9 @@ export class SignupValidationError extends CustomError {
     this.errors = errors;
   }
 }
+
+export class SignupBlocked extends CustomError {
+  constructor(message: string) {
+    super(403, ErrorCode.SIGNUP_BLOCKED, message);
+  }
+}

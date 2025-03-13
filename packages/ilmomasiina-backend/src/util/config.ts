@@ -22,6 +22,20 @@ export function envEnum<V extends string | null>(name: string, values: readonly 
   throw new Error(`Env variable ${name} must be one of ${values.map((val) => `'${val}'`).join(", ")}`);
 }
 
+/** Gets an array of strings from the environment. */
+export function envArray(name: string, defaultValue: null): string[] | null;
+export function envArray(name: string, defaultValue?: string[]): string[];
+export function envArray(name: string, defaultValue?: string[] | null) {
+  const value = process.env[name];
+  if (value === undefined && defaultValue !== undefined) {
+    return defaultValue;
+  }
+  if (value !== undefined) {
+    return value.split(",");
+  }
+  throw new Error(`Env variable ${name} must be set`);
+}
+
 /** Gets and parses and integer from the environment. */
 export function envInteger(name: string, defaultValue: null): number | null;
 export function envInteger(name: string, defaultValue?: number): number;
