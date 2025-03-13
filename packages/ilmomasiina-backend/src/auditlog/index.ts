@@ -54,7 +54,10 @@ export function addLogEventHook(fastify: FastifyInstance): void {
     throw new Error("Not initialized");
   });
   fastify.addHook("onRequest", async (req) => {
-    (req.logEvent as AuditLogger) = eventLogger(req.ip, () => req.sessionData?.email || null);
+    const reqIp = req.ip;
+    const xRealIp = req.headers["x-real-ip"];
+    const ip = xRealIp ? xRealIp.toString() : reqIp;
+    (req.logEvent as AuditLogger) = eventLogger(ip, () => req.sessionData?.email || null);
   });
 }
 
