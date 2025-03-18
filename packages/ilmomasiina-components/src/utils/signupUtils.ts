@@ -14,6 +14,7 @@ import type {
 } from "@tietokilta/ilmomasiina-models";
 import { SignupStatus } from "@tietokilta/ilmomasiina-models";
 import { getCsvDateTimeFormatter } from "./dateFormat";
+import { SignupState, signupState } from "./signupStateText";
 
 /** Placeholder quota ID for the open quota. */
 export const OPENQUOTA = "\x00open" as const;
@@ -59,17 +60,22 @@ export type QuotaSignups = {
 
 /** Gathers all signups of an event into their assigned quotas, the open quota, and the queue. */
 export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
+  const signupsDisabled =
+    signupState(event.registrationStartDate, event.registrationEndDate).state === SignupState.disabled;
   const signups = getSignupsAsList(event);
   const quotas = [
-    ...event.quotas.map((quota) => {
-      const quotaSignups = signups.filter((signup) => signup.quotaId === quota.id && signup.status === "in-quota");
-      return {
-        ...quota,
-        signups: quotaSignups,
-        // Trust signupCount and size, unless we have concrete information that more signups exist
-        signupCount: Math.max(quotaSignups.length, Math.min(quota.signupCount, quota.size ?? Infinity)),
-      };
-    }),
+    ...event.quotas
+      // If the event does not have signups, only show quotas that somehow still have signups within.
+      .filter((quota) => !signupsDisabled || quota.signupCount > 0)
+      .map((quota) => {
+        const quotaSignups = signups.filter((signup) => signup.quotaId === quota.id && signup.status === "in-quota");
+        return {
+          ...quota,
+          signups: quotaSignups,
+          // Trust signupCount and size, unless we have concrete information that more signups exist
+          signupCount: Math.max(quotaSignups.length, Math.min(quota.signupCount, quota.size ?? Infinity)),
+        };
+      }),
   ];
 
   const { openQuotaCount, queueCount } = countOverflowSignups(event.quotas, event.openQuotaSize);
@@ -77,7 +83,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
   const openSignups = signups.filter((signup) => signup.status === "in-open");
   // Open quota is shown if the event has one, or if signups have been assigned there nevertheless.
   const openQuota =
-    openSignups.length > 0 || event.openQuotaSize > 0
+    openSignups.length > 0 || (!signupsDisabled && event.openQuotaSize > 0)
       ? [
           {
             id: OPENQUOTA,
