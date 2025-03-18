@@ -89,6 +89,12 @@
   row-gap: $spacer;
   margin-bottom: $spacer;
 
+  @if $force-link-underline {
+    :link {
+      text-decoration: underline;
+    }
+  }
+
   .spinner-border {
     align-self: center;
   }
