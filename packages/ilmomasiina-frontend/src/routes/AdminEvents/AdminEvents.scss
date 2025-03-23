@@ -1,7 +1,7 @@
 @use "@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
 
 @if $force-link-underline {
-  table.ilmo--admin-event-list :link {
+  table.ilmo--admin-event-list :link:not(.btn) {
     text-decoration: underline;
   }
 }

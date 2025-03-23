@@ -25,7 +25,7 @@ table.ilmo--event-list {
 }
 
 @if $force-link-underline {
-  table.ilmo--event-list :link {
+  table.ilmo--event-list :link:not(.btn) {
     text-decoration: underline;
   }
 }

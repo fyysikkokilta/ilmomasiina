@@ -1,6 +1,7 @@
 import React, { MouseEvent } from "react";
 
 import sumBy from "lodash-es/sumBy";
+import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -63,12 +64,12 @@ const AdminEventListItem = ({ event }: Props) => {
       <td>{status}</td>
       <td>{sumBy(quotas, "signupCount")}</td>
       <td>
-        <Link to={appPaths.adminEditEvent(id)}>{t("adminEvents.action.edit")}</Link>
-        &ensp;/&ensp;
-        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a href="#" onClick={onDelete} role="button">
+        <Button as={Link} variant="primary" size="sm" to={appPaths.adminEditEvent(id)}>
+          {t("adminEvents.action.edit")}
+        </Button>
+        <Button variant="danger" size="sm" onClick={onDelete}>
           {t("adminEvents.action.delete")}
-        </a>
+        </Button>
       </td>
     </tr>
   );
