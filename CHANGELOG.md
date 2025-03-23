@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0-alpha39
+
+- Minor layout and styling improvements to frontend
+
 ## 2.0.0-alpha38
 
 - Fix answers sticking around when updating a signup
