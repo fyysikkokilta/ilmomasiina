@@ -1,12 +1,14 @@
 @use "definitions" as *;
 
 .ilmo--form {
-  // Make forms look nicer when labels wrap
+  // Make forms look nicer when labels wrap in two column view
   .form-group.row {
     margin-bottom: 0;
 
-    > :last-child {
-      margin-bottom: 1rem;
+    @include media-breakpoint-up(sm) {
+      > :last-child {
+        margin-bottom: 1rem;
+      }
     }
   }
 
@@ -27,6 +29,12 @@
   .ilmo--label-column {
     @include media-breakpoint-up(sm) {
       text-align: right;
+    }
+    // Make empty labels not consume the height of a text line in single column view
+    @include media-breakpoint-down(xs) {
+      label:empty {
+        display: block;
+      }
     }
   }
 

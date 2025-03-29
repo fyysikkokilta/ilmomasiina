@@ -22,6 +22,7 @@ import { Question } from "../../models/question";
 import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";
 import { formatSignupForAdmin } from "../events/getEventDetails";
+import { refreshSignupPositions } from "./computeSignupPosition";
 import { signupEditable } from "./createNewSignup";
 import { NoSuchQuota, NoSuchSignup, SignupBlocked, SignupsClosed, SignupValidationError } from "./errors";
 
@@ -79,7 +80,8 @@ async function updateExistingSignup(
     },
     transaction,
   });
-  await Answer.bulkCreate(answers, { transaction });
+  // eslint-disable-next-line no-param-reassign -- signup.update() is already modifying signup
+  signup.answers = await Answer.bulkCreate(answers, { transaction });
 }
 
 /** Requires editTokenVerification and validates answers thoroughly */
@@ -291,17 +293,33 @@ export async function createSignupAsAdmin(
   const updatedSignup = await getSequelize().transaction(async (transaction) => {
     // Find the given quota and event.
     const quota = await Quota.findByPk(request.body.quotaId, {
-      attributes: [],
-      include: [{ model: Event }],
+      attributes: ["id"],
+      include: [
+        {
+          model: Event,
+          include: [
+            {
+              model: Question,
+              required: false,
+            },
+          ],
+        },
+      ],
       transaction,
     });
     if (!quota || !quota.event) throw new NoSuchQuota("Quota doesn't exist.");
 
     const signup = await Signup.create({ quotaId: quota.id }, { transaction });
+    // Set the quota, which create() doesn't do.
+    signup.quota = quota;
     await updateExistingSignupAsAdmin(signup, quota.event, request.body, transaction);
     await request.logEvent(AuditEvent.CREATE_SIGNUP, { signup, event: quota.event, transaction });
     return signup;
   });
+
+  // Refresh signup positions. Ignore errors, but wait for this to complete, so that the user
+  // gets a status on their signup before it being returned.
+  await refreshSignupPositions(updatedSignup.quota!.event!).catch((error) => console.error(error));
 
   if (request.body.sendEmail ?? true) sendSignupConfirmationMail(updatedSignup, "signup", true);
 

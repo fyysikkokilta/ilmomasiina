@@ -89,6 +89,12 @@
   row-gap: $spacer;
   margin-bottom: $spacer;
 
+  @if $force-link-underline {
+    :link {
+      text-decoration: underline;
+    }
+  }
+
   .spinner-border {
     align-self: center;
   }
@@ -121,4 +127,16 @@
 
 .event-editor--preview .ilmo--title-nav h1 {
   margin-top: 0;
+}
+
+// Apply same widths as NarrowContainer, but to the dialog
+.event-editor--signup-dialog {
+  max-width: 100% * 8 / 12 !important;
+
+  @include media-breakpoint-down(sm) {
+    max-width: 100% * 10 / 12 !important;
+  }
+  @include media-breakpoint-down(xs) {
+    max-width: 100% !important;
+  }
 }

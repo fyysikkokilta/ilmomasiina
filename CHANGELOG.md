@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0-alpha39
+
+- **Feature:** Admins can now create and edit signups via the Signups tab
+- **Feature:** Admins can now view signups grouped by quota
+- Quota information is now consistently hidden when signups are disabled for an event
+- Signup creation is now audit logged to mitigate spamming
+- Minor layout and styling improvements to frontend
+
 ## 2.0.0-alpha38
 
 - Fix answers sticking around when updating a signup

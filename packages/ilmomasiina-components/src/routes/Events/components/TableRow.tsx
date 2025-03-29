@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import { SignupStateText } from "../../../utils/signupStateText";
+import { SignupState, SignupStateText } from "../../../utils/signupStateText";
 
 type Props = {
   className: string;
@@ -27,12 +27,14 @@ const TableRow = ({ className, title, date, signupStatus, signupCount, quotaSize
         <span className="ilmo--desktop-only">{signupStatus?.shortLabel}</span>
         <span className="ilmo--mobile-only">{signupStatus?.fullLabel || signupStatus?.shortLabel}</span>
       </td>
-      <td key="signups" className="ilmo--signup-count">
-        {signupCount !== undefined && <span className="ilmo--mobile-only">{`${t("events.signupCount")} `}</span>}
-        {signupCount}
-        {quotaSize && <>&ensp;/&ensp;</>}
-        {quotaSize || ""}
-      </td>
+      {signupStatus?.state.state !== SignupState.disabled && (
+        <td key="signups" className="ilmo--signup-count">
+          {signupCount !== undefined && <span className="ilmo--mobile-only">{`${t("events.signupCount")} `}</span>}
+          {signupCount}
+          {quotaSize && <>&ensp;/&ensp;</>}
+          {quotaSize || ""}
+        </td>
+      )}
     </tr>
   );
 };
