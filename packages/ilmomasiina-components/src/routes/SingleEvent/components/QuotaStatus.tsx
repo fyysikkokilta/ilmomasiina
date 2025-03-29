@@ -9,6 +9,8 @@ import QuotaProgress from "./QuotaProgress";
 const QuotaStatus = () => {
   const { event, signupsByQuota } = useSingleEventContext();
   const { t } = useTranslation();
+
+  if (!signupsByQuota?.length) return null;
   return (
     <div className="ilmo--side-widget">
       <h3>{t("singleEvent.quotaCounts.title")}</h3>

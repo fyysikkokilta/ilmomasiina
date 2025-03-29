@@ -8,7 +8,7 @@ import type {
   UserEventListItem,
   UserEventListResponse,
 } from "@tietokilta/ilmomasiina-models";
-import { signupState, SignupStateInfo } from "./signupStateText";
+import { SignupState, signupState, SignupStateInfo } from "./signupStateText";
 
 export interface EventTableOptions {
   /** If true, quotas are not placed on separate rows. */
@@ -57,8 +57,8 @@ export function eventToRows(event: UserEventListItem, { compact }: EventTableOpt
     },
   ];
 
-  // We're done for compact format
-  if (compact) return rows;
+  // We're done for compact format and events without a signup
+  if (compact || state.state === SignupState.disabled) return rows;
 
   // Multiple quotas go on their own rows
   if (quotas.length > 1) {
