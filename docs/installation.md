@@ -116,6 +116,8 @@ Especially for development, running PostgreSQL with Docker may be the easiest op
 
 #### Ubuntu/Debian MariaDB installation
 
+**NOTE:** MySQL will not be supported by Ilmomasiina 3.0.
+
 If you intend to run your own database, you can follow these instructions to install one on a Ubuntu or Debian system.
 
 1. Install MariaDB with `sudo apt install default-mysql-server`
