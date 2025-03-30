@@ -16,6 +16,11 @@ $text-muted: #888 !default;
 // You can disable this if you use something light.
 $force-link-underline: true !default;
 
+// Default button hover color logic doesn't work with Tietokilta's black $primary.
+// You can disable this if you use something light.
+$lighter-primary-hover: true !default;
+$lighter-secondary-hover: true !default;
+
 // Additional colors, only used by Ilmomasiina's SCSS.
 
 $secondary-background: #f1f1f1 !default;
