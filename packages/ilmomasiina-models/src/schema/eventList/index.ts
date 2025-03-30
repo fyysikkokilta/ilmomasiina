@@ -1,6 +1,12 @@
 import { Static, Type } from "@sinclair/typebox";
 
-import { adminEventListAttributes, eventIdentity, userEventListAttributes } from "../event/attributes";
+import {
+  adminEventListAttributes,
+  eventIdentity,
+  userEventLanguages,
+  userEventListAttributes,
+  userPerLanguageAttributes,
+} from "../event/attributes";
 import { quotaWithSignupCount } from "../quotaWithSignups";
 
 /** Schema for an item of an event list from the admin API. */
@@ -21,6 +27,8 @@ export const adminEventListResponse = Type.Array(adminEventListItemSchema);
 const userEventListItemSchema = Type.Composite([
   eventIdentity,
   userEventListAttributes,
+  userPerLanguageAttributes,
+  userEventLanguages,
   Type.Object({
     quotas: Type.Array(quotaWithSignupCount, {
       description: "The quotas in this event, with signup counts.",

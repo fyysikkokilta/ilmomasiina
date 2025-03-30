@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { getSequelize } from ".";
+import { getSequelize } from "..";
 
 /**
  * Portable way to sort NULLs first across databases.

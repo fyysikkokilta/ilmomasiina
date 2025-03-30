@@ -27,6 +27,7 @@ export const previewDummyQuota = (event?: UserEventResponse): SignupForEdit["quo
     id: `preview${Math.random()}`,
     title: "\u2013",
     size: 0,
+    languages: {},
   };
 
 export const previewDummySignup = (event: UserEventResponse): SignupForEdit => ({

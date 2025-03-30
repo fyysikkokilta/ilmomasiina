@@ -17,11 +17,12 @@ import {
   Sequelize,
 } from "sequelize";
 
-import type { EventAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
+import type { EventAttributes, EventLanguage } from "@tietokilta/ilmomasiina-models/dist/models";
 import config from "../config";
 import type { Question } from "./question";
 import type { Quota } from "./quota";
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
+import { jsonColumnGetter } from "./util/json";
 
 // Drop updatedAt so we don't need to define it manually in Event.init()
 interface EventManualAttributes extends Omit<EventAttributes, "updatedAt"> {}
@@ -43,6 +44,8 @@ export interface EventCreationAttributes
     | "nameQuestion"
     | "emailQuestion"
     | "verificationEmail"
+    | "languages"
+    | "defaultLanguage"
   > {}
 
 export class Event extends Model<EventManualAttributes, EventCreationAttributes> implements EventAttributes {
@@ -66,6 +69,8 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
   public nameQuestion!: boolean;
   public emailQuestion!: boolean;
   public verificationEmail!: string | null;
+  public languages!: Record<string, EventLanguage>;
+  public defaultLanguage!: string;
 
   public questions?: Question[];
   public getQuestions!: HasManyGetAssociationsMixin<Question>;
@@ -194,6 +199,20 @@ export default function setupEventModel(sequelize: Sequelize) {
       },
       verificationEmail: {
         type: DataTypes.TEXT,
+      },
+      languages: {
+        type: DataTypes.JSON,
+        allowNull: false,
+        defaultValue: {},
+        get: jsonColumnGetter<Record<string, EventLanguage>>("languages"),
+      },
+      defaultLanguage: {
+        type: DataTypes.STRING(8),
+        allowNull: false,
+        // The default value used for this depends on config, so we can't set it in the database easily.
+        get(): string {
+          return this.getDataValue("defaultLanguage") ?? config.defaultLanguage;
+        },
       },
     },
     {

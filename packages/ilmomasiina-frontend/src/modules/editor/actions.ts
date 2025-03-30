@@ -24,6 +24,7 @@ import {
   EVENT_SAVING,
   EVENT_SLUG_CHECKED,
   EVENT_SLUG_CHECKING,
+  LANGUAGE_SELECTED,
   MOVE_TO_QUEUE_CANCELED,
   MOVE_TO_QUEUE_WARNING,
   RESET,
@@ -51,6 +52,8 @@ export const defaultEvent = (): EditorEvent => ({
   description: "",
   price: "",
   signupsPublic: false,
+  languages: {},
+  defaultLanguage: DEFAULT_LANGUAGE,
 
   registrationStartDate: null,
   registrationEndDate: null,
@@ -60,8 +63,9 @@ export const defaultEvent = (): EditorEvent => ({
   quotas: [
     {
       key: "new",
-      title: "Kiintiö",
+      title: "Kiintiö", // TODO
       size: 20,
+      languages: {},
     },
   ],
 
@@ -115,6 +119,12 @@ export const slugAvailabilityChecked = (result: CheckSlugResponse | null) =>
   <const>{
     type: EVENT_SLUG_CHECKED,
     payload: result,
+  };
+
+export const languageSelected = (language: string) =>
+  <const>{
+    type: LANGUAGE_SELECTED,
+    payload: language,
   };
 
 export const saving = () =>
@@ -180,6 +190,7 @@ export type EditorActions =
   | ReturnType<typeof loadFailed>
   | ReturnType<typeof checkingSlugAvailability>
   | ReturnType<typeof slugAvailabilityChecked>
+  | ReturnType<typeof languageSelected>
   | ReturnType<typeof saving>
   | ReturnType<typeof moveToQueueWarning>
   | ReturnType<typeof moveToQueueCanceled>

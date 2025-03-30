@@ -1,10 +1,14 @@
 import EventAttributes from "./event";
 
-export default interface QuotaAttributes {
+export interface QuotaLanguage {
+  title: string;
+}
+
+export default interface QuotaAttributes extends QuotaLanguage {
   id: string;
   order: number;
-  title: string;
   size: number | null;
   eventId: EventAttributes["id"];
+  languages: Record<string, Partial<QuotaLanguage>>;
   signupCount?: number;
 }

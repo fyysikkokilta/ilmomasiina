@@ -12,6 +12,7 @@ import type { AnswerAttributes } from "@tietokilta/ilmomasiina-models/dist/model
 import type { Question } from "./question";
 import { RANDOM_ID_LENGTH } from "./randomId";
 import { Signup } from "./signup";
+import { jsonColumnGetter } from "./util/json";
 
 export interface AnswerCreationAttributes extends Optional<AnswerAttributes, "id"> {}
 
@@ -54,11 +55,7 @@ export default function setupAnswerModel(sequelize: Sequelize) {
       answer: {
         type: DataTypes.JSON,
         allowNull: false,
-        get(): string | string[] {
-          // For whatever reason Sequelize doesn't do this automatically.
-          const json = this.getDataValue("answer");
-          return json === null ? null : JSON.parse(json as unknown as string);
-        },
+        get: jsonColumnGetter<string | string[]>("answer"),
       },
     },
     {

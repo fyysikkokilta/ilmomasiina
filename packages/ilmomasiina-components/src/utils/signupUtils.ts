@@ -56,7 +56,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
     ...event.quotas
       // If the event does not have signups, only show quotas that somehow still have signups within.
       .filter((quota) => !signupsDisabled || quota.signupCount > 0)
-      .map((quota) => {
+      .map((quota): QuotaSignups => {
         const quotaSignups = signups.filter((signup) => signup.quota.id === quota.id && signup.status === "in-quota");
         return {
           ...quota,
@@ -72,7 +72,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
 
   const openSignups = signups.filter((signup) => signup.status === "in-open");
   // Open quota is shown if the event has one, or if signups have been assigned there nevertheless.
-  const openQuota =
+  const openQuota: QuotaSignups[] =
     openSignups.length > 0 || (!signupsDisabled && event.openQuotaSize > 0)
       ? [
           {
@@ -80,6 +80,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
             id: null,
             title: null,
             size: event.openQuotaSize,
+            languages: {},
             signups: openSignups,
             signupCount: Math.max(openQuotaCount, openSignups.length),
           },
@@ -88,7 +89,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
 
   const queueSignups = signups.filter((signup) => signup.status === "in-queue");
   // Queue is shown if signups have been assigned there.
-  const queue =
+  const queue: QuotaSignups[] =
     queueSignups.length > 0
       ? [
           {
@@ -96,6 +97,7 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
             id: null,
             title: null,
             size: null,
+            languages: {},
             signups: queueSignups,
             signupCount: Math.max(queueCount, queueSignups.length),
           },

@@ -13,16 +13,12 @@ export const questionIdentity = Type.Object({
   id: questionID,
 });
 
-/** Editable attributes of a question. */
-export const questionAttributes = Type.Object({
+/** Editable attributes of a question language version. */
+export const questionPerLanguageAttributes = Type.Object({
   question: Type.String({
     description: "The question shown to attendees.",
     minLength: 1,
     maxLength: 255,
-  }),
-  type: Type.Enum(QuestionType, {
-    title: "QuestionType",
-    description: "The type of answer expected.",
   }),
   options: Nullable(
     Type.Array(
@@ -34,10 +30,25 @@ export const questionAttributes = Type.Object({
       description: "For select or checkbox questions, the options available.",
     },
   ),
-  required: Type.Boolean({
-    description: "Whether to require an answer to this question from all attendees.",
-  }),
-  public: Type.Boolean({
-    description: "Whether to show the answers to this question publicly.",
-  }),
 });
+
+/** Schema for a question language version. */
+export const questionLanguage = Type.Partial(questionPerLanguageAttributes);
+
+/** Editable attributes of a question. */
+export const questionAttributes = Type.Composite([
+  questionPerLanguageAttributes,
+  Type.Object({
+    type: Type.Enum(QuestionType, {
+      title: "QuestionType",
+      description: "The type of answer expected.",
+    }),
+    required: Type.Boolean({
+      description: "Whether to require an answer to this question from all attendees.",
+    }),
+    public: Type.Boolean({
+      description: "Whether to show the answers to this question publicly.",
+    }),
+    languages: Type.Record(Type.String({ maxLength: 8 }), questionLanguage),
+  }),
+]);

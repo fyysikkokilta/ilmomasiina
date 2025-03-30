@@ -5,11 +5,13 @@ import { quotaCreate, quotaUpdate } from "../quota";
 import { adminQuotaWithSignups, userQuotaWithSignups } from "../quotaWithSignups";
 import {
   adminEventDetailsAttributes,
+  adminEventLanguage,
   eventDynamicAttributes,
   eventID,
   eventIdentity,
   eventSlug,
   userEventDetailsAttributes,
+  userEventLanguage,
 } from "./attributes";
 
 /** Response schema for fetching or modifying an event in the admin API. */
@@ -105,3 +107,8 @@ export type EventUpdateBody = Static<typeof eventUpdateBody>;
 export type AdminEventResponse = Static<typeof adminEventResponse>;
 /** Response schema for fetching an event from the public API. */
 export type UserEventResponse = Static<typeof userEventResponse>;
+
+/** Schema for an event language version for admins. */
+export type AdminEventLanguage = Static<typeof adminEventLanguage>;
+/** Schema for an event language version. */
+export type UserEventLanguage = Static<typeof userEventLanguage>;

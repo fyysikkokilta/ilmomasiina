@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 
+import { mapValues } from "lodash-es";
 import { Button, Col, Row } from "react-bootstrap";
 import { UseFieldConfig } from "react-final-form";
 import { FieldArrayRenderProps, useFieldArray } from "react-final-form-arrays";
@@ -9,8 +10,10 @@ import { SortEnd } from "react-sortable-hoc";
 import { FieldRow } from "@tietokilta/ilmomasiina-components";
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import useShallowMemo from "@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo";
-import { EditorQuota } from "../../../modules/editor/types";
+import { EditorEvent, EditorQuota } from "../../../modules/editor/types";
 import useEditorErrors from "./errors";
+import { useFieldValue } from "./hooks";
+import LocalizedFieldRow from "./LocalizedFieldRow";
 import Sortable from "./Sortable";
 
 type QuotaRowProps = {
@@ -33,8 +36,10 @@ const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
   return (
     <Row className="quota-body">
       <Col xs="12" sm="10">
-        <FieldRow
+        <LocalizedFieldRow
           name={`${name}.title`}
+          localizedName={`${name}.languages.{}.title`}
+          defaultAsPlaceholder
           label={t("editor.quotas.quotaName")}
           help={[
             isOnly ? t("editor.quotas.quotaName.singleQuota") : "",
@@ -71,14 +76,15 @@ const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
 
 const Quotas = () => {
   const { t } = useTranslation();
-
   const { fields } = useFieldArray<EditorQuota>("quotas");
+  const languages = useFieldValue<EditorEvent["languages"]>("languages");
 
   const addQuota = useEvent(() => {
     fields.push({
       key: `new-${Math.random()}`,
       title: "",
       size: null,
+      languages: mapValues(languages, () => ({})),
     });
   });
 

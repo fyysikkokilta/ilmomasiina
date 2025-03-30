@@ -1,6 +1,6 @@
 import { Static, Type } from "@sinclair/typebox";
 
-import { questionAttributes, questionID, questionIdentity } from "./attributes";
+import { questionAttributes, questionID, questionIdentity, questionLanguage } from "./attributes";
 
 export { questionID } from "./attributes";
 
@@ -17,7 +17,15 @@ export const questionUpdate = Type.Composite([Type.Partial(questionIdentity), qu
 
 /** Question ID type. Randomly generated alphanumeric string. */
 export type QuestionID = Static<typeof questionID>;
+
 /** Schema for a question. */
 export type Question = Static<typeof question>;
+
+/** Schema for a question language version. */
+export type QuestionLanguage = Static<typeof questionLanguage>;
+
+/** Schema for updating a question. */
+export type QuestionCreate = Static<typeof questionCreate>;
+
 /** Schema for updating a question. */
 export type QuestionUpdate = Static<typeof questionUpdate>;

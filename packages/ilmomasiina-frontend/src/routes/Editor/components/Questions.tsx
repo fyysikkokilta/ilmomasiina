@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 
+import { mapValues } from "lodash-es";
 import { Button, Col, Form, FormCheckProps, InputGroup, Row } from "react-bootstrap";
 import { Field, FieldRenderProps, useForm } from "react-final-form";
 import { FieldArray, FieldArrayRenderProps, useFieldArray } from "react-final-form-arrays";
@@ -10,9 +11,10 @@ import { FieldRow } from "@tietokilta/ilmomasiina-components";
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import useShallowMemo from "@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo";
 import { QuestionType, questionUpdate } from "@tietokilta/ilmomasiina-models";
-import { EditorQuestion } from "../../../modules/editor/types";
+import { EditorEvent, EditorQuestion } from "../../../modules/editor/types";
 import useEditorErrors from "./errors";
 import { useFieldValue } from "./hooks";
+import LocalizedFieldRow from "./LocalizedFieldRow";
 import SelectBox from "./SelectBox";
 import Sortable from "./Sortable";
 
@@ -76,8 +78,10 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
   return (
     <Row className="question-body px-0">
       <Col xs="12" sm="9" xl="10">
-        <FieldRow
+        <LocalizedFieldRow
           name={`${name}.question`}
+          localizedName={`${name}.languages.{}.question`}
+          defaultAsPlaceholder
           type="text"
           label={t("editor.questions.questionText")}
           required
@@ -149,8 +153,8 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
 
 const Questions = () => {
   const { t } = useTranslation();
-
   const { fields } = useFieldArray<EditorQuestion>("questions");
+  const languages = useFieldValue<EditorEvent["languages"]>("languages");
 
   const addQuestion = useEvent(() => {
     fields.push({
@@ -160,6 +164,7 @@ const Questions = () => {
       question: "",
       type: QuestionType.TEXT,
       options: [""],
+      languages: mapValues(languages, () => ({})),
     });
   });
 

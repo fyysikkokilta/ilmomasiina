@@ -6,7 +6,7 @@ export type BaseFieldRowProps = {
   /** Passed to the `FormGroup`. */
   controlId?: string;
   /** The label placed in the left column. */
-  label?: string;
+  label?: ReactNode;
   /** The help string placed below the field. */
   help?: ReactNode;
   /** Whether the field is required. */

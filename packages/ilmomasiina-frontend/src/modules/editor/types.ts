@@ -34,6 +34,7 @@ export interface EditorState {
   isNew: boolean;
   loadError?: ApiError;
   slugAvailability: null | "checking" | CheckSlugResponse;
+  selectedLanguage: string;
   allCategories: null | string[];
   moveToQueueModal: { count: number } | null;
   editConflictModal: EditConflictError | null;

@@ -1,13 +1,17 @@
 import { QuestionType } from "../enum";
 import EventAttributes from "./event";
 
-export default interface QuestionAttributes {
+export interface QuestionLanguage {
+  question: string;
+  options: string[] | null;
+}
+
+export default interface QuestionAttributes extends QuestionLanguage {
   id: string;
   order: number;
-  question: string;
   type: QuestionType;
-  options: string[] | null;
   required: boolean;
   public: boolean;
+  languages: Record<string, Partial<QuestionLanguage>>;
   eventId: EventAttributes["id"];
 }

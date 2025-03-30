@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { createEvents, DateArray } from "ics";
 import { Op } from "sequelize";
 
-import config from "../../config";
+import config, { eventDetailsUrl } from "../../config";
 import { Event } from "../../models/event";
 
 function dateToArray(date: Date) {
@@ -50,7 +50,7 @@ export async function eventsAsICal() {
       description: event.description || undefined, // TODO convert markdown
       location: event.location || undefined,
       categories: event.category ? [event.category] : undefined,
-      url: config.eventDetailsUrl.replace(/\{slug\}/g, event.slug).replace(/\{lang\}/g, config.mailDefaultLang),
+      url: eventDetailsUrl({ slug: event.slug, lang: config.defaultLanguage }),
     })),
   );
 

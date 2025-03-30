@@ -7,11 +7,14 @@ import * as en from "./locales/en.json";
 import * as fi from "./locales/fi.json";
 
 export const defaultNS = ["components"] as const;
-export const resources = {
+const resources = {
   // this way we generate typescript errors if not exact match
-  fi: fi as typeof en,
-  en: en as typeof fi,
+  fi: fi satisfies typeof en,
+  en: en satisfies typeof fi,
 } as const;
+
+export type KnownLanguage = keyof typeof resources;
+export const knownLanguages = Object.keys(resources) as KnownLanguage[];
 
 export { resources as i18nResources };
 
