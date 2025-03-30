@@ -7,6 +7,7 @@ import _0002_add_event_endDate from "./0002-add-event-endDate";
 import _0003_add_signup_language from "./0003-add-signup-language";
 import _0004_answers_to_json from "./0004-answers-to-json";
 import _0005_add_indexes from "./0005-add-indexes";
+import _0006_json_datatype from "./0006-json-datatype";
 
 const migrations: RunnableMigration<Sequelize>[] = [
   _0000_initial,
@@ -15,6 +16,7 @@ const migrations: RunnableMigration<Sequelize>[] = [
   _0003_add_signup_language,
   _0004_answers_to_json,
   _0005_add_indexes,
+  _0006_json_datatype,
 ];
 
 export default migrations;

@@ -86,16 +86,12 @@ export default function setupQuestionModel(sequelize: Sequelize) {
         allowNull: false,
       },
       options: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: true,
-        // TODO: Once we upgrade to Sequelize v7, try migrating this to custom datatypes again.
         get(): string[] {
+          // For whatever reason Sequelize doesn't do this automatically.
           const json = this.getDataValue("options");
           return json === null ? null : JSON.parse(json as unknown as string);
-        },
-        set(val: string[] | null) {
-          const json = val === null ? null : JSON.stringify(val);
-          this.setDataValue("options", json as unknown as string[]);
         },
       },
       required: {
