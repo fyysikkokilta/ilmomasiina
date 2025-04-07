@@ -120,7 +120,7 @@ const SignupTable = ({ event, signups, showQuota }: TableProps) => {
 const csvOptions: CSVOptions = { delimiter: "\t" };
 
 const SignupsTab = () => {
-  const event = useTypedSelector((state) => state.editor.event);
+  const event = useTypedSelector((state) => state.editor.event)!;
   const dispatch = useTypedDispatch();
 
   const signups = useMemo(() => event && getSignupsForAdminList(event), [event]);
@@ -139,10 +139,6 @@ const SignupsTab = () => {
   } = useTranslation();
 
   const createSignup = useEvent(() => dispatch(editNewSignup({ language })));
-
-  if (!event || !signups?.length || !signupsByQuota) {
-    return <p>{t("editor.signups.noSignups")}</p>;
-  }
 
   const isSingleQuota = event.quotas.length <= 1;
 
@@ -167,7 +163,10 @@ const SignupsTab = () => {
           {t("editor.signups.download")}
         </CSVLink>
       </nav>
-      {grouped ? (
+      {/* eslint-disable-next-line no-nested-ternary */}
+      {!signups.length ? (
+        <p>{t("editor.signups.noSignups")}</p>
+      ) : grouped ? (
         signupsByQuota.map((quota) => (
           <Fragment key={quota.id ?? quota.type}>
             <h3>{quota.type === SignupStatus.IN_QUEUE ? t("editor.signups.inQueue") : quota.title}</h3>
