@@ -67,6 +67,14 @@ const config = {
   dbDatabase: envString("DB_DATABASE", null),
   /** Required to run tests, as they reset the test database for every test. */
   allowTestsToResetDb: envBoolean("THIS_IS_A_TEST_DB_AND_CAN_BE_WIPED", false),
+  /** Maximum number of connections in the connection pool. */
+  dbPoolMax: envInteger("DB_POOL_MAX", 5),
+  /** Minimum number of connections in the connection pool. */
+  dbPoolMin: envInteger("DB_POOL_MIN", 0),
+  /** Maximum time to acquire a connection from the pool in milliseconds. */
+  dbPoolAcquire: envInteger("DB_POOL_ACQUIRE", 30000),
+  /** Maximum time a connection can be idle in the pool in milliseconds. */
+  dbPoolIdle: envInteger("DB_POOL_IDLE", 10000),
 
   /** Salt for generating legacy edit tokens. Used only to keep tokens valid from a previous installation. */
   oldEditTokenSalt: envString("EDIT_TOKEN_SALT", null),

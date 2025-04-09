@@ -2,7 +2,21 @@ import { Dialect, Options, Sequelize } from "sequelize";
 
 import appConfig from "../config";
 
-const { clearDbUrl, dbDialect, dbHost, dbPort, dbSsl, dbDatabase, dbUser, dbPassword, debugDbLogging } = appConfig;
+const {
+  clearDbUrl,
+  dbDialect,
+  dbHost,
+  dbPort,
+  dbSsl,
+  dbDatabase,
+  dbUser,
+  dbPassword,
+  debugDbLogging,
+  dbPoolMax,
+  dbPoolMin,
+  dbPoolAcquire,
+  dbPoolIdle,
+} = appConfig;
 
 let auth: Options;
 
@@ -40,6 +54,12 @@ if (clearDbUrl) {
 const sequelizeConfig = {
   ...auth,
   logging: debugDbLogging,
+  pool: {
+    max: dbPoolMax,
+    min: dbPoolMin,
+    acquire: dbPoolAcquire,
+    idle: dbPoolIdle,
+  },
 };
 
 export = {
