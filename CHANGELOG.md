@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0-alpha41
+
+- Fix issue that caused failure in rendering the CreateEvent page
+
 ## 2.0.0.-alpha40
 
 - Fix issue that caused the backend to lock up on concurrent signups
