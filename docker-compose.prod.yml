@@ -22,6 +22,8 @@ services:
         - BRANDING_FOOTER_HOME_LINK=http://fyysikkokilta.fi
         - BRANDING_LOGIN_PLACEHOLDER_EMAIL=it@fyysikkokilta.fi
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - NODE_ENV=production
       - ENFORCE_HTTPS=false
