@@ -144,8 +144,10 @@ const SignupsTab = () => {
 
   const createSignup = useEvent(() => dispatch(editNewSignup({ language })));
 
-  if (!event || !signups?.length || !signupsByQuota) {
-    return <p>{t("editor.signups.noSignups")}</p>;
+  if (!event) {
+    return (
+      <p>{t("editor.signups.noSignups")}</p>
+    )
   }
 
   const isSingleQuota = event.quotas.length <= 1;
@@ -172,8 +174,11 @@ const SignupsTab = () => {
           {t("editor.signups.download")}
         </CSVLink>
       </nav>
-      {grouped ? (
-        signupsByQuota.map((quota) => (
+      {/* eslint-disable-next-line no-nested-ternary */}
+      {!signups?.length ? (
+        <p>{t("editor.signups.noSignups")}</p>
+      ) : grouped ? (
+        signupsByQuota?.map((quota) => (
           <Fragment key={quota.id ?? quota.type}>
             <h3>{quota.type === SignupStatus.IN_QUEUE ? t("editor.signups.inQueue") : quota.title}</h3>
             <SignupTable event={event} signups={quota.signups} showQuota={false} />
