@@ -7,9 +7,9 @@ import { useTranslation } from "react-i18next";
 
 import { knownLanguages } from "@tietokilta/ilmomasiina-components";
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
-import { AdminEventLanguage, QuestionLanguage, QuotaLanguage } from "@tietokilta/ilmomasiina-models";
+import { AdminEventLanguage } from "@tietokilta/ilmomasiina-models";
 import { languageSelected } from "../../../modules/editor/actions";
-import { EditorEvent, EditorQuestion, EditorQuota } from "../../../modules/editor/types";
+import { EditorEvent } from "../../../modules/editor/types";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
 
 type VersionProps = { language: string };
@@ -22,7 +22,7 @@ const LanguageVersion = ({ language }: VersionProps) => {
   const {
     input: { value: languages },
   } = useField<EditorEvent["languages"]>("languages");
-  const { change, getFieldState, getState } = useForm<EditorEvent>();
+  const { change, getState } = useForm<EditorEvent>();
   const selectedLanguage = useTypedSelector((state) => state.editor.selectedLanguage);
   const dispatch = useTypedDispatch();
 
@@ -37,9 +37,9 @@ const LanguageVersion = ({ language }: VersionProps) => {
   const setAsDefault = useEvent(() => {
     // If the language is present, we need to swap it with the default.
     if (isPresent) {
+      const { values } = getState();
       // First, extract all the language version fields from the event, and add the result to languages.
-      const oldDefaultLanguage: Required<AdminEventLanguage> = pick(
-        getState().values,
+      const eventKeys = [
         "description",
         "title",
         "price",
@@ -47,47 +47,31 @@ const LanguageVersion = ({ language }: VersionProps) => {
         "webpageUrl",
         "facebookUrl",
         "verificationEmail",
-      );
+      ] as const;
+      const oldDefaultLanguage: AdminEventLanguage = {
+        ...pick(values, eventKeys),
+        questions: values.questions.map((question) => pick(question, "question", "options")),
+        quotas: values.quotas.map((quota) => pick(quota, "title")),
+      };
       change("languages", {
         ...omit(languages, language),
         [defaultLanguage]: oldDefaultLanguage,
       });
       // Then, overwrite the event fields with the new default language.
       const newDefaultLanguage = languages[language];
-      for (const key of Object.keys(newDefaultLanguage) as (keyof AdminEventLanguage)[]) {
-        change(key, newDefaultLanguage[key]);
-      }
-      // Do the same for quotas and questions.
-      change(
-        "quotas",
-        getFieldState("quotas")!.value!.map((quota): EditorQuota => {
-          const oldDefault: Required<QuotaLanguage> = pick(quota, "title");
-          const newDefault = quota.languages[language];
-          return {
-            ...quota,
-            ...newDefault,
-            languages: {
-              ...omit(quota.languages, language),
-              [defaultLanguage]: oldDefault,
-            },
-          };
-        }),
-      );
+      for (const key of eventKeys) change(key, newDefaultLanguage[key]);
       change(
         "questions",
-        getFieldState("questions")!.value!.map((question): EditorQuestion => {
-          const oldDefault: Required<QuestionLanguage> = pick(question, "question", "options");
-          const newDefault = question.languages[language];
-          return {
-            ...question,
-            ...newDefault,
-            options: newDefault.options ?? question.options,
-            languages: {
-              ...omit(question.languages, language),
-              [defaultLanguage]: oldDefault,
-            },
-          };
-        }),
+        values.questions.map((question, i) => ({
+          ...question,
+          ...newDefaultLanguage.questions[i],
+          // options needs separate handling because it's non-nullable in EditorQuestion
+          options: newDefaultLanguage.questions[i].options ?? question.options,
+        })),
+      );
+      change(
+        "quotas",
+        values.quotas.map((quota, i) => ({ ...quota, ...newDefaultLanguage.quotas[i] })),
       );
     }
     change("defaultLanguage", language);
@@ -96,43 +80,32 @@ const LanguageVersion = ({ language }: VersionProps) => {
   });
 
   const add = useEvent(() => {
-    // Add empty language to event, all quotas and all questions.
-    change("languages", { ...languages, [language]: {} });
-    change(
-      "quotas",
-      getFieldState("quotas")!.value!.map((quota) => ({
-        ...quota,
-        languages: { ...quota.languages, [language]: {} },
-      })),
-    );
-    change(
-      "questions",
-      getFieldState("questions")!.value!.map((question) => ({
-        ...question,
-        languages: { ...question.languages, [language]: {} },
-      })),
-    );
+    const { quotas, questions } = getState().values;
+    // Add empty language to event.
+    change("languages", {
+      ...languages,
+      [language]: {
+        title: "",
+        description: null,
+        price: null,
+        location: null,
+        webpageUrl: null,
+        facebookUrl: null,
+        verificationEmail: null,
+        quotas: quotas.map(() => ({ title: "" })),
+        questions: questions.map((question) => ({
+          question: "",
+          options: question.options.map(() => ""),
+        })),
+      },
+    });
     // Finally, start editing the new language.
     dispatch(languageSelected(language));
   });
 
   const remove = useEvent(() => {
-    // Remove language from event, all quotas and all questions.
+    // Remove language from event.
     change("languages", omit(languages, language));
-    change(
-      "quotas",
-      getFieldState("quotas")!.value!.map((quota) => ({
-        ...quota,
-        languages: omit(quota.languages, language),
-      })),
-    );
-    change(
-      "questions",
-      getFieldState("questions")!.value!.map((question) => ({
-        ...question,
-        languages: omit(question.languages, language),
-      })),
-    );
     // Switch to default language if we removed the active one.
     if (isEditing) dispatch(languageSelected(defaultLanguage));
   });

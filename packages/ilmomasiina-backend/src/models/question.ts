@@ -19,7 +19,7 @@ import {
 } from "sequelize";
 
 import { QuestionType } from "@tietokilta/ilmomasiina-models";
-import type { QuestionAttributes, QuestionLanguage } from "@tietokilta/ilmomasiina-models/dist/models";
+import type { QuestionAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
 import type { Answer } from "./answer";
 import type { Event } from "./event";
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
@@ -36,7 +36,6 @@ export class Question extends Model<QuestionAttributes, QuestionCreationAttribut
   public options!: string[] | null;
   public required!: boolean;
   public public!: boolean;
-  public languages!: Record<string, QuestionLanguage>;
 
   public eventId!: Event["id"];
   public event?: Event;
@@ -101,12 +100,6 @@ export default function setupQuestionModel(sequelize: Sequelize) {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
-      },
-      languages: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: {},
-        get: jsonColumnGetter<Record<string, QuestionLanguage>>("languages"),
       },
     },
     {

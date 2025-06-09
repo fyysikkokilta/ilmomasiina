@@ -1,26 +1,27 @@
 import React, { useMemo } from "react";
 
-import { mapValues } from "lodash-es";
 import { Button, Col, Row } from "react-bootstrap";
 import { UseFieldConfig } from "react-final-form";
-import { FieldArrayRenderProps, useFieldArray } from "react-final-form-arrays";
 import { useTranslation } from "react-i18next";
 import { SortEnd } from "react-sortable-hoc";
 
 import { FieldRow } from "@tietokilta/ilmomasiina-components";
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import useShallowMemo from "@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo";
-import { EditorEvent, EditorQuota } from "../../../modules/editor/types";
+import { QuotaLanguage } from "@tietokilta/ilmomasiina-models";
+import { EditorQuota } from "../../../modules/editor/types";
 import useEditorErrors from "./errors";
 import { useFieldValue } from "./hooks";
 import LocalizedFieldRow from "./LocalizedFieldRow";
 import Sortable from "./Sortable";
+import useFieldArrayMap from "./useFieldArrayMap";
+import useLocalizedFieldArrayMutators from "./useLocalizedFieldArrayMutators";
 
 type QuotaRowProps = {
   name: string;
   index: number;
   isOnly: boolean;
-  remove: FieldArrayRenderProps<EditorQuota, HTMLElement>["fields"]["remove"];
+  remove: (index: number) => void;
 };
 
 const numberConfig: UseFieldConfig<number | null> = {
@@ -38,7 +39,6 @@ const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
       <Col xs="12" sm="10">
         <LocalizedFieldRow
           name={`${name}.title`}
-          localizedName={`${name}.languages.{}.title`}
           defaultAsPlaceholder
           label={t("editor.quotas.quotaName")}
           help={[
@@ -76,26 +76,29 @@ const QuotaRow = ({ name, index, isOnly, remove }: QuotaRowProps) => {
 
 const Quotas = () => {
   const { t } = useTranslation();
-  const { fields } = useFieldArray<EditorQuota>("quotas");
-  const languages = useFieldValue<EditorEvent["languages"]>("languages");
+  const quotas = useFieldValue<EditorQuota[]>("quotas");
+  const { map: mapFields, length } = useFieldArrayMap("quotas");
+  const { push, move, remove } = useLocalizedFieldArrayMutators<EditorQuota, QuotaLanguage>("quotas");
 
   const addQuota = useEvent(() => {
-    fields.push({
-      key: `new-${Math.random()}`,
-      title: "",
-      size: null,
-      languages: mapValues(languages, () => ({})),
-    });
+    push(
+      {
+        key: `new-${Math.random()}`,
+        title: "",
+        size: null,
+      },
+      {
+        title: "",
+      },
+    );
   });
 
-  const updateOrder = useEvent(({ newIndex, oldIndex }: SortEnd) => fields.move(oldIndex, newIndex));
+  const updateOrder = useEvent(({ newIndex, oldIndex }: SortEnd) => move(oldIndex, newIndex));
 
-  const keys = useShallowMemo(fields.value.map((item) => item.key));
+  const keys = useShallowMemo(quotas.map((item) => item.key));
   const quotaItems = useMemo(
     () =>
-      fields.map((name, i) => (
-        <QuotaRow key={keys[i]} name={name} index={i} remove={fields.remove} isOnly={fields.length === 1} />
-      )),
+      mapFields((name, i) => <QuotaRow key={keys[i]} name={name} index={i} remove={remove} isOnly={length === 1} />),
     // This list only invalidates when the question positions or count change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [keys],

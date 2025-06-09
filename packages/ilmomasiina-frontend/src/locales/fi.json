@@ -232,7 +232,7 @@
     "editor.questions.questionType.checkbox": "Monivalinta (voi valita monta)",
     "editor.questions.questionRequired": "Pakollinen",
     "editor.questions.questionPublic": "Julkinen",
-    "editor.questions.questionOptions": "Vastausvaihtoehto",
+    "editor.questions.questionOptions": "Vastaus\u00ADvaihtoehto",
     "editor.questions.questionOptions.add": "Lisää vastausvaihtoehto",
     "editor.questions.questionOptions.delete": "Poista",
     "editor.emails.verificationEmail": "Vahvistusviesti sähköpostiin",

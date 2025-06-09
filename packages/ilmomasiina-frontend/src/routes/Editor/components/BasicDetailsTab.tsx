@@ -99,7 +99,6 @@ const BasicDetailsTab = () => {
       </FieldRow>
       <LocalizedFieldRow
         name="title"
-        localizedName="languages.{}.title"
         defaultAsPlaceholder
         label={t("editor.basic.name")}
         required
@@ -204,7 +203,6 @@ const BasicDetailsTab = () => {
       />
       <LocalizedFieldRow
         name="webpageUrl"
-        localizedName="languages.{}.webpageUrl"
         defaultAsPlaceholder
         label={t("editor.basic.homePage")}
         maxLength={255}
@@ -212,7 +210,6 @@ const BasicDetailsTab = () => {
       />
       <LocalizedFieldRow
         name="facebookUrl"
-        localizedName="languages.{}.facebookUrl"
         defaultAsPlaceholder
         label={t("editor.basic.facebook")}
         maxLength={255}
@@ -220,7 +217,6 @@ const BasicDetailsTab = () => {
       />
       <LocalizedFieldRow
         name="location"
-        localizedName="languages.{}.location"
         defaultAsPlaceholder
         label={t("editor.basic.location")}
         maxLength={255}
@@ -228,7 +224,6 @@ const BasicDetailsTab = () => {
       />
       <LocalizedFieldRow
         name="price"
-        localizedName="languages.{}.price"
         defaultAsPlaceholder
         label={t("editor.basic.price")}
         maxLength={255}
@@ -236,7 +231,6 @@ const BasicDetailsTab = () => {
       />
       <LocalizedFieldRow
         name="description"
-        localizedName="languages.{}.description"
         defaultAsPlaceholder
         label={t("editor.basic.description")}
         help={t("editor.basic.description.info")}

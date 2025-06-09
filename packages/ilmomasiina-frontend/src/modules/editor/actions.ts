@@ -60,14 +60,7 @@ export const defaultEvent = (): EditorEvent => ({
 
   openQuotaSize: 0,
   useOpenQuota: false,
-  quotas: [
-    {
-      key: "new",
-      title: "Kiintiö", // TODO
-      size: 20,
-      languages: {},
-    },
-  ],
+  quotas: [],
 
   nameQuestion: true,
   emailQuestion: true,

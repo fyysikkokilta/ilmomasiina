@@ -88,6 +88,9 @@ export default async function updateEvent(
       { transaction },
     );
 
+    // Validate data within languages. This uses event.languages and is thus done after update()
+    event.validateLanguages(updatedQuestions ?? event.questions!, updatedQuotas ?? event.quotas!);
+
     if (updatedQuestions !== undefined) {
       const reuseQuestionIds = updatedQuestions
         .map((question) => question.id)

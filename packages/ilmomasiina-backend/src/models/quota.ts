@@ -18,11 +18,10 @@ import {
   Sequelize,
 } from "sequelize";
 
-import type { QuotaAttributes, QuotaLanguage } from "@tietokilta/ilmomasiina-models/dist/models";
+import type { QuotaAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
 import type { Event } from "./event";
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
 import type { Signup } from "./signup";
-import { jsonColumnGetter } from "./util/json";
 
 export interface QuotaCreationAttributes extends Optional<QuotaAttributes, "id"> {}
 
@@ -31,7 +30,6 @@ export class Quota extends Model<QuotaAttributes, QuotaCreationAttributes> imple
   public order!: number;
   public title!: string;
   public size!: number | null;
-  public languages!: Record<string, QuotaLanguage>;
 
   public eventId!: Event["id"];
   public event?: Event;
@@ -86,12 +84,6 @@ export default function setupQuotaModel(sequelize: Sequelize) {
         validate: {
           min: 1,
         },
-      },
-      languages: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: {},
-        get: jsonColumnGetter<Record<string, QuotaLanguage>>("languages"),
       },
       signupCount: {
         type: DataTypes.VIRTUAL,

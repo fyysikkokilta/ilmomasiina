@@ -1,11 +1,14 @@
 import { Static, Type } from "@sinclair/typebox";
 
-import { quotaAttributes, quotaID, quotaIdentity, quotaLanguage } from "./attributes";
+import { quotaAttributes, quotaID, quotaIdentity, quotaLanguageAttributes } from "./attributes";
 
 export { quotaID } from "./attributes";
 
 /** Schema for a quota. */
 export const quota = Type.Composite([quotaIdentity, quotaAttributes]);
+
+/** Schema for a quota language version. */
+export const quotaLanguage = quotaLanguageAttributes;
 
 /** Schema for creating a quota. */
 export const quotaCreate = quotaAttributes;

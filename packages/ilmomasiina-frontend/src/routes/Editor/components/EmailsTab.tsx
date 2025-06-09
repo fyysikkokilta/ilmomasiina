@@ -15,7 +15,6 @@ const EmailsTab = () => {
       <LanguageSelect />
       <LocalizedFieldRow
         name="verificationEmail"
-        localizedName="languages.{}.verificationEmail"
         defaultAsPlaceholder
         as={Textarea}
         label={t("editor.emails.verificationEmail")}

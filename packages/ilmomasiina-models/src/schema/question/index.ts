@@ -1,11 +1,14 @@
 import { Static, Type } from "@sinclair/typebox";
 
-import { questionAttributes, questionID, questionIdentity, questionLanguage } from "./attributes";
+import { questionAttributes, questionID, questionIdentity, questionLanguageAttributes } from "./attributes";
 
 export { questionID } from "./attributes";
 
 /** Schema for a question. */
 export const question = Type.Composite([questionIdentity, questionAttributes]);
+
+/** Schema for a question language version. */
+export const questionLanguage = questionLanguageAttributes;
 
 /** Schema for creating a question. */
 export const questionCreate = questionAttributes;

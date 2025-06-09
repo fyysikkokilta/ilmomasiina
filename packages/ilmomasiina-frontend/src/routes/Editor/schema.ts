@@ -54,13 +54,24 @@ const editorSchema: ZodType<EditorEvent> = z
     verificationEmail: z.nullable(z.string()),
     languages: z.record(
       z.object({
-        title: z.optional(z.string().max(255)),
-        description: z.optional(z.string()),
-        price: z.optional(z.string().max(255)),
-        location: z.optional(z.string().max(255)),
-        webpageUrl: z.optional(z.string().max(255)),
-        facebookUrl: z.optional(z.string().max(255)),
-        verificationEmail: z.optional(z.string()),
+        title: z.string().max(255),
+        description: z.nullable(z.string()),
+        price: z.nullable(z.string().max(255)),
+        location: z.nullable(z.string().max(255)),
+        webpageUrl: z.nullable(z.string().max(255)),
+        facebookUrl: z.nullable(z.string().max(255)),
+        verificationEmail: z.nullable(z.string()),
+        quotas: z.array(
+          z.object({
+            title: z.string().max(255),
+          }),
+        ),
+        questions: z.array(
+          z.object({
+            question: z.string().max(255),
+            options: questionOptionsSchema,
+          }),
+        ),
       }),
     ),
     defaultLanguage: z.string(),
@@ -70,11 +81,6 @@ const editorSchema: ZodType<EditorEvent> = z
         key: z.string(),
         title: z.string().min(1).max(255),
         size: z.nullable(z.number().min(1)),
-        languages: z.record(
-          z.object({
-            title: z.optional(z.string().max(255)),
-          }),
-        ),
       }),
     ),
     questions: z.array(
@@ -86,12 +92,6 @@ const editorSchema: ZodType<EditorEvent> = z
         required: z.boolean(),
         public: z.boolean(),
         options: questionOptionsSchema,
-        languages: z.record(
-          z.object({
-            question: z.optional(z.string().max(255)),
-            options: z.optional(questionOptionsSchema),
-          }),
-        ),
       }),
     ),
     moveSignupsToQueue: z.optional(z.boolean()),

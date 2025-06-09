@@ -27,34 +27,10 @@ export default defineMigration({
       },
       { transaction },
     );
-    await query.addColumn(
-      "quota",
-      "languages",
-      {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: {},
-      },
-      { transaction },
-    );
-    await query.bulkUpdate("quota", { languages: "{}" }, {}, { transaction });
-    await query.addColumn(
-      "question",
-      "languages",
-      {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: {},
-      },
-      { transaction },
-    );
-    await query.bulkUpdate("question", { languages: "{}" }, {}, { transaction });
   },
   async down({ context: { sequelize, transaction } }) {
     const query = sequelize.getQueryInterface();
     await query.removeColumn("event", "languages", { transaction });
     await query.removeColumn("event", "defaultLanguage", { transaction });
-    await query.removeColumn("quota", "languages", { transaction });
-    await query.removeColumn("question", "languages", { transaction });
   },
 });

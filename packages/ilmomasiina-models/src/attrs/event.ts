@@ -46,11 +46,10 @@ export const eventGetQuestionAttrs: (keyof QuestionAttributes)[] = [
   "options",
   "required",
   "public",
-  "languages",
 ];
 
 /** Attributes included in results for Quota instances. */
-export const eventGetQuotaAttrs: (keyof QuotaAttributes)[] = ["id", "title", "size", "languages"];
+export const eventGetQuotaAttrs: (keyof QuotaAttributes)[] = ["id", "title", "size"];
 
 /** Attributes included in GET /api/events/slug for Signup instances. */
 export const eventGetSignupAttrs: (keyof SignupAttributes)[] = [
@@ -86,12 +85,14 @@ export const eventListEventAttrs: (keyof EventAttributes)[] = [
   "facebookUrl",
   "category",
   "signupsPublic",
+  "nameQuestion",
+  "emailQuestion",
   "languages",
   "defaultLanguage",
 ];
 
 /** Attributes included in GET /api/events for Quota instances. */
-export const eventListQuotaAttrs: (keyof QuotaAttributes)[] = ["id", "title", "size", "languages"];
+export const eventListQuotaAttrs: (keyof QuotaAttributes)[] = ["id", "title", "size"];
 
 /** Attributes included in GET /api/admin/events for Event instances. */
 export const adminEventListEventAttrs: (keyof EventAttributes)[] = [...eventListEventAttrs, "draft", "listed"];

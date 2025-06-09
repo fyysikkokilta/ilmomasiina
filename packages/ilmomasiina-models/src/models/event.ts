@@ -1,4 +1,6 @@
-export interface EventLanguage {
+import type { QuestionLanguage, QuotaLanguage } from "../schema";
+
+interface EventPerLanguageAttributes {
   title: string;
   description: string | null;
   price: string | null;
@@ -8,7 +10,12 @@ export interface EventLanguage {
   verificationEmail: string | null;
 }
 
-export default interface EventAttributes extends EventLanguage {
+export interface EventLanguage extends EventPerLanguageAttributes {
+  quotas: QuotaLanguage[];
+  questions: QuestionLanguage[];
+}
+
+export default interface EventAttributes extends EventPerLanguageAttributes {
   id: string;
   slug: string;
   date: Date | null;
@@ -22,7 +29,7 @@ export default interface EventAttributes extends EventLanguage {
   signupsPublic: boolean;
   nameQuestion: boolean;
   emailQuestion: boolean;
-  languages: Record<string, Partial<EventLanguage>>;
+  languages: Record<string, EventLanguage>;
   defaultLanguage: string;
   updatedAt: Date;
 }

@@ -51,7 +51,7 @@ type PropsWithAs<C extends As> = BaseProps & {
 
 export type FieldRowProps<C extends As> = PropsWithFormControl | PropsWithChildren | PropsWithAs<C>;
 
-/** react-final-field field row component */
+/** react-final-form field row component */
 export default function FieldRow<C extends As>({
   name,
   label = "",
