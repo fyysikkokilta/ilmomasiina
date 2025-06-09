@@ -1,13 +1,13 @@
 import { Static, Type } from "@sinclair/typebox";
 
 import { question, questionCreate, questionUpdate } from "../question";
-import { quotaCreate, quotaUpdate } from "../quota";
+import { quota, quotaCreate, quotaUpdate } from "../quota";
 import { adminQuotaWithSignups, userQuotaWithSignups } from "../quotaWithSignups";
 import { Nullable } from "../utils";
 import {
+  adminDetailsOnlyCommonAttributes,
   adminEventLanguage,
   adminEventLanguages,
-  adminDetailsOnlyCommonAttributes,
   adminOnlyEventAttributes,
   eventID,
   eventIdentity,
@@ -43,6 +43,7 @@ export const userEventForSignup = Type.Composite([
   publicAttributes,
   Type.Object({
     questions: Type.Array(question),
+    quotas: Type.Array(quota),
   }),
 ]);
 

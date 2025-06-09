@@ -63,11 +63,8 @@ export default async function updateEvent(
 
     // Find questions and quotas that were requested by ID but don't exist
     const deletedQuestions =
-      updatedQuestions
-        ?.filter((question) => !question.existing && question.id)
-        .map((question) => question.id as Question["id"]) ?? [];
-    const deletedQuotas =
-      updatedQuotas?.filter((quota) => !quota.existing && quota.id).map((quota) => quota.id as Quota["id"]) ?? [];
+      updatedQuestions?.filter((question) => !question.existing && question.id).map((question) => question.id!) ?? [];
+    const deletedQuotas = updatedQuotas?.filter((quota) => !quota.existing && quota.id).map((quota) => quota.id!) ?? [];
 
     // Check for edit conflicts
     const expectedUpdatedAt = new Date(request.body.updatedAt ?? "");

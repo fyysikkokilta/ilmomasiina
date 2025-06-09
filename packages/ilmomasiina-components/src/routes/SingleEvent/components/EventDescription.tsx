@@ -10,15 +10,18 @@ import AuthContext from "../../../contexts/auth";
 import { usePaths } from "../../../contexts/paths";
 import { useSingleEventContext } from "../../../modules/singleEvent";
 import { useEventDateTimeFormatter } from "../../../utils/dateFormat";
+import { getLocalizedEvent } from "../../../utils/localizedEvent";
 
 const EventDescription = () => {
-  const event = useSingleEventContext().event!;
+  const unlocalizedEvent = useSingleEventContext().event!;
   const { preview } = useSingleEventContext();
   const { loggedIn } = useContext(AuthContext);
   const Link = linkComponent();
   const paths = usePaths();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const eventDateFormat = useEventDateTimeFormatter();
+  const event = getLocalizedEvent(unlocalizedEvent, i18n.language);
+
   return (
     <>
       <nav className="ilmo--title-nav">

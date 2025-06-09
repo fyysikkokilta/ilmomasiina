@@ -7,6 +7,8 @@ import { useSingleEventContext } from "../../../modules/singleEvent";
 import QuotaProgress from "./QuotaProgress";
 
 const QuotaStatus = () => {
+  // TODO: Separate quota information from signupsByQuota as it needs to be localized.
+  //  This will be a bit painful, but has to be done.
   const { event, signupsByQuota } = useSingleEventContext();
   const { t } = useTranslation();
 

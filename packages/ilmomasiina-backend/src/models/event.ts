@@ -257,7 +257,7 @@ export default function setupEventModel(sequelize: Sequelize) {
       freezeTableName: true,
       paranoid: true,
       validate: {
-        hasDateOrRegistration() {
+        hasDateOrRegistration(this: Event) {
           if (this.date === null && this.registrationStartDate === null) {
             throw new Error("either date or registrationStartDate/registrationEndDate must be set");
           }
@@ -266,6 +266,11 @@ export default function setupEventModel(sequelize: Sequelize) {
           }
           if ((this.registrationStartDate === null) !== (this.registrationEndDate === null)) {
             throw new Error("only neither or both of registrationStartDate and registrationEndDate may be set");
+          }
+        },
+        noDuplicateDefaultLanguage(this: Event) {
+          if (this.languages[this.defaultLanguage]) {
+            throw new Error("defaultLanguage may not be present in languages");
           }
         },
       },
