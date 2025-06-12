@@ -1,6 +1,6 @@
 import debug from "debug";
 
-const debugLog = debug("app:perf:cache");
+const perfLog = debug("app:perf:cache");
 
 interface Options<A, K, R> {
   /** Maximum number of milliseconds since start of call that a result can be reused. */
@@ -65,7 +65,7 @@ export default function createCache<A, K, R>({
 
     // Log cache usage statistics every 25 requests.
     if (logName && requestCount % 25 === 0) {
-      debugLog(`${logName}: ${hitCount}/${requestCount} cache hits`);
+      perfLog(`${logName}: ${hitCount}/${requestCount} cache hits`);
     }
 
     requestCount += 1;
