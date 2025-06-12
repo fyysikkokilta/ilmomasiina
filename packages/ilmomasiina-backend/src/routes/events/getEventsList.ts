@@ -30,6 +30,7 @@ const DEFAULT_MAX_AGE_DAYS = 7; // days
 export const eventsListForUserCached = createCache({
   maxAgeMs: 1000,
   maxPendingAgeMs: 2000,
+  logName: "eventsListForUserCached",
   formatKey: ({ category, maxAge = DEFAULT_MAX_AGE_DAYS }: EventsListArgs) => `${category} ${maxAge}`,
   async get({ category, maxAge = DEFAULT_MAX_AGE_DAYS }: EventsListArgs) {
     const where: WhereOptions & unknown[] = [{ listed: true }];
