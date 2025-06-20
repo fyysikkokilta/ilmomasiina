@@ -8,19 +8,7 @@ version: '3.2'
 
 services:
   ilmomasiina:
-    build:
-      context: .
-      dockerfile: "Dockerfile"
-      args:
-        #- PATH_PREFIX=
-        #- API_URL=
-        - BRANDING_HEADER_TITLE_TEXT=FK-Ilmomasiina
-        - BRANDING_HEADER_TITLE_TEXT_SHORT=FK-Ilmo
-        - BRANDING_FOOTER_GDPR_TEXT=Tietosuoja/GDPR
-        - BRANDING_FOOTER_GDPR_LINK=https://drive.google.com/drive/folders/12VBoHzXG7vEYGul87egYQZ3QN_-CKpBa
-        - BRANDING_FOOTER_HOME_TEXT=fyysikkokilta.fi
-        - BRANDING_FOOTER_HOME_LINK=http://fyysikkokilta.fi
-        - BRANDING_LOGIN_PLACEHOLDER_EMAIL=it@fyysikkokilta.fi
+    image: ghcr.io/fyysikkokilta/ilmomasiina:latest
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
