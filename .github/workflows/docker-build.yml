@@ -50,7 +50,7 @@ jobs:
         with:
           images: ${{ env.docker_tag }}
           flavor: |
-            latest=${{ github.ref == 'refs/heads/dev' }}
+            latest=${{ github.ref == 'refs/heads/main' }}
           tags: |
             type=semver,pattern={{version}},enable=${{ github.ref_type == 'tag' }}
             type=semver,pattern={{major}}.{{minor}},enable=${{ github.ref_type == 'tag' }}
