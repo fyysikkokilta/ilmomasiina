@@ -17,44 +17,19 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "v*"
 
 jobs:
   lint:
     name: Lint & type-check
     uses: ./.github/workflows/lint-test.yml
 
-  packagejson:
-    name: Check package.json versions
-    runs-on: ubuntu-latest
-    if: github.ref_type == 'tag'
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-
-      - name: Check package.json versions against tag
-        run: |
-          errors=0
-          for file in package.json packages/*/package.json
-          do
-            if cat $file | jq '"v" + .version' | grep -Fqvx '"${{ github.ref_name }}"'
-            then
-              echo "::error file=$file::The version here does not match the Git tag you pushed (${{ github.ref_name }}). This would cause no NPM packages to be published."
-              errors=1
-            fi
-          done
-          exit $errors
-
   docker:
     name: Push Docker image to GitHub Packages
-    needs: [lint, packagejson]
+    needs: [lint]
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
-    # Change this to your repo name to build automatically on your fork.
-    if: github.repository == 'fyysikkokilta/ilmomasiina'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
