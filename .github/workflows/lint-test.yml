@@ -12,7 +12,7 @@ jobs:
   lint:
     name: ESLint
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 5
     steps:
 
@@ -22,7 +22,7 @@ jobs:
     - uses: pnpm/action-setup@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: useblacksmith/setup-node@v5
       with:
         node-version-file: '.nvmrc'
         cache: 'pnpm'
@@ -36,7 +36,7 @@ jobs:
   typecheck:
     name: Type checking
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 5
     steps:
 
@@ -46,7 +46,7 @@ jobs:
     - uses: pnpm/action-setup@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: useblacksmith/setup-node@v5
       with:
         node-version-file: '.nvmrc'
         cache: 'pnpm'
@@ -60,7 +60,7 @@ jobs:
   test:
     name: Tests
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 5
 
     services:
@@ -86,7 +86,7 @@ jobs:
     - uses: pnpm/action-setup@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: useblacksmith/setup-node@v5
       with:
         node-version-file: '.nvmrc'
         cache: 'pnpm'
