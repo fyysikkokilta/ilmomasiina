@@ -62,12 +62,12 @@
 @if $lighter-secondary-hover {
   .btn-secondary {
     @include button-variant(
-      $primary,
-      $primary,
-      $hover-background: lighten($primary, 15%),
-      $hover-border: lighten($primary, 20%),
-      $active-background: lighten($primary, 20%),
-      $active-border: lighten($primary, 25%)
+      $secondary,
+      $secondary,
+      $hover-background: lighten($secondary, 15%),
+      $hover-border: lighten($secondary, 20%),
+      $active-background: lighten($secondary, 20%),
+      $active-border: lighten($secondary, 25%)
     );
   }
 }
