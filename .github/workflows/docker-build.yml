@@ -62,7 +62,7 @@ jobs:
         run: echo "version=$(git describe --always --tags)" >> "$GITHUB_OUTPUT"
 
       - name: Push to GitHub Packages
-        uses: useblacksmith/build-push-action@v1
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
@@ -78,5 +78,7 @@ jobs:
             BRANDING_FOOTER_HOME_LINK=${{ env.branding_footer_home_link }}
             BRANDING_LOGIN_PLACEHOLDER_EMAIL=${{ env.branding_login_placeholder_email }}
             VERSION=${{steps.get-version.outputs.version}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
     outputs:
       tag: ${{ steps.meta.outputs.version }}
