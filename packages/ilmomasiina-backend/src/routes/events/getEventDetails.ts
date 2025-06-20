@@ -31,6 +31,7 @@ import { StringifyApi } from "../utils";
 export const basicEventInfoCached = createCache({
   maxAgeMs: 5000,
   maxPendingAgeMs: 5000,
+  logName: "basicEventInfoCached",
   async get(eventSlug: EventSlug) {
     // First query general event information
     const event = await Event.scope("user").findOne({
@@ -67,6 +68,7 @@ export const basicEventInfoCached = createCache({
 export const eventDetailsForUserCached = createCache({
   maxAgeMs: 1000,
   maxPendingAgeMs: 1000,
+  logName: "eventDetailsForUserCached",
   async get(eventSlug: EventSlug) {
     const { event, publicQuestions } = await basicEventInfoCached(eventSlug);
 

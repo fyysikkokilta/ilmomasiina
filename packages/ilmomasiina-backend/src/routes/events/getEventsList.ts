@@ -29,6 +29,7 @@ type EventsListArgs = { category?: string; maxAge?: number };
 export const eventsListForUserCached = createCache({
   maxAgeMs: 1000,
   maxPendingAgeMs: 2000,
+  logName: "eventsListForUserCached",
   formatKey: ({ category, maxAge = config.notShowEventAfterDays }: EventsListArgs) => `${category} ${maxAge}`,
   async get({ category, maxAge = config.notShowEventAfterDays }: EventsListArgs) {
     const where: WhereOptions & unknown[] = [{ listed: true }];
