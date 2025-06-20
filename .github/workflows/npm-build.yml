@@ -5,7 +5,7 @@ on:
 
 jobs:
   npm:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       packages: write
       contents: read
@@ -16,7 +16,7 @@ jobs:
       - uses: pnpm/action-setup@v4
 
       - name: Setup Node.js for NPM
-        uses: actions/setup-node@v4
+        uses: useblacksmith/setup-node@v5
         with:
           registry-url: "https://registry.npmjs.org"
           node-version-file: ".nvmrc"
@@ -38,7 +38,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Setup Node.js for GitHub Packages
-        uses: actions/setup-node@v4
+        uses: useblacksmith/setup-node@v5
         with:
           registry-url: "https://npm.pkg.github.com"
 
