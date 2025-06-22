@@ -1,112 +1,115 @@
 import debug from "debug";
-import { Sequelize } from "sequelize";
-import { SequelizeStorage, Umzug } from "umzug";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { Pool } from "pg";
 
-import setupAnswerModel, { Answer } from "./answer";
-import setupAuditLogModel from "./auditlog";
-import sequelizeConfig from "./config";
-import setupEventModel, { Event } from "./event";
-import migrations from "./migrations";
-import setupQuestionModel, { Question } from "./question";
-import setupQuotaModel, { Quota } from "./quota";
-import setupSignupModel, { Signup } from "./signup";
-import setupUserModel from "./user";
+import appConfig from "../config";
+import * as schema from "./schema";
 
 const debugLog = debug("app:db");
 
-let sequelize: Sequelize | null = null;
+const {
+  clearDbUrl,
+  dbDialect,
+  dbHost,
+  dbPort,
+  dbDatabase,
+  dbUser,
+  dbPassword,
+  dbSsl,
+  debugDbLogging,
+  dbPoolMax,
+  dbPoolMin,
+  dbPoolAcquire,
+  dbPoolIdle,
+} = appConfig;
 
-export function getSequelize() {
-  if (!sequelize) throw new Error("setupDatabase() has not been called");
-  return sequelize;
+let pool: Pool | null = null;
+let db: ReturnType<typeof drizzle> | null = null;
+
+export function getDatabase() {
+  if (!db) throw new Error("setupDatabase() has not been called");
+  return db;
+}
+
+export function getPool() {
+  if (!pool) throw new Error("setupDatabase() has not been called");
+  return pool;
 }
 
 export async function closeDatabase() {
-  if (sequelize) {
-    const old = sequelize;
-    sequelize = null;
-    await old.close();
+  if (pool) {
+    await pool.end();
+    pool = null;
+    db = null;
   }
-}
-
-async function runMigrations() {
-  if (!sequelize) throw new Error();
-  const storage = new SequelizeStorage({ sequelize });
-
-  debugLog("Running database migrations");
-  const umzug = new Umzug({
-    migrations,
-    storage,
-    logger: console,
-    context: sequelize,
-  });
-  await umzug.up();
 }
 
 export default async function setupDatabase() {
-  if (sequelize) return sequelize;
+  if (db) return db;
 
   debugLog("Connecting to database");
-  sequelize = new Sequelize(sequelizeConfig.default);
+  
   try {
-    await sequelize.authenticate();
-    const cfg = (sequelize.connectionManager as any).config;
-    debugLog(`Connected to ${cfg.host} as ${cfg.username}.`);
+    let connectionConfig;
+    
+    if (clearDbUrl) {
+      connectionConfig = {
+        connectionString: clearDbUrl,
+        ssl: dbSsl ? { rejectUnauthorized: false } : false,
+      };
+    } else if (dbDialect === 'postgres') {
+      connectionConfig = {
+        host: dbHost,
+        port: dbPort,
+        database: dbDatabase,
+        user: dbUser,
+        password: dbPassword,
+        ssl: dbSsl ? { rejectUnauthorized: false } : false,
+      };
+    } else {
+      throw new Error('Only PostgreSQL is supported with Drizzle');
+    }
+
+    pool = new Pool({
+      ...connectionConfig,
+      max: dbPoolMax,
+      min: dbPoolMin,
+      connectionTimeoutMillis: dbPoolAcquire,
+      idleTimeoutMillis: dbPoolIdle,
+    });
+    
+    db = drizzle(pool, { schema, logger: debugDbLogging });
+    
+    // Test connection
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    debugLog("Connected to database successfully");
+    
+    // Run migrations
+    debugLog("Running database migrations");
+    await migrate(db, { migrationsFolder: './src/models/migrations' });
+    debugLog("Migrations completed");
+    
   } catch (err) {
-    const cfg = (sequelize.connectionManager as any).config;
-    console.error(`Error connecting to ${cfg.host} as ${cfg.username}: ${err}`);
+    console.error(`Error connecting to database: ${err}`);
     throw err;
   }
 
-  setupEventModel(sequelize);
-  setupQuotaModel(sequelize);
-  setupSignupModel(sequelize);
-  setupQuestionModel(sequelize);
-  setupAnswerModel(sequelize);
-  setupUserModel(sequelize);
-  setupAuditLogModel(sequelize);
-
-  Event.hasMany(Question, {
-    foreignKey: {
-      allowNull: false,
-    },
-    onDelete: "CASCADE",
-  });
-  Question.belongsTo(Event);
-
-  Event.hasMany(Quota, {
-    foreignKey: {
-      allowNull: false,
-    },
-    onDelete: "CASCADE",
-  });
-  Quota.belongsTo(Event);
-
-  Quota.hasMany(Signup, {
-    foreignKey: {
-      allowNull: false,
-    },
-    onDelete: "CASCADE",
-  });
-  Signup.belongsTo(Quota);
-
-  Signup.hasMany(Answer, {
-    foreignKey: {
-      allowNull: false,
-    },
-    onDelete: "CASCADE",
-  });
-  Answer.belongsTo(Signup);
-
-  Question.hasMany(Answer, {
-    foreignKey: {
-      allowNull: false,
-    },
-    onDelete: "CASCADE",
-  });
-  Answer.belongsTo(Question);
-
-  await runMigrations();
-
-  return sequelize;
+  return db;
 }
+
+// Export tables and schema for use in queries
+export * from "./schema";
+
+// Keep backward compatibility by exporting types that other parts expect
+export type { 
+  EventAttributes,
+  QuestionAttributes,
+  QuotaAttributes,
+  SignupAttributes,
+  AnswerAttributes,
+  UserAttributes,
+  AuditLogAttributes 
+} from "@tietokilta/ilmomasiina-models/dist/models";
