@@ -1,14 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { Conflict } from "http-errors";
-import { Transaction } from "sequelize";
+import { eq } from "drizzle-orm";
 
 import type { UserCreateSchema, UserInviteSchema, UserSchema } from "@tietokilta/ilmomasiina-models";
 import { AuditEvent } from "@tietokilta/ilmomasiina-models";
 import { AuditLogger } from "../../../auditlog";
 import AdminPasswordAuth from "../../../authentication/adminPasswordAuth";
 import EmailService from "../../../mail";
-import { getSequelize } from "../../../models";
-import { User } from "../../../models/user";
+import { getDatabase, user } from "../../../models";
 import generatePassword from "./generatePassword";
 
 /**
@@ -20,27 +19,27 @@ import generatePassword from "./generatePassword";
 export async function createUser(
   params: UserCreateSchema,
   auditLogger: AuditLogger,
-  transaction: Transaction,
+  transaction: any,
 ): Promise<UserSchema> {
-  const existing = await User.findOne({
-    where: { email: params.email },
-    transaction,
-  });
+  const existing = await transaction
+    .select()
+    .from(user as any)
+    .where(eq(user.email as any, params.email) as any);
 
-  if (existing) throw new Conflict("User with given email already exists");
+  if (existing.length > 0) throw new Conflict("User with given email already exists");
 
   // Create new user with hashed password
-  const user = await User.create(
-    {
+  const [newUser] = await transaction
+    .insert(user as any)
+    .values({
       ...params,
       password: AdminPasswordAuth.createHash(params.password),
-    },
-    { transaction },
-  );
+    })
+    .returning({ id: user.id as any, email: user.email as any });
 
   const res = {
-    id: user.id,
-    email: user.email,
+    id: newUser.id,
+    email: newUser.email,
   };
 
   await auditLogger(AuditEvent.CREATE_USER, {
@@ -61,23 +60,24 @@ export default async function inviteUser(
   // Generate secure password
   const password = generatePassword();
 
-  const user = await getSequelize().transaction(async (transaction) =>
+  const db = getDatabase();
+  const newUser = await db.transaction(async (tx) =>
     createUser(
       {
         email: request.body.email,
         password,
       },
       request.logEvent,
-      transaction,
+      tx,
     ),
   );
 
   // Send invitation mail
-  await EmailService.sendNewUserMail(user.email, null, {
-    email: user.email,
+  await EmailService.sendNewUserMail(newUser.email, null, {
+    email: newUser.email,
     password,
   });
 
   reply.status(201);
-  return user;
+  return newUser;
 }
