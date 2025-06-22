@@ -3,7 +3,7 @@ import { NotFound } from "http-errors";
 import { eq } from "drizzle-orm";
 
 import { AuditEvent, ErrorCode, UserPathParams } from "@tietokilta/ilmomasiina-models";
-import { getDatabase, user } from "../../../models";
+import { db, user } from "../../../models";
 import CustomError from "../../../util/customError";
 
 class CannotDeleteSelf extends CustomError {
@@ -16,17 +16,15 @@ export default async function deleteUser(
   request: FastifyRequest<{ Params: UserPathParams }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const db = getDatabase();
-  
-  await db.transaction(async (tx) => {
+  await db.transaction(async (transaction) => {
     // Try to fetch existing user
-    const existing = await tx
+    const existing = await transaction
       .select({
-        id: user.id as any,
-        email: user.email as any,
-      })
+        id: user.id,
+        email: user.email,
+      } as any)
       .from(user as any)
-      .where(eq(user.id as any, request.params.id) as any);
+      .where(eq(user.id, request.params.id) as any) as any;
 
     const existingUser = existing[0];
 
@@ -36,14 +34,16 @@ export default async function deleteUser(
       throw new CannotDeleteSelf("You can't delete your own user");
     } else {
       // Delete user
-      await tx.delete(user as any).where(eq(user.id as any, request.params.id) as any);
+      await transaction
+        .delete(user as any)
+        .where(eq(user.id, request.params.id) as any);
       
       await request.logEvent(AuditEvent.DELETE_USER, {
         extra: {
           id: existingUser.id,
           email: existingUser.email,
         },
-        transaction: tx,
+        transaction,
       });
     }
   });

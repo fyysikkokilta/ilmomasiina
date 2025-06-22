@@ -16,7 +16,7 @@ import deleteOldAuditLogs from "./cron/deleteOldAuditLogs";
 import deleteUnconfirmedSignups from "./cron/deleteUnconfirmedSignups";
 import removeDeletedData from "./cron/removeDeletedData";
 import enforceHTTPS from "./enforceHTTPS";
-import setupDatabase from "./models";
+import "./models"; // Initialize database connection
 import setupRoutes from "./routes";
 import { isInitialSetupDone } from "./routes/admin/users/createInitialUser";
 
@@ -40,8 +40,6 @@ const defaultCompiler = new Ajv({
 ajvFormats(defaultCompiler);
 
 export default async function initApp(): Promise<FastifyInstance> {
-  await setupDatabase();
-
   const server = fastify({
     trustProxy: config.isAzure || config.trustProxy, // Get IPs from X-Forwarded-For
     logger: !["test", "bench"].some((env) => env === config.nodeEnv), // Enable logger when not testing or benchmarking

@@ -1,62 +1,56 @@
 import moment from "moment";
-import { Op, WhereOptions } from "sequelize";
+import { lt, isNotNull, and } from "drizzle-orm";
 
 import config from "../config";
-import { Answer } from "../models/answer";
-import { Event } from "../models/event";
-import { Question } from "../models/question";
-import { Quota } from "../models/quota";
-import { Signup } from "../models/signup";
+import { db, answer, event, question, quota, signup } from "../models";
 
 export default async function removeDeletedData() {
   const ifRemovedBefore = moment().subtract(config.deletionGracePeriod, "days").toDate();
 
-  await Event.unscoped().destroy({
-    where: {
-      deletedAt: {
-        [Op.lt]: ifRemovedBefore,
-      },
-      // Manually adding and initializing deletedAt in _every_ model would be counter-productive,
-      // so casting to avoid a type error here.
-    } as WhereOptions,
-    force: true,
-  });
+  await db
+    .delete(event as any)
+    .where(
+      and(
+        isNotNull(event.deletedAt),
+        lt(event.deletedAt, ifRemovedBefore)
+      ) as any
+    );
 
-  await Question.unscoped().destroy({
-    where: {
-      deletedAt: {
-        [Op.lt]: ifRemovedBefore,
-      },
-    } as WhereOptions,
-    force: true,
-  });
+  await db
+    .delete(question as any)
+    .where(
+      and(
+        isNotNull(question.deletedAt),
+        lt(question.deletedAt, ifRemovedBefore)
+      ) as any
+    );
 
-  await Quota.unscoped().destroy({
-    where: {
-      deletedAt: {
-        [Op.lt]: ifRemovedBefore,
-      },
-    } as WhereOptions,
-    force: true,
-  });
+  await db
+    .delete(quota as any)
+    .where(
+      and(
+        isNotNull(quota.deletedAt),
+        lt(quota.deletedAt, ifRemovedBefore)
+      ) as any
+    );
 
-  await Signup.unscoped().destroy({
-    where: {
-      deletedAt: {
-        [Op.lt]: ifRemovedBefore,
-      },
-    } as WhereOptions,
-    force: true,
-  });
+  await db
+    .delete(signup as any)
+    .where(
+      and(
+        isNotNull(signup.deletedAt),
+        lt(signup.deletedAt, ifRemovedBefore)
+      ) as any
+    );
 
-  // Technically shouldn't be necessary due to how ON DELETE CASCADE and paranoid mode interact,
+  // Technically shouldn't be necessary due to how ON DELETE CASCADE works,
   // but here for completeness' sake.
-  await Answer.unscoped().destroy({
-    where: {
-      deletedAt: {
-        [Op.lt]: ifRemovedBefore,
-      },
-    } as WhereOptions,
-    force: true,
-  });
+  await db
+    .delete(answer as any)
+    .where(
+      and(
+        isNotNull(answer.deletedAt),
+        lt(answer.deletedAt, ifRemovedBefore)
+      ) as any
+    );
 }

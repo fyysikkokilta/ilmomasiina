@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 
 import { AuditEvent, ErrorCode, UserChangePasswordSchema } from "@tietokilta/ilmomasiina-models";
 import AdminPasswordAuth from "../../../authentication/adminPasswordAuth";
-import { getDatabase, user } from "../../../models";
+import { db, user } from "../../../models";
 import CustomError from "../../../util/customError";
 
 class WrongOldPassword extends CustomError {
@@ -19,18 +19,16 @@ export default async function changePassword(
 ): Promise<void> {
   AdminPasswordAuth.validateNewPassword(request.body.newPassword);
 
-  const db = getDatabase();
-
-  await db.transaction(async (tx) => {
+  await db.transaction(async (transaction) => {
     // Try to fetch existing user
-    const existing = await tx
+    const existing = await transaction
       .select({
-        id: user.id as any,
-        email: user.email as any,
-        password: user.password as any,
-      })
+        id: user.id,
+        email: user.email,
+        password: user.password,
+      } as any)
       .from(user as any)
-      .where(eq(user.id as any, request.sessionData.user) as any);
+      .where(eq(user.id, request.sessionData.user) as any) as any;
 
     const existingUser = existing[0];
 
@@ -42,17 +40,17 @@ export default async function changePassword(
         throw new WrongOldPassword("Incorrect password");
       }
       // Update user with a new password
-      await tx
+      await transaction
         .update(user as any)
         .set({ password: AdminPasswordAuth.createHash(request.body.newPassword) })
-        .where(eq(user.id as any, request.sessionData.user) as any);
+        .where(eq(user.id, request.sessionData.user) as any);
 
       await request.logEvent(AuditEvent.CHANGE_PASSWORD, {
         extra: {
           id: existingUser.id,
           email: existingUser.email,
         },
-        transaction: tx,
+        transaction,
       });
     }
   });

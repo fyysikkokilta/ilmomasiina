@@ -78,7 +78,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.1",
     "nodemailer-mailgun-transport": "^2.1.5",
-    "pg": "^8.16.0",
+    "pg": "^8.16.2",
     "validator": "^13.15.15"
   },
   "devDependencies": {

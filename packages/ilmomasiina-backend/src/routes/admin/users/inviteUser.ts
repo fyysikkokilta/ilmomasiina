@@ -7,7 +7,7 @@ import { AuditEvent } from "@tietokilta/ilmomasiina-models";
 import { AuditLogger } from "../../../auditlog";
 import AdminPasswordAuth from "../../../authentication/adminPasswordAuth";
 import EmailService from "../../../mail";
-import { getDatabase, user } from "../../../models";
+import { db, user } from "../../../models";
 import generatePassword from "./generatePassword";
 
 /**
@@ -24,7 +24,7 @@ export async function createUser(
   const existing = await transaction
     .select()
     .from(user as any)
-    .where(eq(user.email as any, params.email) as any);
+    .where(eq(user.email, params.email) as any) as any;
 
   if (existing.length > 0) throw new Conflict("User with given email already exists");
 
@@ -35,7 +35,7 @@ export async function createUser(
       ...params,
       password: AdminPasswordAuth.createHash(params.password),
     })
-    .returning({ id: user.id as any, email: user.email as any });
+    .returning({ id: user.id, email: user.email } as any) as any;
 
   const res = {
     id: newUser.id,
@@ -60,15 +60,14 @@ export default async function inviteUser(
   // Generate secure password
   const password = generatePassword();
 
-  const db = getDatabase();
-  const newUser = await db.transaction(async (tx) =>
+  const newUser = await db.transaction(async (transaction) =>
     createUser(
       {
         email: request.body.email,
         password,
       },
       request.logEvent,
-      tx,
+      transaction,
     ),
   );
 
