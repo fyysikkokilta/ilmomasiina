@@ -1,42 +1,52 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { NotFound } from "http-errors";
+import { eq } from "drizzle-orm";
 
 import type { UserPathParams } from "@tietokilta/ilmomasiina-models";
 import { AuditEvent } from "@tietokilta/ilmomasiina-models";
 import AdminPasswordAuth from "../../../authentication/adminPasswordAuth";
 import EmailService from "../../../mail";
-import { getSequelize } from "../../../models";
-import { User } from "../../../models/user";
+import { getDatabase, user } from "../../../models";
 import generatePassword from "./generatePassword";
 
 export default async function resetPassword(
   request: FastifyRequest<{ Params: UserPathParams }>,
   reply: FastifyReply,
 ): Promise<void> {
-  await getSequelize().transaction(async (transaction) => {
+  const db = getDatabase();
+  
+  await db.transaction(async (tx) => {
     // Try to fetch existing user
-    const existing = await User.findByPk(request.params.id, {
-      attributes: ["id", "email"],
-      transaction,
-    });
+    const existing = await tx
+      .select({
+        id: user.id as any,
+        email: user.email as any,
+      })
+      .from(user as any)
+      .where(eq(user.id as any, request.params.id) as any);
 
-    if (!existing) {
+    const existingUser = existing[0];
+
+    if (!existingUser) {
       throw new NotFound("User does not exist");
     } else {
       // Update user with a new password
       const newPassword = generatePassword();
-      await existing.update({ password: AdminPasswordAuth.createHash(newPassword) }, { transaction });
+      await tx
+        .update(user as any)
+        .set({ password: AdminPasswordAuth.createHash(newPassword) })
+        .where(eq(user.id as any, request.params.id) as any);
 
       await request.logEvent(AuditEvent.RESET_PASSWORD, {
         extra: {
-          id: existing.id,
-          email: existing.email,
+          id: existingUser.id,
+          email: existingUser.email,
         },
-        transaction,
+        transaction: tx,
       });
 
-      await EmailService.sendResetPasswordMail(existing.email, null, {
-        email: existing.email,
+      await EmailService.sendResetPasswordMail(existingUser.email, null, {
+        email: existingUser.email,
         password: newPassword,
       });
     }

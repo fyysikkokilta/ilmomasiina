@@ -1,10 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { NotFound } from "http-errors";
+import { eq } from "drizzle-orm";
 
 import { AuditEvent, ErrorCode, UserChangePasswordSchema } from "@tietokilta/ilmomasiina-models";
 import AdminPasswordAuth from "../../../authentication/adminPasswordAuth";
-import { getSequelize } from "../../../models";
-import { User } from "../../../models/user";
+import { getDatabase, user } from "../../../models";
 import CustomError from "../../../util/customError";
 
 class WrongOldPassword extends CustomError {
@@ -19,29 +19,40 @@ export default async function changePassword(
 ): Promise<void> {
   AdminPasswordAuth.validateNewPassword(request.body.newPassword);
 
-  await getSequelize().transaction(async (transaction) => {
-    // Try to fetch existing user
-    const existing = await User.findByPk(request.sessionData.user, {
-      attributes: ["id", "email", "password"],
-      transaction,
-    });
+  const db = getDatabase();
 
-    if (!existing) {
+  await db.transaction(async (tx) => {
+    // Try to fetch existing user
+    const existing = await tx
+      .select({
+        id: user.id as any,
+        email: user.email as any,
+        password: user.password as any,
+      })
+      .from(user as any)
+      .where(eq(user.id as any, request.sessionData.user) as any);
+
+    const existingUser = existing[0];
+
+    if (!existingUser) {
       throw new NotFound("User does not exist");
     } else {
       // Verify old password
-      if (!AdminPasswordAuth.verifyHash(request.body.oldPassword, existing.password)) {
+      if (!AdminPasswordAuth.verifyHash(request.body.oldPassword, existingUser.password)) {
         throw new WrongOldPassword("Incorrect password");
       }
       // Update user with a new password
-      await existing.update({ password: AdminPasswordAuth.createHash(request.body.newPassword) }, { transaction });
+      await tx
+        .update(user as any)
+        .set({ password: AdminPasswordAuth.createHash(request.body.newPassword) })
+        .where(eq(user.id as any, request.sessionData.user) as any);
 
       await request.logEvent(AuditEvent.CHANGE_PASSWORD, {
         extra: {
-          id: existing.id,
-          email: existing.email,
+          id: existingUser.id,
+          email: existingUser.email,
         },
-        transaction,
+        transaction: tx,
       });
     }
   });
