@@ -152,9 +152,6 @@ importers:
       pg-hstore:
         specifier: ^2.3.4
         version: 2.3.4
-      postgres:
-        specifier: ^3.4.7
-        version: 3.4.7
       sequelize:
         specifier: ^6.37.7
         version: 6.37.7(mysql2@3.14.1)(pg-hstore@2.3.4)(pg@8.16.0)
@@ -9060,7 +9057,8 @@ snapshots:
     dependencies:
       xtend: 4.0.2
 
-  postgres@3.4.7: {}
+  postgres@3.4.7:
+    optional: true
 
   prelude-ls@1.2.1: {}
 

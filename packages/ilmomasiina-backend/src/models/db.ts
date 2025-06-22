@@ -1,7 +1,7 @@
 import debug from "debug";
-import { drizzle } from "drizzle-orm/postgres-js";
-import { migrate } from "drizzle-orm/postgres-js/migrator";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { Pool } from "pg";
 
 import appConfig from "../config";
 import * as schema from "./schema";
@@ -24,19 +24,7 @@ const {
   dbPoolIdle,
 } = appConfig;
 
-let connectionString: string;
-
-if (clearDbUrl) {
-  connectionString = clearDbUrl;
-} else if (dbDialect === 'postgres') {
-  const port = dbPort ? `:${dbPort}` : '';
-  const password = dbPassword ? `:${dbPassword}` : '';
-  connectionString = `postgresql://${dbUser}${password}@${dbHost}${port}/${dbDatabase}`;
-} else {
-  throw new Error('Only PostgreSQL is supported with Drizzle');
-}
-
-let sql: postgres.Sql | null = null;
+let pool: Pool | null = null;
 let db: ReturnType<typeof drizzle> | null = null;
 
 export function getDatabase() {
@@ -44,15 +32,15 @@ export function getDatabase() {
   return db;
 }
 
-export function getSql() {
-  if (!sql) throw new Error("setupDatabase() has not been called");
-  return sql;
+export function getPool() {
+  if (!pool) throw new Error("setupDatabase() has not been called");
+  return pool;
 }
 
 export async function closeDatabase() {
-  if (sql) {
-    await sql.end();
-    sql = null;
+  if (pool) {
+    await pool.end();
+    pool = null;
     db = null;
   }
 }
@@ -63,18 +51,40 @@ export default async function setupDatabase() {
   debugLog("Connecting to database");
   
   try {
-    sql = postgres(connectionString, {
+    let connectionConfig;
+    
+    if (clearDbUrl) {
+      connectionConfig = {
+        connectionString: clearDbUrl,
+        ssl: dbSsl ? { rejectUnauthorized: false } : false,
+      };
+    } else if (dbDialect === 'postgres') {
+      connectionConfig = {
+        host: dbHost,
+        port: dbPort,
+        database: dbDatabase,
+        user: dbUser,
+        password: dbPassword,
+        ssl: dbSsl ? { rejectUnauthorized: false } : false,
+      };
+    } else {
+      throw new Error('Only PostgreSQL is supported with Drizzle');
+    }
+
+    pool = new Pool({
+      ...connectionConfig,
       max: dbPoolMax,
-      idle_timeout: dbPoolIdle,
-      connect_timeout: dbPoolAcquire,
-      debug: debugDbLogging,
-      ssl: dbSsl ? { rejectUnauthorized: false } : false,
+      min: dbPoolMin,
+      connectionTimeoutMillis: dbPoolAcquire,
+      idleTimeoutMillis: dbPoolIdle,
     });
     
-    db = drizzle(sql, { schema });
+    db = drizzle(pool, { schema, logger: debugDbLogging });
     
     // Test connection
-    await sql`SELECT 1`;
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
     debugLog("Connected to database successfully");
     
     // Run migrations
