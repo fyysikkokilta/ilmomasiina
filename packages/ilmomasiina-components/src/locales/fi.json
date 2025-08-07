@@ -105,7 +105,7 @@
     "singleEvent.info.website": "Kotisivut:",
     "singleEvent.info.cancellation": "Ilmoittautumisen sulkeuduttua ilmoittautuminen on sitova. Tämän jälkeen maksulliseen tapahtumaan ilmoittautunut on velvollinen maksamaan osallistumismaksun tai löytämään paikalleen toisen osallistujan. Fyysikkokillan peruutuskäytännöt löydät",
     "singleEvent.info.cancellationLink": "täältä",
-    "singleEvent.info.cancellationLinkAddress": "https://www.fyysikkokilta.fi/peruutuskaytannot-ja-korvausvelvollisuus/",
+    "singleEvent.info.cancellationLinkAddress": "https://fyysikkokilta.fi/fi/peruutuskaytannot",
     "singleEvent.loadError.404.title": "Tapahtumaa ei löytynyt",
     "singleEvent.loadError.404.description": "Tapahtumaa ei löytynyt. Se saattaa olla menneisyydessä tai poistettu, tai olet ehkä kirjoittanut URL-osoitteen väärin.",
     "singleEvent.loadError.default.description": "Tapahtuman lataaminen epäonnistui. $t(errors.contactAdmin)",
