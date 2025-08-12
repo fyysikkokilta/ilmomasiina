@@ -17,7 +17,7 @@ type Props = {
 const SignupListRow = ({ showQuota, signup, index }: Props) => {
   const { firstName, lastName, namePublic, answers, quota, createdAt, confirmed } = signup;
 
-  const { questions, nameQuestion } = useSingleEventContext().event!;
+  const { questions, nameQuestion } = useSingleEventContext().localizedEvent!;
   const { t } = useTranslation();
   const actionDateFormat = useActionDateTimeFormatter();
   const msDateFormat = useMillisecondsDateTimeFormatter();

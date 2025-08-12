@@ -1,11 +1,9 @@
-/* eslint-disable import/prefer-default-export */
-
 import type { SignupForEdit, SignupForEditResponse, UserEventResponse } from "@tietokilta/ilmomasiina-models";
 
 type EventForEditSignup = SignupForEditResponse["event"];
 
 /** Overrides localized properties in the event, quotas and questions with localized versions. */
-export function getLocalizedEvent(event: UserEventResponse | EventForEditSignup, language: string): EventForEditSignup {
+export function getLocalizedEvent<E extends UserEventResponse | EventForEditSignup>(event: E, language: string): E {
   const locale = event.languages[language] ?? event;
   return {
     ...event,

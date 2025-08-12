@@ -25,7 +25,7 @@ type SignupButtonProps = {
 const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) => {
   const navigate = useNavigate();
   const paths = usePaths();
-  const { registrationStartDate, registrationEndDate, quotas } = useSingleEventContext().event!;
+  const { registrationStartDate, registrationEndDate, quotas } = useSingleEventContext().localizedEvent!;
   const { preview } = useSingleEventContext();
   const eventState = signupState(registrationStartDate, registrationEndDate);
   const [submitting, setSubmitting] = useState(false);

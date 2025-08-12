@@ -16,7 +16,7 @@ type Props = {
 
 const SignupList = ({ isSingleQuota, quota }: Props) => {
   const { signups } = quota;
-  const { questions, nameQuestion } = useSingleEventContext().event!;
+  const { questions, nameQuestion } = useSingleEventContext().localizedEvent!;
   const showQuotas = !isSingleQuota && quota.type !== SignupStatus.IN_QUOTA;
   const { t } = useTranslation();
   return (

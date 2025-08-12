@@ -10,17 +10,15 @@ import AuthContext from "../../../contexts/auth";
 import { usePaths } from "../../../contexts/paths";
 import { useSingleEventContext } from "../../../modules/singleEvent";
 import { useEventDateTimeFormatter } from "../../../utils/dateFormat";
-import { getLocalizedEvent } from "../../../utils/localizedEvent";
 
 const EventDescription = () => {
-  const unlocalizedEvent = useSingleEventContext().event!;
+  const event = useSingleEventContext().localizedEvent!;
   const { preview } = useSingleEventContext();
   const { loggedIn } = useContext(AuthContext);
   const Link = linkComponent();
   const paths = usePaths();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const eventDateFormat = useEventDateTimeFormatter();
-  const event = getLocalizedEvent(unlocalizedEvent, i18n.language);
 
   return (
     <>

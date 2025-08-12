@@ -14,7 +14,7 @@ import SignupCountdown from "./components/SignupCountdown";
 import SignupList from "./components/SignupList";
 
 const SingleEventView = () => {
-  const { event, signupsByQuota, pending, error } = useSingleEventContext();
+  const { localizedEvent: event, signupsByQuota, pending, error } = useSingleEventContext();
   const Link = linkComponent();
   const paths = usePaths();
   const { t } = useTranslation();
