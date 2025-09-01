@@ -60,6 +60,8 @@ export async function testEvent(
     category: faker.lorem.words({ min: 1, max: 2 }),
     draft: false,
     verificationEmail: faker.lorem.paragraphs({ min: 1, max: 5 }),
+    defaultLanguage: "en",
+    languages: {},
   });
   if (hasDate) {
     if (inPast) {

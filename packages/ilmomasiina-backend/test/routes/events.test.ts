@@ -46,6 +46,8 @@ describe("getEventDetails", () => {
       registrationClosed: false,
       questions: expect.any(Array),
       quotas: expect.any(Array),
+      defaultLanguage: event.defaultLanguage,
+      languages: event.languages,
       millisTillOpening: expect.any(Number),
     });
 
@@ -256,6 +258,10 @@ describe("getEventList", () => {
       webpageUrl: event.webpageUrl,
       category: event.category,
       signupsPublic: event.signupsPublic,
+      nameQuestion: event.nameQuestion,
+      emailQuestion: event.emailQuestion,
+      defaultLanguage: event.defaultLanguage,
+      languages: expect.any(Object),
       quotas: expect.any(Array),
     });
 
