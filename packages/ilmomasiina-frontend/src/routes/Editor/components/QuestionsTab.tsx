@@ -3,7 +3,7 @@ import React from "react";
 import { Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import { FieldRow } from "@tietokilta/ilmomasiina-components";
+import FieldRow from "../../../components/FieldRow";
 import useEditorErrors from "./errors";
 import { useFieldValue } from "./hooks";
 import LanguageSelect from "./LanguageSelect";

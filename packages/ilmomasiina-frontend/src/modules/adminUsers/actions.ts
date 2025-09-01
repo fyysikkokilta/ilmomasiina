@@ -1,4 +1,4 @@
-import type { ApiError } from "@tietokilta/ilmomasiina-components";
+import type { ApiError } from "@tietokilta/ilmomasiina-client";
 import type {
   UserChangePasswordSchema,
   UserID,

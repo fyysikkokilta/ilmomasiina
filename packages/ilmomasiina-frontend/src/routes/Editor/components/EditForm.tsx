@@ -8,15 +8,15 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { ApiError } from "@tietokilta/ilmomasiina-components";
-import { errorDesc } from "@tietokilta/ilmomasiina-components/dist/utils/errorMessage";
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
+import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import type { TKey } from "../../../i18n";
 import { publishEventUpdate, publishNewEvent, serverEventToEditor } from "../../../modules/editor/actions";
 import { selectFormData } from "../../../modules/editor/selectors";
 import type { EditorEvent } from "../../../modules/editor/types";
-import appPaths from "../../../paths";
+import paths from "../../../paths";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
 import convertZodError from "../../../utils/convertZodError";
+import useEvent from "../../../utils/useEvent";
 import editorSchema from "../schema";
 import BasicDetailsTab from "./BasicDetailsTab";
 import EditConflictModal from "./EditConflictModal";
@@ -117,7 +117,7 @@ const EditForm = () => {
       let saved;
       if (isNew) {
         saved = await dispatch(publishNewEvent(data));
-        history.push(appPaths.adminEditEvent(saved.id));
+        history.push(paths.adminEditEvent(saved.id));
         toast.success(t("editor.status.createSuccess"), { autoClose: 2000 });
       } else {
         saved = await dispatch(publishEventUpdate(eventId!, data));
@@ -133,7 +133,7 @@ const EditForm = () => {
         form.change("questions", newFormData.questions);
       }
     } catch (error) {
-      toast.error(errorDesc(t, error as ApiError, "editor.saveError"), {
+      toast.error(t(errorDesc<TKey>(error as ApiError, "editor.saveError")), {
         autoClose: 2000,
       });
     }

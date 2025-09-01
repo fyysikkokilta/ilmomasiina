@@ -28,12 +28,12 @@ jobs:
       - name: Build packages
         run: |
           pnpm run --filter @tietokilta/ilmomasiina-models build
-          pnpm run --filter @tietokilta/ilmomasiina-components build
+          pnpm run --filter @tietokilta/ilmomasiina-client build
 
       - name: Publish to NPM
         run: |
           pnpm publish --filter @tietokilta/ilmomasiina-models --no-git-checks --access public
-          pnpm publish --filter @tietokilta/ilmomasiina-components --no-git-checks --access public
+          pnpm publish --filter @tietokilta/ilmomasiina-client --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -45,6 +45,6 @@ jobs:
       - name: Publish to GitHub Packages
         run: |
           pnpm publish --filter @tietokilta/ilmomasiina-models --no-git-checks --access public
-          pnpm publish --filter @tietokilta/ilmomasiina-components --no-git-checks --access public
+          pnpm publish --filter @tietokilta/ilmomasiina-client --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

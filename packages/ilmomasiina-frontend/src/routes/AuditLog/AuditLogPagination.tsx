@@ -3,9 +3,9 @@ import React, { ChangeEvent } from "react";
 import { Button, Form } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
 
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import { setAuditLogQueryField } from "../../modules/auditLog/actions";
 import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
+import useEvent from "../../utils/useEvent";
 
 export const LOGS_PER_PAGE = 100;
 

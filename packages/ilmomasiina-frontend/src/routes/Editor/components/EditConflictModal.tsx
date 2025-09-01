@@ -4,12 +4,12 @@ import { Button, Modal } from "react-bootstrap";
 import { useForm } from "react-final-form";
 import { Trans, useTranslation } from "react-i18next";
 
-import { useActionDateTimeFormatter } from "@tietokilta/ilmomasiina-components/dist/utils/dateFormat";
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import { EditConflictError } from "@tietokilta/ilmomasiina-models";
 import { editConflictDismissed, reloadEvent } from "../../../modules/editor/actions";
 import { EditorEvent, EditorQuestion, EditorQuota } from "../../../modules/editor/types";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import { useActionDateTimeFormatter } from "../../../utils/dateFormat";
+import useEvent from "../../../utils/useEvent";
 import { useFieldValue } from "./hooks";
 
 const DeletedQuotasAndQuestions = ({ modal }: { modal: EditConflictError }) => {

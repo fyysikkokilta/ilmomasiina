@@ -5,11 +5,11 @@ import { Field, FieldRenderProps } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { SortEnd } from "react-sortable-hoc";
 
-import { FieldRow } from "@tietokilta/ilmomasiina-components";
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
-import useShallowMemo from "@tietokilta/ilmomasiina-components/dist/utils/useShallowMemo";
+import useShallowMemo from "@tietokilta/ilmomasiina-client/dist/utils/useShallowMemo";
 import { QuestionLanguage, QuestionType, questionUpdate } from "@tietokilta/ilmomasiina-models";
+import FieldRow from "../../../components/FieldRow";
 import { EditorQuestion } from "../../../modules/editor/types";
+import useEvent from "../../../utils/useEvent";
 import useEditorErrors from "./errors";
 import { useFieldValue } from "./hooks";
 import LocalizedField from "./LocalizedField";

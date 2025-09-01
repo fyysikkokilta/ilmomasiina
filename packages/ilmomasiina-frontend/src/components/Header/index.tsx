@@ -8,7 +8,7 @@ import logo from "../../assets/logo.svg";
 import branding from "../../branding";
 import i18n from "../../i18n";
 import { logout } from "../../modules/auth/actions";
-import appPaths from "../../paths";
+import paths from "../../paths";
 import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
 
 import "./Header.scss";
@@ -24,7 +24,7 @@ const Header = () => {
   return (
     <Navbar>
       <Container>
-        <Link to={appPaths.eventsList} className="navbar-brand mr-auto">
+        <Link to={paths.eventsList} className="navbar-brand mr-auto">
           <img className="navbar-logo" src={logo} alt="Logo" />
           <span className="d-none d-sm-inline">{branding.headerTitle}</span>
           <span className="d-sm-none">{branding.headerTitleShort}</span>

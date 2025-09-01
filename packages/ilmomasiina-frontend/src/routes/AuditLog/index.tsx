@@ -5,10 +5,11 @@ import { useTranslation } from "react-i18next";
 import { shallowEqual } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { errorDesc } from "@tietokilta/ilmomasiina-components/dist/utils/errorMessage";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import requireAuth from "../../containers/requireAuth";
+import type { TKey } from "../../i18n";
 import { getAuditLogs, resetState } from "../../modules/auditLog/actions";
-import appPaths from "../../paths";
+import paths from "../../paths";
 import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
 import AuditLogActionFilter from "./AuditLogActionFilter";
 import AuditLogFilter from "./AuditLogFilter";
@@ -35,7 +36,7 @@ const AuditLog = () => {
 
   return (
     <>
-      <Link to={appPaths.adminEventsList}>&#8592; {t("auditLog.returnToEvents")}</Link>
+      <Link to={paths.adminEventsList}>&#8592; {t("auditLog.returnToEvents")}</Link>
       <h1>{t("auditLog.title")}</h1>
       <AuditLogPagination />
       <table className="table audit-log--table">
@@ -67,7 +68,7 @@ const AuditLog = () => {
         <tbody>
           {loadError && (
             <tr>
-              <td colSpan={4}>{errorDesc(t, loadError, "auditLog.loadError")}</td>
+              <td colSpan={4}>{t(errorDesc<TKey>(loadError, "auditLog.loadError"))}</td>
             </tr>
           )}
           {!loadError && !auditLog && (

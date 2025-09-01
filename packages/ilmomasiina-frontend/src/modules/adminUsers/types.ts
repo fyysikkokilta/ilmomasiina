@@ -1,4 +1,4 @@
-import { ApiError } from "@tietokilta/ilmomasiina-components";
+import { ApiError } from "@tietokilta/ilmomasiina-client";
 import type { UserListResponse } from "@tietokilta/ilmomasiina-models";
 
 export interface AdminUsersState {

@@ -1,4 +1,4 @@
-@use "@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
+@use "definitions" as *;
 
 @use "bootstrap/scss/bootstrap" with (
   // Override Bootstrap theme colors
@@ -22,7 +22,8 @@
 );
 
 @use "widgets";
-@use "@tietokilta/ilmomasiina-components/src/styles/all";
+@use "forms";
+@use "shared";
 
 // Global layout
 

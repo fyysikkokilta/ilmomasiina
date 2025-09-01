@@ -50,8 +50,8 @@ services:
         source: ./packages/ilmomasiina-frontend/index.html
         target: /opt/ilmomasiina/packages/ilmomasiina-frontend/index.html
       - type: bind
-        source: ./packages/ilmomasiina-components/src
-        target: /opt/ilmomasiina/packages/ilmomasiina-components/src
+        source: ./packages/ilmomasiina-client/src
+        target: /opt/ilmomasiina/packages/ilmomasiina-client/src
       - type: bind
         source: ./packages/ilmomasiina-backend/src
         target: /opt/ilmomasiina/packages/ilmomasiina-backend/src

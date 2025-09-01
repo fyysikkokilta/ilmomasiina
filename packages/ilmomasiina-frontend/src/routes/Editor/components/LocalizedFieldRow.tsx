@@ -3,7 +3,7 @@ import React, { ComponentType, forwardRef, useState } from "react";
 import { OverlayTrigger, Tooltip, TooltipProps } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import FieldRow, { FieldRowProps } from "@tietokilta/ilmomasiina-components/dist/components/FieldRow";
+import FieldRow, { FieldRowProps } from "../../../components/FieldRow";
 import useLocalizedFieldProps, { FieldLocalizationOptions } from "./useLocalizedFieldProps";
 
 const LocalizedTooltip = forwardRef<HTMLElement, Omit<TooltipProps, "id">>((props, ref) => {
