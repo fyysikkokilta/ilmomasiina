@@ -8,7 +8,7 @@ import { useEditSignupContext } from "../../../modules/editSignup";
 import useFieldErrors from "./fieldError";
 
 const CommonFields = () => {
-  const { event, signup, editingClosedOnLoad, admin } = useEditSignupContext();
+  const { localizedEvent: event, signup, editingClosedOnLoad, admin } = useEditSignupContext();
   const isNew = !signup!.confirmed;
   const { t } = useTranslation();
   const formatError = useFieldErrors();

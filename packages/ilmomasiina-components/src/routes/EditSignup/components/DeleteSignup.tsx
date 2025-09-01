@@ -14,7 +14,7 @@ type Props = {
 };
 
 const DeleteSignup = ({ deleting, onDelete }: Props) => {
-  const { event } = useEditSignupContext();
+  const event = useEditSignupContext().localizedEvent!;
   const { t } = useTranslation();
 
   const { submitting } = useFormState({ subscription: { submitting: true } });
@@ -25,7 +25,7 @@ const DeleteSignup = ({ deleting, onDelete }: Props) => {
       <p>
         <Trans t={t} i18nKey="editSignup.delete.info1">
           {"Are you sure you want to delete your sign up to "}
-          <strong>{{ event: event!.title }}</strong>?
+          <strong>{{ event: event.title }}</strong>?
         </Trans>
       </p>
       <p>

@@ -14,6 +14,7 @@ import {
 } from "@tietokilta/ilmomasiina-components/dist/routes/EditSignup/components/formData";
 import QuestionFields from "@tietokilta/ilmomasiina-components/dist/routes/EditSignup/components/QuestionFields";
 import { errorDesc } from "@tietokilta/ilmomasiina-components/dist/utils/errorMessage";
+import { getLocalizedEvent } from "@tietokilta/ilmomasiina-components/dist/utils/localizedEvent";
 import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import type { QuotaID } from "@tietokilta/ilmomasiina-models";
 import { saveSignup, signupEditCanceled } from "../../../modules/editor/actions";
@@ -100,6 +101,7 @@ const EditSignupModal = () => {
       editToken: "",
       isNew: true,
       event: convertedEvent,
+      localizedEvent: getLocalizedEvent(convertedEvent, editedSignup?.language ?? values.defaultLanguage),
       signup: {
         createdAt: new Date().toISOString(),
         status: null,

@@ -13,6 +13,7 @@ import {
 import EditSignupForm from "@tietokilta/ilmomasiina-components/dist/routes/EditSignup/components/EditForm";
 import EventDescription from "@tietokilta/ilmomasiina-components/dist/routes/SingleEvent/components/EventDescription";
 import SignupCountdown from "@tietokilta/ilmomasiina-components/dist/routes/SingleEvent/components/SignupCountdown";
+import { getLocalizedEvent } from "@tietokilta/ilmomasiina-components/dist/utils/localizedEvent";
 import { EditorEvent } from "../../../modules/editor/types";
 import { useTypedSelector } from "../../../store/reducers";
 import LanguageSelect from "./LanguageSelect";
@@ -29,10 +30,12 @@ const PreviewTab = () => {
   // Render route contents with simulated state.
   const [singleEventCtx, editSignupCtx] = useMemo((): [SingleEventState, EditSignupState] => {
     const convertedEvent = editorEventToUserEvent(values);
+    const localizedEvent = getLocalizedEvent(convertedEvent, selectedLanguage);
     return [
       {
         pending: false,
         event: convertedEvent,
+        localizedEvent,
         preview: { setPreviewingForm },
       },
       {
@@ -40,6 +43,7 @@ const PreviewTab = () => {
         editToken: "",
         isNew: true,
         event: convertedEvent,
+        localizedEvent,
         signup: previewDummySignup(convertedEvent),
         editingClosedOnLoad: false,
         confirmableUntil: Date.now() + 30 * 60 * 60 * 1000,
@@ -47,7 +51,7 @@ const PreviewTab = () => {
         preview: { setPreviewingForm },
       },
     ];
-  }, [values]);
+  }, [values, selectedLanguage]);
 
   return (
     <>

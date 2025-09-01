@@ -65,8 +65,11 @@ const SingleEventView = () => {
 
 const SingleEvent = () => {
   const { slug } = useParams<SingleEventProps>();
+  const {
+    i18n: { language },
+  } = useTranslation();
   return (
-    <SingleEventProvider slug={slug}>
+    <SingleEventProvider slug={slug} language={language}>
       <I18nProvider>
         <SingleEventView />
       </I18nProvider>

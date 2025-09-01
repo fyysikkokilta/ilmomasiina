@@ -172,7 +172,7 @@ type Props = {
 };
 
 const QuestionFields = ({ name }: Props) => {
-  const { event, editingClosedOnLoad, admin } = useEditSignupContext();
+  const { localizedEvent: event, editingClosedOnLoad, admin } = useEditSignupContext();
   const canEdit = !editingClosedOnLoad || admin;
   return (
     <>

@@ -37,7 +37,13 @@ const SubmitError = () => {
 const EXPIRY_WARNING_THRESHOLD = 5 * 60 * 1000;
 
 const EditableUntil = () => {
-  const { event, signup, editingClosedOnLoad, editableUntil, confirmableUntil } = useEditSignupContext();
+  const {
+    localizedEvent: event,
+    signup,
+    editingClosedOnLoad,
+    editableUntil,
+    confirmableUntil,
+  } = useEditSignupContext();
   const paths = usePaths();
   const Link = linkComponent();
   const { t } = useTranslation();
@@ -78,7 +84,7 @@ const EditableUntil = () => {
 };
 
 const EditFormSubmit = ({ disabled }: { disabled: boolean }) => {
-  const { event, editingClosedOnLoad, isNew, preview } = useEditSignupContext();
+  const { localizedEvent: event, editingClosedOnLoad, isNew, preview } = useEditSignupContext();
   const paths = usePaths();
   const Link = linkComponent();
   const { t } = useTranslation();
@@ -144,7 +150,7 @@ const EditFormBody = ({ handleSubmit, deleting, onDelete }: BodyProps) => {
 };
 
 const EditForm = () => {
-  const { event, signup, isNew, preview } = useEditSignupContext();
+  const { localizedEvent: event, signup, isNew, preview } = useEditSignupContext();
   const updateSignup = useUpdateSignup();
   const deleteSignup = useDeleteSignup();
   const [deleting, setDeleting] = useState(false);

@@ -36,8 +36,11 @@ const EditSignupView = () => {
 
 const EditSignup = () => {
   const { id, editToken } = useParams<EditSignupProps>();
+  const {
+    i18n: { language },
+  } = useTranslation();
   return (
-    <EditSignupProvider id={id} editToken={editToken}>
+    <EditSignupProvider id={id} editToken={editToken} language={language}>
       <I18nProvider>
         <EditSignupView />
       </I18nProvider>

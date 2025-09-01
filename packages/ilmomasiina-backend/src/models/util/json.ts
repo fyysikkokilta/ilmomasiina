@@ -11,5 +11,6 @@ import type { Model } from "sequelize";
 export const jsonColumnGetter = <T>(name: string) =>
   function getJsonColumn(this: Model): T {
     const json = this.getDataValue(name);
+    if (this.sequelize.getDialect() === "postgres") return json;
     return typeof json === "string" ? JSON.parse(json as unknown as string) : json;
   };
