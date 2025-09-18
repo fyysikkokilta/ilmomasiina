@@ -145,7 +145,7 @@
     "editor.action.convertToDraft": "Convert to draft",
     "editor.action.saveChanges": "Save changes",
     "editor.tabs.basic": "Basic details",
-    "editor.tabs.quotas": "Kiintiöt",
+    "editor.tabs.quotas": "Quotas",
     "editor.tabs.questions": "Questions",
     "editor.tabs.emails": "Confirmation emails",
     "editor.tabs.preview": "Preview",
