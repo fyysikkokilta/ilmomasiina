@@ -15,7 +15,7 @@
     "editSignup.action.save": "Save",
     "editSignup.action.back": "Back",
     "editSignup.delete.action": "Delete signup",
-    "editSignup.delete.action.confirm": "Paina uudelleen varmistukseksi\u2026",
+    "editSignup.delete.action.confirm": "Click again to confirm\u2026",
     "editSignup.delete.info1": "Are you sure you want to delete your sign up to <1>{{event}}</1>?",
     "editSignup.delete.info2": "If you delete your signup you will lose your spot in the queue. If you change your mind you can always sign up again to the event later, but you will be moved to the end of the queue.",
     "editSignup.delete.info3": "This cannot be undone.",
