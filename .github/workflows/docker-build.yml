@@ -132,6 +132,8 @@ jobs:
     permissions:
       packages: write
       contents: read
+      # NPM OIDC auth
+      id-token: write
     if: github.ref_type == 'tag' && github.repository == 'Tietokilta/ilmomasiina'
     uses: ./.github/workflows/npm-build.yml
     secrets: inherit
