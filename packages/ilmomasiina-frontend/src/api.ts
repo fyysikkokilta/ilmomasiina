@@ -1,4 +1,4 @@
-import { ApiError, apiFetch, FetchOptions } from "@tietokilta/ilmomasiina-components";
+import { ApiError, apiFetch, FetchOptions } from "@tietokilta/ilmomasiina-client";
 import { ErrorCode } from "@tietokilta/ilmomasiina-models";
 import { loginExpired } from "./modules/auth/actions";
 import { AccessToken } from "./modules/auth/types";

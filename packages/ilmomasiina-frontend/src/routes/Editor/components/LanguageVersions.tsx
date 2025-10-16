@@ -5,12 +5,12 @@ import { Button, ButtonGroup } from "react-bootstrap";
 import { useField, useForm } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
-import { knownLanguages } from "@tietokilta/ilmomasiina-components";
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import { AdminEventLanguage } from "@tietokilta/ilmomasiina-models";
+import { knownLanguages } from "../../../i18n";
 import { languageSelected } from "../../../modules/editor/actions";
 import { EditorEvent } from "../../../modules/editor/types";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import useEvent from "../../../utils/useEvent";
 
 type VersionProps = { language: string };
 

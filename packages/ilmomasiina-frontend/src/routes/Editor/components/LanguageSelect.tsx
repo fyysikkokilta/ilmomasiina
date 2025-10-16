@@ -3,10 +3,10 @@ import React, { ChangeEvent, useMemo } from "react";
 import { useField } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import { languageSelected } from "../../../modules/editor/actions";
 import { EditorEvent } from "../../../modules/editor/types";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import useEvent from "../../../utils/useEvent";
 import { useFieldValue } from "./hooks";
 import SelectBox from "./SelectBox";
 

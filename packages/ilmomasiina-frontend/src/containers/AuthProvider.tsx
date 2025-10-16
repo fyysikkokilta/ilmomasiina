@@ -1,12 +1,19 @@
-import React, { PropsWithChildren, useEffect } from "react";
+import React, { createContext, PropsWithChildren, useEffect } from "react";
 
-import { AuthContext } from "@tietokilta/ilmomasiina-components";
 import { renewLogin } from "../modules/auth/actions";
 import { useTypedDispatch, useTypedSelector } from "../store/reducers";
 
+export interface AuthState {
+  loggedIn: boolean;
+}
+
+export const AuthContext = createContext<AuthState>({
+  loggedIn: false,
+});
+
 const LOGIN_RENEW_INTERVAL = 60 * 1000;
 
-const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
+export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const auth = useTypedSelector((state) => state.auth);
   const dispatch = useTypedDispatch();
 
@@ -20,5 +27,3 @@ const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
-
-export default AuthProvider;

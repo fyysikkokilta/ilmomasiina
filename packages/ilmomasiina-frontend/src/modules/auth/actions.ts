@@ -1,10 +1,10 @@
 import { push } from "connected-react-router";
 import { toast } from "react-toastify";
 
-import { apiFetch } from "@tietokilta/ilmomasiina-components";
+import { apiFetch } from "@tietokilta/ilmomasiina-client";
 import { AdminLoginResponse } from "@tietokilta/ilmomasiina-models";
 import i18n from "../../i18n";
-import appPaths from "../../paths";
+import paths from "../../paths";
 import type { DispatchAction, GetState } from "../../store/types";
 import { LOGIN_SUCCEEDED, RESET } from "./actionTypes";
 
@@ -48,7 +48,7 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
     },
   });
   dispatch(loginSucceeded(sessionResponse));
-  dispatch(push(appPaths.adminEventsList));
+  dispatch(push(paths.adminEventsList));
   loginToast("success", i18n.t("auth.loginSuccess"), 2000);
   return true;
 };
@@ -62,14 +62,14 @@ export const createInitialUser = (email: string, password: string) => async (dis
     },
   });
   dispatch(loginSucceeded(sessionResponse));
-  dispatch(push(appPaths.adminEventsList));
+  dispatch(push(paths.adminEventsList));
   loginToast("success", i18n.t("initialSetup.success"), 2000);
   return true;
 };
 
 export const redirectToLogin = () => (dispatch: DispatchAction) => {
   dispatch(resetState());
-  dispatch(push(appPaths.adminLogin));
+  dispatch(push(paths.adminLogin));
 };
 
 export const logout = () => async (dispatch: DispatchAction) => {

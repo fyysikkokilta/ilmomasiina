@@ -3,10 +3,10 @@ import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
-import { useActionDateTimeFormatter } from "@tietokilta/ilmomasiina-components/dist/utils/dateFormat";
 import type { AuditLogItemSchema } from "@tietokilta/ilmomasiina-models";
 import { AuditEvent } from "@tietokilta/ilmomasiina-models";
-import appPaths from "../../paths";
+import paths from "../../paths";
+import { useActionDateTimeFormatter } from "../../utils/dateFormat";
 
 type Props = {
   item: AuditLogItemSchema;
@@ -46,7 +46,7 @@ function useItemDescription(item: AuditLogItemSchema) {
         <Trans t={t} i18nKey={ACTION_STRINGS[item.action]}>
           created event
           {item.eventId ? (
-            <Link to={appPaths.adminEditEvent(item.eventId as any)}>{{ event: item.eventName ?? "" }}</Link>
+            <Link to={paths.adminEditEvent(item.eventId as any)}>{{ event: item.eventName ?? "" }}</Link>
           ) : (
             { event: item.eventName ?? "" }
           )}
@@ -62,7 +62,7 @@ function useItemDescription(item: AuditLogItemSchema) {
           {{ signup: `${item.signupId} (${item.signupName})` }}
           in event
           {item.eventId ? (
-            <Link to={appPaths.adminEditEvent(item.eventId)}>{{ event: item.eventName ?? "" }}</Link>
+            <Link to={paths.adminEditEvent(item.eventId)}>{{ event: item.eventName ?? "" }}</Link>
           ) : (
             { event: item.eventName ?? "" }
           )}

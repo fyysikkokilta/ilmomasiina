@@ -3,13 +3,13 @@ import React, { ChangeEvent, Fragment, useCallback, useMemo, useState } from "re
 import { Button, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import { useActionDateTimeFormatter } from "@tietokilta/ilmomasiina-components/dist/utils/dateFormat";
-import { stringifyAnswer } from "@tietokilta/ilmomasiina-components/dist/utils/signupUtils";
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
+import { stringifyAnswer } from "@tietokilta/ilmomasiina-client/dist/utils/signupUtils";
 import { AdminEventResponse, SignupStatus } from "@tietokilta/ilmomasiina-models";
 import { deleteSignup, editNewSignup, editSignup, getEvent } from "../../../modules/editor/actions";
 import type { AdminSignupWithQuota } from "../../../modules/editor/types";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import { useActionDateTimeFormatter } from "../../../utils/dateFormat";
+import useEvent from "../../../utils/useEvent";
 import CSVLink, { CSVOptions } from "./CSVLink";
 import {
   getAnswersFromSignup,
@@ -141,9 +141,7 @@ const SignupsTab = () => {
   const createSignup = useEvent(() => dispatch(editNewSignup({ language })));
 
   if (!event) {
-    return (
-      <p>{t("editor.signups.noSignups")}</p>
-    )
+    return <p>{t("editor.signups.noSignups")}</p>;
   }
 
   const isSingleQuota = event.quotas.length <= 1;

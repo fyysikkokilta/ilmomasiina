@@ -7,19 +7,21 @@ import { Route, Switch } from "react-router-dom";
 import { Flip, ToastContainer } from "react-toastify";
 import { PersistGate } from "redux-persist/integration/react";
 
-import { EditSignup, Events, SingleEvent } from "@tietokilta/ilmomasiina-components";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import appPaths, { PathsProvider } from "../paths";
+import paths from "../paths";
 import PageNotFound from "../routes/404/PageNotFound";
-import AdminEventsList from "../routes/AdminEvents";
+import AdminEventsList from "../routes/AdminEventsList";
 import AdminUsersList from "../routes/AdminUsers";
 import AuditLog from "../routes/AuditLog";
 import Editor from "../routes/Editor";
+import EditSignup from "../routes/EditSignup";
+import EventList from "../routes/EventList";
 import InitialSetup from "../routes/InitialSetup";
 import Login from "../routes/Login";
+import SingleEvent from "../routes/SingleEvent";
 import configureStore, { history } from "../store/configureStore";
-import AuthProvider from "./AuthProvider";
+import { AuthProvider } from "./AuthProvider";
 
 import "react-toastify/scss/main.scss";
 import "../styles/app.scss";
@@ -31,46 +33,44 @@ const AppContainer = () => (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <ConnectedRouter history={history}>
-          <PathsProvider>
-            <AuthProvider>
-              <Header />
-              <Container>
-                <Switch>
-                  <Route exact path={appPaths.eventsList}>
-                    <Events />
-                  </Route>
-                  <Route exact path={appPaths.eventDetails(":slug")}>
-                    <SingleEvent />
-                  </Route>
-                  <Route exact path={appPaths.editSignup(":id", ":editToken")}>
-                    <EditSignup />
-                  </Route>
-                  <Route exact path={appPaths.adminLogin}>
-                    <Login />
-                  </Route>
-                  <Route exact path={appPaths.adminInitialSetup}>
-                    <InitialSetup />
-                  </Route>
-                  <Route exact path={appPaths.adminEventsList}>
-                    <AdminEventsList />
-                  </Route>
-                  <Route exact path={appPaths.adminUsersList}>
-                    <AdminUsersList />
-                  </Route>
-                  <Route exact path={appPaths.adminEditEvent(":id")}>
-                    <Editor />
-                  </Route>
-                  <Route exact path={appPaths.adminAuditLog}>
-                    <AuditLog />
-                  </Route>
-                  <Route path="*">
-                    <PageNotFound />
-                  </Route>
-                </Switch>
-              </Container>
-              <Footer />
-            </AuthProvider>
-          </PathsProvider>
+          <AuthProvider>
+            <Header />
+            <Container>
+              <Switch>
+                <Route exact path={paths.eventsList}>
+                  <EventList />
+                </Route>
+                <Route exact path={paths.eventDetails(":slug")}>
+                  <SingleEvent />
+                </Route>
+                <Route exact path={paths.editSignup(":id", ":editToken")}>
+                  <EditSignup />
+                </Route>
+                <Route exact path={paths.adminLogin}>
+                  <Login />
+                </Route>
+                <Route exact path={paths.adminInitialSetup}>
+                  <InitialSetup />
+                </Route>
+                <Route exact path={paths.adminEventsList}>
+                  <AdminEventsList />
+                </Route>
+                <Route exact path={paths.adminUsersList}>
+                  <AdminUsersList />
+                </Route>
+                <Route exact path={paths.adminEditEvent(":id")}>
+                  <Editor />
+                </Route>
+                <Route exact path={paths.adminAuditLog}>
+                  <AuditLog />
+                </Route>
+                <Route path="*">
+                  <PageNotFound />
+                </Route>
+              </Switch>
+            </Container>
+            <Footer />
+          </AuthProvider>
         </ConnectedRouter>
         <ToastContainer
           position="top-right"

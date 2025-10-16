@@ -7,15 +7,15 @@ import { I18nextProvider, useTranslation } from "react-i18next";
 import {
   EditSignupContextProvider,
   EditSignupState,
+  getLocalizedEvent,
   SingleEventContextProvider,
   SingleEventState,
-} from "@tietokilta/ilmomasiina-components";
-import EditSignupForm from "@tietokilta/ilmomasiina-components/dist/routes/EditSignup/components/EditForm";
-import EventDescription from "@tietokilta/ilmomasiina-components/dist/routes/SingleEvent/components/EventDescription";
-import SignupCountdown from "@tietokilta/ilmomasiina-components/dist/routes/SingleEvent/components/SignupCountdown";
-import { getLocalizedEvent } from "@tietokilta/ilmomasiina-components/dist/utils/localizedEvent";
+} from "@tietokilta/ilmomasiina-client";
 import { EditorEvent } from "../../../modules/editor/types";
 import { useTypedSelector } from "../../../store/reducers";
+import EditSignupForm from "../../EditSignup/components/EditForm";
+import EventDescription from "../../SingleEvent/components/EventDescription";
+import SignupCountdown from "../../SingleEvent/components/SignupCountdown";
 import LanguageSelect from "./LanguageSelect";
 import { editorEventToUserEvent, previewDummySignup } from "./userComponentInterop";
 
