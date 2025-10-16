@@ -206,6 +206,10 @@ i18n.init({
   lng: config.defaultLanguage,
   fallbackLng: config.defaultLanguage,
   resources: i18nResources,
+  interpolation: {
+    // We only pass i18n strings to email subjects or Pug, which also does escaping
+    escapeValue: false,
+  },
 });
 
 export default config;
