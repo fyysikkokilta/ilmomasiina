@@ -1,5 +1,5 @@
-import { QuestionType } from "../enum";
-import EventAttributes from "./event";
+import type { QuestionType } from "../enum";
+import type EventAttributes from "./event";
 
 export default interface QuestionAttributes {
   id: string;

@@ -13,6 +13,15 @@ export const quotaIdentity = Type.Object({
   id: quotaID,
 });
 
+/** Editable attributes of a quota language version. */
+export const quotaLanguageAttributes = Type.Object({
+  // No minLength to allow for fallback.
+  title: Type.String({
+    description: "Quota name.",
+    maxLength: 255,
+  }),
+});
+
 /** Editable attributes of a quota. */
 export const quotaAttributes = Type.Object({
   title: Type.String({

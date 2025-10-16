@@ -12,6 +12,9 @@ import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
 import DateTimePicker from "./DateTimePicker";
 import useEditorErrors from "./errors";
 import { useFieldTouched, useFieldValue } from "./hooks";
+import LanguageSelect from "./LanguageSelect";
+import LanguageVersions from "./LanguageVersions";
+import LocalizedFieldRow from "./LocalizedFieldRow";
 import SelectBox from "./SelectBox";
 import SlugField from "./SlugField";
 import Textarea from "./Textarea";
@@ -90,7 +93,18 @@ const BasicDetailsTab = () => {
 
   return (
     <div>
-      <FieldRow name="title" label={t("editor.basic.name")} required maxLength={255} formatError={formatError} />
+      <LanguageSelect />
+      <FieldRow name="languages" label={t("editor.basic.languages")} help={t("editor.basic.languages.info")} checkAlign>
+        <LanguageVersions />
+      </FieldRow>
+      <LocalizedFieldRow
+        name="title"
+        defaultAsPlaceholder
+        label={t("editor.basic.name")}
+        required
+        maxLength={255}
+        formatError={formatError}
+      />
       <GenerateSlug />
       <FieldRow
         name="slug"
@@ -187,12 +201,37 @@ const BasicDetailsTab = () => {
         inputProps={{ maxLength: 255 }}
         formatError={formatError}
       />
-      <FieldRow name="webpageUrl" label={t("editor.basic.homePage")} maxLength={255} formatError={formatError} />
-      <FieldRow name="facebookUrl" label={t("editor.basic.facebook")} maxLength={255} formatError={formatError} />
-      <FieldRow name="location" label={t("editor.basic.location")} maxLength={255} formatError={formatError} />
-      <FieldRow name="price" label={t("editor.basic.price")} maxLength={255} formatError={formatError} />
-      <FieldRow
+      <LocalizedFieldRow
+        name="webpageUrl"
+        defaultAsPlaceholder
+        label={t("editor.basic.homePage")}
+        maxLength={255}
+        formatError={formatError}
+      />
+      <LocalizedFieldRow
+        name="facebookUrl"
+        defaultAsPlaceholder
+        label={t("editor.basic.facebook")}
+        maxLength={255}
+        formatError={formatError}
+      />
+      <LocalizedFieldRow
+        name="location"
+        defaultAsPlaceholder
+        label={t("editor.basic.location")}
+        maxLength={255}
+        formatError={formatError}
+      />
+      <LocalizedFieldRow
+        name="price"
+        defaultAsPlaceholder
+        label={t("editor.basic.price")}
+        maxLength={255}
+        formatError={formatError}
+      />
+      <LocalizedFieldRow
         name="description"
+        defaultAsPlaceholder
         label={t("editor.basic.description")}
         help={t("editor.basic.description.info")}
         as={Textarea}

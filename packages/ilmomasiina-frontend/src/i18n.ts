@@ -11,8 +11,8 @@ const fiCombined = { ...fi, ...componentsRes.fi } as const;
 const enCombined = { ...en, ...componentsRes.en } as const;
 export const resources = {
   // these generate typescript errors if not exact match
-  fi: fiCombined as typeof enCombined,
-  en: enCombined as typeof fiCombined,
+  fi: fiCombined satisfies typeof enCombined,
+  en: enCombined satisfies typeof fiCombined,
 } as const;
 
 i18n
@@ -20,7 +20,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: "fi",
+    fallbackLng: DEFAULT_LANGUAGE,
     defaultNS,
     supportedLngs: Object.keys(resources),
     interpolation: {
@@ -33,7 +33,10 @@ i18n
     },
   });
 
-componentsI18n.init({ debug: !PROD });
+componentsI18n.init({
+  debug: !PROD,
+  fallbackLng: DEFAULT_LANGUAGE,
+});
 
 i18n.on("languageChanged", (newLang) => {
   componentsI18n.changeLanguage(newLang);

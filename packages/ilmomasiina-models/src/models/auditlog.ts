@@ -1,4 +1,4 @@
-import { AuditEvent } from "../enum";
+import type { AuditEvent } from "../enum";
 
 export default interface AuditLogAttributes {
   id: number;

@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 
 import { SignupStatus } from "@tietokilta/ilmomasiina-models";
-import config from "../config";
+import config, { editSignupUrl } from "../config";
 import i18n from "../i18n";
 import { Signup } from "../models/signup";
 import { generateToken } from "../routes/signups/editTokens";
@@ -37,10 +37,7 @@ export default async function sendSignupConfirmationMail(
   const date = event.date && moment(event.date).tz(config.timezone).format(dateFormat);
 
   const editToken = generateToken(signup.id);
-  const cancelLink = config.editSignupUrl
-    .replace(/\{id\}/g, signup.id)
-    .replace(/\{editToken\}/g, editToken)
-    .replace(/\{lang\}/g, signup.language || config.mailDefaultLang);
+  const cancelLink = editSignupUrl({ id: signup.id, editToken, lang: signup.language || config.defaultLanguage });
 
   const params = {
     name: fullName,

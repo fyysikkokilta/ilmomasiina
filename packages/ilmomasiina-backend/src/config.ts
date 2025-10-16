@@ -1,6 +1,7 @@
 import dotenvFlow from "dotenv-flow";
 import path from "path";
 
+import i18n, { i18nResources, knownLanguages } from "./i18n";
 import { envBoolean, envEnum, envInteger, envString, frontendFilesPath } from "./util/config";
 
 // Vite/Vitest sets BASE_URL. This conflicts with our config, but isn't used
@@ -18,6 +19,13 @@ if (!process.env.BASE_URL && process.env.EMAIL_BASE_URL) {
   console.warn(
     "BASE_URL is not set - assuming based on EMAIL_BASE_URL and PATH_PREFIX:\n" +
       `${process.env.BASE_URL}\n` +
+      "This behavior is DEPRECATED and may be removed in a future Ilmomasiina version.",
+  );
+}
+if (!process.env.DEFAULT_LANGUAGE && process.env.MAIL_DEFAULT_LANG) {
+  process.env.DEFAULT_LANGUAGE = process.env.MAIL_DEFAULT_LANG;
+  console.warn(
+    `DEFAULT_LANGUAGE is not set - using MAIL_DEFAULT_LANG: ${process.env.DEFAULT_LANGUAGE}\n` +
       "This behavior is DEPRECATED and may be removed in a future Ilmomasiina version.",
   );
 }
@@ -83,11 +91,8 @@ const config = {
   brandingMailFooterLink: envString("BRANDING_MAIL_FOOTER_LINK"),
   /** Calendar name included in iCalendar exports. */
   icalCalendarName: envString("BRANDING_ICAL_CALENDAR_NAME", "Ilmomasiina"),
-  /** Default language for emails, if no language is known for the signup.
-   *
-   * Also used for URLs in iCalendar.
-   */
-  mailDefaultLang: envString("MAIL_DEFAULT_LANG", "fi"),
+  /** Default language for emails, iCalendar exports, and signups for which no language is known. */
+  defaultLanguage: envEnum("DEFAULT_LANGUAGE", knownLanguages, "fi"),
 
   /** Domain name used for iCalendar UIDs. */
   icalUidDomain: envString("ICAL_UID_DOMAIN", null),
@@ -197,4 +202,25 @@ if (!config.editSignupUrl.includes("{id}") || !config.editSignupUrl.includes("{e
   throw new Error("EDIT_SIGNUP_URL must contain {id} and {editToken} if set.");
 }
 
+i18n.init({
+  lng: config.defaultLanguage,
+  fallbackLng: config.defaultLanguage,
+  resources: i18nResources,
+});
+
 export default config;
+
+export function adminUrl({ lang }: { lang: string }) {
+  return config.adminUrl.replace(/\{lang\}/g, lang);
+}
+
+export function eventDetailsUrl({ slug, lang }: { slug: string; lang: string }) {
+  return config.eventDetailsUrl.replace(/\{slug\}/g, slug).replace(/\{lang\}/g, lang);
+}
+
+export function editSignupUrl({ id, editToken, lang }: { id: string; editToken: string; lang: string }) {
+  return config.editSignupUrl
+    .replace(/\{id\}/g, id)
+    .replace(/\{editToken\}/g, editToken)
+    .replace(/\{lang\}/g, lang);
+}

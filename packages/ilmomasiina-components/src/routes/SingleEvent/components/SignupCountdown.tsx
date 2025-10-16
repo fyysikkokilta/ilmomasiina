@@ -6,7 +6,7 @@ import { useSingleEventContext } from "../../../modules/singleEvent";
 import SignupButton from "./SignupButton";
 
 const SignupCountdown = () => {
-  const event = useSingleEventContext().event!;
+  const event = useSingleEventContext().localizedEvent!;
   const openingTime = new Date(Date.now() + (event.millisTillOpening || 0));
 
   return (

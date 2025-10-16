@@ -12,13 +12,14 @@ import { useSingleEventContext } from "../../../modules/singleEvent";
 import { useEventDateTimeFormatter } from "../../../utils/dateFormat";
 
 const EventDescription = () => {
-  const event = useSingleEventContext().event!;
+  const event = useSingleEventContext().localizedEvent!;
   const { preview } = useSingleEventContext();
   const { loggedIn } = useContext(AuthContext);
   const Link = linkComponent();
   const paths = usePaths();
   const { t } = useTranslation();
   const eventDateFormat = useEventDateTimeFormatter();
+
   return (
     <>
       <nav className="ilmo--title-nav">

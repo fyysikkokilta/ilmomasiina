@@ -8,7 +8,7 @@ import { timezone } from "@tietokilta/ilmomasiina-components";
 import { getSignupsAsList, stringifyAnswer } from "@tietokilta/ilmomasiina-components/dist/utils/signupUtils";
 import type { AdminEventResponse, AdminSignupSchema, QuestionID } from "@tietokilta/ilmomasiina-models";
 import { SignupStatus } from "@tietokilta/ilmomasiina-models";
-import { AdminQuotaSignups, AdminSignupWithQuota } from "../../../modules/editor/types";
+import type { AdminQuotaSignups, AdminSignupWithQuota } from "../../../modules/editor/types";
 
 export function getAnswersFromSignup(event: AdminEventResponse, signup: AdminSignupSchema) {
   const answers: Record<QuestionID, string | string[]> = {};

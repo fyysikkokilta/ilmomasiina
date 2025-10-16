@@ -44,7 +44,7 @@ const ListQuotaRow = ({ row: { type, title, signupCount, quotaSize } }: { row: Q
 };
 
 const EventListView = () => {
-  const { events, error, pending } = useEventListContext();
+  const { localizedEvents: events, error, pending } = useEventListContext();
   const { t } = useTranslation();
   const paths = usePaths();
 
@@ -95,12 +95,17 @@ const EventListView = () => {
   );
 };
 
-const EventList = ({ category }: EventListProps) => (
-  <EventListProvider category={category}>
-    <I18nProvider>
-      <EventListView />
-    </I18nProvider>
-  </EventListProvider>
-);
+const EventList = ({ category }: EventListProps) => {
+  const {
+    i18n: { language },
+  } = useTranslation();
+  return (
+    <EventListProvider category={category} language={language}>
+      <I18nProvider>
+        <EventListView />
+      </I18nProvider>
+    </EventListProvider>
+  );
+};
 
 export default EventList;

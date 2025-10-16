@@ -49,9 +49,9 @@ type PropsWithAs<C extends As> = BaseProps & {
   children?: undefined;
 } & Omit<ComponentPropsWithoutRef<C>, keyof BaseProps | "as" | "children">;
 
-type Props<C extends As> = PropsWithFormControl | PropsWithChildren | PropsWithAs<C>;
+export type FieldRowProps<C extends As> = PropsWithFormControl | PropsWithChildren | PropsWithAs<C>;
 
-/** react-final-field field row component */
+/** react-final-form field row component */
 export default function FieldRow<C extends As>({
   name,
   label = "",
@@ -68,7 +68,7 @@ export default function FieldRow<C extends As>({
   controlId = id ?? name,
   config,
   ...props
-}: Props<C>) {
+}: FieldRowProps<C>) {
   const {
     input,
     meta: { error: validationError, submitError, invalid },

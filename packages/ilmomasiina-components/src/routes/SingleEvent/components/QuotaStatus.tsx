@@ -7,7 +7,7 @@ import { useSingleEventContext } from "../../../modules/singleEvent";
 import QuotaProgress from "./QuotaProgress";
 
 const QuotaStatus = () => {
-  const { event, signupsByQuota } = useSingleEventContext();
+  const { localizedEvent, signupsByQuota } = useSingleEventContext();
   const { t } = useTranslation();
 
   if (!signupsByQuota?.length) return null;
@@ -31,7 +31,7 @@ const QuotaStatus = () => {
                 key={quota.id}
                 title={t("singleEvent.quotaCounts.openQuota")}
                 value={quota.signupCount}
-                max={event!.openQuotaSize}
+                max={localizedEvent!.openQuotaSize}
               />
             );
           case SignupStatus.IN_QUEUE:

@@ -1,21 +1,65 @@
 import { Static, Type } from "@sinclair/typebox";
 
 import { question, questionCreate, questionUpdate } from "../question";
-import { quotaCreate, quotaUpdate } from "../quota";
+import { quota, quotaCreate, quotaUpdate } from "../quota";
 import { adminQuotaWithSignups, userQuotaWithSignups } from "../quotaWithSignups";
+import { Nullable } from "../utils";
 import {
-  adminEventDetailsAttributes,
-  eventDynamicAttributes,
+  adminDetailsOnlyCommonAttributes,
+  adminEventLanguage,
+  adminEventLanguages,
+  adminOnlyEventAttributes,
   eventID,
   eventIdentity,
   eventSlug,
-  userEventDetailsAttributes,
+  publicCommonAttributes,
+  publicEventAttributes,
+  userEventLanguage,
+  userEventLanguages,
 } from "./attributes";
 
-/** Response schema for fetching or modifying an event in the admin API. */
-export const adminEventResponse = Type.Intersect([
+/** Non-relation attributes for the public API. */
+const publicAttributes = Type.Composite([publicEventAttributes, publicCommonAttributes, userEventLanguages]);
+
+/** Response schema for fetching an event from the public API. */
+export const userEventResponse = Type.Composite([
   eventIdentity,
-  adminEventDetailsAttributes,
+  publicAttributes,
+  Type.Object({
+    questions: Type.Array(question),
+    quotas: Type.Array(userQuotaWithSignups),
+    millisTillOpening: Nullable(Type.Integer(), {
+      description: "Time in ms until signup opens. If null, the signup will not open in the future.",
+    }),
+    registrationClosed: Type.Boolean({
+      description: "Whether the signup has closed.",
+    }),
+  }),
+]);
+
+/** Response schema when an event is fetched as part of an editable signup. */
+export const userEventForSignup = Type.Composite([
+  eventIdentity,
+  publicAttributes,
+  Type.Object({
+    questions: Type.Array(question),
+    quotas: Type.Array(quota),
+  }),
+]);
+
+/** Non-relation attributes for the admin API. */
+const adminAttributes = Type.Composite([
+  publicEventAttributes,
+  publicCommonAttributes,
+  adminOnlyEventAttributes,
+  adminDetailsOnlyCommonAttributes,
+  adminEventLanguages,
+]);
+
+/** Response schema for fetching or modifying an event in the admin API. */
+export const adminEventResponse = Type.Composite([
+  eventIdentity,
+  adminAttributes,
   Type.Object({
     questions: Type.Array(question),
     quotas: Type.Array(adminQuotaWithSignups),
@@ -26,20 +70,9 @@ export const adminEventResponse = Type.Intersect([
   }),
 ]);
 
-/** Response schema for fetching an event from the public API. */
-export const userEventResponse = Type.Intersect([
-  eventIdentity,
-  userEventDetailsAttributes,
-  Type.Object({
-    questions: Type.Array(question),
-    quotas: Type.Array(userQuotaWithSignups),
-  }),
-  eventDynamicAttributes,
-]);
-
 /** Request body for creating an event. */
-export const eventCreateBody = Type.Intersect([
-  adminEventDetailsAttributes,
+export const eventCreateBody = Type.Composite([
+  adminAttributes,
   Type.Object({
     quotas: Type.Array(quotaCreate),
     questions: Type.Array(questionCreate),
@@ -49,7 +82,7 @@ export const eventCreateBody = Type.Intersect([
 /** Request body for editing an existing event. */
 export const eventUpdateBody = Type.Partial(
   Type.Composite([
-    adminEventDetailsAttributes,
+    adminAttributes,
     Type.Object({
       quotas: Type.Array(quotaUpdate),
       questions: Type.Array(questionUpdate),
@@ -67,23 +100,14 @@ export const eventUpdateBody = Type.Partial(
   ]),
 );
 
-/** Response schema when an event is fetched as part of an editable signup. */
-export const userEventForSignup = Type.Composite([
-  eventIdentity,
-  userEventDetailsAttributes,
-  Type.Object({
-    questions: Type.Array(question),
-  }),
-]);
+/** Path parameters necessary to fetch an event from the public API. */
+export const userEventPathParams = Type.Object({
+  slug: eventSlug,
+});
 
 /** Path parameters necessary to fetch an event from the admin API. */
 export const adminEventPathParams = Type.Object({
   id: eventID,
-});
-
-/** Path parameters necessary to fetch an event from the public API. */
-export const userEventPathParams = Type.Object({
-  slug: eventSlug,
 });
 
 /** Event ID type. Randomly generated alphanumeric string. */
@@ -105,3 +129,8 @@ export type EventUpdateBody = Static<typeof eventUpdateBody>;
 export type AdminEventResponse = Static<typeof adminEventResponse>;
 /** Response schema for fetching an event from the public API. */
 export type UserEventResponse = Static<typeof userEventResponse>;
+
+/** Schema for an event language version for admins. */
+export type AdminEventLanguage = Static<typeof adminEventLanguage>;
+/** Schema for an event language version. */
+export type UserEventLanguage = Static<typeof userEventLanguage>;

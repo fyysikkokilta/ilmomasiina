@@ -12,6 +12,7 @@ import type { AnswerAttributes } from "@tietokilta/ilmomasiina-models/dist/model
 import type { Question } from "./question";
 import { RANDOM_ID_LENGTH } from "./randomId";
 import { Signup } from "./signup";
+import { jsonColumnGetter } from "./util/json";
 
 export interface AnswerCreationAttributes extends Optional<AnswerAttributes, "id"> {}
 
@@ -52,17 +53,9 @@ export default function setupAnswerModel(sequelize: Sequelize) {
         allowNull: false,
       },
       answer: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: false,
-        // TODO: Once we upgrade to Sequelize v7, try migrating this to custom datatypes again.
-        get(): string | string[] {
-          const json = this.getDataValue("answer");
-          return json === null ? null : JSON.parse(json as unknown as string);
-        },
-        set(val: string[] | null) {
-          const json = val === null ? null : JSON.stringify(val);
-          this.setDataValue("answer", json as unknown as string | string[]);
-        },
+        get: jsonColumnGetter<string | string[]>("answer"),
       },
     },
     {
