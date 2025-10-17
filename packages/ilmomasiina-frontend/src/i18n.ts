@@ -1,26 +1,31 @@
-import i18n from "i18next";
+import i18n, { DefaultNamespace, ParseKeys } from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
-import { i18n as componentsI18n, i18nResources as componentsRes } from "@tietokilta/ilmomasiina-components";
-import * as en from "./locales/en.json";
-import * as fi from "./locales/fi.json";
+import { i18nResources as componentsRes } from "@tietokilta/ilmomasiina-client";
+import en from "./locales/en.json";
+import fi from "./locales/fi.json";
 
-export const defaultNS = ["frontend", "components"] as const;
+export const defaultNS = ["frontend", "public"] as const;
 const fiCombined = { ...fi, ...componentsRes.fi } as const;
 const enCombined = { ...en, ...componentsRes.en } as const;
 export const resources = {
   // these generate typescript errors if not exact match
-  fi: fiCombined as typeof enCombined,
-  en: enCombined as typeof fiCombined,
+  fi: fiCombined satisfies typeof enCombined,
+  en: enCombined satisfies typeof fiCombined,
 } as const;
+
+export type KnownLanguage = keyof typeof resources;
+export const knownLanguages = Object.keys(resources) as KnownLanguage[];
+
+export type TKey = ParseKeys<DefaultNamespace>;
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: "fi",
+    fallbackLng: DEFAULT_LANGUAGE,
     defaultNS,
     supportedLngs: Object.keys(resources),
     interpolation: {
@@ -32,12 +37,5 @@ i18n
       nsMode: "fallback",
     },
   });
-
-componentsI18n.init({ debug: !PROD });
-
-i18n.on("languageChanged", (newLang) => {
-  componentsI18n.changeLanguage(newLang);
-});
-componentsI18n.changeLanguage(i18n.language);
 
 export default i18n;

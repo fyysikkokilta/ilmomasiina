@@ -3,9 +3,9 @@ import React from "react";
 import { Button, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
 import { moveToQueueCanceled } from "../../../modules/editor/actions";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import useEvent from "../../../utils/useEvent";
 
 type Props = {
   onProceed: () => void;

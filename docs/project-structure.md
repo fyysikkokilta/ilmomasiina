@@ -48,22 +48,17 @@ The project is divided into four packages. Source folders are listed under each,
     - `src/mail`: Code for formatting and sending emails.
     - `emails`: Pug templates and CSS for email templates.
     - `test`: Backend test code.
-- `ilmomasiina-components` contains reusable components for the user-facing parts of the frontend.
+- `ilmomasiina-client` contains reusable client code for the user-facing parts of the frontend.
     - `src/modules`: API access and minimal state logic for each route provided by this package.
       See [state-context.md](./state-context.md) for more on what these files contain.
-    - `src/routes`: React implementations of the routes using React-Bootstrap.
     - `src/locales`: Locale files for the routes.
-    - `src/styles`: Shared styles for the React route implementations here.
-    - `src/config`: Global state used for integrating the routes to other code.
-    - `src/contexts`: Contexts used for integrating the routes to other code.
-    - `src/components`: Some reusable components shared between routes.
 - `ilmomasiina-frontend` contains the frontend code and Vite config for building and developing it.
-  It also depends on `ilmomasiina-models` and `ilmomasiina-components` but not `ilmomasiina-backend`.
+  It also depends on `ilmomasiina-models` and `ilmomasiina-client` but not `ilmomasiina-backend`.
     - `src/modules`: Redux reducers for each route.
     - `src/routes`: React implementations for each route.
     - `src/locales`: Locale files for the app.
     - `src/styles`: Styles for the app.
-    - `src/containers`: Router for the app, for both the routes from this package and `ilmomasiina-components`.
+    - `src/containers`: Router for the app.
     - `src/components`: Some reusable components shared between routes.
     - `src/store`: Redux store.
     - `src/branding.ts`: Definitions for some configurable branding strings.

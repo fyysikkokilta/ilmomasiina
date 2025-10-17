@@ -9,7 +9,7 @@ If you want to change any of the following, you'll need to modify the code sligh
 build your own Docker image (if using Docker):
 
 - Hosting in a subfolder (instead of directly at `https://ilmo.your.domain/`)
-- Colors ([`packages/ilmomasiina-components/src/styles/_definitions.scss`](../packages/ilmomasiina-components/src/styles/_definitions.scss))
+- Colors ([`packages/ilmomasiina-frontend/src/styles/_definitions.scss`](../packages/ilmomasiina-frontend/src/styles/_definitions.scss))
 - Header logo (`packages/ilmomasiina-frontend/src/assets/logo.svg`) (can also be disabled from `_definitions.scss`)
 - Favicon (`packages/ilmomasiina-frontend/public/*.png`)
 - Header title (build args or [`packages/ilmomasiina-frontend/src/branding.ts`](../packages/ilmomasiina-frontend/src/branding.ts))

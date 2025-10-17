@@ -14,6 +14,7 @@ import type {
 } from "@tietokilta/ilmomasiina-models";
 import {
   adminEventGetEventAttrs,
+  adminEventGetSignupAttrs,
   eventGetAnswerAttrs,
   eventGetEventAttrs,
   eventGetQuestionAttrs,
@@ -199,7 +200,7 @@ export async function eventDetailsForAdmin(eventID: EventID): Promise<AdminEvent
     include: [
       {
         model: Signup.scope("active"),
-        attributes: [...eventGetSignupAttrs, "id", "email"],
+        attributes: adminEventGetSignupAttrs,
         required: false,
         // ... and answers of signups
         include: [

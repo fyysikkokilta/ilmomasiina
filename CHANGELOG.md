@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0-alpha42
+
+- **BREAKING:** Replaced the `@tietokilta/ilmomasiina-components` package with `ilmomasiina-client`, which gets rid of
+  shared React components and only provides API helpers, React hooks for state and API, and locale strings
+- **BREAKING:** Restructuring moved all customization to the `@tietokilta/ilmomasiina-frontend` package.
+- **Feature:** Added comprehensive multi-language support to events; API is backwards compatible and older clients will
+  see the default language of events
+- Localization fixes
+- Updated dependencies
+- Development environment improvements
+
 ## 2.0.0-alpha41
 
 - Fix issue that caused failure in rendering the CreateEvent page

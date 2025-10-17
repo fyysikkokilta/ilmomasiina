@@ -9,6 +9,7 @@ import {
   EVENT_SAVING,
   EVENT_SLUG_CHECKED,
   EVENT_SLUG_CHECKING,
+  LANGUAGE_SELECTED,
   MOVE_TO_QUEUE_CANCELED,
   MOVE_TO_QUEUE_WARNING,
   RESET,
@@ -21,6 +22,7 @@ const initialState: EditorState = {
   event: null,
   isNew: true,
   slugAvailability: null,
+  selectedLanguage: DEFAULT_LANGUAGE,
   allCategories: null,
   moveToQueueModal: null,
   editConflictModal: null,
@@ -61,6 +63,11 @@ export default function reducer(state = initialState, action: EditorActions): Ed
       return {
         ...state,
         slugAvailability: action.payload,
+      };
+    case LANGUAGE_SELECTED:
+      return {
+        ...state,
+        selectedLanguage: action.payload,
       };
     case EVENT_SAVING:
       return {
@@ -149,6 +156,7 @@ export default function reducer(state = initialState, action: EditorActions): Ed
         editedSignup: null,
       };
     default:
+      action satisfies never;
       return state;
   }
 }

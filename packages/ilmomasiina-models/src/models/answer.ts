@@ -1,5 +1,5 @@
-import QuestionAttributes from "./question";
-import SignupAttributes from "./signup";
+import type QuestionAttributes from "./question";
+import type SignupAttributes from "./signup";
 
 export default interface AnswerAttributes {
   id: string;

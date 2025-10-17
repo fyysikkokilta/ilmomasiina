@@ -1,4 +1,4 @@
-@use "@tietokilta/ilmomasiina-components/src/styles/definitions" as *;
+@use "../../styles/definitions" as *;
 
 .tab {
   border-left: 1px solid grey;
@@ -16,6 +16,35 @@
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
+}
+
+.event-editor--selected-language {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 1ch;
+  white-space: nowrap;
+  margin-bottom: 1rem;
+
+  label {
+    margin-bottom: 0;
+  }
+
+  select {
+    width: max-content;
+  }
+}
+
+.event-editor--language-versions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-editor--language-version {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
 }
 
 .sortable-item {

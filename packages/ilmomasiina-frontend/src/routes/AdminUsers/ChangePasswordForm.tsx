@@ -6,13 +6,12 @@ import { Form } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { ApiError } from "@tietokilta/ilmomasiina-components";
-import { errorDesc } from "@tietokilta/ilmomasiina-components/dist/utils/errorMessage";
-import useEvent from "@tietokilta/ilmomasiina-components/dist/utils/useEvent";
+import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
 import FieldFormGroup from "../../components/FieldFormGroup";
-import i18n from "../../i18n";
+import i18n, { TKey } from "../../i18n";
 import { changePassword } from "../../modules/adminUsers/actions";
 import { useTypedDispatch } from "../../store/reducers";
+import useEvent from "../../utils/useEvent";
 
 type FormData = {
   oldPassword: string;
@@ -60,7 +59,7 @@ const ChangePasswordForm = () => {
         autoClose: 5000,
       });
     } catch (err) {
-      toast.error(errorDesc(t, err as ApiError, "adminUsers.changePassword.errors"), {
+      toast.error(t(errorDesc<TKey>(err as ApiError, "adminUsers.changePassword.errors")), {
         autoClose: 5000,
       });
     }

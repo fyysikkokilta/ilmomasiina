@@ -1,4 +1,4 @@
-import EventAttributes from "./event";
+import type EventAttributes from "./event";
 
 export default interface QuotaAttributes {
   id: string;

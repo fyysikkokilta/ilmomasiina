@@ -1,5 +1,5 @@
-import type { ApiError } from "@tietokilta/ilmomasiina-components";
-import type { QuotaSignups, SignupWithQuota } from "@tietokilta/ilmomasiina-components/dist/utils/signupUtils";
+import type { ApiError } from "@tietokilta/ilmomasiina-client";
+import type { QuotaSignups, SignupWithQuota } from "@tietokilta/ilmomasiina-client/dist/utils/signupUtils";
 import type {
   AdminEventResponse,
   AdminSignupCreateBody,
@@ -34,6 +34,7 @@ export interface EditorState {
   isNew: boolean;
   loadError?: ApiError;
   slugAvailability: null | "checking" | CheckSlugResponse;
+  selectedLanguage: string;
   allCategories: null | string[];
   moveToQueueModal: { count: number } | null;
   editConflictModal: EditConflictError | null;

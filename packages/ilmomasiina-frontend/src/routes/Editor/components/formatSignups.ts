@@ -4,11 +4,10 @@ import find from "lodash-es/find";
 import orderBy from "lodash-es/orderBy";
 import { useTranslation } from "react-i18next";
 
-import { timezone } from "@tietokilta/ilmomasiina-components";
-import { getSignupsAsList, stringifyAnswer } from "@tietokilta/ilmomasiina-components/dist/utils/signupUtils";
+import { getSignupsAsList, stringifyAnswer } from "@tietokilta/ilmomasiina-client/dist/utils/signupUtils";
 import type { AdminEventResponse, AdminSignupSchema, QuestionID } from "@tietokilta/ilmomasiina-models";
 import { SignupStatus } from "@tietokilta/ilmomasiina-models";
-import { AdminQuotaSignups, AdminSignupWithQuota } from "../../../modules/editor/types";
+import type { AdminQuotaSignups, AdminSignupWithQuota } from "../../../modules/editor/types";
 
 export function getAnswersFromSignup(event: AdminEventResponse, signup: AdminSignupSchema) {
   const answers: Record<QuestionID, string | string[]> = {};
@@ -73,7 +72,7 @@ function getCsvDateTimeFormatter() {
     minute: "numeric",
     second: "numeric",
     hour12: false,
-    timeZone: timezone(),
+    timeZone: TIMEZONE,
   });
 }
 

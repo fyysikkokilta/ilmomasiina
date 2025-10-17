@@ -23,6 +23,7 @@ import type { QuestionAttributes } from "@tietokilta/ilmomasiina-models/dist/mod
 import type { Answer } from "./answer";
 import type { Event } from "./event";
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
+import { jsonColumnGetter } from "./util/json";
 
 export interface QuestionCreationAttributes
   extends Optional<QuestionAttributes, "id" | "options" | "required" | "public"> {}
@@ -86,17 +87,9 @@ export default function setupQuestionModel(sequelize: Sequelize) {
         allowNull: false,
       },
       options: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: true,
-        // TODO: Once we upgrade to Sequelize v7, try migrating this to custom datatypes again.
-        get(): string[] {
-          const json = this.getDataValue("options");
-          return json === null ? null : JSON.parse(json as unknown as string);
-        },
-        set(val: string[] | null) {
-          const json = val === null ? null : JSON.stringify(val);
-          this.setDataValue("options", json as unknown as string[]);
-        },
+        get: jsonColumnGetter<string[]>("options"),
       },
       required: {
         type: DataTypes.BOOLEAN,

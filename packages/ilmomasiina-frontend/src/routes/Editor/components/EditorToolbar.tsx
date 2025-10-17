@@ -5,7 +5,7 @@ import { useFormState } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
-import appPaths from "../../../paths";
+import paths from "../../../paths";
 import { useTypedSelector } from "../../../store/reducers";
 
 type Props = {
@@ -28,7 +28,7 @@ const EditorToolbar = ({ onSave, onSaveToggleDraft }: Props) => {
       <h1>{isNew ? t("editor.title.new") : t("editor.title.edit")}</h1>
       <div className="event-editor--buttons-wrapper">
         <div className="flex-fill">
-          <Link to={appPaths.adminEventsList}>&#8592; {t("editor.action.goBack")}</Link>
+          <Link to={paths.adminEventsList}>&#8592; {t("editor.action.goBack")}</Link>
         </div>
         {isSubmitting && <Spinner animation="border" />}
         <div className="event-editor--public-status">
@@ -37,7 +37,7 @@ const EditorToolbar = ({ onSave, onSaveToggleDraft }: Props) => {
             {isDraft ? (
               t("editor.status.draft")
             ) : (
-              <Link to={appPaths.eventDetails(event!.slug)} target="_blank">
+              <Link to={paths.eventDetails(event!.slug)} target="_blank">
                 {t("editor.status.published")}
               </Link>
             )}

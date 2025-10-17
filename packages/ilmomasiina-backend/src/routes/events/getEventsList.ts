@@ -4,12 +4,16 @@ import moment from "moment";
 import { col, fn, Op, Order, WhereOptions } from "sequelize";
 
 import type { AdminEventListResponse, EventListQuery, UserEventListResponse } from "@tietokilta/ilmomasiina-models";
-import { adminEventListEventAttrs, eventListEventAttrs } from "@tietokilta/ilmomasiina-models/dist/attrs/event";
+import {
+  adminEventListEventAttrs,
+  eventListEventAttrs,
+  eventListQuotaAttrs,
+} from "@tietokilta/ilmomasiina-models/dist/attrs/event";
 import config from "../../config";
 import { Event } from "../../models/event";
 import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";
-import { ascNullsFirst } from "../../models/util";
+import { ascNullsFirst } from "../../models/util/ascNullsFirst";
 import createCache from "../../util/cache";
 import { InitialSetupNeeded, isInitialSetupDone } from "../admin/users/createInitialUser";
 import { StringifyApi } from "../utils";
@@ -57,7 +61,7 @@ export const eventsListForUserCached = createCache({
       include: [
         {
           model: Quota,
-          attributes: ["id", "title", "size", [fn("COUNT", col("quotas->signups.id")), "signupCount"]],
+          attributes: [...eventListQuotaAttrs, [fn("COUNT", col("quotas->signups.id")), "signupCount"]],
           include: [
             {
               model: Signup.scope("active"),
@@ -109,7 +113,7 @@ export async function getEventsListForAdmin(
     include: [
       {
         model: Quota,
-        attributes: ["id", "title", "size", [fn("COUNT", col("quotas->signups.id")), "signupCount"]],
+        attributes: [...eventListQuotaAttrs, [fn("COUNT", col("quotas->signups.id")), "signupCount"]],
         include: [
           {
             model: Signup.scope("active"),

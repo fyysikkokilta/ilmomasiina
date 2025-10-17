@@ -1,5 +1,5 @@
-import { SignupStatus } from "../enum";
-import QuotaAttributes from "./quota";
+import type { SignupStatus } from "../enum";
+import type QuotaAttributes from "./quota";
 
 export default interface SignupAttributes {
   id: string;

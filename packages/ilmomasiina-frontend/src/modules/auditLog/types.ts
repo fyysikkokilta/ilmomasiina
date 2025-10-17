@@ -1,4 +1,4 @@
-import type { ApiError } from "@tietokilta/ilmomasiina-components";
+import type { ApiError } from "@tietokilta/ilmomasiina-client";
 import type { AuditLogResponse, AuditLoqQuery } from "@tietokilta/ilmomasiina-models";
 
 export interface AuditLogState {

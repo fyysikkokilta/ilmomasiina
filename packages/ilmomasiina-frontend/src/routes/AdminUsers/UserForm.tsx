@@ -6,10 +6,10 @@ import { Form } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { ApiError } from "@tietokilta/ilmomasiina-components";
-import { errorDesc } from "@tietokilta/ilmomasiina-components/dist/utils/errorMessage";
+import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
 import branding from "../../branding";
 import FieldFormGroup from "../../components/FieldFormGroup";
+import type { TKey } from "../../i18n";
 import { createUser, getUsers } from "../../modules/adminUsers/actions";
 import { useTypedDispatch } from "../../store/reducers";
 
@@ -31,7 +31,7 @@ const UserForm = () => {
       });
     } catch (err) {
       toast.error(
-        errorDesc(t, err as ApiError, "adminUsers.createUser.errors", {
+        t(errorDesc<TKey>(err as ApiError, "adminUsers.createUser.errors"), {
           email: data.email,
         }),
         { autoClose: 5000 },

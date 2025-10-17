@@ -9,6 +9,8 @@ jobs:
     permissions:
       packages: write
       contents: read
+      # NPM OIDC auth
+      id-token: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -22,20 +24,22 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "pnpm"
 
+      - # Necessary for OIDC auth
+        name: Update npm to latest
+        run: npm install -g npm@^11
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
         run: |
           pnpm run --filter @tietokilta/ilmomasiina-models build
-          pnpm run --filter @tietokilta/ilmomasiina-components build
+          pnpm run --filter @tietokilta/ilmomasiina-client build
 
       - name: Publish to NPM
         run: |
           pnpm publish --filter @tietokilta/ilmomasiina-models --no-git-checks --access public
-          pnpm publish --filter @tietokilta/ilmomasiina-components --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          pnpm publish --filter @tietokilta/ilmomasiina-client --no-git-checks --access public
 
       - name: Setup Node.js for GitHub Packages
         uses: useblacksmith/setup-node@v5
@@ -45,6 +49,6 @@ jobs:
       - name: Publish to GitHub Packages
         run: |
           pnpm publish --filter @tietokilta/ilmomasiina-models --no-git-checks --access public
-          pnpm publish --filter @tietokilta/ilmomasiina-components --no-git-checks --access public
+          pnpm publish --filter @tietokilta/ilmomasiina-client --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

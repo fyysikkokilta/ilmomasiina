@@ -51,6 +51,8 @@ const tabForField: Record<keyof EditorEvent, EditorTab | null> = {
   verificationEmail: EditorTab.EMAILS,
   quotas: EditorTab.QUOTAS,
   questions: EditorTab.QUESTIONS,
+  languages: EditorTab.BASIC_DETAILS,
+  defaultLanguage: EditorTab.BASIC_DETAILS,
   moveSignupsToQueue: null,
   updatedAt: null,
 };
