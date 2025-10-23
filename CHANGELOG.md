@@ -1,10 +1,29 @@
 # Changelog
 
+## 2.0.0-alpha46
+
+- Avoid another error for older servers in `getLocalizedEvent`
+
+## 2.0.0-alpha45
+
+- **Breaking (ilmomasiina-client):** Replaced `getLocalizedQuotaForEditSignup` with `getLocalizedSignup`
+- Fix localization of current quota in signup editor
+- Avoid errors for older servers in `getLocalizedEvent`
+
+## 2.0.0-alpha44
+
+- Also build ESM versions of public packages
+
+## 2.0.0-alpha43
+
+- Minor typing improvements
+
 ## 2.0.0-alpha42
 
-- **BREAKING:** Replaced the `@tietokilta/ilmomasiina-components` package with `ilmomasiina-client`, which gets rid of
-  shared React components and only provides API helpers, React hooks for state and API, and locale strings
 - **BREAKING:** Restructuring moved all customization to the `@tietokilta/ilmomasiina-frontend` package.
+- **Breaking (ilmomasiina-components):** Replaced the `@tietokilta/ilmomasiina-components` package with
+  `ilmomasiina-client`, which gets rid of shared React components and only provides API helpers, React hooks for state
+  and API, and locale strings
 - **Feature:** Added comprehensive multi-language support to events; API is backwards compatible and older clients will
   see the default language of events
 - Localization fixes

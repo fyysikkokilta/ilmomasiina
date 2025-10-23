@@ -3,16 +3,17 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 import { useEditSignupContext } from "@tietokilta/ilmomasiina-client";
+import { SignupStatus as SignupStatusEnum } from "@tietokilta/ilmomasiina-models";
 
 const SignupStatus = () => {
-  const { localizedEvent: event, signup } = useEditSignupContext();
+  const { localizedEvent: event, localizedSignup: signup } = useEditSignupContext();
   const { status, position, quota } = signup!;
   const { openQuotaSize } = event!;
   const { t } = useTranslation();
 
   if (!status) return null;
 
-  if (status === "in-quota") {
+  if (status === SignupStatusEnum.IN_QUOTA) {
     return (
       <p>
         {t("editSignup.position.quota", {
@@ -23,7 +24,7 @@ const SignupStatus = () => {
     );
   }
 
-  if (status === "in-open") {
+  if (status === SignupStatusEnum.IN_OPEN_QUOTA) {
     return <p>{t("editSignup.position.openQuota", { position: `${position} / ${openQuotaSize}.` })}</p>;
   }
 

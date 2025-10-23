@@ -1,26 +1,28 @@
 {
   "name": "@tietokilta/ilmomasiina-client",
-  "version": "2.0.0-alpha42",
+  "version": "2.0.0-alpha46",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Tietokilta/ilmomasiina.git"
   },
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "types": "dist/esm/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "node": "./dist/cjs/index.js"
     },
     "./dist/*": {
-      "types": "./dist/*.d.ts",
-      "import": "./dist/*.js"
+      "types": "./dist/esm/*.d.ts",
+      "import": "./dist/esm/*.js",
+      "node": "./dist/cjs/*.js"
     },
     "./src/*": "./src/*.ts"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build && tsc --build tsconfig.cjs.json",
     "clean": "rimraf dist",
     "typecheck": "tsc --build"
   },
@@ -41,6 +43,6 @@
     "@types/react": "^17.0.87",
     "react": "^18.3.0",
     "rimraf": "^5.0.10",
-    "typescript": "~5.2.2"
+    "typescript": "~5.9.3"
   }
 }

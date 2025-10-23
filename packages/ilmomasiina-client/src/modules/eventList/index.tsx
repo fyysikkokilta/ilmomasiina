@@ -24,7 +24,11 @@ const { Provider, useStateContext } = createStateContext<State>();
 export { useStateContext as useEventListContext };
 
 export function useEventListState({ category, maxAge, language }: EventListProps = {}) {
-  const fetchEvents = useAbortablePromise(
+  const {
+    result: events,
+    error,
+    pending,
+  } = useAbortablePromise(
     (signal) => {
       const queryKeys = new URLSearchParams();
       if (category !== undefined) queryKeys.set("category", category);
@@ -37,18 +41,16 @@ export function useEventListState({ category, maxAge, language }: EventListProps
     [category, maxAge],
   );
 
-  const events = fetchEvents.result;
-
   const localizedEvents = useMemo(
     () => (events && language ? events.map((event) => getLocalizedEventListItem(event, language)) : events),
     [events, language],
   );
 
   return useShallowMemo<State>({
-    events: fetchEvents.result,
+    events,
     localizedEvents,
-    pending: fetchEvents.pending,
-    error: fetchEvents.error as ApiError | undefined,
+    pending,
+    error: error as ApiError | undefined,
   });
 }
 

@@ -98,24 +98,26 @@ const EditSignupModal = () => {
   const editSignupCtx = useMemo((): EditSignupState | null => {
     if (!editedSignup) return null;
     const convertedEvent = editorEventToUserEvent(values);
+    const signup = {
+      createdAt: new Date().toISOString(),
+      status: null,
+      position: null,
+      confirmed: false,
+      editableForMillis: Infinity,
+      confirmableForMillis: Infinity,
+      // Override with values from signup if this is an existing signup.
+      ...editedSignup,
+      id: editedSignup.id ?? "new",
+      quota: previewDummyQuota(convertedEvent),
+    };
     return {
       pending: false,
       editToken: "",
       isNew: true,
       event: convertedEvent,
       localizedEvent: getLocalizedEvent(convertedEvent, editedSignup?.language ?? values.defaultLanguage),
-      signup: {
-        createdAt: new Date().toISOString(),
-        status: null,
-        position: null,
-        confirmed: false,
-        editableForMillis: Infinity,
-        confirmableForMillis: Infinity,
-        // Override with values from signup if this is an existing signup.
-        ...editedSignup,
-        id: editedSignup.id ?? "new",
-        quota: previewDummyQuota(convertedEvent),
-      },
+      signup,
+      localizedSignup: signup, // No need for quota name localization
       editingClosedOnLoad: false,
       confirmableUntil: Infinity,
       editableUntil: Infinity,
