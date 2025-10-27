@@ -34,7 +34,7 @@ export default async function createSignup(
       include: [
         {
           model: Event.scope("user"),
-          attributes: ["id", "registrationStartDate", "registrationEndDate", "openQuotaSize"],
+          attributes: ["id", "title", "registrationStartDate", "registrationEndDate", "openQuotaSize"],
         },
       ],
       transaction,
@@ -53,7 +53,7 @@ export default async function createSignup(
     const signup = await Signup.create({ quotaId: request.body.quotaId }, { transaction });
 
     // Create an audit log event
-    await request.logEvent(AuditEvent.CREATE_SIGNUP, { signup, transaction });
+    await request.logEvent(AuditEvent.CREATE_SIGNUP, { signup, event: quota.event, transaction });
 
     return { newSignup: signup, event: quota.event };
   });
