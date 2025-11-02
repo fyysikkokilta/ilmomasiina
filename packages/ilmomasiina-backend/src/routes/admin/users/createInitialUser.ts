@@ -32,7 +32,7 @@ export async function isInitialSetupDone(transaction?: Transaction) {
  * For additional users, use {@link inviteUser} instead.
  */
 export default async function createInitialUser(
-  this: FastifyInstance<any, any, any, any, any>,
+  this: FastifyInstance,
   request: FastifyRequest<{ Body: UserCreateSchema }>,
   reply: FastifyReply,
 ): Promise<AdminLoginResponse> {

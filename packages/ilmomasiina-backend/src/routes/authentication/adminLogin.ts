@@ -8,7 +8,7 @@ import { User } from "../../models/user";
 import CustomError from "../../util/customError";
 
 export async function adminLogin(
-  this: FastifyInstance<any, any, any, any, any>,
+  this: FastifyInstance,
   request: FastifyRequest<{ Body: AdminLoginBody }>,
   reply: FastifyReply,
 ): Promise<AdminLoginResponse> {
@@ -32,8 +32,8 @@ export async function adminLogin(
 }
 
 export async function renewAdminToken(
-  this: FastifyInstance<any, any, any, any, any>,
-  request: FastifyRequest<{ Body: AdminLoginBody }>,
+  this: FastifyInstance,
+  request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<AdminLoginResponse | void> {
   // Verify existing token
