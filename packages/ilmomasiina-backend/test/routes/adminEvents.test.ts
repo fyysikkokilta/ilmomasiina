@@ -396,7 +396,7 @@ describe("POST /api/admin/events", () => {
       expect(found!.question).toBe(postQuestion.question);
       expect(found!.required).toBe(postQuestion.required);
       expect(found!.public).toBe(postQuestion.public);
-      expect(found!.options).toEqual(postQuestion.options);
+      expect(found!.options).toEqual(postQuestion.options ?? []);
       expect(found!.order).toBe(index);
     });
 
