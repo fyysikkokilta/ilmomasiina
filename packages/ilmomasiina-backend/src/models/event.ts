@@ -20,6 +20,7 @@ import {
 import type { QuestionCreate, QuotaCreate } from "@tietokilta/ilmomasiina-models";
 import type { EventAttributes, EventLanguage } from "@tietokilta/ilmomasiina-models/dist/models";
 import config from "../config";
+import { EventValidationError } from "./errors";
 import type { Question, QuestionCreationAttributes } from "./question";
 import type { Quota, QuotaCreationAttributes } from "./quota";
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
@@ -121,11 +122,12 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
       // We cannot check by ID, because new questions/quotas do not have IDs at this point.
 
       // Check that quota counts match.
-      if (language.quotas.length !== quotas.length) throw new Error(`language ${langKey} has wrong number of quotas`);
+      if (language.quotas.length !== quotas.length)
+        throw new EventValidationError(`language ${langKey} has wrong number of quotas`);
 
       // Check that question counts match.
       if (language.questions.length !== questions.length)
-        throw new Error(`language ${langKey} has wrong number of questions`);
+        throw new EventValidationError(`language ${langKey} has wrong number of questions`);
 
       for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
@@ -138,7 +140,7 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
           localizedQuestion.options &&
           question.options.length !== localizedQuestion.options.length
         ) {
-          throw new Error(`question ${i} in language ${langKey} has wrong number of options`);
+          throw new EventValidationError(`question ${i} in language ${langKey} has wrong number of options`);
         }
       }
     }
@@ -257,20 +259,36 @@ export default function setupEventModel(sequelize: Sequelize) {
       freezeTableName: true,
       paranoid: true,
       validate: {
+        noReversedDates(this: Event) {
+          if (this.date != null && this.endDate != null && this.date > this.endDate) {
+            throw new EventValidationError("endDate must be after or equal to date");
+          }
+        },
+        noReversedRegistrationDates(this: Event) {
+          if (
+            this.registrationStartDate != null &&
+            this.registrationEndDate != null &&
+            this.registrationStartDate > this.registrationEndDate
+          ) {
+            throw new EventValidationError("registrationEndDate must be after or equal to registrationStartDate");
+          }
+        },
         hasDateOrRegistration(this: Event) {
           if (this.date === null && this.registrationStartDate === null) {
-            throw new Error("either date or registrationStartDate/registrationEndDate must be set");
+            throw new EventValidationError("either date or registrationStartDate/registrationEndDate must be set");
           }
           if (this.date === null && this.endDate !== null) {
-            throw new Error("endDate may only be set with date");
+            throw new EventValidationError("endDate may only be set with date");
           }
           if ((this.registrationStartDate === null) !== (this.registrationEndDate === null)) {
-            throw new Error("only neither or both of registrationStartDate and registrationEndDate may be set");
+            throw new EventValidationError(
+              "only neither or both of registrationStartDate and registrationEndDate may be set",
+            );
           }
         },
         noDuplicateDefaultLanguage(this: Event) {
-          if (this.languages[this.defaultLanguage]) {
-            throw new Error("defaultLanguage may not be present in languages");
+          if (this.languages != null && this.languages[this.defaultLanguage]) {
+            throw new EventValidationError("defaultLanguage may not be present in languages");
           }
         },
       },

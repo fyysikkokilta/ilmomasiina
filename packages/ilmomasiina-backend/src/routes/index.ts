@@ -116,7 +116,7 @@ async function setupAdminRoutes(fastifyInstance: FastifyInstance, opts: RouteOpt
         response: {
           ...errorResponses,
           200: schema.adminEventResponse,
-          409: Type.Union([schema.editConflictError, schema.wouldMoveSignupsToQueueError]),
+          409: Type.Union([schema.editConflictError, schema.wouldMoveSignupsToQueueError, schema.errorResponse]),
         },
       },
     },
