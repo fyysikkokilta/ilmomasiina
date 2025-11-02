@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "engines": {
-    "node": "^20"
+    "node": "^24"
   },
   "packageManager": "pnpm@9.1.1",
   "scripts": {
@@ -67,9 +67,6 @@
         "popper.js",
         "eslint"
       ]
-    },
-    "overrides": {
-      "@types/react": "^17"
     }
   }
 }

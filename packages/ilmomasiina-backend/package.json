@@ -94,7 +94,7 @@
     "@types/nodemailer": "^6.4.17",
     "@types/nodemailer-mailgun-transport": "^1.4.6",
     "@vitest/coverage-v8": "^1.4.0",
-    "rimraf": "^5.0.10",
+    "rimraf": "^6.1.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
