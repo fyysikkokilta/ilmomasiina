@@ -1,6 +1,5 @@
 import { ApiError, apiFetch, FetchOptions } from "@tietokilta/ilmomasiina-client";
 import { ErrorCode } from "@tietokilta/ilmomasiina-models";
-import { loginExpired } from "./modules/auth/actions";
 import { AccessToken } from "./modules/auth/types";
 import type { DispatchAction } from "./store/types";
 
@@ -27,6 +26,7 @@ export default async function adminApiFetch<T = unknown>(
     });
   } catch (err) {
     if (err instanceof ApiError && err.code === ErrorCode.BAD_SESSION) {
+      // TODO
       dispatch(loginExpired());
     }
     throw err;

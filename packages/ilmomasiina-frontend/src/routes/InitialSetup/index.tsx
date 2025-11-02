@@ -4,12 +4,14 @@ import { FORM_ERROR } from "final-form";
 import { Alert, Button, Form as BsForm, FormControl } from "react-bootstrap";
 import { Form } from "react-final-form";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
 import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import branding from "../../branding";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import i18n, { TKey } from "../../i18n";
-import { createInitialUser } from "../../modules/auth/actions";
+import { createInitialUser, loginToast } from "../../modules/auth/actions";
+import paths from "../../paths";
 import { useTypedDispatch } from "../../store/reducers";
 import useEvent from "../../utils/useEvent";
 
@@ -51,12 +53,15 @@ function validate(values: FormData) {
 
 const InitialSetup = () => {
   const dispatch = useTypedDispatch();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const onSubmit = useEvent(async (data: FormData) => {
     const { email, password } = data;
     try {
       await dispatch(createInitialUser(email, password));
+      loginToast("success", t("initialSetup.success"), 2000);
+      navigate(paths.adminEventsList);
       return undefined;
     } catch (err) {
       return { [FORM_ERROR]: err };

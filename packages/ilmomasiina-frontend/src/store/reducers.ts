@@ -1,5 +1,3 @@
-import { connectRouter } from "connected-react-router";
-import { History } from "history";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { combineReducers } from "redux";
 
@@ -10,9 +8,8 @@ import auth from "../modules/auth/reducer";
 import editor from "../modules/editor/reducer";
 import type { AppState, DispatchAction } from "./types";
 
-export const makeRootReducer = (history: History) =>
+export const makeRootReducer = () =>
   combineReducers({
-    router: connectRouter(history),
     auth,
     adminEvents,
     adminUsers,

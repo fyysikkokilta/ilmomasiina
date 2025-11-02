@@ -1,10 +1,7 @@
-import { push } from "connected-react-router";
 import { toast } from "react-toastify";
 
 import { apiFetch } from "@tietokilta/ilmomasiina-client";
 import { AdminLoginResponse } from "@tietokilta/ilmomasiina-models";
-import i18n from "../../i18n";
-import paths from "../../paths";
 import type { DispatchAction, GetState } from "../../store/types";
 import { LOGIN_SUCCEEDED, RESET } from "./actionTypes";
 
@@ -14,17 +11,17 @@ export const loginSucceeded = (payload: AdminLoginResponse) =>
     payload,
   };
 
-export const resetState = () =>
+export const resetAuthState = () =>
   <const>{
     type: RESET,
   };
 
-export type AuthActions = ReturnType<typeof loginSucceeded> | ReturnType<typeof resetState>;
+export type AuthActions = ReturnType<typeof loginSucceeded> | ReturnType<typeof resetAuthState>;
 
 /** ID of latest login/auth related toast shown. Only used by `loginToast`. */
 let loginToastId = 0;
 
-const loginToast = (type: "success" | "error", text: string, autoClose: number) => {
+export const loginToast = (type: "success" | "error", text: string, autoClose: number) => {
   // If the previous login/auth related toast is still visible, update it instead of spamming a new one.
   // Otherwise, increment the ID and show a new one.
   if (toast.isActive(`loginState${loginToastId}`)) {
@@ -48,8 +45,6 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
     },
   });
   dispatch(loginSucceeded(sessionResponse));
-  dispatch(push(paths.adminEventsList));
-  loginToast("success", i18n.t("auth.loginSuccess"), 2000);
   return true;
 };
 
@@ -62,25 +57,7 @@ export const createInitialUser = (email: string, password: string) => async (dis
     },
   });
   dispatch(loginSucceeded(sessionResponse));
-  dispatch(push(paths.adminEventsList));
-  loginToast("success", i18n.t("initialSetup.success"), 2000);
   return true;
-};
-
-export const redirectToLogin = () => (dispatch: DispatchAction) => {
-  dispatch(resetState());
-  dispatch(push(paths.adminLogin));
-};
-
-export const logout = () => async (dispatch: DispatchAction) => {
-  dispatch(resetState());
-  dispatch(redirectToLogin());
-  loginToast("success", i18n.t("auth.logoutSuccess"), 2000);
-};
-
-export const loginExpired = () => (dispatch: DispatchAction) => {
-  loginToast("error", i18n.t("auth.loginExpired"), 10000);
-  dispatch(redirectToLogin());
 };
 
 const RENEW_LOGIN_THRESHOLD = 5 * 60 * 1000;

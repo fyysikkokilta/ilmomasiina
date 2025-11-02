@@ -1,6 +1,4 @@
 import { composeWithDevTools } from "@redux-devtools/extension";
-import { routerMiddleware } from "connected-react-router";
-import { createBrowserHistory } from "history";
 import { applyMiddleware, createStore } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
@@ -9,10 +7,8 @@ import thunk, { ThunkMiddleware } from "redux-thunk";
 import { makeRootReducer } from "./reducers";
 import { AppActions, AppState } from "./types";
 
-export const history = createBrowserHistory();
-
 export default function configureStore(initialState = {}) {
-  const middleware = [routerMiddleware(history), thunk as ThunkMiddleware<AppState, AppActions>];
+  const middleware = [thunk as ThunkMiddleware<AppState, AppActions>];
 
   const persistConfig = {
     key: DEV ? "ilmomasiina-dev" : "ilmomasiina",

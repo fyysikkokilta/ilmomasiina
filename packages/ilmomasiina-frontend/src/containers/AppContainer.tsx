@@ -1,9 +1,8 @@
 import React from "react";
 
-import { ConnectedRouter } from "connected-react-router";
 import { Container } from "react-bootstrap";
 import { Provider } from "react-redux";
-import { Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router";
 import { Flip, ToastContainer } from "react-toastify";
 import { PersistGate } from "redux-persist/integration/react";
 
@@ -20,7 +19,7 @@ import EventList from "../routes/EventList";
 import InitialSetup from "../routes/InitialSetup";
 import Login from "../routes/Login";
 import SingleEvent from "../routes/SingleEvent";
-import configureStore, { history } from "../store/configureStore";
+import configureStore from "../store/configureStore";
 import { AuthProvider } from "./AuthProvider";
 
 import "react-toastify/scss/main.scss";
@@ -32,49 +31,49 @@ const AppContainer = () => (
   <div className="layout-wrapper">
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        <ConnectedRouter history={history}>
-          <AuthProvider>
-            <Header />
-            <Container>
-              <Switch>
-                <Route exact path={paths.eventsList}>
+        <AuthProvider>
+          <Header />
+          <Container>
+            <BrowserRouter>
+              <Routes>
+                <Route path={paths.eventsList}>
                   <EventList />
                 </Route>
-                <Route exact path={paths.eventDetails(":slug")}>
+                <Route path={paths.eventDetails(":slug")}>
                   <SingleEvent />
                 </Route>
-                <Route exact path={paths.editSignup(":id", ":editToken")}>
+                <Route path={paths.editSignup(":id", ":editToken")}>
                   <EditSignup />
                 </Route>
-                <Route exact path={paths.adminLogin}>
+                <Route path={paths.adminLogin}>
                   <Login />
                 </Route>
-                <Route exact path={paths.adminInitialSetup}>
+                <Route path={paths.adminInitialSetup}>
                   <InitialSetup />
                 </Route>
-                <Route exact path={paths.adminEventsList}>
+                <Route path={paths.adminEventsList}>
                   <AdminEventsList />
                 </Route>
-                <Route exact path={paths.adminUsersList}>
+                <Route path={paths.adminUsersList}>
                   <AdminUsersList />
                 </Route>
-                <Route exact path={paths.adminEditEvent(":id")}>
+                <Route path={paths.adminEditEvent(":id")}>
                   <Editor />
                 </Route>
-                <Route exact path={paths.adminCopyEvent(":id")}>
+                <Route path={paths.adminCopyEvent(":id")}>
                   <Editor copy />
                 </Route>
-                <Route exact path={paths.adminAuditLog}>
+                <Route path={paths.adminAuditLog}>
                   <AuditLog />
                 </Route>
                 <Route path="*">
                   <PageNotFound />
                 </Route>
-              </Switch>
-            </Container>
-            <Footer />
-          </AuthProvider>
-        </ConnectedRouter>
+              </Routes>
+            </BrowserRouter>
+          </Container>
+          <Footer />
+        </AuthProvider>
         <ToastContainer
           position="top-right"
           autoClose={5000}
