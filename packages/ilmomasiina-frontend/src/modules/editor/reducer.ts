@@ -47,6 +47,7 @@ export default function reducer(state = initialState, action: EditorActions): Ed
         ...state,
         event: action.payload.event,
         isNew: action.payload.isNew,
+        selectedLanguage: action.payload.event?.defaultLanguage ?? DEFAULT_LANGUAGE,
         loadError: undefined,
       };
     case EVENT_LOAD_FAILED:
