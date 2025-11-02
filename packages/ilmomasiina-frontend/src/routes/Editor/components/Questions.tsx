@@ -27,10 +27,13 @@ type OptionProps = {
   remove: (index: number) => void;
 };
 
-type CheckboxRenderProps = { input: FormCheckProps };
+type CheckboxRenderProps = {
+  // <Field> provides us `string`, Form.Check wants "checkbox" | "radio".
+  input: Omit<FormCheckProps, "type">;
+};
 
-const renderCheck = ({ input, meta, ...props }: FieldRenderProps<boolean> & CheckboxRenderProps) => (
-  <Form.Check {...input} {...props} />
+const renderCheck = ({ input, meta, ...props }: FieldRenderProps<boolean, HTMLInputElement> & CheckboxRenderProps) => (
+  <Form.Check {...input} type="checkbox" {...props} />
 );
 
 const OptionRow = ({ name, index, remove }: OptionProps) => {
@@ -49,11 +52,9 @@ const OptionRow = ({ name, index, remove }: OptionProps) => {
     >
       <InputGroup>
         <LocalizedField name={name} required maxLength={255} defaultAsPlaceholder />
-        <InputGroup.Append>
-          <Button variant="outline-danger" onClick={removeThis}>
-            {t("editor.questions.questionOptions.delete")}
-          </Button>
-        </InputGroup.Append>
+        <Button variant="outline-danger" onClick={removeThis}>
+          {t("editor.questions.questionOptions.delete")}
+        </Button>
       </InputGroup>
     </LocalizedFieldRow>
   );

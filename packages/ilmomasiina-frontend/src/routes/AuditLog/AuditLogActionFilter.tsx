@@ -33,14 +33,14 @@ const AuditLogActionFilter = () => {
   };
 
   return (
-    <Form.Control as="select" onChange={onChange}>
+    <Form.Select onChange={onChange}>
       <option value="">{t("auditLog.filter.action")}</option>
       {ACTIONS.map(([key, label]) => (
         <option value={key} key={key}>
           {t(label)}
         </option>
       ))}
-    </Form.Control>
+    </Form.Select>
   );
 };
 

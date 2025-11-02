@@ -10,7 +10,6 @@ import {
   EventID,
   SignupID,
 } from "@tietokilta/ilmomasiina-models";
-import adminApiFetch from "../../api";
 import storeSlice from "../../utils/storeSlice";
 import type { Root } from "../store";
 import { editorEventToServer } from "./selectors";
@@ -79,9 +78,8 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
 
   newEvent: () => getSlice().loaded(null, true),
   getEvent: async (id: EventID, toCopy = false) => {
-    const { accessToken } = get().auth;
     try {
-      const response = await adminApiFetch<AdminEventResponse>(`admin/events/${id}`, { accessToken });
+      const response = await get().auth.adminApiFetch<AdminEventResponse>(`admin/events/${id}`);
       getSlice().loaded(response, toCopy);
     } catch (e) {
       setSlice({ loadError: e as ApiError });
@@ -103,9 +101,8 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
 
   checkingSlugAvailability: () => setSlice({ slugAvailability: "checking" }),
   checkSlugAvailability: async (slug: string) => {
-    const { accessToken } = get().auth;
     try {
-      const response = await adminApiFetch<CheckSlugResponse>(`admin/slugs/${slug}`, { accessToken });
+      const response = await get().auth.adminApiFetch<CheckSlugResponse>(`admin/slugs/${slug}`);
       setSlice({ slugAvailability: response });
     } catch (e) {
       setSlice({ slugAvailability: null });
@@ -118,9 +115,8 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
   editConflictDismissed: () => setSlice({ editConflictModal: null }),
 
   loadCategories: async () => {
-    const { accessToken } = get().auth;
     try {
-      const response = await adminApiFetch<CategoriesResponse>("admin/categories", { accessToken });
+      const response = await get().auth.adminApiFetch<CategoriesResponse>("admin/categories");
       setSlice({ allCategories: response });
     } catch (e) {
       setSlice({ allCategories: [] });
@@ -132,9 +128,7 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
     setSlice({ moveToQueueModal: null });
 
     const cleaned = editorEventToServer(data);
-    const { accessToken } = get().auth;
-    const response = await adminApiFetch<AdminEventResponse>("admin/events", {
-      accessToken,
+    const response = await get().auth.adminApiFetch<AdminEventResponse>("admin/events", {
       method: "POST",
       body: cleaned,
     });
@@ -145,10 +139,8 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
     setSlice({ moveToQueueModal: null });
 
     const body = editorEventToServer(data);
-    const { accessToken } = get().auth;
     try {
-      const response = await adminApiFetch<AdminEventResponse>(`admin/events/${id}`, {
-        accessToken,
+      const response = await get().auth.adminApiFetch<AdminEventResponse>(`admin/events/${id}`, {
         method: "PATCH",
         body,
       });
@@ -194,28 +186,21 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
     }),
   signupEditCanceled: () => setSlice({ editedSignup: null }),
   deleteSignup: async (id: SignupID) => {
-    const { accessToken } = get().auth;
     try {
-      await adminApiFetch(`admin/signups/${id}`, {
-        accessToken,
-        method: "DELETE",
-      });
+      await get().auth.adminApiFetch(`admin/signups/${id}`, { method: "DELETE" });
       return true;
     } catch (e) {
       return false;
     }
   },
   saveSignup: async (formData: EditorSignup): Promise<void> => {
-    const { accessToken } = get().auth;
     const saved =
       formData.id == null
-        ? await adminApiFetch<AdminSignupSchema>(`admin/signups`, {
-            accessToken,
+        ? await get().auth.adminApiFetch<AdminSignupSchema>(`admin/signups`, {
             method: "POST",
             body: formData satisfies AdminSignupCreateBody,
           })
-        : await adminApiFetch<AdminSignupSchema>(`admin/signups/${formData.id}`, {
-            accessToken,
+        : await get().auth.adminApiFetch<AdminSignupSchema>(`admin/signups/${formData.id}`, {
             method: "PATCH",
             body: formData satisfies AdminSignupUpdateBody,
           });

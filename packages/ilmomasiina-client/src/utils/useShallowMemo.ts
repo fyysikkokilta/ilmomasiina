@@ -24,7 +24,7 @@ function shallowEqual(a: any, b: any) {
 
 /** Returns the given object. Returns a previously used object, if shallow-equal to the current one. */
 export default function useShallowMemo<T>(value: T): T {
-  const ref = useRef<T>();
+  const ref = useRef<T>(undefined);
   if (!shallowEqual(ref.current, value)) ref.current = value;
   return ref.current as T;
 }

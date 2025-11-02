@@ -1,6 +1,5 @@
 import { ApiError } from "@tietokilta/ilmomasiina-client";
 import { AuditLogResponse, AuditLoqQuery } from "@tietokilta/ilmomasiina-models";
-import adminApiFetch from "../../api";
 import storeSlice from "../../utils/storeSlice";
 import type { Root } from "../store";
 
@@ -40,10 +39,8 @@ export const auditLogSlice = storeSlice<Root>()("auditLog", (set, get, store, ge
       ),
     );
 
-    const { accessToken } = get().auth;
-
     try {
-      const response = await adminApiFetch<AuditLogResponse>(`admin/auditlog?${queryString}`, { accessToken });
+      const response = await get().auth.adminApiFetch<AuditLogResponse>(`admin/auditlog?${queryString}`);
       setSlice({
         auditLog: response,
         loadError: undefined,

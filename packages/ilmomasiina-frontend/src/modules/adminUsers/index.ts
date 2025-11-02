@@ -5,7 +5,6 @@ import type {
   UserInviteSchema,
   UserListResponse,
 } from "@tietokilta/ilmomasiina-models";
-import adminApiFetch from "../../api";
 import storeSlice from "../../utils/storeSlice";
 import type { Root } from "../store";
 
@@ -32,9 +31,8 @@ export const adminUsersSlice = storeSlice<Root>()("adminUsers", (set, get, store
   resetState,
 
   getUsers: async () => {
-    const { accessToken } = get().auth;
     try {
-      const response = await adminApiFetch<UserListResponse>("admin/users", { accessToken });
+      const response = await get().auth.adminApiFetch<UserListResponse>("admin/users");
       setSlice({ users: response, loadError: undefined });
     } catch (e) {
       setSlice({ users: null, loadError: e as ApiError });
@@ -42,34 +40,16 @@ export const adminUsersSlice = storeSlice<Root>()("adminUsers", (set, get, store
   },
 
   createUser: async (data: UserInviteSchema) => {
-    const { accessToken } = get().auth;
-    await adminApiFetch("admin/users", {
-      accessToken,
-      method: "POST",
-      body: data,
-    });
+    await get().auth.adminApiFetch("admin/users", { method: "POST", body: data });
   },
   deleteUser: async (id: UserID) => {
-    const { accessToken } = get().auth;
-    await adminApiFetch(`admin/users/${id}`, {
-      accessToken,
-      method: "DELETE",
-    });
+    await get().auth.adminApiFetch(`admin/users/${id}`, { method: "DELETE" });
   },
 
   resetUserPassword: async (id: UserID) => {
-    const { accessToken } = get().auth;
-    await adminApiFetch(`admin/users/${id}/resetpassword`, {
-      accessToken,
-      method: "POST",
-    });
+    await get().auth.adminApiFetch(`admin/users/${id}/resetpassword`, { method: "POST" });
   },
   changePassword: async (data: UserChangePasswordSchema) => {
-    const { accessToken } = get().auth;
-    await adminApiFetch("admin/users/self/changepassword", {
-      accessToken,
-      method: "POST",
-      body: data,
-    });
+    await get().auth.adminApiFetch("admin/users/self/changepassword", { method: "POST", body: data });
   },
 }));

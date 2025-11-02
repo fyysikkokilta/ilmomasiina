@@ -1,6 +1,5 @@
 import { ApiError } from "@tietokilta/ilmomasiina-client";
 import type { AdminEventListResponse, EventID } from "@tietokilta/ilmomasiina-models";
-import adminApiFetch from "../../api";
 import storeSlice from "../../utils/storeSlice";
 import type { Root } from "../store";
 
@@ -27,8 +26,7 @@ export const adminEventsSlice = storeSlice<Root>()(
 
     getAdminEvents: async () => {
       try {
-        const { accessToken } = get().auth;
-        const response = await adminApiFetch<AdminEventListResponse>("admin/events", { accessToken });
+        const response = await get().auth.adminApiFetch<AdminEventListResponse>("admin/events");
         setSlice({ events: response, loadError: undefined });
       } catch (e) {
         setSlice({ events: null, loadError: e as ApiError });
@@ -36,11 +34,7 @@ export const adminEventsSlice = storeSlice<Root>()(
     },
 
     deleteEvent: async (id: EventID) => {
-      const { accessToken } = get().auth;
-      await adminApiFetch(`admin/events/${id}`, {
-        accessToken,
-        method: "DELETE",
-      });
+      await get().auth.adminApiFetch(`admin/events/${id}`, { method: "DELETE" });
     },
   }),
 );

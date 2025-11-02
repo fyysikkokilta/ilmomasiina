@@ -21,7 +21,7 @@ const AuditLogPagination = () => {
   const nextPage = useEvent(() => {
     setAuditLogQueryField("offset", value + perPage);
   });
-  const onOffsetChange = useEvent((e: ChangeEvent<HTMLSelectElement>) => {
+  const onOffsetChange = useEvent((e: ChangeEvent<HTMLInputElement>) => {
     const newOffset = Number(e.target.value) - 1;
     if (newOffset >= 0) setAuditLogQueryField("offset", newOffset);
   });

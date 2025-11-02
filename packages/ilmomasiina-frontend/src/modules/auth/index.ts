@@ -1,7 +1,8 @@
 import { toast } from "react-toastify";
 
-import { apiFetch } from "@tietokilta/ilmomasiina-client";
-import { AdminLoginResponse } from "@tietokilta/ilmomasiina-models";
+import { ApiError, apiFetch, FetchOptions } from "@tietokilta/ilmomasiina-client";
+import { AdminLoginResponse, ErrorCode } from "@tietokilta/ilmomasiina-models";
+import i18n from "../../i18n";
 import storeSlice from "../../utils/storeSlice";
 import type { Root } from "../store";
 
@@ -26,6 +27,7 @@ export type AuthSlice = AuthState & {
   login: (email: string, password: string) => Promise<boolean>;
   createInitialUser: (email: string, password: string) => Promise<boolean>;
   renewLogin: () => Promise<void>;
+  adminApiFetch: <T>(url: string, options?: FetchOptions) => Promise<T>;
 };
 
 function getTokenExpiry(jwt: string): number {
@@ -44,6 +46,24 @@ function getTokenExpiry(jwt: string): number {
 
   return 0;
 }
+
+/** ID of latest login/auth related toast shown. Only used by `loginToast`. */
+let loginToastId = 0;
+
+export const loginToast = (type: "success" | "error", text: string, autoClose: number) => {
+  // If the previous login/auth related toast is still visible, update it instead of spamming a new one.
+  // Otherwise, increment the ID and show a new one.
+  if (toast.isActive(`loginState${loginToastId}`)) {
+    toast.update(`loginState${loginToastId}`, {
+      render: text,
+      autoClose,
+      type,
+    });
+  } else {
+    loginToastId += 1;
+    toast(text, { autoClose, type, toastId: `loginState${loginToastId}` });
+  }
+};
 
 const RENEW_LOGIN_THRESHOLD = 5 * 60 * 1000;
 
@@ -82,7 +102,7 @@ export const authSlice = storeSlice<Root>()("auth", (set, get, store, getSlice, 
     return true;
   },
   renewLogin: async () => {
-    const { accessToken } = get().auth;
+    const { accessToken } = getSlice();
     if (
       !accessToken ||
       Date.now() < accessToken.expiresAt - RENEW_LOGIN_THRESHOLD ||
@@ -105,22 +125,23 @@ export const authSlice = storeSlice<Root>()("auth", (set, get, store, getSlice, 
       // Ignore errors from login renewal - loginExpired() will trigger via requireAuth.
     }
   },
+
+  async adminApiFetch<T = unknown>(uri: string, opts: FetchOptions = {}): Promise<T> {
+    try {
+      const { accessToken } = getSlice();
+      if (!accessToken) {
+        throw new ApiError(401, { isUnauthenticated: true });
+      }
+      return await apiFetch<T>(uri, {
+        ...opts,
+        headers: { ...opts.headers, Authorization: accessToken.token },
+      });
+    } catch (err) {
+      if (err instanceof ApiError && err.code === ErrorCode.BAD_SESSION) {
+        loginToast("error", i18n.t("auth.loginExpired"), 10000);
+        getSlice().resetAuth();
+      }
+      throw err;
+    }
+  },
 }));
-
-/** ID of latest login/auth related toast shown. Only used by `loginToast`. */
-let loginToastId = 0;
-
-export const loginToast = (type: "success" | "error", text: string, autoClose: number) => {
-  // If the previous login/auth related toast is still visible, update it instead of spamming a new one.
-  // Otherwise, increment the ID and show a new one.
-  if (toast.isActive(`loginState${loginToastId}`)) {
-    toast.update(`loginState${loginToastId}`, {
-      render: text,
-      autoClose,
-      type,
-    });
-  } else {
-    loginToastId += 1;
-    toast(text, { autoClose, type, toastId: `loginState${loginToastId}` });
-  }
-};

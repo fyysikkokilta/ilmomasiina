@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { ApiError } from "@tietokilta/ilmomasiina-client";
 import { errorDesc } from "@tietokilta/ilmomasiina-client/dist/utils/errorMessage";
 import type { AdminEventListItem as AdminEventListItemSchema } from "@tietokilta/ilmomasiina-models";
+import LinkButton from "../../components/LinkButton";
 import type { TKey } from "../../i18n";
 import useStore from "../../modules/store";
 import paths from "../../paths";
@@ -64,12 +65,12 @@ const AdminEventListItem = ({ event }: Props) => {
       <td>{status}</td>
       <td>{sumBy(quotas, "signupCount")}</td>
       <td>
-        <Button as={Link} variant="primary" size="sm" className="mr-1" to={paths.adminEditEvent(id)}>
+        <LinkButton variant="primary" size="sm" className="mr-1" to={paths.adminEditEvent(id)}>
           {t("adminEvents.action.edit")}
-        </Button>
-        <Button as={Link} variant="primary" size="sm" className="mr-1" to={paths.adminCopyEvent(id)}>
+        </LinkButton>
+        <LinkButton variant="primary" size="sm" className="mr-1" to={paths.adminCopyEvent(id)}>
           {t("adminEvents.action.copy")}
-        </Button>
+        </LinkButton>
         <Button variant="danger" size="sm" onClick={onDelete}>
           {t("adminEvents.action.delete")}
         </Button>

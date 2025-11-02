@@ -1,4 +1,4 @@
-import React, { ComponentType, forwardRef, useState } from "react";
+import React, { ComponentType, forwardRef, JSX, useState } from "react";
 
 import { OverlayTrigger, Tooltip, TooltipProps } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import FieldRow, { FieldRowProps } from "../../../components/FieldRow";
 import useLocalizedFieldProps, { FieldLocalizationOptions } from "./useLocalizedFieldProps";
 
-const LocalizedTooltip = forwardRef<HTMLElement, Omit<TooltipProps, "id">>((props, ref) => {
+const LocalizedTooltip = forwardRef<HTMLDivElement, Omit<TooltipProps, "id">>((props, ref) => {
   const { t } = useTranslation();
   const [id] = useState(`tooltip${Math.random()}`);
   return (

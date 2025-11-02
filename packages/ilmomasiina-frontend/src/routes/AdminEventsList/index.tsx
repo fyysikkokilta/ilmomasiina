@@ -5,6 +5,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { errorDesc, errorTitle } from "@tietokilta/ilmomasiina-client";
+import LinkButton from "../../components/LinkButton";
 import requireAuth from "../../containers/requireAuth";
 import type { TKey } from "../../i18n";
 import useStore from "../../modules/store";
@@ -60,15 +61,15 @@ const AdminEventsList = () => {
         <Button variant="secondary" onClick={togglePast}>
           {showPast ? t("adminEvents.nav.upcoming") : t("adminEvents.nav.past")}
         </Button>
-        <Button as={Link} variant="secondary" to={paths.adminUsersList}>
+        <LinkButton variant="secondary" to={paths.adminUsersList}>
           {t("adminEvents.nav.users")}
-        </Button>
-        <Button as={Link} variant="secondary" to={paths.adminAuditLog}>
+        </LinkButton>
+        <LinkButton variant="secondary" to={paths.adminAuditLog}>
           {t("adminEvents.nav.auditLog")}
-        </Button>
-        <Button as={Link} variant="primary" to={paths.adminEditEvent("new")}>
+        </LinkButton>
+        <LinkButton variant="primary" to={paths.adminEditEvent("new")}>
           {t("adminEvents.nav.newEvent")}
-        </Button>
+        </LinkButton>
       </nav>
       <table className="table ilmo--admin-event-list">
         <thead>

@@ -109,8 +109,7 @@ const QuestionField = ({ name, question, disabled }: QuestionFieldProps) => {
     case QuestionType.SELECT:
       if (question.options && question.options.length > 3) {
         input = (
-          <Form.Control
-            as="select"
+          <Form.Select
             required={question.required}
             disabled={disabled}
             value={currentAnswerString}
@@ -126,7 +125,7 @@ const QuestionField = ({ name, question, disabled }: QuestionFieldProps) => {
                 {option}
               </option>
             ))}
-          </Form.Control>
+          </Form.Select>
         );
       } else {
         input = question.options?.map((option, optIndex) => (

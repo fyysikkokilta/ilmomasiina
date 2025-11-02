@@ -64,7 +64,11 @@ type PropsWithAs<C extends As> = BaseProps & {
   /** The component or element to use as the field. */
   as: C;
   children?: undefined;
-} & Omit<ComponentPropsWithoutRef<C>, keyof BaseProps | "as" | "children">;
+} & Omit<
+    ComponentPropsWithoutRef<C>,
+    // Drop anything that 1) overlaps with BaseProps, 2) overlaps with other modes, or 3) is handled by r-f-f.
+    keyof BaseProps | "as" | "children" | "onChange" | "onFocus" | "onBlur" | "value"
+  >;
 
 export type FieldRowProps<C extends As> = PropsWithFormControl | PropsWithChildren | PropsWithAs<C>;
 

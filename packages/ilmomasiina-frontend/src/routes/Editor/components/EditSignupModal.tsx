@@ -27,14 +27,14 @@ import { editorEventToUserEvent, previewDummyQuota } from "./userComponentIntero
 const QuotaField = (props: FieldInputProps<QuotaID>) => {
   const quotas = useStore((state) => state.editor.event!.quotas);
   return (
-    <BsForm.Control as="select" {...props}>
+    <BsForm.Select {...props}>
       {quotas.map((quota) => (
         // eslint-disable-next-line react/no-array-index-key
         <option key={quota.id} value={quota.id}>
           {quota.title}
         </option>
       ))}
-    </BsForm.Control>
+    </BsForm.Select>
   );
 };
 
