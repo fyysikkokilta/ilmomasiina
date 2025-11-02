@@ -15,6 +15,7 @@ module.exports = {
     "**/node_modules/**",
     "**/dist/**",
     "**/build/**",
+    "**/coverage/**",
     ".eslintrc.js",
     "jest.config.js",
     "*.svg",
