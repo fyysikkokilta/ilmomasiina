@@ -22,7 +22,7 @@ import SingleEvent from "../routes/SingleEvent";
 import configureStore from "../store/configureStore";
 import { AuthProvider } from "./AuthProvider";
 
-import "react-toastify/scss/main.scss";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/app.scss";
 
 const { store, persistor } = configureStore();
