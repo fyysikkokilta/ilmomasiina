@@ -7,18 +7,22 @@ import { Link, useParams } from "react-router-dom";
 import { errorDesc, errorTitle } from "@tietokilta/ilmomasiina-client";
 import requireAuth from "../../containers/requireAuth";
 import type { TKey } from "../../i18n";
-import { getEvent, newEvent, resetState } from "../../modules/editor/actions";
+import { copyEvent, getEvent, newEvent, resetState } from "../../modules/editor/actions";
 import paths from "../../paths";
 import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
 import EditForm from "./components/EditForm";
 
 import "./Editor.scss";
 
+interface Props {
+  copy?: boolean;
+}
+
 interface MatchParams {
   id: string;
 }
 
-const Editor = () => {
+const Editor = ({ copy = false }: Props) => {
   const dispatch = useTypedDispatch();
   const loaded = useTypedSelector((state) => state.editor.event != null);
   const loadError = useTypedSelector((state) => state.editor.loadError);
@@ -30,13 +34,15 @@ const Editor = () => {
   useEffect(() => {
     if (urlIsNew) {
       dispatch(newEvent());
+    } else if (copy) {
+      dispatch(copyEvent(urlEventId));
     } else {
       dispatch(getEvent(urlEventId));
     }
     return () => {
       dispatch(resetState());
     };
-  }, [dispatch, urlIsNew, urlEventId]);
+  }, [dispatch, urlIsNew, copy, urlEventId]);
 
   if (loadError) {
     return (

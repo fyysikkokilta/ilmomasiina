@@ -31,48 +31,8 @@ import {
   SAVED_SIGNUP,
   SIGNUP_EDIT_CANCELED,
 } from "./actionTypes";
-import type { AdminSignupWithQuota, ConvertedEditorEvent, EditorEvent, EditorSignup } from "./types";
-
-export enum EditorEventType {
-  ONLY_EVENT = "event",
-  EVENT_WITH_SIGNUP = "event+signup",
-  ONLY_SIGNUP = "signup",
-}
-
-export const defaultEvent = (): EditorEvent => ({
-  eventType: EditorEventType.EVENT_WITH_SIGNUP,
-  title: "",
-  slug: "",
-  date: null,
-  endDate: null,
-  webpageUrl: "",
-  facebookUrl: "",
-  category: "",
-  location: "",
-  description: "",
-  price: "",
-  signupsPublic: false,
-  languages: {},
-  defaultLanguage: DEFAULT_LANGUAGE,
-
-  registrationStartDate: null,
-  registrationEndDate: null,
-
-  openQuotaSize: 0,
-  useOpenQuota: false,
-  quotas: [],
-
-  nameQuestion: true,
-  emailQuestion: true,
-  questions: [],
-
-  verificationEmail: "",
-
-  draft: true,
-  listed: true,
-
-  updatedAt: "",
-});
+import { editorEventToServer } from "./selectors";
+import type { AdminSignupWithQuota, EditorEvent, EditorSignup } from "./types";
 
 export const resetState = () =>
   <const>{
@@ -85,6 +45,15 @@ export const loaded = (event: AdminEventResponse) =>
     payload: {
       event,
       isNew: false,
+    },
+  };
+
+export const loadedForCopy = (event: AdminEventResponse) =>
+  <const>{
+    type: EVENT_LOADED,
+    payload: {
+      event,
+      isNew: true,
     },
   };
 
@@ -179,6 +148,7 @@ export const signupEditCanceled = () =>
 export type EditorActions =
   | ReturnType<typeof resetState>
   | ReturnType<typeof loaded>
+  | ReturnType<typeof loadedForCopy>
   | ReturnType<typeof newEvent>
   | ReturnType<typeof loadFailed>
   | ReturnType<typeof checkingSlugAvailability>
@@ -195,57 +165,23 @@ export type EditorActions =
   | ReturnType<typeof savedSignup>
   | ReturnType<typeof signupEditCanceled>;
 
-function eventType(event: AdminEventResponse): EditorEventType {
-  if (event.date === null) {
-    return EditorEventType.ONLY_SIGNUP;
-  }
-  if (event.registrationStartDate === null) {
-    return EditorEventType.ONLY_EVENT;
-  }
-  return EditorEventType.EVENT_WITH_SIGNUP;
-}
-
-export const serverEventToEditor = (event: AdminEventResponse): EditorEvent => ({
-  ...event,
-  eventType: eventType(event),
-  date: event.date ? new Date(event.date) : null,
-  endDate: event.endDate ? new Date(event.endDate) : null,
-  registrationStartDate: event.registrationStartDate ? new Date(event.registrationStartDate) : null,
-  registrationEndDate: event.registrationEndDate ? new Date(event.registrationEndDate) : null,
-  quotas: event.quotas.map((quota) => ({
-    ...quota,
-    key: quota.id,
-  })),
-  useOpenQuota: event.openQuotaSize > 0,
-  questions: event.questions.map((question) => ({
-    ...question,
-    key: question.id,
-    options: question.options || [""],
-  })),
-});
-
-export const editorEventToServer = (form: EditorEvent): ConvertedEditorEvent => ({
-  ...form,
-  date: form.eventType === EditorEventType.ONLY_SIGNUP ? null : (form.date?.toISOString() ?? null),
-  endDate: form.eventType === EditorEventType.ONLY_SIGNUP ? null : (form.endDate?.toISOString() ?? null),
-  registrationStartDate:
-    form.eventType === EditorEventType.ONLY_EVENT ? null : (form.registrationStartDate?.toISOString() ?? null),
-  registrationEndDate:
-    form.eventType === EditorEventType.ONLY_EVENT ? null : (form.registrationEndDate?.toISOString() ?? null),
-  quotas: form.quotas,
-  openQuotaSize: form.useOpenQuota && form.openQuotaSize ? form.openQuotaSize : 0,
-  questions: form.questions.map((question) => ({
-    ...question,
-    options: question.type === "select" || question.type === "checkbox" ? question.options : null,
-  })),
-});
-
 export const getEvent = (id: EventID) => async (dispatch: DispatchAction, getState: GetState) => {
   const { accessToken } = getState().auth;
 
   try {
     const response = await adminApiFetch<AdminEventResponse>(`admin/events/${id}`, { accessToken }, dispatch);
     dispatch(loaded(response));
+  } catch (e) {
+    dispatch(loadFailed(e as ApiError));
+  }
+};
+
+export const copyEvent = (id: EventID) => async (dispatch: DispatchAction, getState: GetState) => {
+  const { accessToken } = getState().auth;
+
+  try {
+    const response = await adminApiFetch<AdminEventResponse>(`admin/events/${id}`, { accessToken }, dispatch);
+    dispatch(loadedForCopy(response));
   } catch (e) {
     dispatch(loadFailed(e as ApiError));
   }

@@ -1,3 +1,4 @@
+import type { EditorActions } from "./actions";
 import {
   CATEGORIES_LOADED,
   EDIT_CONFLICT,
@@ -16,7 +17,7 @@ import {
   SAVED_SIGNUP,
   SIGNUP_EDIT_CANCELED,
 } from "./actionTypes";
-import type { EditorActions, EditorExistingSignup, EditorNewSignup, EditorSignup, EditorState } from "./types";
+import type { EditorExistingSignup, EditorNewSignup, EditorSignup, EditorState } from "./types";
 
 const initialState: EditorState = {
   event: null,
