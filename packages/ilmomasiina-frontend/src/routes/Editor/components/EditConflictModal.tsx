@@ -1,13 +1,12 @@
 import React from "react";
 
 import { Button, Modal } from "react-bootstrap";
-import { useForm } from "react-final-form";
 import { Trans, useTranslation } from "react-i18next";
 
 import { EditConflictError } from "@tietokilta/ilmomasiina-models";
-import { editConflictDismissed, reloadEvent } from "../../../modules/editor/actions";
-import { EditorEvent, EditorQuestion, EditorQuota } from "../../../modules/editor/types";
-import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import { useEditorForm } from "../../../modules/editor/selectors";
+import { EditorQuestion, EditorQuota } from "../../../modules/editor/types";
+import useStore from "../../../modules/store";
 import { useActionDateTimeFormatter } from "../../../utils/dateFormat";
 import useEvent from "../../../utils/useEvent";
 import { useFieldValue } from "./hooks";
@@ -42,18 +41,17 @@ type Props = {
 };
 
 const EditConflictModal = ({ onSave }: Props) => {
-  const dispatch = useTypedDispatch();
-  const modal = useTypedSelector((state) => state.editor.editConflictModal);
+  const { editConflictModal: modal, editConflictDismissed, reloadEvent } = useStore((state) => state.editor);
   const { t } = useTranslation();
   const actionDateFormat = useActionDateTimeFormatter();
 
   const deletedQuestions = modal?.deletedQuestions || [];
   const deletedQuotas = modal?.deletedQuotas || [];
 
-  const form = useForm<EditorEvent>();
+  const form = useEditorForm();
 
   const overwrite = useEvent(() => {
-    const { questions, quotas } = form.getState().values;
+    const { questions, quotas } = form.getState().values!; // final-form is currently mistyped as possibly undefined
     // Tell the backend we want to overwrite the latest change.
     form.change("updatedAt", modal!.updatedAt);
     // We still need to re-create the questions and quotas that were deleted, by removing their old IDs.
@@ -79,19 +77,17 @@ const EditConflictModal = ({ onSave }: Props) => {
         };
       }),
     );
-    dispatch(editConflictDismissed());
+    editConflictDismissed();
     onSave();
   });
 
   const revert = useEvent(() => {
-    dispatch(reloadEvent());
-    dispatch(editConflictDismissed());
+    reloadEvent();
+    editConflictDismissed();
   });
 
-  const cancel = useEvent(() => dispatch(editConflictDismissed()));
-
   return (
-    <Modal show={!!modal} onHide={cancel} backdrop="static">
+    <Modal show={!!modal} onHide={editConflictDismissed} backdrop="static">
       <Modal.Header>
         <Modal.Title>{t("editor.editConflict.title")}</Modal.Title>
       </Modal.Header>
@@ -113,7 +109,7 @@ const EditConflictModal = ({ onSave }: Props) => {
         <p>{t("editor.editConflict.info2")}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="muted" onClick={cancel}>
+        <Button variant="muted" onClick={editConflictDismissed}>
           {t("editor.editConflict.action.cancel")}
         </Button>
         <Button variant="secondary" onClick={revert}>

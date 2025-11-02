@@ -1,4 +1,4 @@
-import React, { ComponentPropsWithoutRef, ComponentType } from "react";
+import React, { ComponentPropsWithoutRef, ComponentType, JSX } from "react";
 
 import identity from "lodash-es/identity";
 import { Form, FormControlProps } from "react-bootstrap";
@@ -6,11 +6,11 @@ import { useField, UseFieldConfig } from "react-final-form";
 
 import useLocalizedFieldProps, { FieldLocalizationOptions } from "./useLocalizedFieldProps";
 
-type BaseProps = Pick<UseFieldConfig<any>, "type"> & {
+type BaseProps = Pick<UseFieldConfig, "type"> & {
   /** The name of the field in the data. */
   name: string;
   /** useField() config. */
-  config?: UseFieldConfig<any>;
+  config?: UseFieldConfig;
   /** Whether the field is required. */
   required?: boolean;
 } & FieldLocalizationOptions;

@@ -5,9 +5,8 @@ import { useTranslation } from "react-i18next";
 
 import { stringifyAnswer } from "@tietokilta/ilmomasiina-client/dist/utils/signupUtils";
 import { AdminEventResponse, SignupStatus } from "@tietokilta/ilmomasiina-models";
-import { deleteSignup, editNewSignup, editSignup, getEvent } from "../../../modules/editor/actions";
 import type { AdminSignupWithQuota } from "../../../modules/editor/types";
-import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import useStore from "../../../modules/store";
 import { useActionDateTimeFormatter } from "../../../utils/dateFormat";
 import useEvent from "../../../utils/useEvent";
 import CSVLink, { CSVOptions } from "./CSVLink";
@@ -27,20 +26,20 @@ type SignupProps = {
 };
 
 const SignupRow = ({ position, signup, showQuota }: SignupProps) => {
-  const event = useTypedSelector((state) => state.editor.event)!;
-  const dispatch = useTypedDispatch();
+  const { editSignup, deleteSignup, getEvent } = useStore((state) => state.editor);
+  const event = useStore((state) => state.editor.event!);
   const { t } = useTranslation();
   const actionDateFormat = useActionDateTimeFormatter();
 
   const answersMap = useMemo(() => getAnswersFromSignup(event, signup), [event, signup]);
 
-  const onEdit = useEvent(() => dispatch(editSignup(signup)));
+  const onEdit = useEvent(() => editSignup(signup));
   const onDelete = useEvent(async () => {
     // eslint-disable-next-line no-alert
     const confirmation = window.confirm(t("editor.signups.action.delete.confirm"));
     if (confirmation) {
-      await dispatch(deleteSignup(signup.id!));
-      dispatch(getEvent(event.id));
+      await deleteSignup(signup.id!);
+      getEvent(event.id);
     }
   });
 
@@ -120,8 +119,7 @@ const SignupTable = ({ event, signups, showQuota }: TableProps) => {
 const csvOptions: CSVOptions = { delimiter: "\t" };
 
 const SignupsTab = () => {
-  const event = useTypedSelector((state) => state.editor.event);
-  const dispatch = useTypedDispatch();
+  const { event, editNewSignup } = useStore((state) => state.editor);
 
   const signups = useMemo(() => event && getSignupsForAdminList(event), [event]);
   const signupsByQuota = useMemo(() => event && getSignupsByQuotaForAdminList(event), [event]);
@@ -138,7 +136,7 @@ const SignupsTab = () => {
     i18n: { language },
   } = useTranslation();
 
-  const createSignup = useEvent(() => dispatch(editNewSignup({ language })));
+  const createSignup = useEvent(() => editNewSignup(language));
 
   if (!event || !event.quotas.length) {
     return <p>{t("editor.signups.noQuotas")}</p>;

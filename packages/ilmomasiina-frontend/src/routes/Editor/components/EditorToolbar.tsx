@@ -5,8 +5,8 @@ import { useFormState } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import useStore from "../../../modules/store";
 import paths from "../../../paths";
-import { useTypedSelector } from "../../../store/reducers";
 
 type Props = {
   onSave: (evt: BaseSyntheticEvent) => void;
@@ -17,8 +17,8 @@ const EditorToolbar = ({ onSave, onSaveToggleDraft }: Props) => {
   const isSubmitting = useFormState({
     subscription: { submitting: true },
   }).submitting;
-  const event = useTypedSelector((state) => state.editor.event);
-  const isNew = useTypedSelector((state) => state.editor.isNew);
+  const event = useStore((state) => state.editor.event);
+  const isNew = useStore((state) => state.editor.isNew);
   const isDraft = event?.draft || isNew;
 
   const { t } = useTranslation();

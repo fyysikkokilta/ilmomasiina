@@ -1,20 +1,15 @@
 import { ApiError, apiFetch, FetchOptions } from "@tietokilta/ilmomasiina-client";
 import { ErrorCode } from "@tietokilta/ilmomasiina-models";
-import { AccessToken } from "./modules/auth/types";
-import type { DispatchAction } from "./store/types";
+import i18n from "./i18n";
+import { AccessToken, loginToast } from "./modules/auth";
+import useStore from "./modules/store";
 
 interface AdminApiFetchOptions extends FetchOptions {
   accessToken?: AccessToken;
 }
 
-/** Wrapper for apiFetch that checks for Unauthenticated responses and dispatches a loginExpired
- * action if necessary.
- */
-export default async function adminApiFetch<T = unknown>(
-  uri: string,
-  opts: AdminApiFetchOptions,
-  dispatch: DispatchAction,
-) {
+/** Wrapper for apiFetch that checks for Unauthenticated responses and resets the login state if necessary. */
+export default async function adminApiFetch<T = unknown>(uri: string, opts: AdminApiFetchOptions) {
   try {
     const { accessToken } = opts;
     if (!accessToken) {
@@ -26,8 +21,8 @@ export default async function adminApiFetch<T = unknown>(
     });
   } catch (err) {
     if (err instanceof ApiError && err.code === ErrorCode.BAD_SESSION) {
-      // TODO
-      dispatch(loginExpired());
+      loginToast("error", i18n.t("auth.loginExpired"), 10000);
+      useStore.getState().auth.resetAuth();
     }
     throw err;
   }

@@ -10,9 +10,9 @@ import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import branding from "../../branding";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import type { TKey } from "../../i18n";
-import { login, loginToast } from "../../modules/auth/actions";
+import { loginToast } from "../../modules/auth";
+import useStore from "../../modules/store";
 import paths from "../../paths";
-import { useTypedDispatch } from "../../store/reducers";
 import useEvent from "../../utils/useEvent";
 
 import "./Login.scss";
@@ -28,14 +28,14 @@ const initialValues: FormData = {
 };
 
 const Login = () => {
-  const dispatch = useTypedDispatch();
+  const { login } = useStore((state) => state.auth);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   const onSubmit = useEvent(async (data: FormData) => {
     const { email, password } = data;
     try {
-      await dispatch(login(email, password));
+      await login(email, password);
       loginToast("success", t("auth.loginSuccess"), 2000);
       navigate(paths.adminEventsList);
       return undefined;

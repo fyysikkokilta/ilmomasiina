@@ -7,15 +7,14 @@ import { toast } from "react-toastify";
 import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
 import type { UserSchema } from "@tietokilta/ilmomasiina-models";
 import type { TKey } from "../../i18n";
-import { deleteUser, getUsers, resetUserPassword } from "../../modules/adminUsers/actions";
-import { useTypedDispatch } from "../../store/reducers";
+import useStore from "../../modules/store";
 
 type Props = {
   user: UserSchema;
 };
 
 const AdminUserListItem = ({ user }: Props) => {
-  const dispatch = useTypedDispatch();
+  const { deleteUser, getUsers, resetUserPassword } = useStore((state) => state.adminUsers);
   const { t } = useTranslation();
 
   async function onDelete() {
@@ -23,7 +22,7 @@ const AdminUserListItem = ({ user }: Props) => {
     const confirmed = window.confirm(t("adminUsers.deleteUser.confirm", { user: user.email }));
     if (confirmed) {
       try {
-        await dispatch(deleteUser(user.id));
+        await deleteUser(user.id);
         toast.success(t("adminUsers.deleteUser.success", { user: user.email }), {
           autoClose: 5000,
         });
@@ -35,7 +34,7 @@ const AdminUserListItem = ({ user }: Props) => {
           { autoClose: 5000 },
         );
       }
-      dispatch(getUsers());
+      getUsers();
     }
   }
   async function onResetPassword() {
@@ -43,7 +42,7 @@ const AdminUserListItem = ({ user }: Props) => {
     const confirmed = window.confirm(t("adminUsers.resetPassword.confirm", { user: user.email }));
     if (confirmed) {
       try {
-        await dispatch(resetUserPassword(user.id));
+        await resetUserPassword(user.id);
         toast.success(t("adminUsers.resetPassword.success", { user: user.email }), {
           autoClose: 5000,
         });

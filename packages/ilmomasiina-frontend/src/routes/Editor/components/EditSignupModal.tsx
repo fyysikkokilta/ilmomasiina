@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 import { Button, Form as BsForm, Modal, Spinner } from "react-bootstrap";
-import { FieldInputProps, Form, FormRenderProps, useFormState } from "react-final-form";
+import { FieldInputProps, Form, FormRenderProps } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
@@ -15,9 +15,9 @@ import {
 import type { QuotaID } from "@tietokilta/ilmomasiina-models";
 import FieldRow from "../../../components/FieldRow";
 import type { TKey } from "../../../i18n";
-import { saveSignup, signupEditCanceled } from "../../../modules/editor/actions";
-import type { EditorEvent, EditorSignup } from "../../../modules/editor/types";
-import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import { useEditorFormState } from "../../../modules/editor/selectors";
+import type { EditorSignup } from "../../../modules/editor/types";
+import useStore from "../../../modules/store";
 import useEvent from "../../../utils/useEvent";
 import CommonFields from "../../EditSignup/components/CommonFields";
 import { formDataToSignupUpdate, SignupFormData, signupToFormData } from "../../EditSignup/components/formData";
@@ -25,10 +25,10 @@ import QuestionFields from "../../EditSignup/components/QuestionFields";
 import { editorEventToUserEvent, previewDummyQuota } from "./userComponentInterop";
 
 const QuotaField = (props: FieldInputProps<QuotaID>) => {
-  const event = useTypedSelector((state) => state.editor.event!);
+  const quotas = useStore((state) => state.editor.event!.quotas);
   return (
     <BsForm.Control as="select" {...props}>
-      {event.quotas.map((quota) => (
+      {quotas.map((quota) => (
         // eslint-disable-next-line react/no-array-index-key
         <option key={quota.id} value={quota.id}>
           {quota.title}
@@ -39,12 +39,10 @@ const QuotaField = (props: FieldInputProps<QuotaID>) => {
 };
 
 const EditSignupModalBody = ({ handleSubmit, submitting }: FormRenderProps<SignupFormData<EditorSignup>>) => {
-  const isNew = useTypedSelector((state) => state.editor.editedSignup?.id == null);
-  const dispatch = useTypedDispatch();
+  const isNew = useStore((state) => state.editor.editedSignup?.id == null);
+  const signupEditCanceled = useStore((state) => state.editor.signupEditCanceled);
   const { t } = useTranslation();
   const onSubmit = useEvent(handleSubmit);
-
-  const cancel = useEvent(() => dispatch(signupEditCanceled()));
 
   return (
     <BsForm className="ilmo--form" onSubmit={onSubmit}>
@@ -77,7 +75,7 @@ const EditSignupModalBody = ({ handleSubmit, submitting }: FormRenderProps<Signu
       </Modal.Body>
       <Modal.Footer>
         {submitting && <Spinner animation="border" />}
-        <Button variant="muted" onClick={cancel} disabled={submitting}>
+        <Button variant="muted" onClick={signupEditCanceled} disabled={submitting}>
           {t("editor.editSignup.action.cancel")}
         </Button>
         <Button variant="primary" type="submit" disabled={submitting}>
@@ -89,9 +87,8 @@ const EditSignupModalBody = ({ handleSubmit, submitting }: FormRenderProps<Signu
 };
 
 const EditSignupModal = () => {
-  const dispatch = useTypedDispatch();
-  const editedSignup = useTypedSelector((state) => state.editor.editedSignup);
-  const { values } = useFormState<EditorEvent>();
+  const { editedSignup, saveSignup, signupEditCanceled } = useStore((state) => state.editor);
+  const values = useEditorFormState().values!;
   const { t } = useTranslation();
 
   // We will reuse components from the user signup form, so prepare a mock context.
@@ -130,16 +127,15 @@ const EditSignupModal = () => {
   const onSubmit = useEvent(async (formData: SignupFormData<EditorSignup>) => {
     const update = formDataToSignupUpdate(formData);
     try {
-      await dispatch(saveSignup(update));
+      await saveSignup(update);
       toast.success(t("editor.editSignup.success"), { autoClose: 5000 });
     } catch (error) {
       toast.error(t(errorDesc<TKey>(error as ApiError, "editor.saveSignupError")), { autoClose: 5000 });
     }
   });
-  const cancel = useEvent(() => dispatch(signupEditCanceled()));
 
   return (
-    <Modal show={editedSignup != null} onHide={cancel} dialogClassName="event-editor--signup-dialog">
+    <Modal show={editedSignup != null} onHide={signupEditCanceled} dialogClassName="event-editor--signup-dialog">
       {editSignupCtx && initialValues && (
         <EditSignupContextProvider value={editSignupCtx}>
           <Form<SignupFormData<EditorSignup>> onSubmit={onSubmit} initialValues={initialValues}>

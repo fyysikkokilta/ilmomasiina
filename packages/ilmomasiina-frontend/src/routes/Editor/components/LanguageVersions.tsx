@@ -2,14 +2,14 @@ import React from "react";
 
 import { omit, pick } from "lodash-es";
 import { Button, ButtonGroup } from "react-bootstrap";
-import { useField, useForm } from "react-final-form";
+import { useField } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
 import { AdminEventLanguage } from "@tietokilta/ilmomasiina-models";
 import { knownLanguages } from "../../../i18n";
-import { languageSelected } from "../../../modules/editor/actions";
+import { useEditorForm } from "../../../modules/editor/selectors";
 import { EditorEvent } from "../../../modules/editor/types";
-import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import useStore from "../../../modules/store";
 import useEvent from "../../../utils/useEvent";
 
 type VersionProps = { language: string };
@@ -22,22 +22,21 @@ const LanguageVersion = ({ language }: VersionProps) => {
   const {
     input: { value: languages },
   } = useField<EditorEvent["languages"]>("languages");
-  const { change, getState } = useForm<EditorEvent>();
-  const selectedLanguage = useTypedSelector((state) => state.editor.selectedLanguage);
-  const dispatch = useTypedDispatch();
+  const { change, getState } = useEditorForm();
+  const { selectedLanguage, languageSelected } = useStore((state) => state.editor);
 
   const isPresent = language in languages;
   const isDefault = language === defaultLanguage;
   const isEditing = selectedLanguage === language;
 
   const edit = useEvent(() => {
-    dispatch(languageSelected(language));
+    languageSelected(language);
   });
 
   const setAsDefault = useEvent(() => {
     // If the language is present, we need to swap it with the default.
     if (isPresent) {
-      const { values } = getState();
+      const values = getState().values!;
       // First, extract all the language version fields from the event, and add the result to languages.
       const eventKeys = [
         "description",
@@ -76,11 +75,11 @@ const LanguageVersion = ({ language }: VersionProps) => {
     }
     change("defaultLanguage", language);
     // Finally, start editing the new default language.
-    dispatch(languageSelected(language));
+    languageSelected(language);
   });
 
   const add = useEvent(() => {
-    const { quotas, questions } = getState().values;
+    const { quotas, questions } = getState().values!;
     // Add empty language to event.
     change("languages", {
       ...languages,
@@ -100,14 +99,14 @@ const LanguageVersion = ({ language }: VersionProps) => {
       },
     });
     // Finally, start editing the new language.
-    dispatch(languageSelected(language));
+    languageSelected(language);
   });
 
   const remove = useEvent(() => {
     // Remove language from event.
     change("languages", omit(languages, language));
     // Switch to default language if we removed the active one.
-    if (isEditing) dispatch(languageSelected(defaultLanguage));
+    if (isEditing) languageSelected(defaultLanguage);
   });
 
   const labels: string[] = [];

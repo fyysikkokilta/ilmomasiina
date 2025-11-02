@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { JSX, ReactNode } from "react";
 
 import { Card } from "react-bootstrap";
 import { Offset, SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";

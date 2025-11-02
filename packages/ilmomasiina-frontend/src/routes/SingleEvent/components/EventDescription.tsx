@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 
 import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -7,14 +7,14 @@ import { Link } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 
 import { useSingleEventContext } from "@tietokilta/ilmomasiina-client";
-import { AuthContext } from "../../../containers/AuthProvider";
+import useStore from "../../../modules/store";
 import paths from "../../../paths";
 import { useEventDateTimeFormatter } from "../../../utils/dateFormat";
 
 const EventDescription = () => {
   const event = useSingleEventContext().localizedEvent!;
   const { preview } = useSingleEventContext();
-  const { loggedIn } = useContext(AuthContext);
+  const loggedIn = useStore((state) => state.auth.loggedIn);
   const { t } = useTranslation();
   const eventDateFormat = useEventDateTimeFormatter();
 

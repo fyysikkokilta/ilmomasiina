@@ -2,15 +2,13 @@ import React, { useEffect } from "react";
 
 import { Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { shallowEqual } from "react-redux";
 import { Link } from "react-router-dom";
 
 import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import requireAuth from "../../containers/requireAuth";
 import type { TKey } from "../../i18n";
-import { getAuditLogs, resetState } from "../../modules/auditLog/actions";
+import useStore from "../../modules/store";
 import paths from "../../paths";
-import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
 import AuditLogActionFilter from "./AuditLogActionFilter";
 import AuditLogFilter from "./AuditLogFilter";
 import AuditLogItem from "./AuditLogItem";
@@ -19,20 +17,15 @@ import AuditLogPagination, { LOGS_PER_PAGE } from "./AuditLogPagination";
 import "./AuditLog.scss";
 
 const AuditLog = () => {
-  const dispatch = useTypedDispatch();
-  const { auditLog, loadError } = useTypedSelector((state) => state.auditLog, shallowEqual);
+  const { auditLog, loadError, getAuditLogs, resetState } = useStore((state) => state.auditLog);
   const { t } = useTranslation();
 
   useEffect(() => {
-    dispatch(
-      getAuditLogs({
-        limit: LOGS_PER_PAGE,
-      }),
-    );
-    return () => {
-      resetState();
-    };
-  }, [dispatch]);
+    getAuditLogs({
+      limit: LOGS_PER_PAGE,
+    });
+    return () => resetState();
+  }, [getAuditLogs, resetState]);
 
   return (
     <>
