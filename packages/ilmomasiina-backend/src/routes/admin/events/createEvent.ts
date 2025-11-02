@@ -1,4 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
+import { omit } from "lodash";
 
 import type { AdminEventResponse, EventCreateBody } from "@tietokilta/ilmomasiina-models";
 import { AuditEvent } from "@tietokilta/ilmomasiina-models";
@@ -14,10 +15,13 @@ export default async function createEvent(
   request: FastifyRequest<{ Body: EventCreateBody }>,
   response: FastifyReply,
 ): Promise<AdminEventResponse> {
+  // Ensure event id is always generated
+  const body = omit(request.body, "id");
+
   // Create the event, quotas and questions - Sequelize will handle validation
   const event = await getSequelize().transaction(async (transaction) => {
     const toCreate = new Event({
-      ...request.body,
+      ...body,
       date: toDate(request.body.date),
       endDate: toDate(request.body.endDate),
       registrationStartDate: toDate(request.body.registrationStartDate),

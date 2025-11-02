@@ -13,6 +13,7 @@ const paths = {
   adminInitialSetup: `${urlPrefix}/setup`,
   adminEventsList: `${urlPrefix}/admin`,
   adminEditEvent: (id: EventID) => `${urlPrefix}/admin/edit/${id}`,
+  adminCopyEvent: (id: EventID) => `${urlPrefix}/admin/copy/${id}`,
   adminUsersList: `${urlPrefix}/admin/users`,
   adminAuditLog: `${urlPrefix}/admin/auditlog`,
 };

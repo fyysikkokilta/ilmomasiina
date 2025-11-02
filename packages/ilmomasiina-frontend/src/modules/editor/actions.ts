@@ -88,6 +88,15 @@ export const loaded = (event: AdminEventResponse) =>
     },
   };
 
+export const loadedForCopy = (event: AdminEventResponse) =>
+  <const>{
+    type: EVENT_LOADED,
+    payload: {
+      event,
+      isNew: true,
+    },
+  };
+
 export const newEvent = () =>
   <const>{
     type: EVENT_LOADED,
@@ -179,6 +188,7 @@ export const signupEditCanceled = () =>
 export type EditorActions =
   | ReturnType<typeof resetState>
   | ReturnType<typeof loaded>
+  | ReturnType<typeof loadedForCopy>
   | ReturnType<typeof newEvent>
   | ReturnType<typeof loadFailed>
   | ReturnType<typeof checkingSlugAvailability>
@@ -246,6 +256,17 @@ export const getEvent = (id: EventID) => async (dispatch: DispatchAction, getSta
   try {
     const response = await adminApiFetch<AdminEventResponse>(`admin/events/${id}`, { accessToken }, dispatch);
     dispatch(loaded(response));
+  } catch (e) {
+    dispatch(loadFailed(e as ApiError));
+  }
+};
+
+export const copyEvent = (id: EventID) => async (dispatch: DispatchAction, getState: GetState) => {
+  const { accessToken } = getState().auth;
+
+  try {
+    const response = await adminApiFetch<AdminEventResponse>(`admin/events/${id}`, { accessToken }, dispatch);
+    dispatch(loadedForCopy(response));
   } catch (e) {
     dispatch(loadFailed(e as ApiError));
   }
