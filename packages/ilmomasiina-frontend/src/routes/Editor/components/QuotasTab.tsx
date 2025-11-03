@@ -10,7 +10,7 @@ import { useFieldValue } from "./hooks";
 import LanguageSelect from "./LanguageSelect";
 import Quotas from "./Quotas";
 
-const numberConfig: UseFieldConfig = {
+const numberConfig: UseFieldConfig<number | null> = {
   parse: (value) => (value ? Number(value) : null),
 };
 

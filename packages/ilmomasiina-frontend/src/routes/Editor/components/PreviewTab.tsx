@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 
 import { Col, Row } from "react-bootstrap";
+import { useFormState } from "react-final-form";
 import { I18nextProvider, useTranslation } from "react-i18next";
 
 import {
@@ -10,7 +11,7 @@ import {
   SingleEventContextProvider,
   SingleEventState,
 } from "@tietokilta/ilmomasiina-client";
-import { useEditorFormState } from "../../../modules/editor/selectors";
+import type { EditorEvent } from "../../../modules/editor/types";
 import useStore from "../../../modules/store";
 import EditSignupForm from "../../EditSignup/components/EditForm";
 import EventDescription from "../../SingleEvent/components/EventDescription";
@@ -19,7 +20,7 @@ import LanguageSelect from "./LanguageSelect";
 import { editorEventToUserEvent, previewDummySignup } from "./userComponentInterop";
 
 const PreviewTab = () => {
-  const values = useEditorFormState().values!;
+  const { values } = useFormState<EditorEvent>();
   const [previewingForm, setPreviewingForm] = useState(false);
   const { i18n, t } = useTranslation();
   const selectedLanguage = useStore((state) => state.editor.selectedLanguage);

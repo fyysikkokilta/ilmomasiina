@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 import { Button, Form as BsForm, Modal, Spinner } from "react-bootstrap";
-import { FieldInputProps, Form, FormRenderProps } from "react-final-form";
+import { FieldInputProps, Form, FormRenderProps, useFormState } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
@@ -15,8 +15,7 @@ import {
 import type { QuotaID } from "@tietokilta/ilmomasiina-models";
 import FieldRow from "../../../components/FieldRow";
 import type { TKey } from "../../../i18n";
-import { useEditorFormState } from "../../../modules/editor/selectors";
-import type { EditorSignup } from "../../../modules/editor/types";
+import type { EditorEvent, EditorSignup } from "../../../modules/editor/types";
 import useStore from "../../../modules/store";
 import useEvent from "../../../utils/useEvent";
 import CommonFields from "../../EditSignup/components/CommonFields";
@@ -88,7 +87,7 @@ const EditSignupModalBody = ({ handleSubmit, submitting }: FormRenderProps<Signu
 
 const EditSignupModal = () => {
   const { editedSignup, saveSignup, signupEditCanceled } = useStore((state) => state.editor);
-  const values = useEditorFormState().values!;
+  const { values } = useFormState<EditorEvent>();
   const { t } = useTranslation();
 
   // We will reuse components from the user signup form, so prepare a mock context.

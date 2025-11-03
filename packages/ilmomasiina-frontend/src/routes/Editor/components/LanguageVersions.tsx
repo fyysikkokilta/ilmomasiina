@@ -2,12 +2,11 @@ import React from "react";
 
 import { omit, pick } from "lodash-es";
 import { Button, ButtonGroup } from "react-bootstrap";
-import { useField } from "react-final-form";
+import { useField, useForm } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
 import { AdminEventLanguage } from "@tietokilta/ilmomasiina-models";
 import { knownLanguages } from "../../../i18n";
-import { useEditorForm } from "../../../modules/editor/selectors";
 import { EditorEvent } from "../../../modules/editor/types";
 import useStore from "../../../modules/store";
 import useEvent from "../../../utils/useEvent";
@@ -22,7 +21,7 @@ const LanguageVersion = ({ language }: VersionProps) => {
   const {
     input: { value: languages },
   } = useField<EditorEvent["languages"]>("languages");
-  const { change, getState } = useEditorForm();
+  const { change, getState } = useForm<EditorEvent>();
   const { selectedLanguage, languageSelected } = useStore((state) => state.editor);
 
   const isPresent = language in languages;
@@ -36,7 +35,7 @@ const LanguageVersion = ({ language }: VersionProps) => {
   const setAsDefault = useEvent(() => {
     // If the language is present, we need to swap it with the default.
     if (isPresent) {
-      const values = getState().values!;
+      const { values } = getState();
       // First, extract all the language version fields from the event, and add the result to languages.
       const eventKeys = [
         "description",
@@ -79,7 +78,7 @@ const LanguageVersion = ({ language }: VersionProps) => {
   });
 
   const add = useEvent(() => {
-    const { quotas, questions } = getState().values!;
+    const { quotas, questions } = getState().values;
     // Add empty language to event.
     change("languages", {
       ...languages,

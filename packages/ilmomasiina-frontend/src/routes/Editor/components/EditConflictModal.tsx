@@ -1,11 +1,11 @@
 import React from "react";
 
 import { Button, Modal } from "react-bootstrap";
+import { useForm } from "react-final-form";
 import { Trans, useTranslation } from "react-i18next";
 
 import { EditConflictError } from "@tietokilta/ilmomasiina-models";
-import { useEditorForm } from "../../../modules/editor/selectors";
-import { EditorQuestion, EditorQuota } from "../../../modules/editor/types";
+import { EditorEvent, EditorQuestion, EditorQuota } from "../../../modules/editor/types";
 import useStore from "../../../modules/store";
 import { useActionDateTimeFormatter } from "../../../utils/dateFormat";
 import useEvent from "../../../utils/useEvent";
@@ -48,10 +48,10 @@ const EditConflictModal = ({ onSave }: Props) => {
   const deletedQuestions = modal?.deletedQuestions || [];
   const deletedQuotas = modal?.deletedQuotas || [];
 
-  const form = useEditorForm();
+  const form = useForm<EditorEvent>();
 
   const overwrite = useEvent(() => {
-    const { questions, quotas } = form.getState().values!; // final-form is currently mistyped as possibly undefined
+    const { questions, quotas } = form.getState().values;
     // Tell the backend we want to overwrite the latest change.
     form.change("updatedAt", modal!.updatedAt);
     // We still need to re-create the questions and quotas that were deleted, by removing their old IDs.

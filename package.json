@@ -67,6 +67,10 @@
         "popper.js",
         "eslint"
       ]
+    },
+    "overrides": {
+      "react-final-form@6.5.9>react": "^19.2.0",
+      "react-final-form-arrays@3.1.4>react": "^19.2.0"
     }
   }
 }

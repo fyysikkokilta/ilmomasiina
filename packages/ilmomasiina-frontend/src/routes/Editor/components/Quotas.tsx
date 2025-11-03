@@ -24,7 +24,7 @@ type QuotaRowProps = {
   remove: (index: number) => void;
 };
 
-const numberConfig: UseFieldConfig = {
+const numberConfig: UseFieldConfig<number | null> = {
   parse: (value) => (value ? Number(value) : null),
 };
 

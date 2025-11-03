@@ -1,5 +1,3 @@
-import type { FormApi, FormState } from "final-form";
-import { useForm, useFormState } from "react-final-form";
 import { createSelector } from "reselect";
 
 import { AdminEventResponse } from "@tietokilta/ilmomasiina-models";
@@ -41,24 +39,6 @@ export const defaultEvent = (): EditorEvent => ({
 
   updatedAt: "",
 });
-
-/** Wraps react-final-form's `useForm()` with correct types.
- *
- * `useForm()` assumes the initial values are `Partial<T>`, but the initial values above are complete.
- */
-export function useEditorForm(): FormApi<EditorEvent, EditorEvent> {
-  return useForm<EditorEvent>() as FormApi<EditorEvent, EditorEvent>;
-}
-
-/** Wraps react-final-form's `useForm()` with correct types.
- *
- * `useFormState()` assumes the initial values are `Partial<T>`, but the initial values above are complete.
- *
- * It's also currently mistyped to allow `values` to be possibly undefined.
- */
-export function useEditorFormState(): FormState<EditorEvent, EditorEvent> {
-  return useFormState<EditorEvent>() as FormState<EditorEvent, EditorEvent>;
-}
 
 /** Determines the event type, which is only a thing in the frontend. */
 export function eventType(event: AdminEventResponse): EditorEventType {
