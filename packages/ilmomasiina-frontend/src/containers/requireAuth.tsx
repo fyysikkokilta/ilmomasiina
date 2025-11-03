@@ -12,21 +12,21 @@ export default function requireAuth<P extends {}>(WrappedComponent: ComponentTyp
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const { accessToken, resetAuth: resetState } = useStore((state) => state.auth);
+    const { accessToken, resetAuth } = useStore((state) => state.auth);
 
     const expired = accessToken && accessToken.expiresAt < Date.now();
     const needLogin = expired || !accessToken;
 
     useEffect(() => {
       if (expired) {
-        resetState();
+        resetAuth();
         loginToast("error", t("auth.loginExpired"), 10000);
         navigate(paths.adminLogin);
       } else if (needLogin) {
-        resetState();
+        resetAuth();
         navigate(paths.adminLogin);
       }
-    }, [needLogin, expired, resetState, navigate, t]);
+    }, [needLogin, expired, resetAuth, navigate, t]);
 
     return needLogin ? null : <WrappedComponent {...props} />;
   };
