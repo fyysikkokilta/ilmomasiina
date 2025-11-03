@@ -3,7 +3,6 @@ import React, { useMemo } from "react";
 import { Button, Col, Form, FormCheckProps, InputGroup, Row } from "react-bootstrap";
 import { Field, FieldRenderProps } from "react-final-form";
 import { useTranslation } from "react-i18next";
-import { SortEnd } from "react-sortable-hoc";
 
 import useShallowMemo from "@tietokilta/ilmomasiina-client/dist/utils/useShallowMemo";
 import { QuestionLanguage, QuestionType, questionUpdate } from "@tietokilta/ilmomasiina-models";
@@ -63,13 +62,13 @@ const OptionRow = ({ name, index, remove }: OptionProps) => {
 type QuestionProps = {
   name: string;
   index: number;
-  remove: (index: number) => void;
 };
 
-const QuestionRow = ({ name, index, remove }: QuestionProps) => {
+const QuestionRow = ({ name, index }: QuestionProps) => {
   const { t } = useTranslation();
   const formatError = useEditorErrors();
 
+  const { remove } = useLocalizedFieldArrayMutators<EditorQuestion, QuestionLanguage>("questions");
   const removeThis = useEvent(() => remove(index));
 
   const optionFields = useFieldArrayMap(`${name}.options`);
@@ -153,7 +152,7 @@ const Questions = () => {
   const { t } = useTranslation();
   const questions = useFieldValue<EditorQuestion[]>("questions");
   const { map: mapFields } = useFieldArrayMap("questions");
-  const { push, move, remove } = useLocalizedFieldArrayMutators<EditorQuestion, QuestionLanguage>("questions");
+  const { push, move } = useLocalizedFieldArrayMutators<EditorQuestion, QuestionLanguage>("questions");
 
   const addQuestion = useEvent(() => {
     push(
@@ -172,19 +171,18 @@ const Questions = () => {
     );
   });
 
-  const updateOrder = useEvent(({ newIndex, oldIndex }: SortEnd) => move(oldIndex, newIndex));
-
   const keys = useShallowMemo(questions.map((item) => item.key));
+  // Generate objects to be passed to Sortable.
   const questionItems = useMemo(
-    () => mapFields((name, i) => <QuestionRow key={keys[i]} name={name} index={i} remove={remove} />),
-    // This list only invalidates when the question positions or count change.
+    () => mapFields((name, i) => ({ name, id: keys[i] })),
+    // Actual question data isn't included, so this list only invalidates when the question positions or count change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [keys],
   );
 
   return (
     <>
-      <Sortable collection="questions" items={questionItems} onSortEnd={updateOrder} useDragHandle />
+      <Sortable items={questionItems} component={QuestionRow} move={move} />
       <div className="text-center mb-3">
         <Button type="button" variant="primary" onClick={addQuestion}>
           {t("editor.questions.addQuestion")}

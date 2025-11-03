@@ -51,6 +51,11 @@
   flex-direction: row !important;
   margin-bottom: 1rem;
 
+  &.sorting {
+    outline: $blue solid 2px;
+    z-index: 1000;
+  }
+
   .quota-body,
   .question-body {
     margin: 0;
@@ -69,6 +74,7 @@
     background: $body-bg;
     border-right: 1px solid $card-border-color;
     cursor: move;
+    touch-action: none;
 
     &:after {
       content: "";
