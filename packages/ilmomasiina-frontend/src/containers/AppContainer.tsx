@@ -35,61 +35,39 @@ const AppContainer = () => {
   }, [renewLogin]);
 
   return (
-    <div className="layout-wrapper">
-      <Header />
-      <Container>
-        <BrowserRouter>
+    <BrowserRouter>
+      <div className="layout-wrapper">
+        <Header />
+        <Container>
           <Routes>
-            <Route path={paths.eventsList}>
-              <EventList />
-            </Route>
-            <Route path={paths.eventDetails(":slug")}>
-              <SingleEvent />
-            </Route>
-            <Route path={paths.editSignup(":id", ":editToken")}>
-              <EditSignup />
-            </Route>
-            <Route path={paths.adminLogin}>
-              <Login />
-            </Route>
-            <Route path={paths.adminInitialSetup}>
-              <InitialSetup />
-            </Route>
-            <Route path={paths.adminEventsList}>
-              <AdminEventsList />
-            </Route>
-            <Route path={paths.adminUsersList}>
-              <AdminUsersList />
-            </Route>
-            <Route path={paths.adminEditEvent(":id")}>
-              <Editor />
-            </Route>
-            <Route path={paths.adminCopyEvent(":id")}>
-              <Editor copy />
-            </Route>
-            <Route path={paths.adminAuditLog}>
-              <AuditLog />
-            </Route>
-            <Route path="*">
-              <PageNotFound />
-            </Route>
+            <Route path={paths.eventsList} element={<EventList />} />
+            <Route path={paths.eventDetails(":slug")} element={<SingleEvent />} />
+            <Route path={paths.editSignup(":id", ":editToken")} element={<EditSignup />} />
+            <Route path={paths.adminLogin} element={<Login />} />
+            <Route path={paths.adminInitialSetup} element={<InitialSetup />} />
+            <Route path={paths.adminEventsList} element={<AdminEventsList />} />
+            <Route path={paths.adminUsersList} element={<AdminUsersList />} />
+            <Route path={paths.adminEditEvent(":id")} element={<Editor />} />
+            <Route path={paths.adminCopyEvent(":id")} element={<Editor copy />} />
+            <Route path={paths.adminAuditLog} element={<AuditLog />} />
+            <Route path="*" element={<PageNotFound />} />
           </Routes>
-        </BrowserRouter>
-      </Container>
-      <Footer />
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        transition={Flip}
-      />
-    </div>
+        </Container>
+        <Footer />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          transition={Flip}
+        />
+      </div>
+    </BrowserRouter>
   );
 };
 
