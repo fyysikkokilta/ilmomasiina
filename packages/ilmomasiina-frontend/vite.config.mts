@@ -51,6 +51,16 @@ export default defineConfig(({ mode }) => ({
     sourcemap: true,
   },
 
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Silence deprecation warning spam from Bootstrap for now.
+        // https://github.com/twbs/bootstrap/issues/40962
+        silenceDeprecations: ["import", "color-functions", "global-builtin"],
+      },
+    },
+  },
+
   define: quoteValues({
     DEV: mode === "development",
     PROD: mode === "production",
