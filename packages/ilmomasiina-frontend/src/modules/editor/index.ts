@@ -132,7 +132,7 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
       method: "POST",
       body: cleaned,
     });
-    getSlice().loaded(response, false);
+    setSlice({ event: response, isNew: false });
     return response;
   },
   publishEventUpdate: async (id: EventID, data: EditorEvent): Promise<AdminEventResponse | null> => {
@@ -144,7 +144,7 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
         method: "PATCH",
         body,
       });
-      getSlice().loaded(response, false);
+      setSlice({ event: response, isNew: false });
       return response;
     } catch (e) {
       if (e instanceof ApiError && e.code === ErrorCode.WOULD_MOVE_SIGNUPS_TO_QUEUE) {
