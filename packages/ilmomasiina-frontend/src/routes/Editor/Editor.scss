@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "../../styles/definitions" as *;
 
 .tab {
@@ -62,6 +63,8 @@
     padding: 1.25rem;
     flex-grow: 1;
     background: $secondary-background;
+    border-top-right-radius: var(--bs-card-border-radius);
+    border-bottom-right-radius: var(--bs-card-border-radius);
 
     .no-focus {
       user-select: none;
@@ -75,6 +78,8 @@
     border-right: 1px solid $card-border-color;
     cursor: move;
     touch-action: none;
+    border-top-left-radius: var(--bs-card-border-radius);
+    border-bottom-left-radius: var(--bs-card-border-radius);
 
     &:after {
       content: "";
@@ -101,15 +106,17 @@
   }
 }
 
-@include media-breakpoint-down(xs) {
+@include media-breakpoint-down(sm) {
   .event-editor--question-buttons {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
+    margin-top: $spacer * 0.5 !important;
 
     > *:not(:last-child) {
-      margin-right: $spacer * 0.5;
+      margin-right: $spacer;
     }
+
     > button:first-of-type {
       margin-left: auto;
     }
@@ -123,12 +130,6 @@
   flex-wrap: wrap;
   row-gap: $spacer;
   margin-bottom: $spacer;
-
-  @if $force-link-underline {
-    :link {
-      text-decoration: underline;
-    }
-  }
 
   .spinner-border {
     align-self: center;
@@ -160,18 +161,19 @@
   transition: all 0.3s ease;
 }
 
-.event-editor--preview .ilmo--title-nav h1 {
+.event-editor--preview .ilmo--title-nav {
   margin-top: 0;
 }
 
 // Apply same widths as NarrowContainer, but to the dialog
 .event-editor--signup-dialog {
-  max-width: 100% * 8 / 12 !important;
-
-  @include media-breakpoint-down(sm) {
-    max-width: 100% * 10 / 12 !important;
+  & {
+    max-width: 100% * math.div(8, 12) !important;
   }
-  @include media-breakpoint-down(xs) {
+  @include media-breakpoint-down(md) {
+    max-width: 100% * math.div(10, 12) !important;
+  }
+  @include media-breakpoint-down(sm) {
     max-width: 100% !important;
   }
 }

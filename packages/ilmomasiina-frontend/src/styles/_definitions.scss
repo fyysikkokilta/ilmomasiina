@@ -10,11 +10,7 @@ $primary: #0a0d10 !default;
 $secondary: #0a0d10 !default;
 $red: #d74949 !default; // further assigned to $danger by Bootstrap
 $green: #319236 !default; // further assigned to $success by Bootstrap
-$text-muted: #888 !default;
-
-// Links are impossible to see with Tietokilta's black $primary.
-// You can disable this if you use something light.
-$force-link-underline: true !default;
+$text-muted: #888 !default; // uses $secondary by default, but Tietokilta has a dark $secondary
 
 // Default button hover color logic doesn't work with Tietokilta's black $primary.
 // You can disable this if you use something light.

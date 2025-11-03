@@ -13,8 +13,6 @@ import paths from "../../paths";
 import { isEventInPast } from "../../utils/eventState";
 import AdminEventListItem from "./AdminEventListItem";
 
-import "./AdminEvents.scss";
-
 const AdminEventsList = () => {
   const { events, loadError, getAdminEvents, resetState } = useStore((state) => state.adminEvents);
   const [showPast, setShowPast] = useState(false);
@@ -58,18 +56,20 @@ const AdminEventsList = () => {
     <>
       <nav className="ilmo--title-nav">
         <h1>{showPast ? t("adminEvents.title.past") : t("adminEvents.title")}</h1>
-        <Button variant="secondary" onClick={togglePast}>
-          {showPast ? t("adminEvents.nav.upcoming") : t("adminEvents.nav.past")}
-        </Button>
-        <LinkButton variant="secondary" to={paths.adminUsersList}>
-          {t("adminEvents.nav.users")}
-        </LinkButton>
-        <LinkButton variant="secondary" to={paths.adminAuditLog}>
-          {t("adminEvents.nav.auditLog")}
-        </LinkButton>
-        <LinkButton variant="primary" to={paths.adminEditEvent("new")}>
-          {t("adminEvents.nav.newEvent")}
-        </LinkButton>
+        <nav className="ilmo--title-nav-buttons">
+          <Button variant="secondary" onClick={togglePast}>
+            {showPast ? t("adminEvents.nav.upcoming") : t("adminEvents.nav.past")}
+          </Button>
+          <LinkButton variant="secondary" to={paths.adminUsersList}>
+            {t("adminEvents.nav.users")}
+          </LinkButton>
+          <LinkButton variant="secondary" to={paths.adminAuditLog}>
+            {t("adminEvents.nav.auditLog")}
+          </LinkButton>
+          <LinkButton variant="primary" to={paths.adminEditEvent("new")}>
+            {t("adminEvents.nav.newEvent")}
+          </LinkButton>
+        </nav>
       </nav>
       <table className="table ilmo--admin-event-list">
         <thead>

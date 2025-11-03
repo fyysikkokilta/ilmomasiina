@@ -153,17 +153,18 @@ const SignupsTab = () => {
           checked={grouped}
           onChange={onGroupedChange}
         />
-        <div className="flex-grow-1" />
-        <Button variant="primary" onClick={createSignup}>
-          {t("editor.signups.action.create")}
-        </Button>
-        <CSVLink
-          data={csvSignups!}
-          csvOptions={csvOptions}
-          download={t("editor.signups.download.filename", { event: event.title })}
-        >
-          {t("editor.signups.download")}
-        </CSVLink>
+        <div className="ilmo--title-nav-buttons">
+          <Button variant="primary" onClick={createSignup}>
+            {t("editor.signups.action.create")}
+          </Button>
+          <CSVLink
+            data={csvSignups!}
+            csvOptions={csvOptions}
+            download={t("editor.signups.download.filename", { event: event.title })}
+          >
+            {t("editor.signups.download")}
+          </CSVLink>
+        </div>
       </nav>
       {/* eslint-disable-next-line no-nested-ternary */}
       {!signups?.length ? (

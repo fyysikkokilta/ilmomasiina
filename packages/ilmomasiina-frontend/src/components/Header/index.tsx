@@ -29,8 +29,8 @@ const Header = () => {
 
   return (
     <Navbar>
-      <Container>
-        <Link to={paths.eventsList} className="navbar-brand mr-auto">
+      <Container className="gap-sm-2">
+        <Link to={paths.eventsList} className="navbar-brand">
           <img className="navbar-logo" src={logo} alt="Logo" />
           <span className="d-none d-sm-inline">{branding.headerTitle}</span>
           <span className="d-sm-none">{branding.headerTitleShort}</span>

@@ -116,9 +116,9 @@ export default function FieldRow<C extends As>({
   }
 
   return (
-    <Form.Group as={Row} controlId={controlId}>
+    <Form.Group as={Row} className="form-row" controlId={controlId}>
       <Col sm="3" className="ilmo--label-column">
-        <Form.Label data-required={required} className={`col-form-label ${checkAlign ? "pt-0" : ""}`}>
+        <Form.Label data-required={required} className={`col-form-label ${checkAlign ? "pt-sm-0" : ""}`}>
           {label}
         </Form.Label>
       </Col>

@@ -1,13 +1,22 @@
 @use "../../styles/definitions" as *;
 
 table.ilmo--event-list {
+  // Bootstrap 5 uses border-bottom, but that's impossible to use for our preferred styling.
+  thead tr th {
+    border-block-width: 1px;
+  }
+  tbody tr td {
+    border-bottom-width: 0;
+    border-top-width: 1px;
+  }
+
   tr.ilmo--quota-row {
     td.ilmo--title {
       padding-left: 30px;
     }
     td {
-      border-top: 0;
       padding-top: 0;
+      border-top-width: 0;
     }
   }
   tr.ilmo--signup-not-opened td.ilmo--signup-state {
@@ -24,19 +33,13 @@ table.ilmo--event-list {
   }
 }
 
-@if $force-link-underline {
-  table.ilmo--event-list :link:not(.btn) {
-    text-decoration: underline;
-  }
-}
-
 @include media-breakpoint-up(md) {
   table.ilmo--event-list td.ilmo--title {
     min-width: 300px;
   }
 }
 
-@include media-breakpoint-down(xs) {
+@include media-breakpoint-down(sm) {
   table.ilmo--event-list {
     max-width: 100%;
     overflow: hidden;
@@ -54,7 +57,7 @@ table.ilmo--event-list {
         &:not(:first-child):not(.ilmo--quota-row) {
           padding: $spacer * 0.75 0 0;
           margin-top: $spacer * 0.75;
-          border-top: 1px solid $border-color;
+          border-top-width: 1px;
         }
 
         td {
