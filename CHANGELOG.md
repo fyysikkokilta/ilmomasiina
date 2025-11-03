@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.0-rc.2
+
+**Bug fixes and improvements:**
+
+- The event editor no longer shows a non-functional "Create signup" button when there are no quotas
+
 ## 2.0.0-rc.1
 
 **Breaking changes:**

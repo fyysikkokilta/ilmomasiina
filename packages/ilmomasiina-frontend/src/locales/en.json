@@ -239,6 +239,7 @@
     "editor.questions.questionOptions.delete": "Delete",
     "editor.emails.verificationEmail": "Confirmation email",
     "editor.preview.languageInfo": "Use the language button in the top navigation to preview the event in different languages.",
+    "editor.signups.noQuotas": "There are currently no quotas in this event. Create a quota and save the event in order to create signups.",
     "editor.signups.noSignups": "There are currently no signups for this event. When people sign up, they will appear here.",
     "editor.signups.emptyQuota": "There are currently no signups for this quota. When people sign up, they will appear here.",
     "editor.signups.download": "Download list of participants",

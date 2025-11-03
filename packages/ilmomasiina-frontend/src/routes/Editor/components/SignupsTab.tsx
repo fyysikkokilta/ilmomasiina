@@ -140,8 +140,8 @@ const SignupsTab = () => {
 
   const createSignup = useEvent(() => dispatch(editNewSignup({ language })));
 
-  if (!event) {
-    return <p>{t("editor.signups.noSignups")}</p>;
+  if (!event || !event.quotas.length) {
+    return <p>{t("editor.signups.noQuotas")}</p>;
   }
 
   const isSingleQuota = event.quotas.length <= 1;

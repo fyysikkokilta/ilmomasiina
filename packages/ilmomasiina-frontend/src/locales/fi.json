@@ -239,6 +239,7 @@
     "editor.questions.questionOptions.delete": "Poista",
     "editor.emails.verificationEmail": "Vahvistusviesti sähköpostiin",
     "editor.preview.languageInfo": "Käytä yläpalkissa olevaa kielinappia esikatsellaksesi tapahtumaa eri kielillä.",
+    "editor.signups.noQuotas": "Tapahtumassa ei vielä ole yhtään kiintiötä. Luo kiintiö ja tallenna tapahtuma, niin ilmoittautumisia voidaan luoda.",
     "editor.signups.noSignups": "Tapahtumaan ei vielä ole yhtään ilmoittautumista. Kun tapahtumaan tulee ilmoittautumisia, näet ne tästä.",
     "editor.signups.emptyQuota": "Kiintiöön ei vielä ole yhtään ilmoittautumista. Kun kiintiöön tulee ilmoittautumisia, näet ne tästä.",
     "editor.signups.download": "Lataa osallistujalista",
