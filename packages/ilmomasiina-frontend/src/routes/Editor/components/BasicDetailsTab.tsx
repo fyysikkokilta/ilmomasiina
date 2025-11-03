@@ -83,7 +83,9 @@ const BasicDetailsTab = () => {
 
   const eventType = useFieldValue<EditorEventType>("eventType");
   const date = useFieldValue<Date | null>("date");
-  const endDate = useFieldValue<Date | null>("date");
+  const endDate = useFieldValue<Date | null>("endDate");
+  const registrationStartDate = useFieldValue<Date | null>("registrationStartDate");
+  const registrationEndDate = useFieldValue<Date | null>("registrationEndDate");
 
   useEffect(() => {
     loadCategories();
@@ -163,6 +165,8 @@ const BasicDetailsTab = () => {
           name="registrationStartDate"
           id="registrationStartDate"
           as={DateTimePicker}
+          selectsStart
+          endDate={registrationEndDate}
           label={t("editor.basic.registrationStartDate")}
           required
           formatError={formatError}
@@ -173,6 +177,8 @@ const BasicDetailsTab = () => {
           name="registrationEndDate"
           id="registrationEndDate"
           as={DateTimePicker}
+          selectsEnd
+          startDate={registrationStartDate}
           label={t("editor.basic.registrationEndDate")}
           required
           formatError={formatError}
