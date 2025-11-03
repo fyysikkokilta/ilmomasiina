@@ -22,6 +22,7 @@ const storeSlice =
   ): StateCreator<Root, [], [], Root[Name]> =>
   (set, get, store) => {
     const getSlice = () => get()[name];
+
     const setSlice = (slice: Partial<Root[Name]> | ((prev: Root[Name]) => Partial<Root[Name]>)) => {
       set((state: Root): Partial<Root> => {
         const update = typeof slice === "function" ? slice(state[name]) : slice;
@@ -30,12 +31,14 @@ const storeSlice =
         return next;
       });
     };
+
     const resetState = () =>
       set(() => {
         const next: Partial<Root> = {};
         next[name] = store.getInitialState()[name];
         return next;
       });
+
     return creator(set, get, store, getSlice, setSlice, resetState);
   };
 

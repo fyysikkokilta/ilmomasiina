@@ -70,14 +70,15 @@ const RENEW_LOGIN_THRESHOLD = 5 * 60 * 1000;
 export const authSlice = storeSlice<Root>()("auth", (set, get, store, getSlice, setSlice, resetState) => ({
   ...initialState,
   resetAuth: resetState,
+
   loginSucceeded: (accessToken: string) =>
-    setSlice(() => ({
+    setSlice({
       accessToken: {
         token: accessToken,
         expiresAt: getTokenExpiry(accessToken),
       },
       loggedIn: true,
-    })),
+    }),
 
   login: async (email: string, password: string) => {
     const sessionResponse = await apiFetch<AdminLoginResponse>("authentication", {
@@ -101,14 +102,16 @@ export const authSlice = storeSlice<Root>()("auth", (set, get, store, getSlice, 
     getSlice().loginSucceeded(sessionResponse.accessToken);
     return true;
   },
+
   renewLogin: async () => {
     const { accessToken } = getSlice();
     if (
       !accessToken ||
       Date.now() < accessToken.expiresAt - RENEW_LOGIN_THRESHOLD ||
       Date.now() > accessToken.expiresAt
-    )
+    ) {
       return;
+    }
 
     try {
       if (accessToken) {

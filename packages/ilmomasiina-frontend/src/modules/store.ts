@@ -26,9 +26,15 @@ const useStore = create<Root>()(
         editor: editorSlice(...args),
       }),
       {
-        name: DEV ? "ilmomasiina-dev" : "ilmomasiina",
+        name: DEV ? "ilmomasiina-dev-auth" : "ilmomasiina-auth",
         storage: createJSONStorage(() => localStorage),
-        partialize: (state) => ({ auth: state.auth }),
+        // Only persist the auth slice.
+        partialize: (state) => state.auth,
+        merge: (persistedAuth, current) => ({
+          ...current,
+          // Merge in the persisted auth slice; keep functions etc. from current state.
+          auth: { ...current.auth, ...(persistedAuth as AuthSlice) },
+        }),
       },
     ),
   ),
