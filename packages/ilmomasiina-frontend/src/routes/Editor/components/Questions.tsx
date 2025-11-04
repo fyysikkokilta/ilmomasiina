@@ -75,7 +75,7 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
   const optionMutators = useLocalizedFieldArrayMutators<string>(`${name}.options`);
   const addOption = useEvent(() => optionMutators.push("", ""));
 
-  const type = useFieldValue(`${name}.type`);
+  const type = useFieldValue<QuestionType>(`${name}.type`);
 
   return (
     <Row className="question-body px-0">
@@ -103,7 +103,7 @@ const QuestionRow = ({ name, index, remove }: QuestionProps) => {
           ]}
           formatError={formatError}
         />
-        {(type === "select" || type === "checkbox") && (
+        {(type === QuestionType.SELECT || type === QuestionType.CHECKBOX) && (
           <>
             {optionFields.map((optName, i) => (
               <OptionRow key={optName} name={optName} index={i} remove={optionMutators.remove} />

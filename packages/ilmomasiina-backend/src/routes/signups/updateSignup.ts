@@ -12,7 +12,7 @@ import type {
   SignupUpdateResponse,
   SignupValidationErrors,
 } from "@tietokilta/ilmomasiina-models";
-import { AuditEvent, SignupFieldError } from "@tietokilta/ilmomasiina-models";
+import { AuditEvent, QuestionType, SignupFieldError } from "@tietokilta/ilmomasiina-models";
 import sendSignupConfirmationMail from "../../mail/signupConfirmation";
 import { getSequelize } from "../../models";
 import { Answer, AnswerCreationAttributes } from "../../models/answer";
@@ -148,7 +148,7 @@ export async function updateSignupAsUser(
 
       // Collect valid options from all languages, if applicable
       const validOptions = question.options ?? [];
-      if (question.type === "checkbox" || question.type === "select") {
+      if (question.type === QuestionType.CHECKBOX || question.type === QuestionType.SELECT) {
         for (const lang of Object.values(event.languages)) {
           const localized = lang.questions[index];
           if (localized && localized.options) {
@@ -164,8 +164,8 @@ export async function updateSignupAsUser(
           error = SignupFieldError.MISSING;
         }
         // Normalize empty answers to "" or [], depending on question type
-        answer = question.type === "checkbox" ? [] : "";
-      } else if (question.type === "checkbox") {
+        answer = question.type === QuestionType.CHECKBOX ? [] : "";
+      } else if (question.type === QuestionType.CHECKBOX) {
         // Ensure checkbox answers are arrays
         if (!Array.isArray(answer)) {
           error = SignupFieldError.WRONG_TYPE;
@@ -183,16 +183,16 @@ export async function updateSignupAsUser(
           error = SignupFieldError.WRONG_TYPE;
         } else {
           switch (question.type) {
-            case "text":
-            case "textarea":
+            case QuestionType.TEXT:
+            case QuestionType.TEXT_AREA:
               break;
-            case "number":
+            case QuestionType.NUMBER:
               // Check that a numeric answer is valid
               if (!Number.isFinite(parseFloat(answer))) {
                 error = SignupFieldError.NOT_A_NUMBER;
               }
               break;
-            case "select": {
+            case QuestionType.SELECT: {
               // Check that the select answer is valid
               if (!validOptions.includes(answer)) {
                 error = SignupFieldError.NOT_AN_OPTION;
@@ -257,8 +257,8 @@ async function updateExistingSignupAsAdmin(
     let answer = body.answers?.find((a) => a.questionId === question.id)?.answer;
     if (!answer || !answer.length) {
       // Normalize empty answers to "" or [], depending on question type
-      answer = question.type === "checkbox" ? [] : "";
-    } else if (question.type === "checkbox") {
+      answer = question.type === QuestionType.CHECKBOX ? [] : "";
+    } else if (question.type === QuestionType.CHECKBOX) {
       // Forcibly convert checkbox answers to array
       answer = !Array.isArray(answer) ? [answer] : answer;
     } else {

@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
 
-import type { AdminEventResponse } from "@tietokilta/ilmomasiina-models";
+import { AdminEventResponse, QuestionType } from "@tietokilta/ilmomasiina-models";
 import i18n from "../../i18n";
 import type { AppState } from "../../store/types";
 import { ConvertedEditorEvent, EditorEvent, EditorEventType } from "./types";
@@ -81,7 +81,7 @@ export const editorEventToServer = (form: EditorEvent): ConvertedEditorEvent => 
   openQuotaSize: form.useOpenQuota && form.openQuotaSize ? form.openQuotaSize : 0,
   questions: form.questions.map((question) => ({
     ...question,
-    options: question.type === "select" || question.type === "checkbox" ? question.options : null,
+    options: question.type === QuestionType.SELECT || question.type === QuestionType.CHECKBOX ? question.options : null,
   })),
 });
 
