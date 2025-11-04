@@ -4,6 +4,8 @@
 
 **Bug fixes and improvements:**
 
+- Fixed answer options from non-default languages not being valid for signups
+- Fixed answer options getting desynced between languages when changing question types
 - The event editor no longer shows a non-functional "Create signup" button when there are no quotas
 
 ## 2.0.0-rc.1
