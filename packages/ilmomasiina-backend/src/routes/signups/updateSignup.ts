@@ -141,10 +141,22 @@ export async function updateSignupAsUser(
     }
 
     // Check that all questions are answered with a valid answer
-    const newAnswers = questions.map((question) => {
+    const newAnswers = questions.map((question, index) => {
       // Fetch the answer to this question from the request body
       let answer = request.body.answers?.find((a) => a.questionId === question.id)?.answer;
       let error: SignupFieldError | undefined;
+
+      // Collect valid options from all languages, if applicable
+      const validOptions = question.options ?? [];
+      if (question.type === "checkbox" || question.type === "select") {
+        for (const lang of Object.values(event.languages)) {
+          const localized = lang.questions[index];
+          if (localized && localized.options) {
+            // Only include non-empty options, since empty ones use the default language
+            validOptions.push(...localized.options.filter(Boolean));
+          }
+        }
+      }
 
       if (!answer || !answer.length) {
         // Disallow empty answers to required questions
@@ -160,7 +172,7 @@ export async function updateSignupAsUser(
         } else {
           // Check that all checkbox answers are valid
           answer.forEach((option) => {
-            if (!question.options!.includes(option)) {
+            if (!validOptions.includes(option)) {
               error = SignupFieldError.NOT_AN_OPTION;
             }
           });
@@ -182,7 +194,7 @@ export async function updateSignupAsUser(
               break;
             case "select": {
               // Check that the select answer is valid
-              if (!question.options!.includes(answer)) {
+              if (!validOptions.includes(answer)) {
                 error = SignupFieldError.NOT_AN_OPTION;
               }
               break;
