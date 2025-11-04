@@ -90,7 +90,7 @@ export default async function updateEvent(
       // Validate and fixup data within languages. This uses event.languages and is thus done after set()
       event.validateLanguages(updatedQuestions ?? event.questions!, updatedQuotas ?? event.quotas!);
 
-      event.save({ transaction });
+      await event.save({ transaction });
 
       if (updatedQuestions !== undefined) {
         const reuseQuestionIds = updatedQuestions
