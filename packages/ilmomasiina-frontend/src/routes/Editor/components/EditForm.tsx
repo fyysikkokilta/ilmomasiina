@@ -10,8 +10,8 @@ import { toast } from "react-toastify";
 
 import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
 import type { TKey } from "../../../i18n";
-import { publishEventUpdate, publishNewEvent, serverEventToEditor } from "../../../modules/editor/actions";
-import { selectFormData } from "../../../modules/editor/selectors";
+import { publishEventUpdate, publishNewEvent } from "../../../modules/editor/actions";
+import { selectFormData, serverEventToEditor } from "../../../modules/editor/selectors";
 import type { EditorEvent } from "../../../modules/editor/types";
 import paths from "../../../paths";
 import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";

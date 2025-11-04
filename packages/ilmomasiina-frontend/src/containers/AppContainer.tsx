@@ -61,6 +61,9 @@ const AppContainer = () => (
                 <Route exact path={paths.adminEditEvent(":id")}>
                   <Editor />
                 </Route>
+                <Route exact path={paths.adminCopyEvent(":id")}>
+                  <Editor copy />
+                </Route>
                 <Route exact path={paths.adminAuditLog}>
                   <AuditLog />
                 </Route>

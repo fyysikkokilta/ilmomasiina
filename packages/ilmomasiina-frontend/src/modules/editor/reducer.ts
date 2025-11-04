@@ -1,3 +1,4 @@
+import type { EditorActions } from "./actions";
 import {
   CATEGORIES_LOADED,
   EDIT_CONFLICT,
@@ -16,7 +17,7 @@ import {
   SAVED_SIGNUP,
   SIGNUP_EDIT_CANCELED,
 } from "./actionTypes";
-import type { EditorActions, EditorExistingSignup, EditorNewSignup, EditorSignup, EditorState } from "./types";
+import type { EditorExistingSignup, EditorNewSignup, EditorSignup, EditorState } from "./types";
 
 const initialState: EditorState = {
   event: null,
@@ -47,6 +48,7 @@ export default function reducer(state = initialState, action: EditorActions): Ed
         ...state,
         event: action.payload.event,
         isNew: action.payload.isNew,
+        selectedLanguage: action.payload.event?.defaultLanguage ?? DEFAULT_LANGUAGE,
         loadError: undefined,
       };
     case EVENT_LOAD_FAILED:

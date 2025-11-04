@@ -1,5 +1,5 @@
 import { SignupForEdit, SignupStatus, UserEventResponse } from "@tietokilta/ilmomasiina-models";
-import { editorEventToServer } from "../../../modules/editor/actions";
+import { editorEventToServer } from "../../../modules/editor/selectors";
 import type { EditorEvent } from "../../../modules/editor/types";
 
 export const editorEventToUserEvent = (form: EditorEvent): UserEventResponse => {

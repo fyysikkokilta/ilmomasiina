@@ -6,6 +6,6 @@
     "module": "CommonJS"
   },
   "references": [
-    { "path": "../ilmomasiina-models" }
+    { "path": "../ilmomasiina-models/tsconfig.cjs.json" }
   ]
 }

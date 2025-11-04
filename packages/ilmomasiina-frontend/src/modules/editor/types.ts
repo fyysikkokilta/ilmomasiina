@@ -14,7 +14,12 @@ import type {
   QuotaUpdate,
   SignupCreateBody,
 } from "@tietokilta/ilmomasiina-models";
-import type { EditorEventType } from "./actions";
+
+export enum EditorEventType {
+  ONLY_EVENT = "event",
+  EVENT_WITH_SIGNUP = "event+signup",
+  ONLY_SIGNUP = "signup",
+}
 
 export type AdminQuotaSignups = QuotaSignups<AdminEventResponse>;
 export type AdminSignupWithQuota = SignupWithQuota<AdminEventResponse>;
@@ -85,6 +90,3 @@ export interface EditorEvent
 
 /** Stricter version of EventUpdateBody with fields we guarantee to return from `editorEventToServer`. */
 export type ConvertedEditorEvent = Omit<Required<EventUpdateBody>, "moveSignupsToQueue">;
-
-export { EditorEventType } from "./actions";
-export type { EditorActions } from "./actions";

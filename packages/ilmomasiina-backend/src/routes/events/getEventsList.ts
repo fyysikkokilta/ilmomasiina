@@ -86,7 +86,7 @@ export const eventsListForUserCached = createCache({
 });
 
 export async function getEventsListForUser(
-  this: FastifyInstance<any, any, any, any, any>,
+  this: FastifyInstance,
   request: FastifyRequest<{ Querystring: EventListQuery }>,
   reply: FastifyReply,
 ): Promise<UserEventListResponse> {

@@ -12,7 +12,7 @@ import type {
   SignupUpdateResponse,
   SignupValidationErrors,
 } from "@tietokilta/ilmomasiina-models";
-import { AuditEvent, SignupFieldError } from "@tietokilta/ilmomasiina-models";
+import { AuditEvent, QuestionType, SignupFieldError } from "@tietokilta/ilmomasiina-models";
 import config from "../../config";
 import sendSignupConfirmationMail from "../../mail/signupConfirmation";
 import { getSequelize } from "../../models";
@@ -146,10 +146,22 @@ export async function updateSignupAsUser(
     }
 
     // Check that all questions are answered with a valid answer
-    const newAnswers = questions.map((question) => {
+    const newAnswers = questions.map((question, index) => {
       // Fetch the answer to this question from the request body
       let answer = request.body.answers?.find((a) => a.questionId === question.id)?.answer;
       let error: SignupFieldError | undefined;
+
+      // Collect valid options from all languages, if applicable
+      const validOptions = question.options ?? [];
+      if (question.type === QuestionType.CHECKBOX || question.type === QuestionType.SELECT) {
+        for (const lang of Object.values(event.languages)) {
+          const localized = lang.questions[index];
+          if (localized && localized.options) {
+            // Only include non-empty options, since empty ones use the default language
+            validOptions.push(...localized.options.filter(Boolean));
+          }
+        }
+      }
 
       if (!answer || !answer.length) {
         // Disallow empty answers to required questions
@@ -157,15 +169,15 @@ export async function updateSignupAsUser(
           error = SignupFieldError.MISSING;
         }
         // Normalize empty answers to "" or [], depending on question type
-        answer = question.type === "checkbox" ? [] : "";
-      } else if (question.type === "checkbox") {
+        answer = question.type === QuestionType.CHECKBOX ? [] : "";
+      } else if (question.type === QuestionType.CHECKBOX) {
         // Ensure checkbox answers are arrays
         if (!Array.isArray(answer)) {
           error = SignupFieldError.WRONG_TYPE;
         } else {
           // Check that all checkbox answers are valid
           answer.forEach((option) => {
-            if (!question.options!.includes(option)) {
+            if (!validOptions.includes(option)) {
               error = SignupFieldError.NOT_AN_OPTION;
             }
           });
@@ -176,18 +188,18 @@ export async function updateSignupAsUser(
           error = SignupFieldError.WRONG_TYPE;
         } else {
           switch (question.type) {
-            case "text":
-            case "textarea":
+            case QuestionType.TEXT:
+            case QuestionType.TEXT_AREA:
               break;
-            case "number":
+            case QuestionType.NUMBER:
               // Check that a numeric answer is valid
               if (!Number.isFinite(parseFloat(answer))) {
                 error = SignupFieldError.NOT_A_NUMBER;
               }
               break;
-            case "select": {
+            case QuestionType.SELECT: {
               // Check that the select answer is valid
-              if (!question.options!.includes(answer)) {
+              if (!validOptions.includes(answer)) {
                 error = SignupFieldError.NOT_AN_OPTION;
               }
               break;
@@ -250,8 +262,8 @@ async function updateExistingSignupAsAdmin(
     let answer = body.answers?.find((a) => a.questionId === question.id)?.answer;
     if (!answer || !answer.length) {
       // Normalize empty answers to "" or [], depending on question type
-      answer = question.type === "checkbox" ? [] : "";
-    } else if (question.type === "checkbox") {
+      answer = question.type === QuestionType.CHECKBOX ? [] : "";
+    } else if (question.type === QuestionType.CHECKBOX) {
       // Forcibly convert checkbox answers to array
       answer = !Array.isArray(answer) ? [answer] : answer;
     } else {

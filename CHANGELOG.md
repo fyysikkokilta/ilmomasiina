@@ -1,74 +1,144 @@
 # Changelog
 
+## 2.0.0-rc.2
+
+**Bug fixes and improvements:**
+
+- Fixed answer options from non-default languages not being valid for signups
+- Fixed answer options getting desynced between languages when changing question types
+- The event editor no longer shows a non-functional "Create signup" button when there are no quotas
+
+## 2.0.0-rc.1
+
+**Breaking changes:**
+
+- **API:** Improved event validation errors, some HTTP status codes changed
+
+**Features:**
+
+- Added a button to copy events
+
+**Bug fixes and improvements:**
+
+- Include event info in signup creation audit logs
+- Fix event editor crashing for events with no language version in the app's default language
+
 ## 2.0.0-alpha46
+
+**Bug fixes and improvements:**
 
 - Avoid another error for older servers in `getLocalizedEvent`
 
 ## 2.0.0-alpha45
 
-- **Breaking (ilmomasiina-client):** Replaced `getLocalizedQuotaForEditSignup` with `getLocalizedSignup`
+**Breaking changes:**
+
+- **ilmomasiina-client:** Replaced `getLocalizedQuotaForEditSignup` with `getLocalizedSignup`
+
+**Bug fixes and improvements:**
+
 - Fix localization of current quota in signup editor
 - Avoid errors for older servers in `getLocalizedEvent`
 
 ## 2.0.0-alpha44
 
+**Features:**
+
 - Also build ESM versions of public packages
 
 ## 2.0.0-alpha43
+
+**Bug fixes and improvements:**
 
 - Minor typing improvements
 
 ## 2.0.0-alpha42
 
-- **BREAKING:** Restructuring moved all customization to the `@tietokilta/ilmomasiina-frontend` package.
-- **Breaking (ilmomasiina-components):** Replaced the `@tietokilta/ilmomasiina-components` package with
+**Breaking changes:**
+
+- **Customization:** Restructuring moved all customization to the `@tietokilta/ilmomasiina-frontend` package.
+- **ilmomasiina-components:** Replaced the `@tietokilta/ilmomasiina-components` package with
   `ilmomasiina-client`, which gets rid of shared React components and only provides API helpers, React hooks for state
   and API, and locale strings
-- **Feature:** Added comprehensive multi-language support to events; API is backwards compatible and older clients will
+
+**Features:**
+
+- Added comprehensive multi-language support to events; API is backwards compatible and older clients will
   see the default language of events
+
+**Bug fixes and improvements:**
+
 - Localization fixes
 - Updated dependencies
 - Development environment improvements
 
 ## 2.0.0-alpha41
 
+**Bug fixes and improvements:**
+
 - Fix issue that caused failure in rendering the CreateEvent page
 
-## 2.0.0.-alpha40
+## 2.0.0-alpha40
+
+**Bug fixes and improvements:**
 
 - Fix issue that caused the backend to lock up on concurrent signups
 
 ## 2.0.0-alpha39
 
-- **Feature:** Admins can now create and edit signups via the Signups tab
-- **Feature:** Admins can now view signups grouped by quota
-- Quota information is now consistently hidden when signups are disabled for an event
+**Features:**
+
+- Admins can now create and edit signups via the Signups tab
+- Admins can now view signups grouped by quota
 - Signup creation is now audit logged to mitigate spamming
+
+**Bug fixes and improvements:**
+
+- Quota information is now consistently hidden when signups are disabled for an event
 - Minor layout and styling improvements to frontend
 
 ## 2.0.0-alpha38
+
+**Bug fixes and improvements:**
 
 - Fix answers sticking around when updating a signup
 
 ## 2.0.0-alpha37
 
-- **BREAKING:** Past events are now accessed using the `maxAge` parameter instead of `since`
+**Breaking changes:**
+
+- **API:** Past events are now accessed using the `maxAge` parameter instead of `since`
+
+**Features:**
+
 - The cutoff for old event viewing by regular users is now configurable via `HIDE_EVENT_AFTER_DAYS`
-- Further bug fixes to past events
 - Add API for admins to create and edit signups
 
+**Bug fixes and improvements:**
+
+- Further bug fixes to past events
+
 ## 2.0.0-alpha36
+
+**Bug fixes and improvements:**
 
 - Bug fixes to past events
 
 ## 2.0.0-alpha35
 
+**Bug fixes and improvements:**
+
 - Bug fixes to past events
 
 ## 2.0.0-alpha34
 
-- **BREAKING:** Add logo to Header - make sure to change or disable it on your instance
-- **BREAKING:** Add dark mode variants of favicons - make sure to update yours
+**Breaking changes:**
+
+- **Customization:** Add logo to Header - make sure to change or disable it on your instance
+- **Customization:** Add dark mode variants of favicons - make sure to update yours
+
+**Features:**
+
 - The remaining time to confirm or edit a signup is now shown on the signup form
 - Signups can now be edited for `SIGNUP_CONFIRM_MINS` minutes after creation, even if created just before an event's
   signup closes, if configured with `SIGNUP_CONFIRM_AFTER_CLOSE` (recommended).
@@ -78,44 +148,63 @@
 
 ## 2.0.0-alpha33
 
+**Bug fixes and improvements:**
+
 - Fixed radio/checkbox field layout when answers are invalid
 
 ## 2.0.0-alpha32
+
+**Bug fixes and improvements:**
 
 - Editor fields no longer incorrectly cause errors when cleared
 - Underlines on links are now only used in select places when enabled
 
 ## 2.0.0-alpha31
 
-- **Feature:** The event editor now gives per-field validation feedback and limits e.g. field lengths
-- **Feature:** Events can now be previewed from the event editor
-- **Feature:** Past events are now shown in a separate list for admins
-- **Feature:** The event editor now allows setting a price for events (only a string, no special handling)
+**Features:**
+
+- The event editor now gives per-field validation feedback and limits e.g. field lengths
+- Events can now be previewed from the event editor
+- Past events are now shown in a separate list for admins
+- The event editor now allows setting a price for events (only a string, no special handling)
+- The signup closure date is now shown in various places after signup closes
+
+**Bug fixes and improvements:**
+
 - Links are now easier to see with dark theme colors
 - Signup start/end time and signup publicity are now part of "basic details" in the event editor
-- The signup closure date is now shown in various places after signup closes
 - Quota name is no longer shown in signup lists when there's only one quota
 - Quota size fields now have placeholders to indicate what empty means
 - TypeBox schemas now use Composite instead of Intersect for cleaner schemas
 
 ## 2.0.0-alpha30
 
-- **BREAKING:** Changed default brand colors in email templates
+**Breaking changes:**
+
+- **Customization:** Changed default brand colors in email templates
 
 ## 2.0.0-alpha29
 
-- **Feature:** Added user-friendly validation of signup fields
-- **Feature:** Admin tokens now renew automatically, significantly reducing expired session errors
+**Features:**
+
+- Added user-friendly validation of signup fields
+- Admin tokens now renew automatically, significantly reducing expired session errors
 
 ## 2.0.0-alpha28
 
-- **Feature:** Queue positions are now shown in signup confirmation emails
+**Features:**
+
+- Queue positions are now shown in signup confirmation emails
 
 ## 2.0.0-alpha27
+
+**Bug fixes and improvements:**
 
 - Fixed a bug in external integrations
 
 ## 2.0.0-alpha26
+
+**Bug fixes and improvements:**
 
 - Improved integration options for external sites
 - Removed Moment.js from the frontend
@@ -123,35 +212,54 @@
 
 ## 2.0.0-alpha25
 
+**Bug fixes and improvements:**
+
 - Fixed a bug where deleted events would still keep their slugs reserved
 
 ## 2.0.0-alpha24
+
+**Bug fixes and improvements:**
 
 - Fixed a bug that broke events when questions were created with options
 
 ## 2.0.0-alpha23
 
+**Bug fixes and improvements:**
+
 - Fixed open quota size field
 
 ## 2.0.0-alpha22
+
+**Bug fixes and improvements:**
 
 - Fixed a CI bug
 
 ## 2.0.0-alpha21
 
+**Bug fixes and improvements:**
+
 - Fixed unlimited size quotas not working
 
 ## 2.0.0-alpha20
+
+**Bug fixes and improvements:**
 
 - Fixed a CI bug
 
 ## 2.0.0-alpha19
 
+**Bug fixes and improvements:**
+
 - Fixed a bug where signups couldn't be saved without an email field
 
 ## 2.0.0-alpha18
 
-- **BREAKING:** Changed default brand colors in frontend & components
+**Breaking changes:**
+
+- **Customization:** Changed default brand colors in frontend & components
+
+**Bug fixes and improvements:**
+
 - Significant performance optimizations
 - Multiple bug fixes
 - Dependency upgrades, code quality and development improvements

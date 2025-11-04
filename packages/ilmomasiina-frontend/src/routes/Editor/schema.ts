@@ -1,8 +1,7 @@
 import { z, ZodIssueCode, ZodType } from "zod";
 
 import { QuestionType } from "@tietokilta/ilmomasiina-models";
-import { EditorEventType } from "../../modules/editor/actions";
-import type { EditorEvent } from "../../modules/editor/types";
+import { EditorEvent, EditorEventType } from "../../modules/editor/types";
 import { maxOptionsPerQuestion } from "./components/Questions";
 
 // The form validation should catch almost all error cases.

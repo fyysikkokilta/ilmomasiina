@@ -8,11 +8,8 @@ Ilmomasiina is easy to [install](docs/installation.md) in various environments a
 is freely available for all organizations to use.
 [Migrating](docs/migration.md) from the Athene-made version is also supported.
 
-The latest reviewed development version is in the `dev` branch. You may want to check
-current PRs for somewhat stable feature additions.
-
-**Please note that the code is currently in alpha phase and may still have bugs.**
-Major features for 2.0 are mostly done and we expect to reach a stable beta in spring 2024.
+Releases are made as Git tags and follow semantic versioning.
+The latest reviewed development version is in the `dev` branch.
 
 ## Installation
 
