@@ -27,8 +27,7 @@ export default async function createEvent(
         registrationStartDate: toDate(request.body.registrationStartDate),
         registrationEndDate: toDate(request.body.registrationEndDate),
       });
-
-      // Validate data within languages.
+      // Validate and fixup data within languages.
       toCreate.validateLanguages(request.body.questions, request.body.quotas);
 
       const created = await toCreate.save({ transaction });

@@ -9,7 +9,7 @@ import type {
   EventUpdateBody,
   WouldMoveSignupsToQueueError,
 } from "@tietokilta/ilmomasiina-models";
-import { AuditEvent } from "@tietokilta/ilmomasiina-models";
+import { AuditEvent, QuestionType } from "@tietokilta/ilmomasiina-models";
 import { getSequelize } from "../../../models";
 import { convertSequelizeValidationErrors } from "../../../models/errors";
 import { Event } from "../../../models/event";
@@ -80,19 +80,17 @@ export default async function updateEvent(
 
       // Update the Event
       const wasPublic = !event.draft;
-      await event.update(
-        {
-          ...request.body,
-          registrationEndDate: toDate(request.body.registrationEndDate),
-          registrationStartDate: toDate(request.body.registrationStartDate),
-          date: toDate(request.body.date),
-          endDate: toDate(request.body.endDate),
-        },
-        { transaction },
-      );
-
-      // Validate data within languages. This uses event.languages and is thus done after update()
+      await event.set({
+        ...request.body,
+        registrationEndDate: toDate(request.body.registrationEndDate),
+        registrationStartDate: toDate(request.body.registrationStartDate),
+        date: toDate(request.body.date),
+        endDate: toDate(request.body.endDate),
+      });
+      // Validate and fixup data within languages. This uses event.languages and is thus done after set()
       event.validateLanguages(updatedQuestions ?? event.questions!, updatedQuotas ?? event.quotas!);
+
+      event.save({ transaction });
 
       if (updatedQuestions !== undefined) {
         const reuseQuestionIds = updatedQuestions
@@ -116,7 +114,12 @@ export default async function updateEvent(
             const questionAttribs = {
               ...question,
               order,
-              options: question.options?.length ? question.options : [],
+              options:
+                // Remove options if the question type doesn't support them
+                (question.type === QuestionType.CHECKBOX || question.type === QuestionType.SELECT) &&
+                question.options?.length
+                  ? question.options
+                  : [],
             };
             // Update if an id was provided
             if (question.existing) {

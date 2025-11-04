@@ -115,7 +115,10 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
     return endDates.reduce((lhs, rhs) => Math.max(lhs, rhs));
   }
 
-  /** Validates that the languages for the event contain match the given questions and quotas. */
+  /** Validates that the languages for the event contain match the given questions and quotas.
+   *
+   * Removes answer options from questions that do not have them defined in the default language.
+   */
   public validateLanguages(questions: QuestionCreate[], quotas: QuotaCreate[]) {
     for (const [langKey, language] of Object.entries(this.languages)) {
       // All array types have to be kept in sync or the editor experience will be very wonky.
@@ -141,6 +144,10 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
           question.options.length !== localizedQuestion.options.length
         ) {
           throw new EventValidationError(`question ${i} in language ${langKey} has wrong number of options`);
+        }
+        // Remove options if the question does not have them.
+        if (!question.options) {
+          localizedQuestion.options = null;
         }
       }
     }
