@@ -52,13 +52,18 @@ export default async function updateEvent(
         lock: Transaction.LOCK.UPDATE,
       });
 
-      // Find existing questions and quotas for requested IDs
-      const updatedQuestions = request.body.questions?.map((question) => ({
+      // Find existing questions and quotas for requested IDs, and add order fields
+      const updatedQuestions = request.body.questions?.map((question, order) => ({
         ...question,
+        order,
         existing: question.id ? event.questions!.find((old) => question.id === old.id) : undefined,
+        // Remove options if the question type doesn't support them
+        options:
+          question.type === QuestionType.CHECKBOX || question.type === QuestionType.SELECT ? question.options : null,
       }));
-      const updatedQuotas = request.body.quotas?.map((quota) => ({
+      const updatedQuotas = request.body.quotas?.map((quota, order) => ({
         ...quota,
+        order,
         existing: quota.id ? event.quotas!.find((old) => quota.id === old.id) : undefined,
       }));
 
@@ -110,28 +115,12 @@ export default async function updateEvent(
 
         // Update or create the new Questions
         await Promise.all(
-          updatedQuestions.map(async (question, order) => {
-            const questionAttribs = {
-              ...question,
-              order,
-              options:
-                // Remove options if the question type doesn't support them
-                (question.type === QuestionType.CHECKBOX || question.type === QuestionType.SELECT) &&
-                question.options?.length
-                  ? question.options
-                  : [],
-            };
+          updatedQuestions.map(async (question) => {
             // Update if an id was provided
             if (question.existing) {
-              await question.existing.update(questionAttribs, { transaction });
+              await question.existing.update(question, { transaction });
             } else {
-              await Question.create(
-                {
-                  ...questionAttribs,
-                  eventId: event.id,
-                },
-                { transaction },
-              );
+              await Question.create({ ...question, eventId: event.id }, { transaction });
             }
           }),
         );
@@ -153,22 +142,12 @@ export default async function updateEvent(
 
         // Update or create the new Quotas
         await Promise.all(
-          updatedQuotas.map(async (quota, order) => {
-            const quotaAttribs = {
-              ...quota,
-              order,
-            };
+          updatedQuotas.map(async (quota) => {
             // Update if an id was provided
             if (quota.existing) {
-              await quota.existing.update(quotaAttribs, { transaction });
+              await quota.existing.update(quota, { transaction });
             } else {
-              await Quota.create(
-                {
-                  ...quotaAttribs,
-                  eventId: event.id,
-                },
-                { transaction },
-              );
+              await Quota.create({ ...quota, eventId: event.id }, { transaction });
             }
           }),
         );

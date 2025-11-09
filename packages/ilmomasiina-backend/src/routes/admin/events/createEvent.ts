@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { omit } from "lodash";
 
 import type { AdminEventResponse, EventCreateBody } from "@tietokilta/ilmomasiina-models";
-import { AuditEvent } from "@tietokilta/ilmomasiina-models";
+import { AuditEvent, QuestionType } from "@tietokilta/ilmomasiina-models";
 import { getSequelize } from "../../../models";
 import { convertSequelizeValidationErrors } from "../../../models/errors";
 import { Event } from "../../../models/event";
@@ -27,17 +27,22 @@ export default async function createEvent(
         registrationStartDate: toDate(request.body.registrationStartDate),
         registrationEndDate: toDate(request.body.registrationEndDate),
       });
-      // Validate and fixup data within languages.
-      toCreate.validateLanguages(request.body.questions, request.body.quotas);
+      // Remove options from question types that don't support them. This must be done before validateLanguages().
+      const questionsToCreate = request.body.questions.map((question) => ({
+        ...question,
+        options:
+          question.type === QuestionType.CHECKBOX || question.type === QuestionType.SELECT ? question.options : null,
+      }));
+      // Validate and fixup data within languages. This also requires the
+      toCreate.validateLanguages(questionsToCreate, request.body.quotas);
 
       const created = await toCreate.save({ transaction });
       await Question.bulkCreate(
-        // add order and eventId to questions and convert options to array
-        request.body.questions.map((question, order) => ({
+        // add order and eventId to questions
+        questionsToCreate.map((question, order) => ({
           ...question,
           eventId: created.id,
           order,
-          options: question.options?.length ? question.options : [],
         })),
         { transaction },
       );

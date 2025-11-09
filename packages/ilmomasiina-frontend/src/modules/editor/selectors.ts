@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
 
-import { AdminEventResponse, QuestionType } from "@tietokilta/ilmomasiina-models";
+import { AdminEventResponse } from "@tietokilta/ilmomasiina-models";
 import i18n from "../../i18n";
 import type { AppState } from "../../store/types";
 import { ConvertedEditorEvent, EditorEvent, EditorEventType } from "./types";
@@ -67,6 +67,18 @@ export const serverEventToEditor = (event: AdminEventResponse): EditorEvent => (
     key: question.id,
     options: question.options || [""],
   })),
+  languages: Object.fromEntries(
+    Object.entries(event.languages).map(([language, locale]) => [
+      language,
+      {
+        ...locale,
+        questions: locale.questions.map((question) => ({
+          ...question,
+          options: question.options || [""],
+        })),
+      },
+    ]),
+  ),
 });
 
 export const editorEventToServer = (form: EditorEvent): ConvertedEditorEvent => ({
@@ -77,12 +89,7 @@ export const editorEventToServer = (form: EditorEvent): ConvertedEditorEvent => 
     form.eventType === EditorEventType.ONLY_EVENT ? null : (form.registrationStartDate?.toISOString() ?? null),
   registrationEndDate:
     form.eventType === EditorEventType.ONLY_EVENT ? null : (form.registrationEndDate?.toISOString() ?? null),
-  quotas: form.quotas,
   openQuotaSize: form.useOpenQuota && form.openQuotaSize ? form.openQuotaSize : 0,
-  questions: form.questions.map((question) => ({
-    ...question,
-    options: question.type === QuestionType.SELECT || question.type === QuestionType.CHECKBOX ? question.options : null,
-  })),
 });
 
 export const selectFormData = createSelector(
