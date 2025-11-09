@@ -3,6 +3,14 @@ import React, { ComponentPropsWithoutRef, ComponentType, JSX, ReactNode } from "
 import identity from "lodash-es/identity";
 import { Col, Form, FormControlProps, Row } from "react-bootstrap";
 import { useField, UseFieldConfig } from "react-final-form";
+import { ZodIssue } from "zod";
+
+/** Basic unlocalized default formatter for Zod issues. */
+const defaultFormatError = (error: unknown) =>
+  typeof error === "object" && error && "message" in error
+    ? String((error as ZodIssue).message)
+    : // Errors without a message field are for a nested field and will be shown there.
+      null;
 
 type BaseProps = Pick<UseFieldConfig<any>, "type"> & {
   /** The name of the field in the data. */
@@ -66,7 +74,7 @@ export default function FieldRow<C extends As>({
   label = "",
   help,
   required = false,
-  formatError,
+  formatError = defaultFormatError,
   extraFeedback,
   checkAlign,
   checkLabel,
@@ -89,7 +97,7 @@ export default function FieldRow<C extends As>({
     ...config,
   });
   const error = submitError || validationError;
-  const formattedError = invalid && (formatError ? formatError(error) : error);
+  const formattedError = invalid && formatError(error);
 
   let field: ReactNode;
   if (children) {

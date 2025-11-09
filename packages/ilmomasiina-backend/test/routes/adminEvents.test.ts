@@ -396,7 +396,7 @@ describe("POST /api/admin/events", () => {
       expect(found!.question).toBe(postQuestion.question);
       expect(found!.required).toBe(postQuestion.required);
       expect(found!.public).toBe(postQuestion.public);
-      expect(found!.options).toEqual(postQuestion.options ?? []);
+      expect(found!.options).toEqual(postQuestion.options);
       expect(found!.order).toBe(index);
     });
 
@@ -512,6 +512,68 @@ describe("POST /api/admin/events", () => {
 
     // No event should have been created
     expect(await Event.count()).toBe(0);
+  });
+
+  test("drops options on non-option questions", async () => {
+    const options = testQuestionOptions();
+    const localizedOptions = options.map((option) => option.toUpperCase());
+    const postBody: EventCreateBody = {
+      ...eventBody(),
+      questions: [
+        {
+          type: QuestionType.TEXT,
+          question: faker.lorem.words({ min: 1, max: 5 }),
+          required: true,
+          public: false,
+          options,
+        },
+        {
+          type: QuestionType.SELECT,
+          question: faker.lorem.words({ min: 1, max: 5 }),
+          required: true,
+          public: false,
+          options,
+        },
+      ],
+      languages: {
+        fi: {
+          title: "",
+          description: "",
+          price: "",
+          location: "",
+          webpageUrl: "",
+          facebookUrl: "",
+          quotas: [],
+          questions: [
+            {
+              question: "",
+              options: localizedOptions,
+            },
+            {
+              question: "",
+              options: localizedOptions,
+            },
+          ],
+          verificationEmail: "",
+        },
+      },
+    };
+
+    const [createBody, createResponse] = await createEvent(postBody);
+
+    expect(createResponse.statusCode).toBe(201);
+
+    const event = await Event.findByPk(createBody.id, { include: [Question, Quota] });
+
+    expect(event!.questions).toHaveLength(2);
+    expect(event!.questions![0].type).toBe(QuestionType.TEXT);
+    expect(event!.questions![0].options).toBe(null);
+    expect(event!.questions![1].type).toBe(QuestionType.SELECT);
+    expect(event!.questions![1].options).toEqual(options);
+    expect(event!.languages.fi).toBeTruthy();
+    expect(event!.languages.fi.questions).toHaveLength(2);
+    expect(event!.languages.fi.questions![0].options).toBe(null);
+    expect(event!.languages.fi.questions![1].options).toEqual(localizedOptions);
   });
 
   test("audit logs creations", async () => {

@@ -118,6 +118,7 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
   /** Validates that the languages for the event contain match the given questions and quotas.
    *
    * Removes answer options from questions that do not have them defined in the default language.
+   * This expects that options have already been removed from questions that don't support options.
    */
   public validateLanguages(questions: QuestionCreate[], quotas: QuotaCreate[]) {
     for (const [langKey, language] of Object.entries(this.languages)) {
@@ -146,6 +147,8 @@ export class Event extends Model<EventManualAttributes, EventCreationAttributes>
           throw new EventValidationError(`question ${i} in language ${langKey} has wrong number of options`);
         }
         // Remove options if the question does not have them.
+        // We expect createEvent/updateEvent to remove options from questions that don't support
+        // options before calling this.
         if (!question.options) {
           localizedQuestion.options = null;
         }
