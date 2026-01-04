@@ -114,15 +114,13 @@ export const authSlice = storeSlice<Root>()("auth", (set, get, store, getSlice, 
     }
 
     try {
-      if (accessToken) {
-        const sessionResponse = await apiFetch<AdminLoginResponse>("authentication/renew", {
-          method: "POST",
-          body: { accessToken },
-          headers: { Authorization: accessToken.token },
-        });
-        if (sessionResponse) {
-          getSlice().loginSucceeded(sessionResponse.accessToken);
-        }
+      const sessionResponse = await apiFetch<AdminLoginResponse>("authentication/renew", {
+        method: "POST",
+        body: { accessToken },
+        headers: { Authorization: accessToken.token },
+      });
+      if (sessionResponse) {
+        getSlice().loginSucceeded(sessionResponse.accessToken);
       }
     } catch (err) {
       // Ignore errors from login renewal - loginExpired() will trigger via requireAuth.

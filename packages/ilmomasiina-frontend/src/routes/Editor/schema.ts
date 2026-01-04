@@ -17,7 +17,7 @@ const questionOptionsSchema: ZodType<EditorEvent["questions"][number]["options"]
     if (JSON.stringify(value).length > 255) {
       ctx.addIssue({
         code: "custom",
-        error: "editor.errors.optionsTooLong",
+        message: "editor.errors.optionsTooLong",
         // Add the error on the last option to make it look nice
         path: [value.length - 1],
       });
