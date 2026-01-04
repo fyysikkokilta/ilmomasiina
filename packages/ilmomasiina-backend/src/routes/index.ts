@@ -125,7 +125,7 @@ async function setupAdminRoutes(fastifyInstance: FastifyInstance) {
         params: schema.adminEventPathParams,
         response: {
           ...errorResponses,
-          204: {},
+          204: Type.Null(),
         },
       },
     },
@@ -177,7 +177,7 @@ async function setupAdminRoutes(fastifyInstance: FastifyInstance) {
         params: schema.signupPathParams,
         response: {
           ...errorResponses,
-          204: {},
+          204: Type.Null(),
         },
       },
     },
@@ -249,7 +249,7 @@ async function setupAdminRoutes(fastifyInstance: FastifyInstance) {
         params: schema.userPathParams,
         response: {
           ...errorResponses,
-          204: {},
+          204: Type.Null(),
         },
       },
     },
@@ -263,7 +263,7 @@ async function setupAdminRoutes(fastifyInstance: FastifyInstance) {
         params: schema.userPathParams,
         response: {
           ...errorResponses,
-          204: {},
+          204: Type.Null(),
         },
       },
     },
@@ -276,7 +276,7 @@ async function setupAdminRoutes(fastifyInstance: FastifyInstance) {
         body: schema.userChangePasswordSchema,
         response: {
           ...errorResponses,
-          204: {},
+          204: Type.Null(),
         },
       },
     },
@@ -333,7 +333,7 @@ async function setupPublicRoutes(fastifyInstance: FastifyInstance) {
         params: schema.signupPathParams,
         response: {
           ...errorResponses,
-          204: {},
+          204: Type.Null(),
         },
       },
       // Require valid edit token:
