@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => ({
       scss: {
         // Silence deprecation warning spam from Bootstrap for now.
         // https://github.com/twbs/bootstrap/issues/40962
-        silenceDeprecations: ["import", "color-functions", "global-builtin"],
+        silenceDeprecations: ["import", "color-functions", "global-builtin", "if-function"],
       },
     },
   },
