@@ -17,7 +17,6 @@
     "incremental": true,
     "outDir": "dist",
     "rootDirs": ["src", "."],
-    "baseUrl": ".",
     "paths": {
       "@tietokilta/ilmomasiina-client": ["../ilmomasiina-client/src/index.ts"],
       "@tietokilta/ilmomasiina-client/dist/*": ["../ilmomasiina-client/src/*"],
