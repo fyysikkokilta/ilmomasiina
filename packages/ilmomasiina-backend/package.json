@@ -63,7 +63,7 @@
     "debug": "^4.4.3",
     "dotenv-flow": "^4.1.0",
     "email-templates": "^11.1.1",
-    "fast-jwt": "^4.0.5",
+    "fast-jwt": "^5.0.6",
     "fastify": "^4.29.1",
     "http-errors": "^2.0.1",
     "i18next": "^25.7.3",
