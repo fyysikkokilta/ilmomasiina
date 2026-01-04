@@ -17,7 +17,8 @@
     "build": "tsc --build tsconfig.build.json",
     "clean": "rimraf dist coverage",
     "typecheck": "tsc --build tsconfig.build.json",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "filldb": "ts-node -r tsconfig-paths/register --project tsconfig.json test/fillDatabase.ts"
   },
