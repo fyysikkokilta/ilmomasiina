@@ -48,6 +48,7 @@ jobs:
 
   docker:
     name: Push Docker image to GitHub Packages
+    # If you want to build on a branch instead of tags, remove packagejson from below (since there isn't a tag to check against).
     needs: [lint, packagejson]
     runs-on: ubuntu-latest
     permissions:
