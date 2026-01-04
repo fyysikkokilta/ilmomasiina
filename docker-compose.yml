@@ -25,12 +25,14 @@ services:
       context: .
       dockerfile: "Dockerfile.dev"
     command: "npm start"
+    restart: always
+    depends_on:
+      - database
     environment:
       - DB_DIALECT=postgres
-      - DB_HOST=db
+      - DB_HOST=database
       - NODE_ENV=development
       - HOST=0.0.0.0
-      - ADMIN_REGISTRATION_ALLOWED=true
     volumes:
       - type: bind
         source: ./packages/ilmomasiina-models/src
@@ -60,18 +62,4 @@ services:
         source: .env
         target: /opt/ilmomasiina/.env
     ports:
-     - "3000:3000"
-     - "3001:3001"
-    env_file:
-      # Development server reads branding etc from process environment while building HTML.
-      - .env
-
-  db:
-    image: postgres:alpine
-    environment:
-      POSTGRES_USER: ilmomasiina
-      POSTGRES_PASSWORD: secret
-    volumes:
-    - ./pg-data:/var/lib/postgresql/data
-    ports:
-    - "5432:5432"
+      - "3000:3000"
