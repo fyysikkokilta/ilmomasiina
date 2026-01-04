@@ -25,8 +25,10 @@ import type { Event } from "./event";
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
 import { jsonColumnGetter } from "./util/json";
 
-export interface QuestionCreationAttributes
-  extends Optional<QuestionAttributes, "id" | "options" | "required" | "public"> {}
+export interface QuestionCreationAttributes extends Optional<
+  QuestionAttributes,
+  "id" | "options" | "required" | "public"
+> {}
 
 export class Question extends Model<QuestionAttributes, QuestionCreationAttributes> implements QuestionAttributes {
   public id!: string;
