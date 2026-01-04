@@ -4,13 +4,7 @@ import { Col, Row, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
-import {
-  errorDesc,
-  errorTitle,
-  SingleEventProps,
-  SingleEventProvider,
-  useSingleEventContext,
-} from "@tietokilta/ilmomasiina-client";
+import { errorDesc, errorTitle, SingleEventProvider, useSingleEventContext } from "@tietokilta/ilmomasiina-client";
 import { TKey } from "../../i18n";
 import paths from "../../paths";
 import EventDescription from "./components/EventDescription";
@@ -69,7 +63,7 @@ const SingleEventView = () => {
 };
 
 const SingleEvent = () => {
-  const { slug } = useParams<SingleEventProps>();
+  const slug = useParams<"slug">().slug!;
   const {
     i18n: { language },
   } = useTranslation();

@@ -4,5 +4,6 @@ declare module "i18next" {
   interface CustomTypeOptions {
     resources: (typeof resources)["fi"];
     defaultNS: (typeof defaultNS)[number];
+    allowObjectInHTMLChildren: true;
   }
 }

@@ -3,9 +3,8 @@ import React, { ChangeEvent, useMemo } from "react";
 import { useField } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
-import { languageSelected } from "../../../modules/editor/actions";
 import { EditorEvent } from "../../../modules/editor/types";
-import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import useStore from "../../../modules/store";
 import useEvent from "../../../utils/useEvent";
 import { useFieldValue } from "./hooks";
 import SelectBox from "./SelectBox";
@@ -20,8 +19,7 @@ const LanguageSelect = ({ label }: Props) => {
     input: { value: languages },
   } = useField<EditorEvent["languages"]>("languages");
   const defaultLanguage = useFieldValue<string>("defaultLanguage");
-  const selectedLanguage = useTypedSelector((state) => state.editor.selectedLanguage);
-  const dispatch = useTypedDispatch();
+  const { selectedLanguage, languageSelected } = useStore((state) => state.editor);
 
   const options = useMemo(
     (): [string, string][] => [
@@ -34,7 +32,7 @@ const LanguageSelect = ({ label }: Props) => {
   );
 
   const handleChange = useEvent((evt: ChangeEvent<HTMLSelectElement>) => {
-    dispatch(languageSelected(evt.currentTarget.value));
+    languageSelected(evt.currentTarget.value);
   });
 
   return (

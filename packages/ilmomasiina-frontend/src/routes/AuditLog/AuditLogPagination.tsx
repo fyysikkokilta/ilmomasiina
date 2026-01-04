@@ -3,35 +3,33 @@ import React, { ChangeEvent } from "react";
 import { Button, Form } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
 
-import { setAuditLogQueryField } from "../../modules/auditLog/actions";
-import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
+import useStore from "../../modules/store";
 import useEvent from "../../utils/useEvent";
 
 export const LOGS_PER_PAGE = 100;
 
 const AuditLogPagination = () => {
-  const { query, auditLog } = useTypedSelector((state) => state.auditLog);
-  const dispatch = useTypedDispatch();
+  const { query, auditLog, setAuditLogQueryField } = useStore((state) => state.auditLog);
   const { t } = useTranslation();
 
   const value = query.offset || 0;
   const perPage = query.limit || LOGS_PER_PAGE;
 
   const previousPage = useEvent(() => {
-    dispatch(setAuditLogQueryField("offset", Math.max(0, value - perPage)));
+    setAuditLogQueryField("offset", Math.max(0, value - perPage));
   });
   const nextPage = useEvent(() => {
-    dispatch(setAuditLogQueryField("offset", value + perPage));
+    setAuditLogQueryField("offset", value + perPage);
   });
-  const onOffsetChange = useEvent((e: ChangeEvent<HTMLSelectElement>) => {
+  const onOffsetChange = useEvent((e: ChangeEvent<HTMLInputElement>) => {
     const newOffset = Number(e.target.value) - 1;
-    if (newOffset >= 0) dispatch(setAuditLogQueryField("offset", newOffset));
+    if (newOffset >= 0) setAuditLogQueryField("offset", newOffset);
   });
 
   return (
     <nav className="audit-log--pagination mb-3">
       <Button
-        className="mr-3"
+        className="me-3"
         type="button"
         onClick={previousPage}
         aria-label={t("auditLog.pagination.previous")}
@@ -48,7 +46,7 @@ const AuditLogPagination = () => {
         {{ total: auditLog?.count ?? "?" }}
       </Trans>
       <Button
-        className="ml-3"
+        className="ms-3"
         type="button"
         onClick={nextPage}
         aria-label={t("auditLog.pagination.next")}

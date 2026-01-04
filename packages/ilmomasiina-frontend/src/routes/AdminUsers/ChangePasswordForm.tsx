@@ -9,8 +9,7 @@ import { toast } from "react-toastify";
 import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import i18n, { TKey } from "../../i18n";
-import { changePassword } from "../../modules/adminUsers/actions";
-import { useTypedDispatch } from "../../store/reducers";
+import useStore from "../../modules/store";
 import useEvent from "../../utils/useEvent";
 
 type FormData = {
@@ -48,12 +47,12 @@ function validate(values: FormData) {
 }
 
 const ChangePasswordForm = () => {
-  const dispatch = useTypedDispatch();
+  const changePassword = useStore((state) => state.adminUsers.changePassword);
   const { t } = useTranslation();
 
   const onSubmit = useEvent(async (data: FormData, form: FormApi<FormData>) => {
     try {
-      await dispatch(changePassword(data));
+      await changePassword(data);
       form.restart();
       toast.success(t("adminUsers.changePassword.success"), {
         autoClose: 5000,

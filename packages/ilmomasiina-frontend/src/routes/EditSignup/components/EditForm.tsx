@@ -4,7 +4,7 @@ import { FORM_ERROR } from "final-form";
 import { Button, Form as BsForm } from "react-bootstrap";
 import { Form, FormRenderProps, useFormState } from "react-final-form";
 import { useTranslation } from "react-i18next";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import {
@@ -15,6 +15,7 @@ import {
   useUpdateSignup,
 } from "@tietokilta/ilmomasiina-client";
 import { ErrorCode, SignupValidationError } from "@tietokilta/ilmomasiina-models";
+import LinkButton from "../../../components/LinkButton";
 import type { TKey } from "../../../i18n";
 import paths from "../../../paths";
 import { useDurationFormatter } from "../../../utils/dateFormat";
@@ -98,9 +99,9 @@ const EditFormSubmit = ({ disabled }: { disabled: boolean }) => {
       </p>
       <nav className="ilmo--submit-buttons">
         {!preview && !isNew && (
-          <Button as={Link} variant="link" to={paths.eventDetails(event!.slug)}>
+          <LinkButton variant="link" to={paths.eventDetails(event!.slug)}>
             {t("editSignup.action.cancel")}
-          </Button>
+          </LinkButton>
         )}
         {!preview && (
           <Button type="submit" variant="primary" formNoValidate disabled={disabled}>
@@ -155,7 +156,7 @@ const EditForm = () => {
   const updateSignup = useUpdateSignup();
   const deleteSignup = useDeleteSignup();
   const [deleting, setDeleting] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
   const {
     t,
     i18n: { language },
@@ -173,20 +174,20 @@ const EditForm = () => {
       await updateSignup({ ...update, language });
       toast.update(progressToast, {
         render: isNew ? t("editSignup.status.signupSuccess") : t("editSignup.status.editSuccess"),
-        type: toast.TYPE.SUCCESS,
+        type: "success",
         autoClose: 5000,
         closeButton: true,
         closeOnClick: true,
         isLoading: false,
       });
       if (isNew) {
-        history.push(paths.eventDetails(event!.slug));
+        navigate(paths.eventDetails(event!.slug));
       }
       return undefined;
     } catch (error) {
       toast.update(progressToast, {
         render: t(errorDesc<TKey>(error as ApiError, isNew ? "editSignup.signupError" : "editSignup.editError")),
-        type: toast.TYPE.ERROR,
+        type: "error",
         autoClose: 5000,
         closeButton: true,
         closeOnClick: true,
@@ -208,16 +209,16 @@ const EditForm = () => {
       await deleteSignup();
       toast.update(progressToast, {
         render: t("editSignup.status.deleteSuccess"),
-        type: toast.TYPE.SUCCESS,
+        type: "success",
         closeButton: true,
         closeOnClick: true,
         isLoading: false,
       });
-      history.push(paths.eventDetails(event!.slug));
+      navigate(paths.eventDetails(event!.slug));
     } catch (error) {
       toast.update(progressToast, {
         render: t(errorDesc<TKey>(error as ApiError, "editSignup.deleteError")),
-        type: toast.TYPE.ERROR,
+        type: "error",
         autoClose: 5000,
         closeButton: true,
         closeOnClick: true,

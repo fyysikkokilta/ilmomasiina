@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 
 import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 import { ApiError, beginSignup, errorDesc, useSingleEventContext } from "@tietokilta/ilmomasiina-client";
@@ -25,7 +25,7 @@ type SignupButtonProps = {
 const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) => {
   const { registrationStartDate, registrationEndDate, quotas } = useSingleEventContext().localizedEvent!;
   const { preview } = useSingleEventContext();
-  const history = useHistory();
+  const navigate = useNavigate();
   const eventState = signupState(registrationStartDate, registrationEndDate);
   const [submitting, setSubmitting] = useState(false);
   const isOnly = quotas.length === 1;
@@ -39,13 +39,13 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
       try {
         const response = await beginSignup(quotaId);
         setSubmitting(false);
-        history.push(paths.editSignup(response.id, response.editToken));
+        navigate(paths.editSignup(response.id, response.editToken));
         toast.dismiss(progressToast);
       } catch (err) {
         setSubmitting(false);
         toast.update(progressToast, {
           render: t(errorDesc<TKey>(err as ApiError, "singleEvent.signupError")),
-          type: toast.TYPE.ERROR,
+          type: "error",
           autoClose: 5000,
           closeButton: true,
           closeOnClick: true,
@@ -53,7 +53,7 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
         });
       }
     },
-    [history, isOpen, t],
+    [navigate, isOpen, t],
   );
 
   const statusText = useSignupStateText(eventState);

@@ -7,9 +7,8 @@ import { Link, useParams } from "react-router-dom";
 import { errorDesc, errorTitle } from "@tietokilta/ilmomasiina-client";
 import requireAuth from "../../containers/requireAuth";
 import type { TKey } from "../../i18n";
-import { copyEvent, getEvent, newEvent, resetState } from "../../modules/editor/actions";
+import useStore from "../../modules/store";
 import paths from "../../paths";
-import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
 import EditForm from "./components/EditForm";
 
 import "./Editor.scss";
@@ -18,31 +17,26 @@ interface Props {
   copy?: boolean;
 }
 
-interface MatchParams {
-  id: string;
-}
-
 const Editor = ({ copy = false }: Props) => {
-  const dispatch = useTypedDispatch();
-  const loaded = useTypedSelector((state) => state.editor.event != null);
-  const loadError = useTypedSelector((state) => state.editor.loadError);
+  const loaded = useStore((state) => state.editor.event != null);
+  const { loadError, newEvent, getEvent, resetState } = useStore((state) => state.editor);
   const { t } = useTranslation();
 
-  const urlEventId = useParams<MatchParams>().id;
+  const urlEventId = useParams<"id">().id!;
   const urlIsNew = urlEventId === "new";
 
   useEffect(() => {
     if (urlIsNew) {
-      dispatch(newEvent());
+      newEvent();
     } else if (copy) {
-      dispatch(copyEvent(urlEventId));
+      getEvent(urlEventId, true);
     } else {
-      dispatch(getEvent(urlEventId));
+      getEvent(urlEventId);
     }
     return () => {
-      dispatch(resetState());
+      resetState();
     };
-  }, [dispatch, urlIsNew, copy, urlEventId]);
+  }, [urlIsNew, copy, urlEventId, newEvent, getEvent, resetState]);
 
   if (loadError) {
     return (

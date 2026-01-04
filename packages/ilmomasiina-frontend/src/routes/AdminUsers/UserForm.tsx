@@ -10,21 +10,20 @@ import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
 import branding from "../../branding";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import type { TKey } from "../../i18n";
-import { createUser, getUsers } from "../../modules/adminUsers/actions";
-import { useTypedDispatch } from "../../store/reducers";
+import useStore from "../../modules/store";
 
 type FormData = {
   email: string;
 };
 
 const UserForm = () => {
-  const dispatch = useTypedDispatch();
+  const { getUsers, createUser } = useStore((state) => state.adminUsers);
   const { t } = useTranslation();
 
   const onSubmit = async (data: FormData, form: FormApi<FormData>) => {
     try {
-      await dispatch(createUser(data));
-      dispatch(getUsers());
+      await createUser(data);
+      getUsers();
       form.restart();
       toast.success(t("adminUsers.createUser.success", { email: data.email }), {
         autoClose: 2000,

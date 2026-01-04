@@ -9,9 +9,7 @@ export default (props: FormControlProps & ComponentPropsWithoutRef<"input">) => 
   const prefix = domain + paths.eventDetails("");
   return (
     <InputGroup>
-      <InputGroup.Prepend>
-        <InputGroup.Text>{prefix}</InputGroup.Text>
-      </InputGroup.Prepend>
+      <InputGroup.Text>{prefix}</InputGroup.Text>
       <Form.Control {...props} />
     </InputGroup>
   );

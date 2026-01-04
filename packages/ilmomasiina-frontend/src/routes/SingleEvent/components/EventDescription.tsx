@@ -1,20 +1,19 @@
-import React, { useContext } from "react";
+import React from "react";
 
-import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
-import { Link } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 
 import { useSingleEventContext } from "@tietokilta/ilmomasiina-client";
-import { AuthContext } from "../../../containers/AuthProvider";
+import LinkButton from "../../../components/LinkButton";
+import useStore from "../../../modules/store";
 import paths from "../../../paths";
 import { useEventDateTimeFormatter } from "../../../utils/dateFormat";
 
 const EventDescription = () => {
   const event = useSingleEventContext().localizedEvent!;
   const { preview } = useSingleEventContext();
-  const { loggedIn } = useContext(AuthContext);
+  const loggedIn = useStore((state) => state.auth.loggedIn);
   const { t } = useTranslation();
   const eventDateFormat = useEventDateTimeFormatter();
 
@@ -23,9 +22,9 @@ const EventDescription = () => {
       <nav className="ilmo--title-nav">
         <h1>{event.title}</h1>
         {loggedIn && !preview && paths.hasAdmin && (
-          <Button as={Link} variant="primary" to={paths.adminEditEvent(event.id)}>
+          <LinkButton variant="primary" to={paths.adminEditEvent(event.id)}>
             {t("singleEvent.editEvent")}
-          </Button>
+          </LinkButton>
         )}
       </nav>
       <div className="ilmo--event-heading">

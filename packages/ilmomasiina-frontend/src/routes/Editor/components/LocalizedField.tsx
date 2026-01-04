@@ -1,4 +1,4 @@
-import React, { ComponentPropsWithoutRef, ComponentType } from "react";
+import React, { ComponentPropsWithoutRef, ComponentType, JSX } from "react";
 
 import identity from "lodash-es/identity";
 import { Form, FormControlProps } from "react-bootstrap";

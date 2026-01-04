@@ -1,8 +1,8 @@
-import React, { MouseEvent, ReactNode, useCallback, useEffect, useState } from "react";
+import React, { ComponentPropsWithoutRef, MouseEvent, ReactNode, useCallback, useEffect, useState } from "react";
 
-import { Button, ButtonProps } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
-type Props = ButtonProps & {
+type Props = ComponentPropsWithoutRef<typeof Button> & {
   /** The interval within which the button must be repressed. */
   confirmDelay?: number;
   /** The button contents shown when waiting for a confirmation press. */

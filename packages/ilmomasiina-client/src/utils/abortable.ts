@@ -59,7 +59,7 @@ export function useAbortablePromise<R>(effect: (signal: AbortSignal) => Promise<
     pending: true,
   });
   // Track promise from latest effect call, ignore updates from other promises
-  const pendingPromise = useRef<unknown>();
+  const pendingPromise = useRef<unknown>(undefined);
   useAbortableEffect((signal) => {
     const promise = ignoreAbort(effect(signal));
     pendingPromise.current = promise;

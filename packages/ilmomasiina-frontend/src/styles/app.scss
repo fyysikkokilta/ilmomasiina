@@ -10,15 +10,13 @@
   $green: $green,
   $text-muted: $text-muted,
 
-  // Just for the sake of Athene legacy
-  $btn-border-radius-lg: 2px,
-
   // Typography
   $font-family-sans-serif: ("Open Sans", sans-serif),
   $line-height-base: 1.618,
+
   $h1-font-size: 2rem,
   $h2-font-size: 1.45rem,
-  $h3-font-size: 1.15rem
+  $h3-font-size: 1.15rem,
 );
 
 @use "widgets";

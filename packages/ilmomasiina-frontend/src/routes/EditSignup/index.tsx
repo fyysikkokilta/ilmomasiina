@@ -4,13 +4,7 @@ import { Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import {
-  EditSignupProps,
-  EditSignupProvider,
-  errorDesc,
-  errorTitle,
-  useEditSignupContext,
-} from "@tietokilta/ilmomasiina-client";
+import { EditSignupProvider, errorDesc, errorTitle, useEditSignupContext } from "@tietokilta/ilmomasiina-client";
 import type { TKey } from "../../i18n";
 import EditForm from "./components/EditForm";
 import NarrowContainer from "./components/NarrowContainer";
@@ -42,12 +36,12 @@ const EditSignupView = () => {
 };
 
 const EditSignup = () => {
-  const { id, editToken } = useParams<EditSignupProps>();
+  const { id, editToken } = useParams<"id" | "editToken">();
   const {
     i18n: { language },
   } = useTranslation();
   return (
-    <EditSignupProvider id={id} editToken={editToken} language={language}>
+    <EditSignupProvider id={id!} editToken={editToken!} language={language}>
       <EditSignupView />
     </EditSignupProvider>
   );

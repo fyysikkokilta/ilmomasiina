@@ -11,8 +11,8 @@ import {
   SingleEventContextProvider,
   SingleEventState,
 } from "@tietokilta/ilmomasiina-client";
-import { EditorEvent } from "../../../modules/editor/types";
-import { useTypedSelector } from "../../../store/reducers";
+import type { EditorEvent } from "../../../modules/editor/types";
+import useStore from "../../../modules/store";
 import EditSignupForm from "../../EditSignup/components/EditForm";
 import EventDescription from "../../SingleEvent/components/EventDescription";
 import SignupCountdown from "../../SingleEvent/components/SignupCountdown";
@@ -23,7 +23,7 @@ const PreviewTab = () => {
   const { values } = useFormState<EditorEvent>();
   const [previewingForm, setPreviewingForm] = useState(false);
   const { i18n, t } = useTranslation();
-  const selectedLanguage = useTypedSelector((state) => state.editor.selectedLanguage);
+  const selectedLanguage = useStore((state) => state.editor.selectedLanguage);
 
   const previewI18n = useMemo(() => i18n.cloneInstance({ lng: selectedLanguage }), [i18n, selectedLanguage]);
 

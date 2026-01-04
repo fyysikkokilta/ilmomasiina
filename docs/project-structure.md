@@ -91,12 +91,11 @@ The frontend is built with [Vite](https://vitejs.dev/).
 
 Libraries:
 
-- [React v17](https://reactjs.org/) with mostly functional components
-    - React upgrade is dependent on switching/upgrading from React-Bootstrap v1, which is a major upgrade
-- [Bootstrap v4](https://getbootstrap.com/docs/4.6/getting-started/introduction/) and
-  [React-Bootstrap v1](https://react-bootstrap-v4.netlify.app/) for UI components
+- [React v19](https://reactjs.org/) with mostly functional components
+- [Bootstrap v5](https://getbootstrap.com/docs/5.3/getting-started/introduction/) and
+  [React-Bootstrap v3](https://react-bootstrap.netlify.app/) for UI components
 - [SCSS](https://sass-lang.com/)
-- [Redux](https://redux.js.org/) and [React Redux](https://react-redux.js.org/)
+- [Zustand](https://zustand.docs.pmnd.rs/)
     - Some state is handled locally, if there's no need to share it between components
 - [React Router](https://reactrouter.com/)
 - [i18next](https://www.i18next.com/) for internationalization

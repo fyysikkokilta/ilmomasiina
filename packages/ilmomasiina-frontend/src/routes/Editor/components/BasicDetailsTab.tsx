@@ -6,9 +6,8 @@ import { useTranslation } from "react-i18next";
 import Combobox from "react-widgets/Combobox";
 
 import FieldRow from "../../../components/FieldRow";
-import { checkingSlugAvailability, checkSlugAvailability, loadCategories } from "../../../modules/editor/actions";
 import { EditorEventType } from "../../../modules/editor/types";
-import { useTypedDispatch, useTypedSelector } from "../../../store/reducers";
+import useStore from "../../../modules/store";
 import DateTimePicker from "./DateTimePicker";
 import useEditorErrors from "./errors";
 import { useFieldTouched, useFieldValue } from "./hooks";
@@ -23,7 +22,7 @@ import Textarea from "./Textarea";
 const SLUG_CHECK_DELAY = 250;
 
 const GenerateSlug = () => {
-  const isNew = useTypedSelector((state) => state.editor.isNew);
+  const isNew = useStore((state) => state.editor.isNew);
   const form = useForm();
   const title = useFieldValue<string>("title");
   const touched = useFieldTouched("slug");
@@ -42,23 +41,23 @@ const GenerateSlug = () => {
 };
 
 const SlugAvailability = () => {
-  const slugAvailability = useTypedSelector((state) => state.editor.slugAvailability);
-  const eventId = useTypedSelector((state) => state.editor.event?.id);
-  const dispatch = useTypedDispatch();
+  const { slugAvailability, event, checkingSlugAvailability, checkSlugAvailability } = useStore(
+    (state) => state.editor,
+  );
   const { t } = useTranslation();
 
   const slug = useFieldValue<string>("slug");
 
-  const checkDelay = useRef<number | undefined>();
+  const checkDelay = useRef<number | undefined>(undefined);
   useEffect(() => {
-    dispatch(checkingSlugAvailability());
+    checkingSlugAvailability();
     window.clearTimeout(checkDelay.current);
     checkDelay.current = window.setTimeout(() => {
       if (slug) {
-        dispatch(checkSlugAvailability(slug));
+        checkSlugAvailability(slug);
       }
     }, SLUG_CHECK_DELAY);
-  }, [dispatch, slug]);
+  }, [slug, checkSlugAvailability, checkingSlugAvailability]);
 
   if (!slug) {
     return null;
@@ -69,7 +68,7 @@ const SlugAvailability = () => {
   if (slugAvailability === null) {
     return null;
   }
-  if (slugAvailability.id === null || slugAvailability.id === eventId) {
+  if (slugAvailability.id === null || slugAvailability.id === event?.id) {
     return <Form.Text className="text-success">{t("editor.basic.url.free")}</Form.Text>;
   }
   return (
@@ -78,18 +77,19 @@ const SlugAvailability = () => {
 };
 
 const BasicDetailsTab = () => {
-  const dispatch = useTypedDispatch();
-  const allCategories = useTypedSelector((state) => state.editor.allCategories);
+  const { allCategories, loadCategories } = useStore((state) => state.editor);
   const { t } = useTranslation();
   const formatError = useEditorErrors();
 
   const eventType = useFieldValue<EditorEventType>("eventType");
   const date = useFieldValue<Date | null>("date");
-  const endDate = useFieldValue<Date | null>("date");
+  const endDate = useFieldValue<Date | null>("endDate");
+  const registrationStartDate = useFieldValue<Date | null>("registrationStartDate");
+  const registrationEndDate = useFieldValue<Date | null>("registrationEndDate");
 
   useEffect(() => {
-    dispatch(loadCategories());
-  }, [dispatch]);
+    loadCategories();
+  }, [loadCategories]);
 
   return (
     <div>
@@ -165,6 +165,8 @@ const BasicDetailsTab = () => {
           name="registrationStartDate"
           id="registrationStartDate"
           as={DateTimePicker}
+          selectsStart
+          endDate={registrationEndDate}
           label={t("editor.basic.registrationStartDate")}
           required
           formatError={formatError}
@@ -175,6 +177,8 @@ const BasicDetailsTab = () => {
           name="registrationEndDate"
           id="registrationEndDate"
           as={DateTimePicker}
+          selectsEnd
+          startDate={registrationStartDate}
           label={t("editor.basic.registrationEndDate")}
           required
           formatError={formatError}
