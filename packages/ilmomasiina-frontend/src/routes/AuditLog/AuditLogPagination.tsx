@@ -29,7 +29,7 @@ const AuditLogPagination = () => {
   return (
     <nav className="audit-log--pagination mb-3">
       <Button
-        className="mr-3"
+        className="me-3"
         type="button"
         onClick={previousPage}
         aria-label={t("auditLog.pagination.previous")}
@@ -46,7 +46,7 @@ const AuditLogPagination = () => {
         {{ total: auditLog?.count ?? "?" }}
       </Trans>
       <Button
-        className="ml-3"
+        className="ms-3"
         type="button"
         onClick={nextPage}
         aria-label={t("auditLog.pagination.next")}

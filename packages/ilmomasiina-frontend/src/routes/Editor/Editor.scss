@@ -106,6 +106,10 @@
   }
 }
 
+.event-editor--signup-table .ilmo--unconfirmed {
+  --bs-table-color-type: var(--bs-secondary-color);
+}
+
 @include media-breakpoint-down(sm) {
   .event-editor--question-buttons {
     display: flex;

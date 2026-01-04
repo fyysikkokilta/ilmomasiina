@@ -27,7 +27,7 @@ const SignupList = ({ isSingleQuota, quota }: Props) => {
       ) : (
         <div className="table-responsive">
           <Table size="sm">
-            <thead className="thead-light">
+            <thead className="table-light">
               <tr>
                 <th key="position">{t("singleEvent.signups.position")}</th>
                 {nameQuestion && (

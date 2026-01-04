@@ -51,13 +51,13 @@ const SignupRow = ({ position, signup, showQuota }: SignupProps) => {
       : null;
 
   return (
-    <tr className={!signup.confirmed ? "text-muted" : ""}>
+    <tr className={!signup.confirmed ? "ilmo--unconfirmed" : ""}>
       <td key="position">{`${position}.`}</td>
       {signup.confirmed && event.nameQuestion && <td key="firstName">{signup.firstName}</td>}
       {signup.confirmed && event.nameQuestion && <td key="lastName">{signup.lastName}</td>}
       {signup.confirmed && event.emailQuestion && <td key="email">{signup.email}</td>}
       {!signup.confirmed && nameEmailCols && (
-        <td colSpan={nameEmailCols} className="font-italic">
+        <td colSpan={nameEmailCols} className="fst-italic">
           {t("editor.signups.unconfirmed")}
         </td>
       )}
@@ -72,7 +72,7 @@ const SignupRow = ({ position, signup, showQuota }: SignupProps) => {
         <Button type="button" variant="primary" size="sm" onClick={onEdit}>
           {t("editor.signups.action.edit")}
         </Button>
-        <Button type="button" variant="danger" size="sm" onClick={onDelete}>
+        <Button type="button" variant="danger" size="sm" onClick={onDelete} className="ms-1">
           {t("editor.signups.action.delete")}
         </Button>
       </td>

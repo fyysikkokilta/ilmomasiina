@@ -65,10 +65,10 @@ const AdminEventListItem = ({ event }: Props) => {
       <td>{status}</td>
       <td>{sumBy(quotas, "signupCount")}</td>
       <td>
-        <LinkButton variant="primary" size="sm" className="mr-1" to={paths.adminEditEvent(id)}>
+        <LinkButton variant="primary" size="sm" className="me-1" to={paths.adminEditEvent(id)}>
           {t("adminEvents.action.edit")}
         </LinkButton>
-        <LinkButton variant="primary" size="sm" className="mr-1" to={paths.adminCopyEvent(id)}>
+        <LinkButton variant="primary" size="sm" className="me-1" to={paths.adminCopyEvent(id)}>
           {t("adminEvents.action.copy")}
         </LinkButton>
         <Button variant="danger" size="sm" onClick={onDelete}>
