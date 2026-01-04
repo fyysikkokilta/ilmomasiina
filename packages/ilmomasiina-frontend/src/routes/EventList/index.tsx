@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 
 import { Spinner, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { Link, Redirect } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import {
   errorDesc,
@@ -56,7 +56,7 @@ const EventListView = () => {
 
   // If initial setup is needed and is possible on this frontend, redirect to that page.
   if (error && error.code === ErrorCode.INITIAL_SETUP_NEEDED && paths.hasAdmin) {
-    return <Redirect to={paths.adminInitialSetup} />;
+    return <Navigate to={paths.adminInitialSetup} />;
   }
 
   if (error) {

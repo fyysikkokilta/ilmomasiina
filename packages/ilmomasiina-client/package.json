@@ -1,6 +1,6 @@
 {
   "name": "@tietokilta/ilmomasiina-client",
-  "version": "2.0.0-rc.2",
+  "version": "2.1.0-beta.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Tietokilta/ilmomasiina.git"
@@ -28,10 +28,10 @@
   },
   "dependencies": {
     "@tietokilta/ilmomasiina-models": "workspace:*",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.22"
   },
   "peerDependencies": {
-    "react": "^17 || ^18"
+    "react": "^17 || ^18 || ^19"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -40,9 +40,9 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "@types/react": "^17.0.87",
-    "react": "^18.3.0",
-    "rimraf": "^5.0.10",
+    "@types/react": "^19.2.7",
+    "react": "^19.2.3",
+    "rimraf": "^6.1.2",
     "typescript": "~5.9.3"
   }
 }

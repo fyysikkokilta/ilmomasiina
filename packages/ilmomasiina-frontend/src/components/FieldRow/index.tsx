@@ -64,7 +64,11 @@ type PropsWithAs<C extends As> = BaseProps & {
   /** The component or element to use as the field. */
   as: C;
   children?: undefined;
-} & Omit<ComponentPropsWithoutRef<C>, keyof BaseProps | "as" | "children">;
+} & Omit<
+    ComponentPropsWithoutRef<C>,
+    // Drop anything that 1) overlaps with BaseProps, 2) overlaps with other modes, or 3) is handled by r-f-f.
+    keyof BaseProps | "as" | "children" | "onChange" | "onFocus" | "onBlur" | "value"
+  >;
 
 export type FieldRowProps<C extends As> = PropsWithFormControl | PropsWithChildren | PropsWithAs<C>;
 
@@ -112,9 +116,9 @@ export default function FieldRow<C extends As>({
   }
 
   return (
-    <Form.Group as={Row} controlId={controlId}>
+    <Form.Group as={Row} className="form-row" controlId={controlId}>
       <Col sm="3" className="ilmo--label-column">
-        <Form.Label data-required={required} className={`col-form-label ${checkAlign ? "pt-0" : ""}`}>
+        <Form.Label data-required={required} className={`col-form-label ${checkAlign ? "pt-sm-0" : ""}`}>
           {label}
         </Form.Label>
       </Col>

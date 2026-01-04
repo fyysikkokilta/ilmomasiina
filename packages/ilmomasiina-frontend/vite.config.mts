@@ -55,16 +55,8 @@ export default defineConfig(({ mode }) => ({
     preprocessorOptions: {
       scss: {
         // Silence deprecation warning spam from Bootstrap for now.
-        // We will get rid of Bootstrap eventually.
-        silenceDeprecations: [
-          "mixed-decls",
-          "slash-div",
-          "abs-percent",
-          "import",
-          "legacy-js-api",
-          "color-functions",
-          "global-builtin",
-        ],
+        // https://github.com/twbs/bootstrap/issues/40962
+        silenceDeprecations: ["import", "color-functions", "global-builtin", "if-function"],
       },
     },
   },

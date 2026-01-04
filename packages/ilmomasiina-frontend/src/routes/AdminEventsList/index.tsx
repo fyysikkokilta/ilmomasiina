@@ -2,23 +2,19 @@ import React, { BaseSyntheticEvent, useCallback, useEffect, useMemo, useState } 
 
 import { Button, Spinner } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
-import { shallowEqual } from "react-redux";
 import { Link } from "react-router-dom";
 
 import { errorDesc, errorTitle } from "@tietokilta/ilmomasiina-client";
+import LinkButton from "../../components/LinkButton";
 import requireAuth from "../../containers/requireAuth";
 import type { TKey } from "../../i18n";
-import { getAdminEvents, resetState } from "../../modules/adminEvents/actions";
+import useStore from "../../modules/store";
 import paths from "../../paths";
-import { useTypedDispatch, useTypedSelector } from "../../store/reducers";
 import { isEventInPast } from "../../utils/eventState";
 import AdminEventListItem from "./AdminEventListItem";
 
-import "./AdminEvents.scss";
-
 const AdminEventsList = () => {
-  const dispatch = useTypedDispatch();
-  const { events, loadError } = useTypedSelector((state) => state.adminEvents, shallowEqual);
+  const { events, loadError, getAdminEvents, resetState } = useStore((state) => state.adminEvents);
   const [showPast, setShowPast] = useState(false);
   const { t } = useTranslation();
 
@@ -28,11 +24,9 @@ const AdminEventsList = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(getAdminEvents());
-    return () => {
-      dispatch(resetState());
-    };
-  }, [dispatch]);
+    getAdminEvents();
+    return () => resetState();
+  }, [getAdminEvents, resetState]);
 
   const shownEvents = useMemo(() => {
     const filtered = events?.filter((event) => isEventInPast(event) === showPast);
@@ -62,18 +56,20 @@ const AdminEventsList = () => {
     <>
       <nav className="ilmo--title-nav">
         <h1>{showPast ? t("adminEvents.title.past") : t("adminEvents.title")}</h1>
-        <Button variant="secondary" onClick={togglePast}>
-          {showPast ? t("adminEvents.nav.upcoming") : t("adminEvents.nav.past")}
-        </Button>
-        <Button as={Link} variant="secondary" to={paths.adminUsersList}>
-          {t("adminEvents.nav.users")}
-        </Button>
-        <Button as={Link} variant="secondary" to={paths.adminAuditLog}>
-          {t("adminEvents.nav.auditLog")}
-        </Button>
-        <Button as={Link} variant="primary" to={paths.adminEditEvent("new")}>
-          {t("adminEvents.nav.newEvent")}
-        </Button>
+        <nav className="ilmo--title-nav-buttons">
+          <Button variant="secondary" onClick={togglePast}>
+            {showPast ? t("adminEvents.nav.upcoming") : t("adminEvents.nav.past")}
+          </Button>
+          <LinkButton variant="secondary" to={paths.adminUsersList}>
+            {t("adminEvents.nav.users")}
+          </LinkButton>
+          <LinkButton variant="secondary" to={paths.adminAuditLog}>
+            {t("adminEvents.nav.auditLog")}
+          </LinkButton>
+          <LinkButton variant="primary" to={paths.adminEditEvent("new")}>
+            {t("adminEvents.nav.newEvent")}
+          </LinkButton>
+        </nav>
       </nav>
       <table className="table ilmo--admin-event-list">
         <thead>

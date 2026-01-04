@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.0-beta.1
+
+**Features:**
+
+- Upgraded most frontend dependencies to modern versions, including React 19 and Bootstrap 5
+- **ilmomasiina-client:** Now officially supports React 19
+
+## 2.0.0
+
+- **First stable release of Ilmomasiina 2.0!** The `dev` branch will be used for Ilmomasiina 3.0 in the
+  near future, while backwards-compatible 2.x releases will be released from the `2.x` branch for some time.
+
 ## 2.0.0-rc.2
 
 **Bug fixes and improvements:**

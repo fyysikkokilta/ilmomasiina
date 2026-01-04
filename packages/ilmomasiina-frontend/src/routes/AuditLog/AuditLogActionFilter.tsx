@@ -4,8 +4,7 @@ import { Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { AuditEvent } from "@tietokilta/ilmomasiina-models";
-import { setAuditLogQueryField } from "../../modules/auditLog/actions";
-import { useTypedDispatch } from "../../store/reducers";
+import useStore from "../../modules/store";
 
 const ACTIONS = [
   [AuditEvent.CREATE_EVENT, "auditLog.filter.action.createEvent"],
@@ -24,24 +23,24 @@ const ACTIONS = [
 ] as const;
 
 const AuditLogActionFilter = () => {
-  const dispatch = useTypedDispatch();
+  const setAuditLogQueryField = useStore((state) => state.auditLog.setAuditLogQueryField);
   const { t } = useTranslation();
 
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     // Since e.target.value comes from the <select> below, we can assume the type
     const event = e.target.value ? [e.target.value as AuditEvent] : undefined;
-    dispatch(setAuditLogQueryField("action", event));
+    setAuditLogQueryField("action", event);
   };
 
   return (
-    <Form.Control as="select" onChange={onChange}>
+    <Form.Select onChange={onChange}>
       <option value="">{t("auditLog.filter.action")}</option>
       {ACTIONS.map(([key, label]) => (
         <option value={key} key={key}>
           {t(label)}
         </option>
       ))}
-    </Form.Control>
+    </Form.Select>
   );
 };
 

@@ -1,14 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 
-import { ConnectedRouter } from "connected-react-router";
 import { Container } from "react-bootstrap";
-import { Provider } from "react-redux";
-import { Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router";
 import { Flip, ToastContainer } from "react-toastify";
-import { PersistGate } from "redux-persist/integration/react";
 
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import useStore from "../modules/store";
 import paths from "../paths";
 import PageNotFound from "../routes/404/PageNotFound";
 import AdminEventsList from "../routes/AdminEventsList";
@@ -20,61 +18,42 @@ import EventList from "../routes/EventList";
 import InitialSetup from "../routes/InitialSetup";
 import Login from "../routes/Login";
 import SingleEvent from "../routes/SingleEvent";
-import configureStore, { history } from "../store/configureStore";
-import { AuthProvider } from "./AuthProvider";
 
-import "react-toastify/scss/main.scss";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/app.scss";
 
-const { store, persistor } = configureStore();
+const LOGIN_RENEW_INTERVAL = 60 * 1000;
 
-const AppContainer = () => (
-  <div className="layout-wrapper">
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <ConnectedRouter history={history}>
-          <AuthProvider>
-            <Header />
-            <Container>
-              <Switch>
-                <Route exact path={paths.eventsList}>
-                  <EventList />
-                </Route>
-                <Route exact path={paths.eventDetails(":slug")}>
-                  <SingleEvent />
-                </Route>
-                <Route exact path={paths.editSignup(":id", ":editToken")}>
-                  <EditSignup />
-                </Route>
-                <Route exact path={paths.adminLogin}>
-                  <Login />
-                </Route>
-                <Route exact path={paths.adminInitialSetup}>
-                  <InitialSetup />
-                </Route>
-                <Route exact path={paths.adminEventsList}>
-                  <AdminEventsList />
-                </Route>
-                <Route exact path={paths.adminUsersList}>
-                  <AdminUsersList />
-                </Route>
-                <Route exact path={paths.adminEditEvent(":id")}>
-                  <Editor />
-                </Route>
-                <Route exact path={paths.adminCopyEvent(":id")}>
-                  <Editor copy />
-                </Route>
-                <Route exact path={paths.adminAuditLog}>
-                  <AuditLog />
-                </Route>
-                <Route path="*">
-                  <PageNotFound />
-                </Route>
-              </Switch>
-            </Container>
-            <Footer />
-          </AuthProvider>
-        </ConnectedRouter>
+const AppContainer = () => {
+  const renewLogin = useStore((state) => state.auth.renewLogin);
+  useEffect(() => {
+    // Renew login immediately on page load if necessary.
+    renewLogin();
+    // Then, check every minute and renew if necessary.
+    const timer = window.setInterval(() => renewLogin(), LOGIN_RENEW_INTERVAL);
+    return () => window.clearTimeout(timer);
+  }, [renewLogin]);
+
+  return (
+    <BrowserRouter>
+      <div className="layout-wrapper">
+        <Header />
+        <Container>
+          <Routes>
+            <Route path={paths.eventsList} element={<EventList />} />
+            <Route path={paths.eventDetails(":slug")} element={<SingleEvent />} />
+            <Route path={paths.editSignup(":id", ":editToken")} element={<EditSignup />} />
+            <Route path={paths.adminLogin} element={<Login />} />
+            <Route path={paths.adminInitialSetup} element={<InitialSetup />} />
+            <Route path={paths.adminEventsList} element={<AdminEventsList />} />
+            <Route path={paths.adminUsersList} element={<AdminUsersList />} />
+            <Route path={paths.adminEditEvent(":id")} element={<Editor />} />
+            <Route path={paths.adminCopyEvent(":id")} element={<Editor copy />} />
+            <Route path={paths.adminAuditLog} element={<AuditLog />} />
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </Container>
+        <Footer />
         <ToastContainer
           position="top-right"
           autoClose={5000}
@@ -87,9 +66,9 @@ const AppContainer = () => (
           pauseOnHover
           transition={Flip}
         />
-      </PersistGate>
-    </Provider>
-  </div>
-);
+      </div>
+    </BrowserRouter>
+  );
+};
 
 export default AppContainer;

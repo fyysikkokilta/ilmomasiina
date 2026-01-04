@@ -1,4 +1,4 @@
-import { z, ZodIssueCode, ZodType } from "zod";
+import { z, ZodType } from "zod";
 
 import { QuestionType } from "@tietokilta/ilmomasiina-models";
 import { EditorEvent, EditorEventType } from "../../modules/editor/types";
@@ -16,7 +16,7 @@ const questionOptionsSchema: ZodType<EditorEvent["questions"][number]["options"]
   .superRefine((value, ctx) => {
     if (JSON.stringify(value).length > 255) {
       ctx.addIssue({
-        code: ZodIssueCode.custom,
+        code: "custom",
         message: "editor.errors.optionsTooLong",
         // Add the error on the last option to make it look nice
         path: [value.length - 1],
@@ -31,8 +31,8 @@ const editorSchema: ZodType<EditorEvent> = z
       .string()
       .min(1)
       .max(255)
-      .regex(/^[A-Za-z0-9_-]+$/, { message: "editor.errors.invalidSlug" }),
-    eventType: z.nativeEnum(EditorEventType),
+      .regex(/^[A-Za-z0-9_-]+$/, { error: "editor.errors.invalidSlug" }),
+    eventType: z.enum(EditorEventType),
     date: z.nullable(z.date()),
     endDate: z.nullable(z.date()),
     registrationStartDate: z.nullable(z.date()),
@@ -52,6 +52,7 @@ const editorSchema: ZodType<EditorEvent> = z
     listed: z.boolean(),
     verificationEmail: z.nullable(z.string()),
     languages: z.record(
+      z.string(),
       z.object({
         title: z.string().max(255),
         description: z.nullable(z.string()),
@@ -86,7 +87,7 @@ const editorSchema: ZodType<EditorEvent> = z
       z.object({
         id: z.optional(z.string()),
         key: z.string(),
-        type: z.nativeEnum(QuestionType),
+        type: z.enum(QuestionType),
         question: z.string().min(1).max(255),
         required: z.boolean(),
         public: z.boolean(),
@@ -100,7 +101,7 @@ const editorSchema: ZodType<EditorEvent> = z
     if (event.eventType !== EditorEventType.ONLY_SIGNUP) {
       if (!event.date) {
         ctx.addIssue({
-          code: ZodIssueCode.invalid_type,
+          code: "invalid_type",
           path: ["date"],
           expected: "date",
           received: "null",
@@ -110,7 +111,7 @@ const editorSchema: ZodType<EditorEvent> = z
     if (event.eventType !== EditorEventType.ONLY_EVENT) {
       if (!event.registrationStartDate) {
         ctx.addIssue({
-          code: ZodIssueCode.invalid_type,
+          code: "invalid_type",
           path: ["registrationStartDate"],
           expected: "date",
           received: "null",
@@ -118,7 +119,7 @@ const editorSchema: ZodType<EditorEvent> = z
       }
       if (!event.registrationEndDate) {
         ctx.addIssue({
-          code: ZodIssueCode.invalid_type,
+          code: "invalid_type",
           path: ["registrationEndDate"],
           expected: "date",
           received: "null",
@@ -127,7 +128,7 @@ const editorSchema: ZodType<EditorEvent> = z
     }
     if (event.date && event.endDate && event.endDate < event.date) {
       ctx.addIssue({
-        code: ZodIssueCode.custom,
+        code: "custom",
         message: "editor.errors.dateInverted",
         path: ["endDate"],
       });
@@ -138,7 +139,7 @@ const editorSchema: ZodType<EditorEvent> = z
       event.registrationEndDate < event.registrationStartDate
     ) {
       ctx.addIssue({
-        code: ZodIssueCode.custom,
+        code: "custom",
         message: "editor.errors.registrationDateInverted",
         path: ["registrationEndDate"],
       });

@@ -59,7 +59,8 @@ export type EditorQuota = QuotaUpdate & {
 
 /** Root form data type for event editor */
 export interface EditorEvent
-  extends Omit<
+  extends
+    Omit<
       Required<EventUpdateBody>,
       // Omit fields we'll overwrite for editing states that aren't valid in the API
       | "quotas"

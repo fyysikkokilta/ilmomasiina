@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { useTypedSelector } from "../../../store/reducers";
+import useStore from "../../../modules/store";
 import { useFieldValue } from "./hooks";
 
 export type FieldLocalizationOptions = {
@@ -17,7 +17,7 @@ type LocalizedFieldOptions = {
 
 /** Resolves which version of a localized field should be shown based on the selected language. */
 function useLocalizedFieldInfo(baseName: string) {
-  const selectedLanguage = useTypedSelector((state) => state.editor.selectedLanguage);
+  const selectedLanguage = useStore((state) => state.editor.selectedLanguage);
   const defaultLanguage = useFieldValue<string>("defaultLanguage");
 
   const isDefaultLanguage = selectedLanguage === defaultLanguage;
