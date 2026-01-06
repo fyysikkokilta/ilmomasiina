@@ -44,7 +44,7 @@
     "react-widgets": "^5.8.6",
     "remark-gfm": "^4.0.1",
     "reselect": "^5.1.1",
-    "sass": "^1.97.1",
+    "sass": "^1.97.2",
     "zod": "^4.3.5",
     "zustand": "^5.0.9"
   },

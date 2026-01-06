@@ -62,6 +62,7 @@ export default async function initApp(): Promise<FastifyInstance> {
     const corsOrigins = config.allowOrigin === "*" ? "*" : (config.allowOrigin?.split(",") ?? []);
     await server.register(fastifyCors, {
       origin: corsOrigins,
+      methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     });
   }
 
