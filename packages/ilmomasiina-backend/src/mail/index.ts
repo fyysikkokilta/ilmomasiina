@@ -49,7 +49,7 @@ function getTemplate(language: string | null, template: string) {
   return { template: defaultPath, lng: config.defaultLanguage };
 }
 
-const TEMPLATE_OPTIONS = {
+const TEMPLATE_OPTIONS: Email.EmailConfig = {
   juice: true,
   juiceResources: {
     preserveImportant: true,

@@ -1,8 +1,7 @@
 import { z, ZodType } from "zod";
 
-import { QuestionType } from "@tietokilta/ilmomasiina-models";
+import { MAX_OPTIONS_PER_QUESTION, QuestionType } from "@tietokilta/ilmomasiina-models";
 import { EditorEvent, EditorEventType } from "../../modules/editor/types";
-import { maxOptionsPerQuestion } from "./components/Questions";
 
 // The form validation should catch almost all error cases.
 // As the form state differs from our JSON schema somewhat, it's probably less work to just write
@@ -11,7 +10,7 @@ import { maxOptionsPerQuestion } from "./components/Questions";
 
 const questionOptionsSchema: ZodType<EditorEvent["questions"][number]["options"]> = z
   .array(z.string().max(255))
-  .max(maxOptionsPerQuestion)
+  .max(MAX_OPTIONS_PER_QUESTION)
   // Validate that the stringified options list is short enough, due to current server limitations.
   .superRefine((value, ctx) => {
     if (JSON.stringify(value).length > 255) {

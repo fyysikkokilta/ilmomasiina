@@ -5,7 +5,7 @@ import { Field, FieldRenderProps } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
 import useShallowMemo from "@tietokilta/ilmomasiina-client/dist/utils/useShallowMemo";
-import { QuestionLanguage, QuestionType, questionUpdate } from "@tietokilta/ilmomasiina-models";
+import { MAX_OPTIONS_PER_QUESTION, QuestionLanguage, QuestionType } from "@tietokilta/ilmomasiina-models";
 import FieldRow from "../../../components/FieldRow";
 import { EditorQuestion } from "../../../modules/editor/types";
 import useEvent from "../../../utils/useEvent";
@@ -17,8 +17,6 @@ import SelectBox from "./SelectBox";
 import Sortable from "./Sortable";
 import useFieldArrayMap from "./useFieldArrayMap";
 import useLocalizedFieldArrayMutators from "./useLocalizedFieldArrayMutators";
-
-export const maxOptionsPerQuestion = questionUpdate.properties.options.maxItems ?? Infinity;
 
 type OptionProps = {
   name: string;
@@ -108,7 +106,7 @@ const QuestionRow = ({ name, index }: QuestionProps) => {
             {optionFields.map((optName, i) => (
               <OptionRow key={optName} name={optName} index={i} remove={optionMutators.remove} />
             ))}
-            {optionFields.length! < maxOptionsPerQuestion && (
+            {optionFields.length! < MAX_OPTIONS_PER_QUESTION && (
               <Row>
                 <Col sm="3" />
                 <Col sm="9">

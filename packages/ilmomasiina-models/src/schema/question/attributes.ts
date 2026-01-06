@@ -1,4 +1,4 @@
-import { Type } from "@sinclair/typebox";
+import { Type } from "typebox";
 
 import { QuestionType } from "../../enum";
 import { Nullable } from "../utils";
@@ -13,12 +13,12 @@ export const questionIdentity = Type.Object({
   id: questionID,
 });
 
+/** Maximum number of options per question. */
+// This was a practical limit before an explicit limitation was added, so seems reasonable to set it here.
+export const MAX_OPTIONS_PER_QUESTION = 64;
+
 const questionOptions = Nullable(
-  Type.Array(
-    Type.String({ maxLength: 255 }),
-    // This was a practical limit before an explicit limitation was added, so seems reasonable to set it here.
-    { maxItems: 64 },
-  ),
+  Type.Array(Type.String({ maxLength: 255 }), { maxItems: MAX_OPTIONS_PER_QUESTION }),
   {
     description: "For select or checkbox questions, the options available.",
   },

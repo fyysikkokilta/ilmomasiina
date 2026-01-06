@@ -1,4 +1,4 @@
-import { Static, Type } from "@sinclair/typebox";
+import { Static, Type } from "typebox";
 
 import {
   adminOnlyEventAttributes,
@@ -10,33 +10,27 @@ import {
 import { quotaWithSignupCount } from "../quotaWithSignups";
 
 /** Schema for an item of an event list from the public API. */
-const userEventListItem = Type.Composite([
-  eventIdentity,
-  publicEventAttributes,
-  publicCommonAttributes,
-  userEventLanguages,
-  Type.Object({
+const userEventListItem = Type.Interface(
+  [eventIdentity, publicEventAttributes, publicCommonAttributes, userEventLanguages],
+  {
     quotas: Type.Array(quotaWithSignupCount, {
       description: "The quotas in this event, with signup counts.",
     }),
-  }),
-]);
+  },
+);
 
 /** Response schema for fetching a list of events from the public API. */
 export const userEventListResponse = Type.Array(userEventListItem);
 
 /** Schema for an item of an event list from the admin API. */
-const adminEventListItem = Type.Composite([
-  eventIdentity,
-  publicEventAttributes,
-  publicCommonAttributes,
-  adminOnlyEventAttributes,
-  Type.Object({
+const adminEventListItem = Type.Interface(
+  [eventIdentity, publicEventAttributes, publicCommonAttributes, adminOnlyEventAttributes],
+  {
     quotas: Type.Array(quotaWithSignupCount, {
       description: "The quotas in this event, with signup counts.",
     }),
-  }),
-]);
+  },
+);
 
 /** Response schema for fetching a list of events from the admin API. */
 export const adminEventListResponse = Type.Array(adminEventListItem);

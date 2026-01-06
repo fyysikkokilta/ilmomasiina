@@ -1,4 +1,4 @@
-import { Type } from "@sinclair/typebox";
+import { Type } from "typebox";
 
 import { questionLanguage } from "../question";
 import { quotaLanguage } from "../quota";
@@ -122,14 +122,13 @@ export const publicLanguageAttributes = Type.Object({
 });
 
 /** Schema for an event language version. */
-export const userEventLanguage = Type.Composite([publicCommonAttributes, publicLanguageAttributes]);
+export const userEventLanguage = Type.Interface([publicCommonAttributes, publicLanguageAttributes], {});
 
 /** Schema for an event language version for admins. */
-export const adminEventLanguage = Type.Composite([
-  publicCommonAttributes,
-  publicLanguageAttributes,
-  adminDetailsOnlyCommonAttributes,
-]);
+export const adminEventLanguage = Type.Interface(
+  [publicCommonAttributes, publicLanguageAttributes, adminDetailsOnlyCommonAttributes],
+  {},
+);
 
 /** Schema for the array of event language versions. */
 export const userEventLanguages = Type.Object({
