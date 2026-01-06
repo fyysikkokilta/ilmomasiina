@@ -1,8 +1,14 @@
 # Changelog
 
+## 2.1.0-beta.2
+
+**Bug fixes and improvements:**
+
+- Upgraded backend dependencies to latest versions, including Node 24 and Fastify 5
+
 ## 2.1.0-beta.1
 
-**Features:**
+**Bug fixes and improvements:**
 
 - Upgraded most frontend dependencies to modern versions, including React 19 and Bootstrap 5
 - **ilmomasiina-client:** Now officially supports React 19

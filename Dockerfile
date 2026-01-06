@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.15-labs
 
 # Build stage:
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 RUN apk add --no-cache brotli
 
 # Build-time env variables
@@ -38,7 +38,7 @@ RUN find packages/ilmomasiina-frontend/build -type f\
   -regex ".*\.\(js\|json\|html\|map\|css\|svg\|ico\|txt\)" -exec gzip -k "{}" \; -exec brotli "{}" \;
 
 # Main stage:
-FROM node:20-alpine
+FROM node:24-alpine
 
 # Accept VERSION at build time, pass to backend server
 ARG VERSION

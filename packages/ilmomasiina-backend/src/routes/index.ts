@@ -1,6 +1,6 @@
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
-import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
+import { Type } from "typebox";
 
 import * as schema from "@tietokilta/ilmomasiina-models";
 import { addLogEventHook } from "../auditlog";

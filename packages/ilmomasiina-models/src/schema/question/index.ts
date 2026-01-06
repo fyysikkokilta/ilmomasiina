@@ -1,11 +1,11 @@
-import { Static, Type } from "@sinclair/typebox";
+import { Static, Type } from "typebox";
 
 import { questionAttributes, questionID, questionIdentity, questionLanguageAttributes } from "./attributes";
 
-export { questionID } from "./attributes";
+export { MAX_OPTIONS_PER_QUESTION, questionID } from "./attributes";
 
 /** Schema for a question. */
-export const question = Type.Composite([questionIdentity, questionAttributes]);
+export const question = Type.Interface([questionIdentity, questionAttributes], {});
 
 /** Schema for a question language version. */
 export const questionLanguage = questionLanguageAttributes;
@@ -14,7 +14,7 @@ export const questionLanguage = questionLanguageAttributes;
 export const questionCreate = questionAttributes;
 
 /** Schema for updating a question. */
-export const questionUpdate = Type.Composite([Type.Partial(questionIdentity), questionCreate], {
+export const questionUpdate = Type.Interface([Type.Partial(questionIdentity), questionCreate], {}, {
   description: "Set id to reuse an existing question, or leave it empty to create a new one.",
 });
 

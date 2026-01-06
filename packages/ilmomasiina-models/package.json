@@ -1,6 +1,6 @@
 {
   "name": "@tietokilta/ilmomasiina-models",
-  "version": "2.1.0-beta.1",
+  "version": "2.1.0-beta.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Tietokilta/ilmomasiina.git"
@@ -31,6 +31,6 @@
     "typescript": "~5.9.3"
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.32.35"
+    "typebox": "^1.0.74"
   }
 }
