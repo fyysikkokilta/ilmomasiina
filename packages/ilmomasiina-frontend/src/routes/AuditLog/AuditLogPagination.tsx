@@ -41,7 +41,7 @@ const AuditLogPagination = () => {
         {"Rows\u00A0"}
         <Form.Control type="number" value={value + 1} onChange={onOffsetChange} />
         &ndash;
-        {{ last: value + LOGS_PER_PAGE }}
+        {{ last: Math.min(value + perPage, auditLog?.count ?? value + perPage) }}
         {" out of "}
         {{ total: auditLog?.count ?? "?" }}
       </Trans>

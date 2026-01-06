@@ -74,10 +74,7 @@ importers:
         version: 9.0.0
       '@fastify/type-provider-typebox':
         specifier: ^6.1.0
-        version: 6.1.0(typebox@1.0.73)
-      '@sinclair/typebox':
-        specifier: ^0.32.35
-        version: 0.32.35
+        version: 6.1.0(typebox@1.0.74)
       '@tietokilta/ilmomasiina-models':
         specifier: workspace:*
         version: link:../ilmomasiina-models
@@ -153,6 +150,9 @@ importers:
       sequelize:
         specifier: ^6.37.7
         version: 6.37.7(mysql2@3.16.0)(pg-hstore@2.3.4)(pg@8.16.3)
+      typebox:
+        specifier: ^1.0.74
+        version: 1.0.74
       umzug:
         specifier: ^3.8.2
         version: 3.8.2(@types/node@24.10.4)
@@ -387,9 +387,9 @@ importers:
 
   packages/ilmomasiina-models:
     dependencies:
-      '@sinclair/typebox':
-        specifier: ^0.32.35
-        version: 0.32.35
+      typebox:
+        specifier: ^1.0.74
+        version: 1.0.74
     devDependencies:
       rimraf:
         specifier: ^6.1.2
@@ -1403,9 +1403,6 @@ packages:
   '@sentry/core@10.32.1':
     resolution: {integrity: sha512-PH2ldpSJlhqsMj2vCTyU0BI2Fx1oIDhm7Izo5xFALvjVCS0gmlqHt1udu6YlKn8BtpGH6bGzssvv5APrk+OdPQ==}
     engines: {node: '>=18'}
-
-  '@sinclair/typebox@0.32.35':
-    resolution: {integrity: sha512-Ul3YyOTU++to8cgNkttakC0dWvpERr6RYoHO2W47DLbFvrwBDJUY31B1sImH6JZSYc4Kt4PyHtoPNu+vL2r2dA==}
 
   '@smithy/abort-controller@4.2.7':
     resolution: {integrity: sha512-rzMY6CaKx2qxrbYbqjXWS0plqEy7LOdKHS0bg4ixJ6aoGDPNUcLWk/FRNuCILh7GKLG9TFUXYYeQQldMBBwuyw==}
@@ -4953,8 +4950,8 @@ packages:
     resolution: {integrity: sha512-OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==}
     engines: {node: '>= 0.6'}
 
-  typebox@1.0.73:
-    resolution: {integrity: sha512-hZSgYMjem+50YuTZzw3XWKyxkDjixapRIAoKPr2ugrpssEwwWzSeowZufiOQNYefnYFtf9KUtYdcnNSj6ZXaSQ==}
+  typebox@1.0.74:
+    resolution: {integrity: sha512-HJuFc2ukVPMOE8SWKv8kHPDnluj4PSfbxBWcg9fw/Pktn7ZVxm+0EB3rk4w2mQ1yoBIqUkMDsu8u6Qu0mqqeNg==}
 
   typed-array-buffer@1.0.3:
     resolution: {integrity: sha512-nAYYwfY3qnzX30IkA6AQZjVbtK6duGontcQm1WSG1MD94YLqK0515GNApXkoxKOWMusVssAHWLh9SeaoefYFGw==}
@@ -6046,9 +6043,9 @@ snapshots:
       fastq: 1.20.1
       glob: 13.0.0
 
-  '@fastify/type-provider-typebox@6.1.0(typebox@1.0.73)':
+  '@fastify/type-provider-typebox@6.1.0(typebox@1.0.74)':
     dependencies:
-      typebox: 1.0.73
+      typebox: 1.0.74
 
   '@floating-ui/core@1.7.3':
     dependencies:
@@ -6414,8 +6411,6 @@ snapshots:
       '@sentry/core': 10.32.1
 
   '@sentry/core@10.32.1': {}
-
-  '@sinclair/typebox@0.32.35': {}
 
   '@smithy/abort-controller@4.2.7':
     dependencies:
@@ -10741,7 +10736,7 @@ snapshots:
       media-typer: 1.1.0
       mime-types: 3.0.2
 
-  typebox@1.0.73: {}
+  typebox@1.0.74: {}
 
   typed-array-buffer@1.0.3:
     dependencies:
