@@ -2,7 +2,8 @@ import i18n, { DefaultNamespace, ParseKeys } from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
-import { i18nResources as componentsRes } from "@tietokilta/ilmomasiina-client";
+// Import via full path to reduce entry chunk size.
+import { i18nResources as componentsRes } from "@tietokilta/ilmomasiina-client/dist/locales";
 import en from "./locales/en.json";
 import fi from "./locales/fi.json";
 

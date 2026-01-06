@@ -1,43 +1,45 @@
-import React, { useEffect } from "react";
+import React, { lazy, Suspense } from "react";
 
-import { Container } from "react-bootstrap";
+import { Container, Spinner } from "react-bootstrap";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { Flip, ToastContainer } from "react-toastify";
 
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import useStore from "../modules/store";
 import paths from "../paths";
 import PageNotFound from "../routes/404/PageNotFound";
-import AdminEventsList from "../routes/AdminEventsList";
-import AdminUsersList from "../routes/AdminUsers";
-import AuditLog from "../routes/AuditLog";
-import Editor from "../routes/Editor";
-import EditSignup from "../routes/EditSignup";
-import EventList from "../routes/EventList";
-import InitialSetup from "../routes/InitialSetup";
-import Login from "../routes/Login";
-import SingleEvent from "../routes/SingleEvent";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/app.scss";
 
-const LOGIN_RENEW_INTERVAL = 60 * 1000;
+// Code-split route components.
+const AdminEventsList = lazy(() => import("../routes/AdminEventsList"));
+const AdminUsersList = lazy(() => import("../routes/AdminUsers"));
+const AuditLog = lazy(() => import("../routes/AuditLog"));
+const Editor = lazy(() => import("../routes/Editor"));
+const EditSignup = lazy(() => import("../routes/EditSignup"));
+const EventList = lazy(() => import("../routes/EventList"));
+const InitialSetup = lazy(() => import("../routes/InitialSetup"));
+const Login = lazy(() => import("../routes/Login"));
+const SingleEvent = lazy(() => import("../routes/SingleEvent"));
 
-const AppContainer = () => {
-  const renewLogin = useStore((state) => state.auth.renewLogin);
-  useEffect(() => {
-    // Renew login immediately on page load if necessary.
-    renewLogin();
-    // Then, check every minute and renew if necessary.
-    const timer = window.setInterval(() => renewLogin(), LOGIN_RENEW_INTERVAL);
-    return () => window.clearTimeout(timer);
-  }, [renewLogin]);
+// Also code-split RenewLogin to avoid strong dependency on the store.
+const RenewLogin = lazy(() => import("./RenewLogin"));
 
-  return (
-    <BrowserRouter>
-      <div className="layout-wrapper">
-        <Header />
+const loadingFallback = (
+  <div className="ilmo--loading-container">
+    <Spinner animation="border" />
+  </div>
+);
+
+const AppContainer = () => (
+  <BrowserRouter>
+    <Suspense>
+      <RenewLogin />
+    </Suspense>
+    <div className="layout-wrapper">
+      <Header />
+      <Suspense fallback={loadingFallback}>
         <Container>
           <Routes>
             <Route path={paths.eventsList} element={<EventList />} />
@@ -53,22 +55,22 @@ const AppContainer = () => {
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Container>
-        <Footer />
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          transition={Flip}
-        />
-      </div>
-    </BrowserRouter>
-  );
-};
+      </Suspense>
+      <Footer />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        transition={Flip}
+      />
+    </div>
+  </BrowserRouter>
+);
 
 export default AppContainer;

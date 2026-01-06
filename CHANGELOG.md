@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0-beta.3
+
+**Bug fixes and improvements:**
+
+- Enabled code splitting for the frontend, halving the initial page load from its previous size
+
 ## 2.1.0-beta.2
 
 **Bug fixes and improvements:**

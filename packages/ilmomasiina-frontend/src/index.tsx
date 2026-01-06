@@ -5,7 +5,8 @@ import ReactDOM from "react-dom/client";
 
 import "./i18n";
 
-import { configureApi } from "@tietokilta/ilmomasiina-client";
+// Import via full path to reduce entry chunk size.
+import { configureApi } from "@tietokilta/ilmomasiina-client/dist/api";
 import AppContainer from "./containers/AppContainer";
 import { apiUrl } from "./paths";
 
