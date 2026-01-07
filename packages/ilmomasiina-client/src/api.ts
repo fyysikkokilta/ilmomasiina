@@ -1,4 +1,4 @@
-import { ErrorCode } from "@tietokilta/ilmomasiina-models";
+import type { ErrorCode } from "@tietokilta/ilmomasiina-models";
 
 export interface FetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";

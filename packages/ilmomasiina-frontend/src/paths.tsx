@@ -1,4 +1,4 @@
-import { EventID, EventSlug, SignupEditToken, SignupID } from "@tietokilta/ilmomasiina-models";
+import type { EventID, EventSlug, SignupEditToken, SignupID } from "@tietokilta/ilmomasiina-models";
 
 export const urlPrefix = PATH_PREFIX;
 
