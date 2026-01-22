@@ -122,8 +122,8 @@ importers:
         specifier: ^3.8.1
         version: 3.8.1
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       moment:
         specifier: ^2.30.1
         version: 2.30.1
@@ -141,7 +141,7 @@ importers:
         version: 7.0.12
       nodemailer-mailgun-transport:
         specifier: ^2.1.5
-        version: 2.1.5(debug@4.4.3)(lodash@4.17.21)(pug@3.0.3)(underscore@1.13.7)
+        version: 2.1.5(debug@4.4.3)(lodash@4.17.23)(pug@3.0.3)(underscore@1.13.7)
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -589,6 +589,11 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
+  '@babel/parser@7.28.6':
+    resolution: {integrity: sha512-TeR9zWR18BvbfPmGbLampPMW+uW1NZnJlRuuHso8i87QZNq2JRF9i6RgxRqtEq+wQGsS19NNTWr2duhnE49mfQ==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
   '@babel/plugin-transform-react-jsx-self@7.27.1':
     resolution: {integrity: sha512-6UzkCs+ejGdZ5mFFC/OCUrv028ab2fp1znZmCZjAOBKiBK2jXD1O+BPSfX8X2qjJ75fZBMSnQn3Rq2mrBJK2mw==}
     engines: {node: '>=6.9.0'}
@@ -615,6 +620,10 @@ packages:
 
   '@babel/types@7.28.5':
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/types@7.28.6':
+    resolution: {integrity: sha512-0ZrskXVEHSWIqZM/sQZ4EV3jZJXRkio/WCxaqKZP1g//CEWEPSfeZFcms4XeKBCHU0ZKnIkdJeU/kF+eRp5lBg==}
     engines: {node: '>=6.9.0'}
 
   '@bcoe/v8-coverage@1.0.2':
@@ -2220,7 +2229,7 @@ packages:
     engines: {node: '>= 6'}
 
   concat-map@0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   confusing-browser-globals@1.0.11:
     resolution: {integrity: sha512-JsPKdmh8ZkmnHxDk55FZ1TqVLvEQTvoByJZRN9jzI0UjxK/QgAmsphz7PGtqgPieQZ/CQcHWXCR7ATDNhGe+YA==}
@@ -3414,7 +3423,7 @@ packages:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
 
   jstransformer@1.0.0:
-    resolution: {integrity: sha1-7Yvwkh4vPx7U1cGkT2hwntJHIsM=}
+    resolution: {integrity: sha512-C9YK3Rf8q6VAPDCCU9fnqo3mAfOH6vUGnMcP4AQAYIEpWtfGLpwOTmZ+igtdK5y+VvI2n3CyYSzy4Qh34eq24A==}
 
   jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
@@ -3460,8 +3469,8 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   long@5.3.2:
     resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
@@ -4663,7 +4672,7 @@ packages:
     engines: {node: '>=0.6'}
 
   token-stream@1.0.0:
-    resolution: {integrity: sha1-zCAOqyYT9BZtJ/+a/HylbUnfbrQ=}
+    resolution: {integrity: sha512-VSsyNPPW74RpHwR8Fc21uubwHY7wMDeJLys2IX5zJNih+OnAnaifKHo+1LHT7DAdloQ7apeaaWg8l7qnf/TnEg==}
 
   toposort-class@1.0.1:
     resolution: {integrity: sha512-OsLcGGbYF3rMjPUf8oKktyvCiUxSbqMMS39m33MAjLTC1DVIH6x3WSt63/M77ihI09+Sdfk1AXvfhCEeUmC7mg==}
@@ -5612,6 +5621,11 @@ snapshots:
     dependencies:
       '@babel/types': 7.28.5
 
+  '@babel/parser@7.28.6':
+    dependencies:
+      '@babel/types': 7.28.6
+    optional: true
+
   '@babel/plugin-transform-react-jsx-self@7.27.1(@babel/core@7.28.5)':
     dependencies:
       '@babel/core': 7.28.5
@@ -5646,6 +5660,12 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
+
+  '@babel/types@7.28.6':
+    dependencies:
+      '@babel/helper-string-parser': 7.27.1
+      '@babel/helper-validator-identifier': 7.28.5
+    optional: true
 
   '@bcoe/v8-coverage@1.0.2': {}
 
@@ -5920,10 +5940,10 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@ladjs/consolidate@1.0.4(@babel/core@7.28.5)(lodash@4.17.21)(pug@3.0.3)(underscore@1.13.7)':
+  '@ladjs/consolidate@1.0.4(@babel/core@7.28.5)(lodash@4.17.23)(pug@3.0.3)(underscore@1.13.7)':
     optionalDependencies:
       '@babel/core': 7.28.5
-      lodash: 4.17.21
+      lodash: 4.17.23
       pug: 3.0.3
       underscore: 1.13.7
 
@@ -5939,7 +5959,7 @@ snapshots:
       '@ladjs/country-language': 1.0.3
       i18n: 0.15.3
       i18n-locales: 0.0.5
-      lodash: 4.17.21
+      lodash: 4.17.23
       multimatch: 5.0.0
       punycode: 2.3.1
       qs: 6.14.1
@@ -7071,7 +7091,7 @@ snapshots:
 
   babel-walk@3.0.0-canary-5:
     dependencies:
-      '@babel/types': 7.28.5
+      '@babel/types': 7.28.6
     optional: true
 
   bail@2.0.2: {}
@@ -7267,18 +7287,18 @@ snapshots:
 
   confusing-browser-globals@1.0.11: {}
 
-  consolidate@0.15.1(lodash@4.17.21)(pug@3.0.3)(underscore@1.13.7):
+  consolidate@0.15.1(lodash@4.17.23)(pug@3.0.3)(underscore@1.13.7):
     dependencies:
       bluebird: 3.7.2
     optionalDependencies:
-      lodash: 4.17.21
+      lodash: 4.17.23
       pug: 3.0.3
       underscore: 1.13.7
 
   constantinople@4.0.1:
     dependencies:
-      '@babel/parser': 7.28.5
-      '@babel/types': 7.28.5
+      '@babel/parser': 7.28.6
+      '@babel/types': 7.28.6
     optional: true
 
   content-disposition@1.0.1: {}
@@ -7495,12 +7515,12 @@ snapshots:
 
   email-templates@13.0.1(@babel/core@7.28.5)(pug@3.0.3)(underscore@1.13.7):
     dependencies:
-      '@ladjs/consolidate': 1.0.4(@babel/core@7.28.5)(lodash@4.17.21)(pug@3.0.3)(underscore@1.13.7)
+      '@ladjs/consolidate': 1.0.4(@babel/core@7.28.5)(lodash@4.17.23)(pug@3.0.3)(underscore@1.13.7)
       '@ladjs/i18n': 10.0.0
       get-paths: 0.0.7
       html-to-text: 9.0.5
       juice: 11.1.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       nodemailer: 7.0.12
     transitivePeerDependencies:
       - '@babel/core'
@@ -8636,7 +8656,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash@4.17.21: {}
+  lodash@4.17.23: {}
 
   long@5.3.2: {}
 
@@ -9144,9 +9164,9 @@ snapshots:
 
   node-releases@2.0.27: {}
 
-  nodemailer-mailgun-transport@2.1.5(debug@4.4.3)(lodash@4.17.21)(pug@3.0.3)(underscore@1.13.7):
+  nodemailer-mailgun-transport@2.1.5(debug@4.4.3)(lodash@4.17.23)(pug@3.0.3)(underscore@1.13.7):
     dependencies:
-      consolidate: 0.15.1(lodash@4.17.21)(pug@3.0.3)(underscore@1.13.7)
+      consolidate: 0.15.1(lodash@4.17.23)(pug@3.0.3)(underscore@1.13.7)
       form-data: 4.0.5
       mailgun.js: 8.2.2(debug@4.4.3)
     transitivePeerDependencies:
@@ -9947,7 +9967,7 @@ snapshots:
       debug: 4.4.3
       dottie: 2.0.6
       inflection: 1.13.4
-      lodash: 4.17.21
+      lodash: 4.17.23
       moment: 2.30.1
       moment-timezone: 0.5.48
       pg-connection-string: 2.9.1
@@ -10628,8 +10648,8 @@ snapshots:
 
   with@7.0.2:
     dependencies:
-      '@babel/parser': 7.28.5
-      '@babel/types': 7.28.5
+      '@babel/parser': 7.28.6
+      '@babel/types': 7.28.6
       assert-never: 1.4.0
       babel-walk: 3.0.0-canary-5
     optional: true
