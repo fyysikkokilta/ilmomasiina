@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@tietokilta/ilmomasiina-models": "workspace:*",
-    "lodash-es": "^4.17.22"
+    "lodash-es": "^4.18.1"
   },
   "peerDependencies": {
     "react": "^17 || ^18 || ^19"
