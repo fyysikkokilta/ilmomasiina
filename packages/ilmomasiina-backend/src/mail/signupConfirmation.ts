@@ -6,6 +6,7 @@ import i18n from "../i18n";
 import { Signup } from "../models/signup";
 import { generateToken } from "../routes/signups/editTokens";
 import EmailService, { ConfirmationMailParams } from ".";
+import { eventToICS } from "./eventIcs";
 
 export default async function sendSignupConfirmationMail(
   signup: Signup,
@@ -21,6 +22,7 @@ export default async function sendSignupConfirmationMail(
   const quota = await signup.getQuota();
   const event = await quota.getEvent();
   const questions = await event.getQuestions();
+  const icsFile = await eventToICS(event)
 
   // Show name only if filled
   const fullName = `${signup.firstName ?? ""} ${signup.lastName ?? ""}`.trim();
@@ -50,6 +52,7 @@ export default async function sendSignupConfirmationMail(
     date,
     event,
     cancelLink,
+    icsContent: icsFile,
   };
 
   await EmailService.sendConfirmationMail(signup.email, signup.language, params);

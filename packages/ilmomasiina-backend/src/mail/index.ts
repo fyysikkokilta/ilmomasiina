@@ -8,6 +8,13 @@ import i18n from "../i18n";
 import { Event } from "../models/event";
 import mailTransporter from "./config";
 
+/** Compatible attachment shape for nodemailer v7 */
+interface MailAttachment {
+  filename: string;
+  content: string;
+  contentType: string;
+}
+
 export interface ConfirmationMailParams {
   name: string;
   email: string;
@@ -22,6 +29,7 @@ export interface ConfirmationMailParams {
   date: string | null;
   event: Event;
   cancelLink: string;
+  icsContent?: string;
 }
 
 export interface NewUserMailParams {
@@ -60,12 +68,13 @@ const TEMPLATE_OPTIONS: Email.EmailConfig = {
 };
 
 export default class EmailService {
-  static send(to: string, subject: string, html: string) {
+  static send(to: string, subject: string, html: string, attachments: MailAttachment[] = []) {
     const msg = {
       to,
       from: config.mailFrom,
       subject,
       html,
+      attachments,
     };
 
     return mailTransporter.sendMail(msg);
@@ -87,7 +96,12 @@ export default class EmailService {
         lng,
         event: params.event.title,
       });
-      await EmailService.send(to, subject, html);
+
+      const attachments: MailAttachment[] = params.icsContent
+        ? [{ filename: "event.ics", content: params.icsContent, contentType: "text/calendar" }]
+        : [];
+
+      await EmailService.send(to, subject, html, attachments);
     } catch (error) {
       console.error(error);
     }
