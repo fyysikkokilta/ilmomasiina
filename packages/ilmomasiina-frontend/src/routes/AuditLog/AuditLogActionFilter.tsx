@@ -28,6 +28,7 @@ const AuditLogActionFilter = () => {
 
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     // Since e.target.value comes from the <select> below, we can assume the type
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-assignment
     const event = e.target.value ? [e.target.value as AuditEvent] : undefined;
     void setAuditLogQueryField("action", event);
   };

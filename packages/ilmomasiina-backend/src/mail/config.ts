@@ -68,7 +68,7 @@ const mailTransporter: AbstractTransporter = (() => {
     version: "0",
     send(mail, callback) {
       const { message } = mail;
-      const input = message!.createReadStream();
+      const input = message.createReadStream();
       let data = "";
       input.on("data", (chunk: string) => {
         data += chunk;
