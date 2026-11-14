@@ -5,7 +5,6 @@ import { ApiError, apiFetch, toApiError } from "../../api";
 import { useAbortablePromise } from "../../utils/abortable";
 import { getLocalizedEventListItem } from "../../utils/localizedEvent";
 import { createStateContext } from "../../utils/stateContext";
-import useShallowMemo from "../../utils/useShallowMemo";
 
 export type EventListProps = {
   category?: string;
@@ -46,12 +45,13 @@ export function useEventListState({ category, maxAge, language }: EventListProps
     [events, language],
   );
 
-  return useShallowMemo<State>({
+  const state: State = {
     events,
     localizedEvents,
     pending,
     error: error === undefined ? undefined : toApiError(error),
-  });
+  };
+  return state;
 }
 
 export function EventListProvider({ category, maxAge, language, children }: PropsWithChildren<EventListProps>) {

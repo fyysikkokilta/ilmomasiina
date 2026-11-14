@@ -4,7 +4,6 @@ import { Alert, Button, Col, Row } from "react-bootstrap";
 import { UseFieldConfig } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
-import useShallowMemo from "@tietokilta/ilmomasiina-client/dist/utils/useShallowMemo";
 import { PaymentMode, QuotaLanguage } from "@tietokilta/ilmomasiina-models";
 import FieldRow from "../../../components/FieldRow";
 import { EditorQuota } from "../../../modules/editor/types";
@@ -91,7 +90,6 @@ const Quotas = () => {
   const formatError = useEditorErrors();
   const quotas = useFieldValue<EditorQuota[]>("quotas");
   const quotasError = useFieldError("quotas");
-  const { map: mapFields } = useFieldArrayMap("quotas");
   const { push, move } = useLocalizedFieldArrayMutators<EditorQuota, QuotaLanguage>("quotas");
 
   const addQuota = useEvent(() => {
@@ -108,15 +106,12 @@ const Quotas = () => {
     );
   });
 
-  const keys = useShallowMemo(quotas.map((item) => item.key));
+  const keyList = quotas.map((item) => item.key).join("\n");
   // Generate objects to be passed to Sortable.
-  // oxlint-disable react-hooks/exhaustive-deps -- see the dependency comment below
   const quotaItems = useMemo(
-    () => mapFields((name, i) => ({ name, id: keys[i] })),
-    // Actual quota data isn't included, so this list only invalidates when the question positions or count change.
-    [keys],
+    () => (keyList ? keyList.split("\n") : []).map((id, i) => ({ name: `quotas[${i}]`, id })),
+    [keyList],
   );
-  // oxlint-enable react-hooks/exhaustive-deps
 
   return (
     <>

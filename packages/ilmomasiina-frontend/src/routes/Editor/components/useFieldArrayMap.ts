@@ -6,7 +6,7 @@ import { useField } from "react-final-form";
  * duplicate the mutators from `useLocalizedFieldArrayMutators`.
  */
 export default function useFieldArrayMap(name: string) {
-  const length = useField(name, { subscription: { length: true } }).meta.length!;
+  const length = useField(name, { subscription: { length: true } }).meta.length ?? 0;
 
   return {
     length,

@@ -4,7 +4,6 @@ import { Button, Col, Form, FormCheckProps, InputGroup, Row } from "react-bootst
 import { Field, FieldRenderProps, useForm } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
-import useShallowMemo from "@tietokilta/ilmomasiina-client/dist/utils/useShallowMemo";
 import {
   MAX_OPTIONS_PER_QUESTION,
   OPTION_QUESTION_TYPES,
@@ -204,7 +203,6 @@ const QuestionRow = ({ name, index }: QuestionProps) => {
 const Questions = () => {
   const { t } = useTranslation();
   const questions = useFieldValue<EditorQuestion[]>("questions");
-  const { map: mapFields } = useFieldArrayMap("questions");
   const { push, move } = useLocalizedFieldArrayMutators<EditorQuestion, QuestionLanguage>("questions");
 
   const addQuestion = useEvent(() => {
@@ -226,15 +224,12 @@ const Questions = () => {
     );
   });
 
-  const keys = useShallowMemo(questions.map((item) => item.key));
+  const keyList = questions.map((item) => item.key).join("\n");
   // Generate objects to be passed to Sortable.
-  // oxlint-disable react-hooks/exhaustive-deps -- see the dependency comment below
   const questionItems = useMemo(
-    () => mapFields((name, i) => ({ name, id: keys[i] })),
-    // Actual question data isn't included, so this list only invalidates when the question positions or count change.
-    [keys],
+    () => (keyList ? keyList.split("\n") : []).map((id, i) => ({ name: `questions[${i}]`, id })),
+    [keyList],
   );
-  // oxlint-enable react-hooks/exhaustive-deps
 
   return (
     <>

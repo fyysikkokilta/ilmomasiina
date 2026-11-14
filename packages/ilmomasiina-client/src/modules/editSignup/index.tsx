@@ -5,7 +5,6 @@ import { EDIT_TOKEN_HEADER, PaymentMode, SignupPaymentStatus, SignupStatus } fro
 import { ApiError, apiFetch, toApiError } from "../../api";
 import { useAbortablePromise } from "../../utils/abortable";
 import { getLocalizedEvent, getLocalizedSignup } from "../../utils/localizedEvent";
-import useShallowMemo from "../../utils/useShallowMemo";
 import { Provider, State } from "./state";
 
 export interface EditSignupProps {
@@ -114,7 +113,7 @@ export function useEditSignupState({ id, editToken, paid, language }: EditSignup
     [mergedValues, language],
   );
 
-  return useShallowMemo<State>({
+  const state: State = {
     editToken,
     pending,
     error: error === undefined ? undefined : toApiError(error),
@@ -122,7 +121,8 @@ export function useEditSignupState({ id, editToken, paid, language }: EditSignup
     ...mergedValues,
     localizedEvent,
     localizedSignup,
-  });
+  };
+  return state;
 }
 
 export function EditSignupProvider({ id, editToken, paid, language, children }: PropsWithChildren<EditSignupProps>) {

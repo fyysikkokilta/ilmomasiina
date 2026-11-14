@@ -6,7 +6,6 @@ import { useAbortablePromise } from "../../utils/abortable";
 import { getLocalizedEvent } from "../../utils/localizedEvent";
 import { getSignupsByQuota, QuotaSignups } from "../../utils/signupUtils";
 import { createStateContext } from "../../utils/stateContext";
-import useShallowMemo from "../../utils/useShallowMemo";
 
 export interface SingleEventProps {
   slug: string;
@@ -50,14 +49,15 @@ export function useSingleEventState({ slug, language }: SingleEventProps) {
 
   const signupsByQuota = useMemo(() => localizedEvent && getSignupsByQuota(localizedEvent), [localizedEvent]);
 
-  return useShallowMemo<State>({
+  const state: State = {
     event,
     localizedEvent,
     signupsByQuota,
     registrationOpens,
     pending,
     error: error === undefined ? undefined : toApiError(error),
-  });
+  };
+  return state;
 }
 
 export function SingleEventProvider({ slug, language, children }: PropsWithChildren<SingleEventProps>) {
