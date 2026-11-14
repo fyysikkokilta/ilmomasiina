@@ -34,10 +34,10 @@ const EditorToolbar = ({ onSave, onSaveToggleDraft }: Props) => {
         <div className="event-editor--public-status">
           <div className={`event-editor--bubble ${isDraft ? "draft" : "public"} event-editor--animated`} />
           <span>
-            {isDraft ? (
+            {isDraft || !event ? (
               t("editor.status.draft")
             ) : (
-              <Link to={paths.eventDetails(event!.slug)} target="_blank">
+              <Link to={paths.eventDetails(event.slug)} target="_blank">
                 {t("editor.status.published")}
               </Link>
             )}

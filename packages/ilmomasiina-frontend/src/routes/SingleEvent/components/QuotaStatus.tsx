@@ -10,7 +10,7 @@ const QuotaStatus = () => {
   const { localizedEvent, signupsByQuota } = useSingleEventContext();
   const { t } = useTranslation();
 
-  if (!signupsByQuota?.length) return null;
+  if (!localizedEvent || !signupsByQuota?.length) return null;
   return (
     <div className="ilmo--side-widget">
       <h3>{t("singleEvent.quotaCounts.title")}</h3>
@@ -31,7 +31,7 @@ const QuotaStatus = () => {
                 key={quota.id}
                 title={t("singleEvent.quotaCounts.openQuota")}
                 value={quota.signupCount}
-                max={localizedEvent!.openQuotaSize}
+                max={localizedEvent.openQuotaSize}
               />
             );
           case SignupStatus.IN_QUEUE:

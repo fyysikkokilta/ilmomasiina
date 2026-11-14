@@ -37,21 +37,23 @@ type PaymentProps = {
 
 const Payment = ({ disabled, onPay }: PaymentProps) => {
   const { signup, paymentError, canPayOnline, isInQuota } = useEditSignupContext();
-  const formatPrice = useDecimalPriceFormatter(signup!.currency ?? CURRENCY);
+  const formatPrice = useDecimalPriceFormatter(signup?.currency ?? CURRENCY);
   const { t } = useTranslation();
+
+  if (!signup) return null;
 
   let alert = null;
   if (paymentError) {
     alert = <Alert variant="danger">{t(errorDesc<TKey>(paymentError, "editSignup.paymentError"))}</Alert>;
-  } else if (signup!.paymentStatus === SignupPaymentStatus.PENDING) {
+  } else if (signup.paymentStatus === SignupPaymentStatus.PENDING) {
     if (isInQuota) {
       alert = <Alert variant="info">{t("editSignup.payment.status.pending")}</Alert>;
     } else {
       alert = <Alert variant="info">{t("editSignup.payment.status.inQueue")}</Alert>;
     }
-  } else if (signup!.paymentStatus === SignupPaymentStatus.PAID) {
+  } else if (signup.paymentStatus === SignupPaymentStatus.PAID) {
     alert = <Alert variant="success">{t("editSignup.payment.status.paid")}</Alert>;
-  } else if (signup!.paymentStatus === SignupPaymentStatus.REFUNDED) {
+  } else if (signup.paymentStatus === SignupPaymentStatus.REFUNDED) {
     alert = <Alert variant="info">{t("editSignup.payment.status.refunded")}</Alert>;
   }
 
@@ -61,7 +63,7 @@ const Payment = ({ disabled, onPay }: PaymentProps) => {
       {alert}
       <Table>
         <tbody>
-          {signup!.products?.map((product) => (
+          {signup.products?.map((product) => (
             <tr key={product.name}>
               <td className="ilmo--amount">{t("editSignup.payment.amount", { amount: product.amount })}</td>
               <td className="ilmo--product">{product.name}</td>
@@ -74,7 +76,7 @@ const Payment = ({ disabled, onPay }: PaymentProps) => {
             <th className="ilmo--total" colSpan={2}>
               {t("editSignup.payment.total")}
             </th>
-            <th className="ilmo--price">{formatPrice(signup!.price ?? 0)}</th>
+            <th className="ilmo--price">{formatPrice(signup.price ?? 0)}</th>
           </tr>
         </tfoot>
       </Table>
@@ -116,12 +118,14 @@ const EditableUntil = () => {
     return <p>{t("editSignup.editable.closed")}</p>;
   }
 
-  if (signup!.paymentStatus === SignupPaymentStatus.PAID) {
+  if (!signup) return null;
+
+  if (signup.paymentStatus === SignupPaymentStatus.PAID) {
     // Handled by the <Alert> in <Payment>
     return null;
   }
 
-  if (signup!.confirmed) {
+  if (signup.confirmed) {
     return <p>{t("editSignup.editable.confirmed", { duration: duration(Math.max(editableUntil! - now)) })}</p>;
   }
 
@@ -144,12 +148,12 @@ const EditFormSubmit = ({ disabled }: { disabled: boolean }) => {
       {canEdit && (
         <p>
           {t("editSignup.editInstructions")}
-          {event!.emailQuestion && ` ${t("editSignup.editInstructions.email")}`}
+          {event?.emailQuestion && ` ${t("editSignup.editInstructions.email")}`}
         </p>
       )}
       <nav className="ilmo--submit-buttons">
-        {!preview && !isNew && (
-          <LinkButton variant="link" to={paths.eventDetails(event!.slug)}>
+        {!preview && !isNew && event && (
+          <LinkButton variant="link" to={paths.eventDetails(event.slug)}>
             {t("editSignup.action.back")}
           </LinkButton>
         )}
@@ -221,7 +225,7 @@ const EditForm = () => {
   } = useTranslation();
 
   // Convert answers to object form for react-final-form.
-  const initialValues = useMemo(() => signupToFormData(signup!), [signup]);
+  const initialValues = useMemo(() => (signup ? signupToFormData(signup) : undefined), [signup]);
 
   const onSubmit = useEvent(async (formData: SignupFormData) => {
     if (preview) return undefined;
@@ -243,8 +247,8 @@ const EditForm = () => {
         isLoading: false,
       });
       // If this was a new signup and no payment is needed, go to event details.
-      if (isNew && updated.paymentStatus == null) {
-        void navigate(paths.eventDetails(event!.slug));
+      if (isNew && updated.paymentStatus == null && event) {
+        void navigate(paths.eventDetails(event.slug));
       }
       return undefined;
     } catch (error) {
@@ -278,7 +282,7 @@ const EditForm = () => {
         closeOnClick: true,
         isLoading: false,
       });
-      void navigate(paths.eventDetails(event!.slug));
+      if (event) void navigate(paths.eventDetails(event.slug));
     } catch (error) {
       toast.update(progressToast, {
         render: t(errorDesc<TKey>(error, "editSignup.deleteError")),

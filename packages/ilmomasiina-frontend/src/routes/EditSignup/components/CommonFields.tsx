@@ -14,7 +14,7 @@ const CommonFields = () => {
 
   return (
     <>
-      {event!.nameQuestion && (
+      {event?.nameQuestion && (
         <>
           <FieldRow
             name="firstName"
@@ -44,7 +44,7 @@ const CommonFields = () => {
           />
         </>
       )}
-      {event!.emailQuestion && (
+      {event?.emailQuestion && (
         <FieldRow
           name="email"
           maxLength={250}

@@ -26,10 +26,10 @@ import QuestionFields from "../../EditSignup/components/QuestionFields";
 import { editorEventToUserEvent, previewDummyQuota } from "./userComponentInterop";
 
 const QuotaField = (props: FieldInputProps<QuotaID>) => {
-  const quotas = useStore((state) => state.editor.event!.quotas);
+  const quotas = useStore((state) => state.editor.event?.quotas);
   return (
     <BsForm.Select {...props}>
-      {quotas.map((quota) => (
+      {quotas?.map((quota) => (
         <option key={quota.id} value={quota.id}>
           {quota.title}
         </option>

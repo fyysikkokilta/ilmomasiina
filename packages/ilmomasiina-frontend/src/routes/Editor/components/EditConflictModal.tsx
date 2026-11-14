@@ -51,9 +51,10 @@ const EditConflictModal = ({ onSave }: Props) => {
   const form = useForm<EditorEvent>();
 
   const overwrite = useEvent(() => {
+    if (!modal) return;
     const { questions, quotas } = form.getState().values;
     // Tell the backend we want to overwrite the latest change.
-    form.change("updatedAt", modal!.updatedAt);
+    form.change("updatedAt", modal.updatedAt);
     // We still need to re-create the questions and quotas that were deleted, by removing their old IDs.
     form.change(
       "questions",

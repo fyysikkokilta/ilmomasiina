@@ -8,14 +8,16 @@ import SignupButton from "./SignupButton";
 const SignupCountdown = () => {
   const { registrationOpens, localizedEvent: event } = useSingleEventContext();
 
+  if (!event) return null;
+
   return (
     <Countdown
       daysInHours
       date={registrationOpens}
       renderer={({ completed, seconds, total }) => (
         <SignupButton
-          isOpen={completed && !event!.registrationClosed}
-          isClosed={event!.registrationClosed}
+          isOpen={completed && !event.registrationClosed}
+          isClosed={event.registrationClosed}
           seconds={seconds}
           total={total}
         />

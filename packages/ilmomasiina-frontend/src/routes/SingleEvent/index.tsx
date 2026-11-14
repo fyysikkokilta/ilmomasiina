@@ -31,7 +31,7 @@ const SingleEventView = () => {
     );
   }
 
-  if (pending) {
+  if (pending || !event) {
     return (
       <div className="ilmo--loading-container">
         <Spinner animation="border" />
@@ -53,11 +53,11 @@ const SingleEventView = () => {
           <QuotaStatus />
         </Col>
       </Row>
-      {event!.signupsPublic && (
+      {event.signupsPublic && (
         <>
           <h2>{t("singleEvent.signups.title")}</h2>
-          {signupsByQuota!.map((quota) => (
-            <SignupList key={quota.id} quota={quota} isSingleQuota={event!.quotas.length === 1} />
+          {signupsByQuota?.map((quota) => (
+            <SignupList key={quota.id} quota={quota} isSingleQuota={event.quotas.length === 1} />
           ))}
         </>
       )}

@@ -40,7 +40,7 @@ const QuestionField = ({ name, question, validate = true }: QuestionFieldProps) 
   const formatPrice = usePriceFormatter();
   // Show the prices for each option if the question has some paid options.
   // Add a + sign if the signup has a "base price" from the quota.
-  const quotaHasPrice = signup!.quota.price > 0;
+  const quotaHasPrice = (signup?.quota.price ?? 0) > 0;
   const hasPrices = questionHasPrices(question);
   const formatOptionPrice = (price?: number) =>
     hasPrices && price != null ? ` (${quotaHasPrice ? "+" : ""}${formatPrice(price)})` : "";
@@ -196,7 +196,7 @@ const QuestionFields = ({ name, validate = true }: Props) => {
   const { localizedEvent: event } = useEditSignupContext();
   return (
     <>
-      {event!.questions.map((question) => (
+      {event?.questions.map((question) => (
         <QuestionField key={question.id} name={name} question={question} validate={validate} />
       ))}
     </>
