@@ -58,23 +58,21 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
   const signupsDisabled =
     signupState(event.registrationStartDate, event.registrationEndDate).state === SignupState.disabled;
   const signups = getSignupsAsList(event);
-  const quotas = [
-    ...event.quotas
-      // If the event does not have signups, only show quotas that somehow still have signups within.
-      .filter((quota) => !signupsDisabled || quota.signupCount > 0)
-      .map((quota): QuotaSignups => {
-        const quotaSignups = signups.filter(
-          (signup) => signup.quota.id === quota.id && signup.status === SignupStatus.IN_QUOTA,
-        );
-        return {
-          ...quota,
-          type: SignupStatus.IN_QUOTA,
-          signups: quotaSignups,
-          // Trust signupCount and size, unless we have concrete information that more signups exist
-          signupCount: Math.max(quotaSignups.length, Math.min(quota.signupCount, quota.size ?? Infinity)),
-        };
-      }),
-  ];
+  const quotas = event.quotas
+    // If the event does not have signups, only show quotas that somehow still have signups within.
+    .filter((quota) => !signupsDisabled || quota.signupCount > 0)
+    .map((quota): QuotaSignups => {
+      const quotaSignups = signups.filter(
+        (signup) => signup.quota.id === quota.id && signup.status === SignupStatus.IN_QUOTA,
+      );
+      return {
+        ...quota,
+        type: SignupStatus.IN_QUOTA,
+        signups: quotaSignups,
+        // Trust signupCount and size, unless we have concrete information that more signups exist
+        signupCount: Math.max(quotaSignups.length, Math.min(quota.signupCount, quota.size ?? Infinity)),
+      };
+    });
 
   const { openQuotaCount, queueCount } = countOverflowSignups(event.quotas, event.openQuotaSize);
 

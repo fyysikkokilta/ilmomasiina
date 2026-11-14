@@ -41,7 +41,7 @@ export function configureApi(url: string) {
 
 export async function apiFetch<T = unknown>(uri: string, { method = "GET", body, headers, signal }: FetchOptions = {}) {
   const allHeaders = {
-    ...(headers || {}),
+    ...headers,
   };
   if (body !== undefined) {
     allHeaders["Content-Type"] = "application/json; charset=utf-8";

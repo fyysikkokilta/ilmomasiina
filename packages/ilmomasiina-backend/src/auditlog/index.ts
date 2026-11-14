@@ -60,7 +60,7 @@ export function addLogEventHook(fastify: FastifyInstance): void {
     const reqIp = req.ip;
     const xRealIp = req.headers["x-real-ip"];
     const ip = xRealIp ? xRealIp.toString() : reqIp;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- the cast only removes readonly
+    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- the cast drops readonly, which tsc needs
     (req.logEvent as AuditLogger) = eventLogger(ip, () => req.sessionData?.email || null);
   });
 }

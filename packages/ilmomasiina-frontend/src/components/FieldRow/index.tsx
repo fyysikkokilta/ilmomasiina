@@ -9,8 +9,7 @@ import { isZodIssue } from "../../utils/convertZodError";
 /** Basic unlocalized default formatter for Zod issues. */
 const defaultFormatError = (error: unknown) =>
   isZodIssue(error)
-    ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-conversion
-      String(error.message)
+    ? error.message
     : // Errors without a message field are for a nested field and will be shown there.
       null;
 
@@ -59,7 +58,6 @@ type PropsWithChildren = BaseProps & {
   as?: undefined;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is the ugly stuff :D
 type As = keyof JSX.IntrinsicElements | ComponentType<any>;
 
 // Props with a custom `as` component.

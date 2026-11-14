@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 /**
  * Modified from https://github.com/reduxjs/react-redux/blob/master/src/utils/shallowEqual.ts
@@ -23,9 +23,9 @@ function shallowEqual(a: unknown, b: unknown) {
 
 /** Returns the given object. Returns a previously used object, if shallow-equal to the current one. */
 export default function useShallowMemo<T>(value: T): T {
-  const ref = useRef<T>(undefined);
-  // eslint-disable-next-line react-hooks/refs
-  if (!shallowEqual(ref.current, value)) ref.current = value;
-  // eslint-disable-next-line react-hooks/refs
-  return ref.current as T;
+  const [memo, setMemo] = useState(value);
+  if (shallowEqual(memo, value)) return memo;
+  // Store the new value; React re-renders immediately with it, as with any state set during render.
+  setMemo(value);
+  return value;
 }

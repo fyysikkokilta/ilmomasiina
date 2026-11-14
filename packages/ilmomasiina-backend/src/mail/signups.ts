@@ -33,7 +33,6 @@ export const sendPromotedFromQueueMail = sendSynchronouslyInTest(async (signup: 
 
   const lang = signup.language ?? config.defaultLanguage;
 
-  // eslint-disable-next-line no-param-reassign
   signup.payments = await signup.getPayments();
   const quota = await signup.getQuota({ attributes: [], include: [Event] });
   if (!quota || !quota.event) return; // Quota or event soft deleted
@@ -62,7 +61,6 @@ export const sendSignupConfirmationMail = sendSynchronouslyInTest(
 
     const lang = signup.language ?? config.defaultLanguage;
 
-    // eslint-disable-next-line no-param-reassign
     signup.payments = await signup.getPayments();
     const answers = await signup.getAnswers();
     const quota = await signup.getQuota({ include: [Event] });
@@ -70,7 +68,6 @@ export const sendSignupConfirmationMail = sendSynchronouslyInTest(
     const { event } = quota;
     const questions = await event.getQuestions({ order: [["order", "ASC"]] });
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- indexing may fail
     const localeQuestions = event.languages[lang]?.questions ?? questions;
 
     // Show name only if filled
@@ -80,6 +77,7 @@ export const sendSignupConfirmationMail = sendSynchronouslyInTest(
       .map((question, index) => [index, question, answers.find((answer) => answer.questionId === question.id)] as const)
       .filter(([, , answer]) => answer)
       .map(([index, question, answer]) => ({
+        questionId: question.id,
         label: localeQuestions[index]?.question || question.question,
         answer: Array.isArray(answer!.answer) ? answer!.answer.join(", ") : answer!.answer,
       }));

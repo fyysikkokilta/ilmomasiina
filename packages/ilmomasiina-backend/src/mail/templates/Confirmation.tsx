@@ -9,7 +9,7 @@ export interface ConfirmationMailParams {
   name: string;
   email: string;
   quota: string;
-  answers: { label: string; answer: string }[];
+  answers: { questionId: string; label: string; answer: string }[];
   queuePosition: number | null;
   type: "signup" | "edit";
   admin: boolean;

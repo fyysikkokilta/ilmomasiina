@@ -1,4 +1,5 @@
-import react from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import dotenvFlow from "dotenv-flow";
 import path from "path";
 import { defineConfig } from "vite";
@@ -98,6 +99,7 @@ export default defineConfig(({ mode }) => ({
 
   plugins: [
     react(),
+    babel({ presets: [reactCompilerPreset()] }),
     checker({
       // We already do type checking & linting separately in CI
       enableBuild: false,
@@ -106,17 +108,10 @@ export default defineConfig(({ mode }) => ({
         buildMode: true,
       },
       // TypeScript in build mode automatically typechecks all depended packages, but
-      // ESLint needs to be told where to find our code
-      eslint: {
-        lintCommand: "eslint packages",
-        // Override the working directory for ESLint to the root of the repository so config loads correctly.
-        // This only works in dev mode, but we don't run the checker plugin at build time anyway.
+      // oxlint needs to be pointed at the repository root, where its config lives.
+      oxlint: {
+        lintCommand: `oxlint ${path.resolve(import.meta.dirname, "../..")}`,
         watchPath: path.resolve(import.meta.dirname, "../../packages"),
-        dev: {
-          overrideConfig: {
-            cwd: path.resolve(import.meta.dirname, "../.."),
-          },
-        },
       },
     }),
   ],

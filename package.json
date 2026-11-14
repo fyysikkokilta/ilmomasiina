@@ -2,11 +2,14 @@
   "name": "ilmomasiina",
   "version": "3.0.0-alpha.1",
   "private": true,
-  "license": "MIT",
-  "engines": {
-    "node": "^26"
+  "bugs": {
+    "url": "https://github.com/Fyysikkokilta/ilmomasiina/issues"
   },
-  "packageManager": "pnpm@12.18.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fyysikkokilta/ilmomasiina"
+  },
   "scripts": {
     "bootstrap": "pnpm install",
     "clean": "pnpm run -r clean",
@@ -14,23 +17,33 @@
     "start": "pnpm run -r --parallel start",
     "start:backend": "pnpm run --filter ilmomasiina-backend start",
     "start:frontend": "pnpm run --filter ilmomasiina-frontend start",
-    "lint": "eslint packages && pnpm run format:check",
-    "lint:fix": "eslint --fix packages && pnpm run format",
-    "format": "prettier --write --list-different 'packages/*/{src,test}/**/*.{ts,tsx,scss}'",
-    "format:check": "prettier --check 'packages/*/{src,test}/**/*.{ts,tsx,scss}'",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix && pnpm run format",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "typecheck": "pnpm run -r --workspace-concurrency=1 typecheck",
     "test": "pnpm run -r test",
-    "test:backend": "pnpm run --filter ilmomasiina-backend test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Fyysikkokilta/ilmomasiina"
-  },
-  "bugs": {
-    "url": "https://github.com/Fyysikkokilta/ilmomasiina/issues"
+    "test:backend": "pnpm run --filter ilmomasiina-backend test",
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
     "typescript": "npm:@typescript/typescript6@^6.0.2"
+  },
+  "devDependencies": {
+    "globals": "^17.14.0",
+    "lint-staged": "^17.6.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "oxlint-tsgolint": "^7.0.2007",
+    "simple-git-hooks": "^2.14.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged"
+  },
+  "babel": {
+    "presets": [
+      "react-app"
+    ]
   },
   "browserslist": {
     "production": [
@@ -44,26 +57,8 @@
       "last 1 safari version"
     ]
   },
-  "babel": {
-    "presets": [
-      "react-app"
-    ]
+  "engines": {
+    "node": "^26"
   },
-  "devDependencies": {
-    "@eslint/compat": "^2.1.1",
-    "@eslint/js": "^9.39.5",
-    "@vitest/eslint-plugin": "^1.6.28",
-    "eslint": "^9.39.5",
-    "eslint-config-airbnb-extended": "^3.3.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.5",
-    "eslint-plugin-import-x": "^4.18.1",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-simple-import-sort": "^14.0.0",
-    "globals": "^17.14.0",
-    "prettier": "^3.10.1",
-    "typescript-eslint": "^8.72.2"
-  }
+  "packageManager": "pnpm@12.18.0"
 }

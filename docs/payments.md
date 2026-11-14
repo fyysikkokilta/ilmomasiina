@@ -4,14 +4,14 @@ This document describes the state machine for Stripe Checkout Session payments.
 
 ## States
 
-| State | Description |
-|-------|-------------|
-| `CREATING` | Payment record created locally, Stripe API call in progress |
-| `PENDING` | Checkout Session created in Stripe, awaiting user payment |
-| `PAID` | Payment completed successfully |
-| `EXPIRED` | Checkout Session expired without payment |
-| `CREATION_FAILED` | Stripe API rejected the session creation |
-| `REFUNDED` | Payment refunded by an admin |
+| State             | Description                                                 |
+| ----------------- | ----------------------------------------------------------- |
+| `CREATING`        | Payment record created locally, Stripe API call in progress |
+| `PENDING`         | Checkout Session created in Stripe, awaiting user payment   |
+| `PAID`            | Payment completed successfully                              |
+| `EXPIRED`         | Checkout Session expired without payment                    |
+| `CREATION_FAILED` | Stripe API rejected the session creation                    |
+| `REFUNDED`        | Payment refunded by an admin                                |
 
 ## State Diagram
 
@@ -36,26 +36,26 @@ stateDiagram-v2
 
 ### Signup
 
-| Field | Description |
-|-------|-------------|
-| `price` | Total price the user agreed to pay at confirmation time |
-| `currency` | Currency code (e.g., `EUR`) |
-| `products` | Snapshot of selected products/quantities at confirmation |
+| Field                 | Description                                                    |
+| --------------------- | -------------------------------------------------------------- |
+| `price`               | Total price the user agreed to pay at confirmation time        |
+| `currency`            | Currency code (e.g., `EUR`)                                    |
+| `products`            | Snapshot of selected products/quantities at confirmation       |
 | `manualPaymentStatus` | Payment status set manually by admin (PAID, REFUNDED), or NULL |
 
 These fields are updated when the user confirms their signup or modifies it.
 
 ### Payment
 
-| Field | Description |
-|-------|-------------|
-| `status` | Current state (CREATING, PENDING, PAID, EXPIRED, CREATION_FAILED, REFUNDED) |
-| `amount` | Amount charged, copied from signup at payment creation |
-| `currency` | Currency code, copied from signup |
-| `products` | Products snapshot, copied from signup at payment creation |
-| `stripeCheckoutSessionId` | Stripe Checkout Session ID (set on transition to PENDING) |
-| `expiresAt` | When the Checkout Session expires |
-| `completedAt` | When payment was completed (for PAID status) |
+| Field                     | Description                                                                 |
+| ------------------------- | --------------------------------------------------------------------------- |
+| `status`                  | Current state (CREATING, PENDING, PAID, EXPIRED, CREATION_FAILED, REFUNDED) |
+| `amount`                  | Amount charged, copied from signup at payment creation                      |
+| `currency`                | Currency code, copied from signup                                           |
+| `products`                | Products snapshot, copied from signup at payment creation                   |
+| `stripeCheckoutSessionId` | Stripe Checkout Session ID (set on transition to PENDING)                   |
+| `expiresAt`               | When the Checkout Session expires                                           |
+| `completedAt`             | When payment was completed (for PAID status)                                |
 
 The payment's `amount` and `products` provide an audit trail of what was actually charged, independent of any later signup modifications.
 
@@ -82,14 +82,14 @@ Use `UPDATE ... WHERE status = 'pending'` and check the affected row count to ha
 
 When a user attempts to pay and a payment record already exists:
 
-| Current State | Action |
-|---------------|--------|
-| `CREATING` | Fail request (TODO: retry with idempotency key if new enough) |
-| `PAID` | No action needed; update UI to reflect paid status |
-| `PENDING` | Check session status in Stripe. If pending, redirect. Otherwise, update payment and act accordingly. |
-| `EXPIRED` | Create a new payment |
-| `CREATION_FAILED` | Create a new payment |
-| `REFUNDED` | Create a new payment |
+| Current State     | Action                                                                                               |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
+| `CREATING`        | Fail request (TODO: retry with idempotency key if new enough)                                        |
+| `PAID`            | No action needed; update UI to reflect paid status                                                   |
+| `PENDING`         | Check session status in Stripe. If pending, redirect. Otherwise, update payment and act accordingly. |
+| `EXPIRED`         | Create a new payment                                                                                 |
+| `CREATION_FAILED` | Create a new payment                                                                                 |
+| `REFUNDED`        | Create a new payment                                                                                 |
 
 Note: `CREATING` is a transient state that only exists during API calls. Users should not encounter it.
 
@@ -156,6 +156,7 @@ If the server crashes after creating the payment record but before completing th
 ### Webhook Delivery Failures
 
 Stripe webhooks can be delayed or fail. Mitigations:
+
 - The return URL flow provides a backup check
 - The background job polls Stripe for stale PENDING payments
 - Stripe retries webhooks, so transient failures self-heal
@@ -199,6 +200,7 @@ With READ COMMITTED isolation, two race conditions can occur:
 #### Solution: Pessimistic Locking
 
 **Approach:**
+
 - Signup row is locked with FOR UPDATE during updates
 - Payment creation waits for this lock when fetching signup data
 - Ensures fresh data is always used
@@ -207,6 +209,7 @@ With READ COMMITTED isolation, two race conditions can occur:
 **Direction 1 - Protect Payment Creation:**
 
 When creating a payment:
+
 1. Load signup for initial validation of preconditions
 2. **BEGIN TRANSACTION**
 3. Re-fetch signup with FOR UPDATE lock (waits if update in progress)
@@ -218,6 +221,7 @@ When creating a payment:
 **Direction 2 - Protect Signup Updates:**
 
 When updating signup:
+
 1. Find and expire any existing CREATING or PENDING payments (in Stripe, then database)
 2. **BEGIN TRANSACTION**
 3. Fetch signup with FOR UPDATE lock

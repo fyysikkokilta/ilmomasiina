@@ -4,7 +4,7 @@
 ------------------------------------- */
 * {
   margin: 0;
-  font-family: 'Source Sans Pro', 'Calibri',  Helvetica, Arial, sans-serif;
+  font-family: "Source Sans Pro", "Calibri", Helvetica, Arial, sans-serif;
   box-sizing: border-box;
   font-size: 14px;
 }
@@ -69,7 +69,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: 'Lora', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
+  font-family: "Lora", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   color: #000;
   margin: 40px 0 0;
   line-height: 1.2em;
@@ -117,7 +117,7 @@ ol li {
     LINKS & BUTTONS
 ------------------------------------- */
 a {
-  color: #FF8A04;
+  color: #ff8a04;
   text-decoration: underline;
 }
 
@@ -177,7 +177,7 @@ a {
   font-weight: 800;
   text-transform: uppercase;
   text-align: center;
-  color: #201E1E;
+  color: #201e1e;
 }
 
 /* -------------------------------------
@@ -214,7 +214,7 @@ a {
   background-color: #d0021b;
 }
 .alert.alert-good {
-  background-color: #201E1E;
+  background-color: #201e1e;
 }
 .alert.alert-neutral {
   background-color: #0a0d10;
@@ -252,5 +252,5 @@ a {
 }
 
 .footer a.footerLink {
-  color: #FF8A04;
+  color: #ff8a04;
 }

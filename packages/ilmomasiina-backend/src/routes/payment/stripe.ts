@@ -147,7 +147,7 @@ export async function checkoutSessionStatusUpdated(
     case null:
       throw new Error("Stripe session has null status");
     default:
-      throw new Error(`Unhandled Stripe session status: ${status satisfies never}`);
+      throw new Error(`Unhandled Stripe session status: ${String(status satisfies never)}`);
   }
 }
 
@@ -236,7 +236,7 @@ export async function expirePaymentForSignupUpdate(payment: Payment): Promise<vo
       // These should not be returned by the "active" scope, but handle defensively
       throw new Error(`Invalid active payment status: ${payment.status}`);
     default:
-      throw new Error(`Unknown payment status: ${payment.status satisfies never}`);
+      throw new Error(`Unknown payment status: ${String(payment.status satisfies never)}`);
   }
 }
 

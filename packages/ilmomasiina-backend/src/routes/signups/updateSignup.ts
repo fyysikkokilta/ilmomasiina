@@ -137,9 +137,7 @@ export function validateAnswersAndGetProducts(
       for (const lang of Object.values(event.languages)) {
         const localized = lang.questions[index];
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- indexing may fail
         if (localized && localized.options) {
-          // eslint-disable-next-line @typescript-eslint/no-loop-func -- func is only used immediately in forEach
           localized.options.forEach((opt, i) => {
             // Only include non-empty options, since empty ones use the default language
             if (!opt) return;
@@ -354,7 +352,6 @@ async function updateExistingSignup(
     },
     transaction,
   });
-  // eslint-disable-next-line no-param-reassign -- signup.update() is already modifying the signup
   signup.answers = await Answer.bulkCreate(
     newAnswers.map((answer) => ({ ...answer, signupId: signup.id })),
     { transaction },
@@ -377,14 +374,14 @@ export async function updateSignupAsUser(
     }
 
     /** Is this signup already confirmed (i.e. is this the first update for this signup) */
-    const wasConfirmed = signup.confirmed;
+    const alreadyConfirmed = signup.confirmed;
 
     await updateExistingSignup(signup, event, request.body, transaction, false);
     await request.logEvent(AuditEvent.EDIT_SIGNUP, { signup, event, transaction });
 
     return {
       updatedSignup: signup,
-      wasConfirmed,
+      wasConfirmed: alreadyConfirmed,
     };
   });
 

@@ -22,7 +22,7 @@ import { editorEventToUserEvent, previewDummySignup } from "./userComponentInter
 const PreviewTab = () => {
   const { values } = useFormState<EditorEvent>();
   const [previewingForm, setPreviewingForm] = useState(false);
-  const [now] = useState(() => Date.now()); // eslint-disable-line react/hook-use-state
+  const [now] = useState(() => Date.now());
   const { i18n, t } = useTranslation();
   const selectedLanguage = useStore((state) => state.editor.selectedLanguage);
 

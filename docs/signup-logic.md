@@ -10,8 +10,8 @@ In addition, the event may have an **open quota** which is specified by its size
 
 When a user signs up, their **Signup** is attached to a single **Quota** instance (never the open quota).
 
-- The first *size* signups in a Quota (ordered by creation timestamp) are assigned to that Quota.
-- The first *openQuotaSize* signups that did not fit in their respective Quotas, ordered together by creation
+- The first _size_ signups in a Quota (ordered by creation timestamp) are assigned to that Quota.
+- The first _openQuotaSize_ signups that did not fit in their respective Quotas, ordered together by creation
   timestamp, are assigned to the open quota.
 - The rest of the signups are assigned to the queue.
 
@@ -21,6 +21,7 @@ The quota assignment and position of signups is stored in the database.
 
 `computeSignupPosition.ts` can be called to refresh the assignments and positions of all signups in an event.
 This code is idempotent and:
+
 - Computes new statuses based on the above rules
 - Stores changed statuses in the database
 - Sends notifications to signups that moved out of the queue
@@ -30,6 +31,7 @@ refreshes. This may be a performance bottleneck - in the future, these updates m
 locks, but such a change is not trivial due to transactions.
 
 The following actions currently trigger a refresh:
+
 - Creation of new signup (`POST /api/signups`)
 - Expiration of signups (`deleteUnconfirmedSignups.ts`)
 - Deletion of signups by user or admin (`DELETE /api/signups/<id>`, `DELETE /api/admin/signups/<id>`)

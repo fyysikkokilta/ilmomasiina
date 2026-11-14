@@ -3,12 +3,14 @@
 This folder contains documentation files for Ilmomasiina.
 
 If you're interested in using Ilmomasiina for your purposes, these might be for you:
+
 - [Installation](installation.md) of a new instance
 - [Customization](installation.md#customization) with your organization's text, colors etc.
 - [Migration](migration.md) from the Athene version to 2.0.0 and from there to later versions
 - [Hacking Ilmomasiina](hacking.md) to suit your purposes
 
 To start contributing to the project, read at least:
+
 - [Development setup](installation.md#development)
 - [Project structure](project-structure.md), to get familiar with where everything is and what technologies we use.
   Especially important if you worked on the Athene version, as this has changed **a lot**.
@@ -16,6 +18,7 @@ To start contributing to the project, read at least:
   since the Athene version.
 
 Other technical documentation:
+
 - [`createStateContext`](state-context.md), the `useContext` wrapper used in `ilmomasiina-client`.
   Relevant if you want to develop that package.
 - [Signup logic](signup-logic.md), documents the exact business logic behind signups, quotas and queueing

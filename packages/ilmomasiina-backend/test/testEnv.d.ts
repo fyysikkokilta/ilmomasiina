@@ -6,7 +6,6 @@ import EmailService from "../src/mail";
 import { User } from "../src/models/user";
 
 declare global {
-  /* eslint-disable vars-on-top -- declare global needs these to be var, not let */
   var server: FastifyInstance;
   var sequelize: Sequelize;
   var emailSend: Mock<(typeof EmailService)["send"]>;
@@ -27,7 +26,6 @@ interface CustomMatchers<R = unknown> {
 }
 
 declare module "vitest" {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   interface Assertion<T = any> extends CustomMatchers<T> {}
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 }

@@ -25,15 +25,7 @@
       "@tietokilta/ilmomasiina-models": ["../ilmomasiina-models/src/index.ts"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
-  "include": [
-    "src",
-    "src/locales/*.json"
-  ],
-  "references": [
-    { "path": "../ilmomasiina-models" }
-  ]
+  "exclude": ["node_modules", "dist"],
+  "include": ["src", "src/locales/*.json"],
+  "references": [{ "path": "../ilmomasiina-models" }]
 }

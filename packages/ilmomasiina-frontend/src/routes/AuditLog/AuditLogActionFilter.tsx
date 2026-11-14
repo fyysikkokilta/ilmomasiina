@@ -22,14 +22,15 @@ const ACTIONS = [
   [AuditEvent.CHANGE_PASSWORD, "auditLog.filter.action.changeOwnPassword"],
 ] as const;
 
+const actionsByValue = new Map<string, AuditEvent>(Object.values(AuditEvent).map((action) => [action, action]));
+
 const AuditLogActionFilter = () => {
   const setAuditLogQueryField = useStore((state) => state.auditLog.setAuditLogQueryField);
   const { t } = useTranslation();
 
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    // Since e.target.value comes from the <select> below, we can assume the type
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-assignment
-    const event = e.target.value ? [e.target.value as AuditEvent] : undefined;
+    const action = actionsByValue.get(e.target.value);
+    const event = action ? [action] : undefined;
     void setAuditLogQueryField("action", event);
   };
 

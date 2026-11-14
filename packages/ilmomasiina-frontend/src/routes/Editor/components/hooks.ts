@@ -2,7 +2,7 @@ import { useDebugValue } from "react";
 
 import { useField } from "react-final-form";
 
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- unsafe, but hard to fix
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- the caller chooses the value type
 export function useFieldValue<T>(name: string) {
   const { value } = useField<T>(name, { subscription: { value: true } }).input;
   useDebugValue(value);

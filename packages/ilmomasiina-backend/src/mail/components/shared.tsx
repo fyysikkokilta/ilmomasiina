@@ -35,7 +35,7 @@ interface SignupDetailsProps {
   name: string;
   email: string;
   quota: string;
-  answers: { label: string; answer: string }[];
+  answers: { questionId: string; label: string; answer: string }[];
 }
 
 export function SignupDetails({ name, email, quota, answers }: SignupDetailsProps) {
@@ -55,9 +55,8 @@ export function SignupDetails({ name, email, quota, answers }: SignupDetailsProp
         <li>
           <strong>{t("emails.quota")}:</strong> {quota}
         </li>
-        {answers.map((answer, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <li key={index}>
+        {answers.map((answer) => (
+          <li key={answer.questionId}>
             <strong>{answer.label}:</strong> {answer.answer}
           </li>
         ))}

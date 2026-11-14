@@ -50,7 +50,7 @@ const baseQuestionSchema = z.object({
 }) satisfies ZodType<EditorQuestion>;
 
 // Zod infers the enum fields as unions of their values, which the rule doesn't recognize as the same enums.
-// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-assignment
+// oxlint-disable-next-line typescript/no-unsafe-enum-assignment
 const editorSchema: ZodType<EditorEvent> = z
   .object({
     title: z.string().min(1).max(255),

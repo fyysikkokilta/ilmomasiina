@@ -37,7 +37,6 @@ export default function Layout({ children }: PropsWithChildren) {
                     <tbody>
                       <tr>
                         {/* Janky, but this is what it's looked like for the last 8 years :D */}
-                        {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
                         <td className="alert alert-neutral">
                           <p className="alertText" />
                         </td>

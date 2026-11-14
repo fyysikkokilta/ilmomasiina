@@ -144,7 +144,7 @@ async function handlePendingPayment(
     case null:
       throw new Error("Stripe session has null status");
     default:
-      throw new Error(`Unhandled Stripe session status: ${session.status satisfies never}`);
+      throw new Error(`Unhandled Stripe session status: ${String(session.status satisfies never)}`);
   }
 }
 
@@ -205,7 +205,7 @@ async function getOrCreatePayment(signupId: SignupID, auditLogger: AuditLogger):
       // These should not be returned by the "active" scope, but handle defensively
       throw new Error(`Invalid active payment status: ${payment.status}`);
     default:
-      throw new Error(`Unknown payment status: ${payment.status satisfies never}`);
+      throw new Error(`Unknown payment status: ${String(payment.status satisfies never)}`);
   }
 }
 

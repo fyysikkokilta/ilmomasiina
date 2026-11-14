@@ -19,7 +19,6 @@ const AdminUserListItem = ({ user }: Props) => {
 
   async function onDelete() {
     // TODO: Use a proper modal instead of window.confirm
-    // eslint-disable-next-line no-alert -- a native confirm dialog is intended here
     const confirmed = window.confirm(t("adminUsers.deleteUser.confirm", { user: user.email }));
     if (confirmed) {
       try {
@@ -40,7 +39,6 @@ const AdminUserListItem = ({ user }: Props) => {
   }
   async function onResetPassword() {
     // TODO: Use a proper modal instead of window.confirm
-    // eslint-disable-next-line no-alert -- a native confirm dialog is intended here
     const confirmed = window.confirm(t("adminUsers.resetPassword.confirm", { user: user.email }));
     if (confirmed) {
       try {

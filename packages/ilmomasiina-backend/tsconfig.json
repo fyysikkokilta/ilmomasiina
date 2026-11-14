@@ -2,14 +2,7 @@
   "compilerOptions": {
     // target/lib from https://github.com/tsconfig/bases/blob/main/bases/node24.json
     "target": "es2024",
-    "lib": [
-      "es2024",
-      "ESNext.Array",
-      "ESNext.Collection",
-      "ESNext.Error",
-      "ESNext.Iterator",
-      "ESNext.Promise"
-    ],
+    "lib": ["es2024", "ESNext.Array", "ESNext.Collection", "ESNext.Error", "ESNext.Iterator", "ESNext.Promise"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -32,16 +25,7 @@
       "test/*": ["./test/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
-  "include": [
-    "src/**/*",
-    "test/**/*",
-    "vitest.config.mts"
-  ],
-  "references": [
-    { "path": "../ilmomasiina-models/tsconfig.cjs.json" }
-  ]
+  "exclude": ["node_modules", "dist"],
+  "include": ["src/**/*", "test/**/*", "vitest.config.mts"],
+  "references": [{ "path": "../ilmomasiina-models/tsconfig.cjs.json" }]
 }

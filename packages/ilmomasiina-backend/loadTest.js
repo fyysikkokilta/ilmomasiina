@@ -23,9 +23,7 @@ const signUpToQuotaMetrics = {
 // Fetch the dynamic routes in the setup function
 export function setup() {
   const eventsList = http.get("http://localhost:3000/api/events").json();
-  const eventRoutes = eventsList.map(
-    (event) => `http://localhost:3000/api/events/${event.slug}`
-  );
+  const eventRoutes = eventsList.map((event) => `http://localhost:3000/api/events/${event.slug}`);
 
   return {
     eventsList: "http://localhost:3000/api/events",
@@ -79,8 +77,7 @@ export function eventsList(data) {
 }
 
 export function individualEvents(data) {
-  let route =
-    data.eventRoutes[Math.floor(Math.random() * data.eventRoutes.length)];
+  let route = data.eventRoutes[Math.floor(Math.random() * data.eventRoutes.length)];
   let res = http.get(route);
 
   check(res, {

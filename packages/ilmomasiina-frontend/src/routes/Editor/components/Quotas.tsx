@@ -110,12 +110,13 @@ const Quotas = () => {
 
   const keys = useShallowMemo(quotas.map((item) => item.key));
   // Generate objects to be passed to Sortable.
+  // oxlint-disable react-hooks/exhaustive-deps -- see the dependency comment below
   const quotaItems = useMemo(
     () => mapFields((name, i) => ({ name, id: keys[i] })),
     // Actual quota data isn't included, so this list only invalidates when the question positions or count change.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [keys],
   );
+  // oxlint-enable react-hooks/exhaustive-deps
 
   return (
     <>

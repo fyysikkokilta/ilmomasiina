@@ -323,7 +323,6 @@ export async function fetchSignups(event: Event) {
   }
   await Promise.all(
     event.quotas.map(async (quota) => {
-      // eslint-disable-next-line no-param-reassign
       quota.signups = await quota.getSignups({
         include: [Answer],
       });

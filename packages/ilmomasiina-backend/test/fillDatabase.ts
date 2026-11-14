@@ -22,9 +22,7 @@ async function main() {
 
   for (let i = 0; i < NUM_EVENTS; i++) {
     process.stderr.write(`\rCreating test events: ${i + 1}/${NUM_EVENTS}...`);
-    // eslint-disable-next-line no-await-in-loop
     const event = await testEvent();
-    // eslint-disable-next-line no-await-in-loop
     await testSignups({
       event,
       count: faker.number.int(NUM_SIGNUPS_PER_EVENT),

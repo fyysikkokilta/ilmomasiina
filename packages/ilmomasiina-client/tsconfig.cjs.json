@@ -6,7 +6,5 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext"
   },
-  "references": [
-    { "path": "../ilmomasiina-models/tsconfig.cjs.json" }
-  ]
+  "references": [{ "path": "../ilmomasiina-models/tsconfig.cjs.json" }]
 }

@@ -6,7 +6,6 @@ import type { Model } from "sequelize";
 // are too much for Sequelize v6.
 
 /** Getter for JSON columns that deserializes string values. */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- unsafe, but hard to fix
 export const jsonColumnGetter = <T>(name: string) =>
   function getJsonColumn(this: Model): T {
     const json = this.getDataValue(name) as string | T;

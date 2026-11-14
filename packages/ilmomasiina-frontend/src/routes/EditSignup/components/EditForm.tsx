@@ -60,9 +60,8 @@ const Payment = ({ disabled, onPay }: PaymentProps) => {
       {alert}
       <Table>
         <tbody>
-          {signup!.products?.map((product, i) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <tr key={i}>
+          {signup!.products?.map((product) => (
+            <tr key={product.name}>
               <td className="ilmo--amount">{t("editSignup.payment.amount", { amount: product.amount })}</td>
               <td className="ilmo--product">{product.name}</td>
               <td className="ilmo--price">{formatPrice(product.unitPrice)}</td>

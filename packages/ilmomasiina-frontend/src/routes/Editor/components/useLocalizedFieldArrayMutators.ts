@@ -5,7 +5,7 @@ import { useForm } from "react-final-form";
 import { EditorEvent } from "../../../modules/editor/types";
 
 /** Wraps `final-form-arrays` mutators to update all languages simultaneously. */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- unsafe, but hard to fix
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- the caller chooses the value type
 export default function useLocalizedFieldArrayMutators<Val, Loc = Val>(baseName: string) {
   const form = useForm<EditorEvent>();
 

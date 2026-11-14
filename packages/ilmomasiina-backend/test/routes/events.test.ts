@@ -318,20 +318,20 @@ describe("GET /api/events", () => {
     await testEvent({ inPast: 8 * 30 }); // past default 6-month cutoff
 
     const [data] = await api.fetchUserEventList();
-    expect(data.map((e) => e.slug).sort()).toEqual([alwaysVisible.slug, defaultVisible.slug].sort());
+    expect(data.map((e) => e.slug).toSorted()).toEqual([alwaysVisible.slug, defaultVisible.slug].toSorted());
 
     const [data2] = await api.fetchUserEventList({ maxAge: 0 });
-    expect(data2.map((e) => e.slug).sort()).toEqual([alwaysVisible.slug].sort());
+    expect(data2.map((e) => e.slug).toSorted()).toEqual([alwaysVisible.slug].toSorted());
 
     const [data3] = await api.fetchUserEventList({ maxAge: 6 * 30 });
-    expect(data3.map((e) => e.slug).sort()).toEqual(
-      [alwaysVisible.slug, defaultVisible.slug, oldButVisible.slug].sort(),
+    expect(data3.map((e) => e.slug).toSorted()).toEqual(
+      [alwaysVisible.slug, defaultVisible.slug, oldButVisible.slug].toSorted(),
     );
 
     // ensure the 6-month cutoff can't be bypassed
     const [data4] = await api.fetchUserEventList({ maxAge: 12 * 30 });
-    expect(data4.map((e) => e.slug).sort()).toEqual(
-      [alwaysVisible.slug, defaultVisible.slug, oldButVisible.slug].sort(),
+    expect(data4.map((e) => e.slug).toSorted()).toEqual(
+      [alwaysVisible.slug, defaultVisible.slug, oldButVisible.slug].toSorted(),
     );
   });
 

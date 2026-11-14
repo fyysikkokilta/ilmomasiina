@@ -21,7 +21,7 @@ import { generateToken } from "../../src/routes/signups/editTokens";
 export type InjectResponse = Awaited<ReturnType<FastifyInstance["inject"]>>;
 
 /** Handles server errors from injected requests. */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- unsafe, but hard to fix
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- the caller chooses the value type
 export function handleTestResponse<R>(response: InjectResponse, ignore500 = false) {
   if (response.statusCode >= 500 && !ignore500) {
     throw new Error(`Request failed with status ${response.statusCode}: ${response.payload}`);

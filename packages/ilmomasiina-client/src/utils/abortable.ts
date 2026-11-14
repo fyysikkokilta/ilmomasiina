@@ -15,7 +15,7 @@ export function useAbortableEffect(effect: (signal: AbortSignal) => void, deps?:
     const [signal, abort] = abortable();
     effect(signal);
     return abort;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- deps are forwarded from the caller, like useEffect
   }, deps);
 }
 
@@ -92,7 +92,6 @@ export function useAbortablePromise<R>(effect: (signal: AbortSignal) => Promise<
         pending: true,
       });
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return state;
 }

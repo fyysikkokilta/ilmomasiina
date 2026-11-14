@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import { Alert, Button, Form as BsForm, Modal, Spinner } from "react-bootstrap";
 import { FieldInputProps, Form, FormRenderProps, useFormState } from "react-final-form";
@@ -98,13 +98,15 @@ const EditSignupModal = () => {
   const { editedSignup, saveSignup, signupEditCanceled } = useStore((state) => state.editor);
   const { values } = useFormState<EditorEvent>();
   const { t } = useTranslation();
+  // Placeholder creation time for the mock signup, fixed when the modal mounts.
+  const [mockCreatedAt] = useState(() => new Date().toISOString());
 
   // We will reuse components from the user signup form, so prepare a mock context.
   const editSignupCtx = useMemo((): EditSignupState | null => {
     if (!editedSignup) return null;
     const convertedEvent = editorEventToUserEvent(values);
     const signup = {
-      createdAt: new Date().toISOString(),
+      createdAt: mockCreatedAt,
       status: null,
       position: null,
       confirmed: false,
@@ -136,7 +138,7 @@ const EditSignupModal = () => {
       canEditNameAndEmail: true,
       canEditPaidQuestions: true,
     };
-  }, [values, editedSignup]);
+  }, [values, editedSignup, mockCreatedAt]);
 
   const initialValues = useMemo(() => editedSignup && signupToFormData(editedSignup), [editedSignup]);
 

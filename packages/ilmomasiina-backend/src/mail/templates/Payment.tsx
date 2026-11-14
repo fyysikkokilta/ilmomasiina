@@ -33,9 +33,8 @@ export default function Payment({ totalFormatted, products, event, signupLink }:
         <p className="bodyText">{t("emails.payment.purchaseDetails")}</p>
         <table>
           <tbody>
-            {products.map((product, index) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <tr key={index}>
+            {products.map((product) => (
+              <tr key={product.name}>
                 <td>{product.amount}&times;</td>
                 <td>{product.name}</td>
                 <td className="price">{product.unitPriceFormatted}</td>

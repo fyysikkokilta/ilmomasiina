@@ -9,10 +9,7 @@ export const RANDOM_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyz234567";
 export function generateRandomId() {
   // Could probably use Math.random() as well, but might as well make it secure.
   const bytes = randomBytes(RANDOM_ID_LENGTH);
-  return (
-    Array.from(bytes)
-      // eslint-disable-next-line no-bitwise
-      .map((b: number) => RANDOM_ID_ALPHABET[b & 31])
-      .join("")
-  );
+  return Array.from(bytes)
+    .map((b: number) => RANDOM_ID_ALPHABET[b & 31])
+    .join("");
 }

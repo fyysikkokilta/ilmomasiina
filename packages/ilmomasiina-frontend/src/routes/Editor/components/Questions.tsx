@@ -30,7 +30,11 @@ type CheckboxRenderProps = {
   input: Omit<FormCheckProps, "type">;
 };
 
-const renderCheck = ({ input, meta, ...props }: FieldRenderProps<boolean, HTMLInputElement> & CheckboxRenderProps) => (
+const renderCheck = ({
+  input,
+  meta: _meta,
+  ...props
+}: FieldRenderProps<boolean, HTMLInputElement> & CheckboxRenderProps) => (
   <Form.Check {...input} type="checkbox" {...props} />
 );
 
@@ -224,12 +228,13 @@ const Questions = () => {
 
   const keys = useShallowMemo(questions.map((item) => item.key));
   // Generate objects to be passed to Sortable.
+  // oxlint-disable react-hooks/exhaustive-deps -- see the dependency comment below
   const questionItems = useMemo(
     () => mapFields((name, i) => ({ name, id: keys[i] })),
     // Actual question data isn't included, so this list only invalidates when the question positions or count change.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [keys],
   );
+  // oxlint-enable react-hooks/exhaustive-deps
 
   return (
     <>

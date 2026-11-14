@@ -50,8 +50,7 @@ const SignupList = ({ isSingleQuota, quota }: Props) => {
                   index={i + 1}
                   signup={signup}
                   showQuota={showQuotas}
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={i}
+                  key={`${signup.quota.id}-${signup.createdAt}`}
                 />
               ))}
             </tbody>

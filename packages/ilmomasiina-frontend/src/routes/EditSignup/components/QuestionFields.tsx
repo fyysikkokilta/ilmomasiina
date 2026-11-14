@@ -97,8 +97,7 @@ const QuestionField = ({ name, question, validate = true }: QuestionFieldProps) 
     case QuestionType.CHECKBOX: {
       input = question.options?.map((option, optIndex) => (
         <Form.Check
-          // eslint-disable-next-line react/no-array-index-key
-          key={optIndex}
+          key={option}
           type="checkbox"
           id={`question-${question.id}-option-${optIndex}`}
           value={option}
@@ -142,8 +141,7 @@ const QuestionField = ({ name, question, validate = true }: QuestionFieldProps) 
               {t("editSignup.fields.select.placeholder")}
             </option>
             {question.options.map((option, optIndex) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <option key={optIndex} value={option}>
+              <option key={option} value={option}>
                 {option}
                 {formatOptionPrice(question.prices?.[optIndex])}
               </option>
@@ -153,8 +151,7 @@ const QuestionField = ({ name, question, validate = true }: QuestionFieldProps) 
       } else {
         input = question.options?.map((option, optIndex) => (
           <Form.Check
-            // eslint-disable-next-line react/no-array-index-key
-            key={optIndex}
+            key={option}
             type="radio"
             id={`question-${question.id}-option-${optIndex}`}
             inline

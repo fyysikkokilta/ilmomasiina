@@ -34,7 +34,7 @@ const AdminEventsList = () => {
   const shownEvents = useMemo(() => {
     const filtered = events?.filter((event) => isEventInPast(event) === showPast);
     // Additionally, reverse events when viewing past events, so the newest event comes first.
-    return showPast ? filtered?.reverse() : filtered;
+    return showPast ? filtered?.toReversed() : filtered;
   }, [events, showPast]);
 
   if (loadError) {
@@ -93,7 +93,6 @@ const AdminEventsList = () => {
               <td colSpan={5}>
                 <Trans t={t} i18nKey={showPast ? "adminEvents.noEvents.past" : "adminEvents.noEvents.upcoming"}>
                   No (type) events to show. Would you like to
-                  {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                   <a href="#" onClick={togglePast} role="button">
                     view (other type) events
                   </a>

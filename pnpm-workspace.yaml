@@ -1,5 +1,5 @@
 packages:
-- 'packages/*'
+  - "packages/*"
 # Replace or drop deprecated sub-dependencies whose parents have no newer release.
 overrides:
   "sequelize>uuid": ^11.1.1
@@ -9,5 +9,6 @@ minimumReleaseAge: 1440
 allowBuilds:
   "@parcel/watcher": false
   bcrypt: false
+  simple-git-hooks: false
   esbuild: false
   unrs-resolver: false

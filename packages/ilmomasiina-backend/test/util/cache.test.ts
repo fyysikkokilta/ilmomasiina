@@ -2,16 +2,17 @@ import { describe, expect, test, vi } from "vitest";
 
 import createCache from "../../src/util/cache";
 
+const increment = async (key: number) => key + 1;
+
 describe("createCache", () => {
   test("returns correct results", async () => {
-    const get = async (key: number) => key + 1;
-    const cache = createCache({ allowTesting: true, maxAgeMs: Infinity, get });
+    const cache = createCache({ allowTesting: true, maxAgeMs: Infinity, get: increment });
     expect(await cache(1)).toEqual(2);
     expect(await cache(39)).toEqual(40);
   });
 
   test("does not call get() unnecessarily", async () => {
-    const get = vi.fn(async (key: number) => key + 1);
+    const get = vi.fn<(key: number) => Promise<number>>(async (key: number) => key + 1);
     const cache = createCache({ allowTesting: true, maxAgeMs: Infinity, get });
 
     await cache(1);
@@ -26,7 +27,7 @@ describe("createCache", () => {
 
   test("respects maxAge", async () => {
     let add = 1;
-    const get = vi.fn(async (key: number) => key + add);
+    const get = vi.fn<(key: number) => Promise<number>>(async (key: number) => key + add);
     const cache = createCache({ allowTesting: true, maxAgeMs: 1000, get });
 
     vi.useFakeTimers();
@@ -47,7 +48,7 @@ describe("createCache", () => {
 
   test("respects maxSize", async () => {
     let add = 1;
-    const get = vi.fn(async (key: number) => key + add);
+    const get = vi.fn<(key: number) => Promise<number>>(async (key: number) => key + add);
     const cache = createCache({ allowTesting: true, maxAgeMs: Infinity, maxSize: 3, get });
 
     expect(await cache(1)).toEqual(2);
@@ -65,7 +66,7 @@ describe("createCache", () => {
 
   test("respects invalidate()", async () => {
     let add = 1;
-    const get = vi.fn(async (key: number) => key + add);
+    const get = vi.fn<(key: number) => Promise<number>>(async (key: number) => key + add);
     const cache = createCache({ allowTesting: true, maxAgeMs: Infinity, get });
 
     expect(await cache(1)).toEqual(2);

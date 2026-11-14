@@ -56,7 +56,7 @@ export function requireAdmin(session: AdminAuthSession, fastify: FastifyInstance
   fastify.addHook("onRequest", async (request: FastifyRequest, reply) => {
     try {
       // Validate session & decorate request with session data
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- the cast only drops readonly
+      // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- the cast drops readonly, which tsc needs
       (request.sessionData as AdminTokenData | undefined) = session.verifySession(request);
     } catch (err) {
       // Throwing inside hook is not safe, so the errors must be converted to actual reply here

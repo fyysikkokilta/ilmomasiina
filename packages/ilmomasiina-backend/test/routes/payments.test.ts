@@ -51,7 +51,7 @@ async function mockCheckoutSessionStatusUpdated(
   sessionId: Stripe.Checkout.Session["id"],
   status: Stripe.Checkout.Session.Status | null,
 ) {
-  const auditLog = vi.fn();
+  const auditLog = vi.fn<Parameters<typeof checkoutSessionStatusUpdated>[2]>();
   await checkoutSessionStatusUpdated(sessionId, status, auditLog, false);
   return auditLog;
 }
@@ -68,7 +68,6 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (mockStripeCheckoutSessionCreate) {
     // Default mock implementation for creating checkout sessions
     mockStripeCheckoutSessionCreate.mockImplementation(async () => createMockCheckoutSession());
@@ -1231,7 +1230,6 @@ describe("Stripe webhook", () => {
 
     const confirmationTimes = [new Date()];
     for (let i = 0; i < 4; i++) {
-      // eslint-disable-next-line no-await-in-loop
       const response = await api.stripeWebhook(JSON.stringify(mockEvent), "t=12345,v1=fakesignature");
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual({ received: true });
