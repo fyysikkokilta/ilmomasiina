@@ -1,5 +1,3 @@
-version: "3.2"
-
 # This compose file demonstrates how Ilmomasiina could be run in a production environment.
 
 # HOST_PORT sets the localhost port (default: 8000).
