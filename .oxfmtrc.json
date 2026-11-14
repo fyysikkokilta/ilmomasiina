@@ -2,7 +2,16 @@
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "printWidth": 120,
   "endOfLine": "lf",
-  "ignorePatterns": ["**/.git", "node_modules", "**/dist", "**/build", "**/coverage", ".env", "pnpm-lock.yaml"],
+  "ignorePatterns": [
+    "**/.git",
+    "node_modules",
+    "**/dist",
+    "**/build",
+    "**/coverage",
+    ".env",
+    "pnpm-lock.yaml",
+    "**/drizzle/**"
+  ],
   "sortImports": {
     "customGroups": [
       {

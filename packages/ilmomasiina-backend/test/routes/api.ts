@@ -173,7 +173,7 @@ export async function deleteSignupAsAdmin(signupId: string) {
 }
 
 export function stripeWebhook(body: string, signature: string | undefined) {
-  return server.inject({
+  return testServer().inject({
     method: "POST",
     url: `/api/stripe/webhook`,
     headers: {
