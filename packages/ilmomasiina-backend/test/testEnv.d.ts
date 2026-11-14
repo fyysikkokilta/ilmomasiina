@@ -1,15 +1,15 @@
 import { FastifyInstance } from "fastify";
-import { Sequelize } from "sequelize";
 import { Mock } from "vitest";
 
+import type { Db } from "../src/db";
 import EmailService from "../src/mail";
-import { User } from "../src/models/user";
+import type { User } from "../src/models/user";
 
 declare global {
   /** Set only for test files under test/routes. */
   var server: FastifyInstance | undefined;
   /** Set only for test files that need the database. */
-  var sequelize: Sequelize | undefined;
+  var db: Db | undefined;
   var emailSend: Mock<(typeof EmailService)["send"]>;
   var consoleLog: Mock<typeof console.log>;
   var consoleWarn: Mock<typeof console.warn>;

@@ -2,9 +2,7 @@ packages:
   - "packages/*"
 # Replace or drop deprecated sub-dependencies whose parents have no newer release.
 overrides:
-  "sequelize>uuid": ^11.1.1
   "react-widgets>@types/classnames": "-"
-  "umzug>@rushstack/ts-command-line": ^5.3.18
 minimumReleaseAge: 1440
 allowBuilds:
   "@parcel/watcher": false

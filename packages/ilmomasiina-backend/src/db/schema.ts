@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
-  char,
   check,
+  customType,
   foreignKey,
   index,
   integer,
@@ -29,7 +29,7 @@ import type { QuestionLanguage, QuotaLanguage } from "@tietokilta/ilmomasiina-mo
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
 
 // The table, column, constraint and enum names here match the schema created by the Sequelize
-// migrations of Ilmomasiina 2.x/3.0-alpha, so that existing databases keep working unchanged.
+// migrations of Ilmomasiina 2.x/3.0-alpha, so that existing databases keep working.
 
 interface EventPerLanguageAttributes {
   title: string;
@@ -46,7 +46,12 @@ export interface EventLanguage extends EventPerLanguageAttributes {
   questions: QuestionLanguage[];
 }
 
-const id = () => char({ length: RANDOM_ID_LENGTH });
+// IDs are stored as CHAR(12), which Postgres pads with spaces. IDs from old installations can be
+// shorter than that, so strip the padding when reading. Comparisons on CHAR columns ignore it anyway.
+const id = customType<{ data: string; driverData: string }>({
+  dataType: () => `char(${RANDOM_ID_LENGTH})`,
+  fromDriver: (value) => value.trimEnd(),
+});
 const date = () => timestamp({ withTimezone: true });
 
 /** `createdAt` and `updatedAt`, maintained by the application like Sequelize did. */
@@ -78,7 +83,7 @@ export const eventTable = pgTable("event", {
   date: date(),
   registrationStartDate: date(),
   registrationEndDate: date(),
-  openQuotaSize: integer().default(0),
+  openQuotaSize: integer().notNull().default(0),
   description: text(),
   price: varchar({ length: 255 }),
   location: varchar({ length: 255 }),
@@ -95,8 +100,7 @@ export const eventTable = pgTable("event", {
   ...softDelete,
   endDate: date(),
   languages: json().$type<Record<string, EventLanguage>>().notNull().default({}),
-  // Nullable in the database: rows created before the column was added have no value.
-  defaultLanguage: varchar({ length: 8 }),
+  defaultLanguage: varchar({ length: 8 }).notNull(),
   payments: paymentModeEnum().notNull().default(PaymentMode.DISABLED),
   preferredFrontend: varchar({ length: 255 }).notNull().default("default"),
 });
@@ -150,7 +154,7 @@ export const signupTable = pgTable(
     quotaId: id().notNull(),
     firstName: varchar({ length: 255 }),
     lastName: varchar({ length: 255 }),
-    namePublic: boolean().default(false),
+    namePublic: boolean().notNull().default(false),
     email: varchar({ length: 255 }),
     confirmedAt: date(),
     status: signupStatusEnum(),

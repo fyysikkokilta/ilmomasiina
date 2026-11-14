@@ -1,41 +1,41 @@
+import { and, count, inArray, sql } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { BadRequest } from "http-errors";
 import moment from "moment";
-import { Op, Order, WhereOptions } from "sequelize";
 
 import type { AdminEventListResponse, EventListQuery, UserEventListResponse } from "@tietokilta/ilmomasiina-models";
 import config from "../../config";
-import { adminEventListEventAttrs, eventListEventAttrs, eventListQuotaAttrs } from "../../models/attrs";
-import { Event } from "../../models/event";
-import { Quota } from "../../models/quota";
-import { Signup } from "../../models/signup";
-import { ascNullsFirst } from "../../models/util/ascNullsFirst";
+import { getDb } from "../../db";
+import { eventTable, signupTable } from "../../db/schema";
+import { adminEventListEventColumns, eventListEventColumns, eventListQuotaColumns } from "../../models/attrs";
+import { userEventFilter } from "../../models/event";
+import type { Quota } from "../../models/quota";
+import { activeSignupCondition } from "../../models/signup";
 import createCache from "../../util/cache";
 import { InitialSetupNeeded, isInitialSetupDone } from "../admin/users/createInitialUser";
 import { asApiResponse } from "../utils";
 
-async function withSignupCounts(events: Event[]) {
-  const quotaIds = events.flatMap((event) => event.quotas!.map((quota) => quota.id));
-  const counts = await Signup.scope("active").count({ where: { quotaId: quotaIds }, group: ["quotaId"] });
-  const signupCounts = new Map(counts.map(({ quotaId, count }) => [quotaId, count]));
-  return events.map((event) => ({
-    ...event.get({ plain: true }),
-    quotas: event.quotas!.map((quota) => ({
-      ...quota.get({ plain: true }),
-      signupCount: signupCounts.get(quota.id) ?? 0,
-    })),
-  }));
+/** Counts the active signups in each quota of the given events. */
+async function countSignups(events: { quotas: Pick<Quota, "id">[] }[]) {
+  const quotaIds = events.flatMap((event) => event.quotas.map((quota) => quota.id));
+  if (!quotaIds.length) return new Map<Quota["id"], number>();
+  const counts = await getDb()
+    .select({ quotaId: signupTable.quotaId, count: count() })
+    .from(signupTable)
+    .where(and(activeSignupCondition(), inArray(signupTable.quotaId, quotaIds)))
+    .groupBy(signupTable.quotaId);
+  return new Map(counts.map((row) => [row.quotaId, row.count]));
 }
 
-function eventOrder(): Order {
-  return [
-    // events without signup (date=NULL) come first
-    ["date", ascNullsFirst()],
-    ["registrationEndDate", "ASC"],
-    ["title", "ASC"],
-    [Quota, "order", "ASC"],
-  ];
-}
+/** Sorts events for the event lists. */
+const eventOrder = (event: typeof eventTable) => [
+  // events without signup (date=NULL) come first
+  sql`${event.date} ASC NULLS FIRST`,
+  sql`${event.registrationEndDate} ASC`,
+  sql`${event.title} ASC`,
+];
+
+const quotasInOrder = { columns: eventListQuotaColumns, orderBy: { order: "asc" } } as const;
 
 type EventsListArgs = { category?: string; maxAge?: number };
 
@@ -45,33 +45,37 @@ export const eventsListForUserCached = createCache({
   logName: "eventsListForUserCached",
   formatKey: ({ category, maxAge = config.notShowEventAfterDays }: EventsListArgs) => `${category} ${maxAge}`,
   async get({ category, maxAge = config.notShowEventAfterDays }: EventsListArgs) {
-    const where: WhereOptions & unknown[] = [{ listed: true }];
-
-    if (category) {
-      where.push({ category });
-    }
-
     if (!Number.isFinite(maxAge) || maxAge < 0) throw new BadRequest("invalid maxAge");
     const since = moment().subtract(Math.round(maxAge), "days").toDate();
-    where.push({
-      [Op.or]: {
-        // closed recently enough
-        registrationEndDate: { [Op.gt]: since },
-        // or happened recently enough
-        date: { [Op.gt]: since },
-        endDate: { [Op.gt]: since },
+
+    const events = await getDb().query.event.findMany({
+      columns: eventListEventColumns,
+      where: {
+        AND: [
+          userEventFilter(),
+          { listed: true },
+          category ? { category } : {},
+          {
+            OR: [
+              // closed recently enough
+              { registrationEndDate: { gt: since } },
+              // or happened recently enough
+              { date: { gt: since } },
+              { endDate: { gt: since } },
+            ],
+          },
+        ],
       },
-    });
-
-    const events = await Event.scope("user").findAll({
-      attributes: eventListEventAttrs,
-      where,
       // Include quotas of event and count of signups
-      include: [{ model: Quota, attributes: eventListQuotaAttrs }],
-      order: eventOrder(),
+      with: { quotas: quotasInOrder },
+      orderBy: eventOrder,
     });
 
-    return withSignupCounts(events);
+    const signupCounts = await countSignups(events);
+    return events.map((event) => ({
+      ...event,
+      quotas: event.quotas.map((quota) => ({ ...quota, signupCount: signupCounts.get(quota.id) ?? 0 })),
+    }));
   },
 });
 
@@ -94,15 +98,20 @@ export async function getEventsListForAdmin(
   reply: FastifyReply,
 ): Promise<AdminEventListResponse> {
   // Admin view also shows id, draft and listed fields.
+  const { category } = request.query;
 
-  const events = await Event.findAll({
-    attributes: adminEventListEventAttrs,
-    where: request.query,
-    include: [{ model: Quota, attributes: eventListQuotaAttrs }],
-    order: eventOrder(),
+  const events = await getDb().query.event.findMany({
+    columns: adminEventListEventColumns,
+    where: { deletedAt: { isNull: true }, ...(category ? { category } : {}) },
+    with: { quotas: quotasInOrder },
+    orderBy: eventOrder,
   });
 
-  const res = await withSignupCounts(events);
+  const signupCounts = await countSignups(events);
+  const res = events.map((event) => ({
+    ...event,
+    quotas: event.quotas.map((quota) => ({ ...quota, signupCount: signupCounts.get(quota.id) ?? 0 })),
+  }));
 
   reply.status(200);
   return asApiResponse(res);

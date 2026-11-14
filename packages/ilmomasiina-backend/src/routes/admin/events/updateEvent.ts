@@ -1,6 +1,7 @@
+import { and, eq, isNull, notInArray } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { NotFound } from "http-errors";
-import { Op, Transaction } from "sequelize";
+import { isUndefined, omitBy } from "lodash";
 
 import type {
   AdminEventPathParams,
@@ -10,11 +11,11 @@ import type {
   WouldMoveSignupsToQueueError,
 } from "@tietokilta/ilmomasiina-models";
 import { AuditEvent } from "@tietokilta/ilmomasiina-models";
-import { getSequelize } from "../../../models";
-import { convertSequelizeValidationErrors } from "../../../models/errors";
-import { Event } from "../../../models/event";
-import { Question } from "../../../models/question";
-import { Quota } from "../../../models/quota";
+import { getDb } from "../../../db";
+import { eventTable, questionTable, quotaTable } from "../../../db/schema";
+import { convertEventDatabaseErrors } from "../../../models/errors";
+import { Event, validateEvent, validateLanguages } from "../../../models/event";
+import { normalizeOptions, validateQuestion } from "../../../models/question";
 import { basicEventInfoCached, eventDetailsForAdmin, eventDetailsForUserCached } from "../../events/getEventDetails";
 import { eventsListForUserCached } from "../../events/getEventsList";
 import { refreshSignupPositions } from "../../signups/computeSignupPosition";
@@ -28,41 +29,48 @@ export default async function updateEvent(
   }>,
   response: FastifyReply,
 ): Promise<AdminEventResponse | EditConflictError | WouldMoveSignupsToQueueError> {
+  const {
+    quotas: bodyQuotas,
+    questions: bodyQuestions,
+    moveSignupsToQueue,
+    updatedAt: bodyUpdatedAt,
+    ...attrs
+  } = request.body;
+
   try {
-    await getSequelize().transaction(async (transaction) => {
+    await getDb().transaction(async (transaction) => {
       // Get the event with all relevant information for the update
-      const event = await Event.findByPk(request.params.id, {
-        transaction,
-        lock: Transaction.LOCK.UPDATE,
-      });
-      if (event === null) {
+      const [event] = await transaction
+        .select()
+        .from(eventTable)
+        .where(and(eq(eventTable.id, request.params.id), isNull(eventTable.deletedAt)))
+        .for("update");
+      if (!(event as Event | undefined)) {
         throw new NotFound("No event found with id");
       }
       // Postgres doesn't support FOR UPDATE with LEFT JOIN
-      event.quotas = await Quota.findAll({
-        where: { eventId: event.id },
-        attributes: ["id"],
-        transaction,
-        lock: Transaction.LOCK.UPDATE,
-      });
-      event.questions = await Question.findAll({
-        where: { eventId: event.id },
-        attributes: ["id"],
-        transaction,
-        lock: Transaction.LOCK.UPDATE,
-      });
+      const oldQuotas = await transaction
+        .select({ id: quotaTable.id, title: quotaTable.title, size: quotaTable.size, price: quotaTable.price })
+        .from(quotaTable)
+        .where(and(eq(quotaTable.eventId, event.id), isNull(quotaTable.deletedAt)))
+        .for("update");
+      const oldQuestions = await transaction
+        .select()
+        .from(questionTable)
+        .where(and(eq(questionTable.eventId, event.id), isNull(questionTable.deletedAt)))
+        .for("update");
 
       // Find existing questions and quotas for requested IDs, and add order fields
-      const updatedQuestions = request.body.questions?.map((question, order) => ({
+      const updatedQuestions = bodyQuestions?.map((question, order) => ({
         ...question,
-        ...Question.normalizeOptions(question),
+        ...normalizeOptions(question),
         order,
-        existing: question.id ? event.questions!.find((old) => question.id === old.id) : undefined,
+        existing: question.id ? oldQuestions.find((old) => question.id === old.id) : undefined,
       }));
-      const updatedQuotas = request.body.quotas?.map((quota, order) => ({
+      const updatedQuotas = bodyQuotas?.map((quota, order) => ({
         ...quota,
         order,
-        existing: quota.id ? event.quotas!.find((old) => quota.id === old.id) : undefined,
+        existing: quota.id ? oldQuotas.find((old) => quota.id === old.id) : undefined,
       }));
 
       // Find questions and quotas that were requested by ID but don't exist
@@ -72,7 +80,7 @@ export default async function updateEvent(
         updatedQuotas?.filter((quota) => !quota.existing && quota.id).map((quota) => quota.id!) ?? [];
 
       // Check for edit conflicts
-      const expectedUpdatedAt = new Date(request.body.updatedAt ?? "");
+      const expectedUpdatedAt = new Date(bodyUpdatedAt ?? "");
       if (
         event.updatedAt.getTime() !== expectedUpdatedAt.getTime() ||
         deletedQuestions.length ||
@@ -81,86 +89,99 @@ export default async function updateEvent(
         throw new EditConflict(event.updatedAt, deletedQuotas, deletedQuestions);
       }
 
-      // Update the Event
+      // Update the Event. Fields missing from the request are left unchanged.
       const wasPublic = !event.draft;
-      event.set({
-        ...request.body,
-        registrationEndDate: toDate(request.body.registrationEndDate),
-        registrationStartDate: toDate(request.body.registrationStartDate),
-        date: toDate(request.body.date),
-        endDate: toDate(request.body.endDate),
-      });
-      // Validate and fixup data within languages. This uses event.languages and is thus done after set()
-      event.validateLanguages(updatedQuestions ?? event.questions, updatedQuotas ?? event.quotas);
+      const changes = omitBy(
+        {
+          ...attrs,
+          registrationEndDate: toDate(attrs.registrationEndDate),
+          registrationStartDate: toDate(attrs.registrationStartDate),
+          date: toDate(attrs.date),
+          endDate: toDate(attrs.endDate),
+        },
+        isUndefined,
+      );
+      const updated: Event = { ...event, ...changes };
 
-      await event.save({ transaction });
+      validateEvent(updated);
+      updatedQuestions?.forEach(validateQuestion);
+      // Validate and fixup data within languages.
+      validateLanguages(updated.languages, updatedQuestions ?? oldQuestions, updatedQuotas ?? oldQuotas);
+
+      // Always written, so that updatedAt changes with every save.
+      await transaction
+        .update(eventTable)
+        .set({ ...changes, languages: updated.languages })
+        .where(eq(eventTable.id, event.id));
 
       if (updatedQuestions !== undefined) {
-        const reuseQuestionIds = updatedQuestions
-          .map((question) => question.id)
-          .filter((questionId): questionId is Question["id"] => Boolean(questionId));
+        const reuseQuestionIds = updatedQuestions.flatMap((question) =>
+          question.existing ? [question.existing.id] : [],
+        );
 
         // Remove previous Questions not present in request
-        await Question.destroy({
-          where: {
-            eventId: event.id,
-            id: { [Op.notIn]: reuseQuestionIds },
-          },
-          transaction,
-        });
+        await transaction
+          .update(questionTable)
+          .set({ deletedAt: new Date() })
+          .where(
+            and(
+              eq(questionTable.eventId, event.id),
+              isNull(questionTable.deletedAt),
+              reuseQuestionIds.length ? notInArray(questionTable.id, reuseQuestionIds) : undefined,
+            ),
+          );
 
         // Update or create the new Questions
-        await Promise.all(
-          updatedQuestions.map(async (question) => {
-            // Update if an id was provided
-            if (question.existing) {
-              await question.existing.update(question, { transaction });
-            } else {
-              await Question.create({ ...question, eventId: event.id }, { transaction });
-            }
-          }),
-        );
+        for (const { existing, id: _id, ...question } of updatedQuestions) {
+          if (existing) {
+            // oxlint-disable-next-line no-await-in-loop -- queries in a transaction share a connection and run in sequence
+            await transaction.update(questionTable).set(question).where(eq(questionTable.id, existing.id));
+          } else {
+            // oxlint-disable-next-line no-await-in-loop -- queries in a transaction share a connection and run in sequence
+            await transaction.insert(questionTable).values({ ...question, eventId: event.id });
+          }
+        }
       }
 
       if (updatedQuotas !== undefined) {
-        const reuseQuotaIds = updatedQuotas
-          .map((quota) => quota.id)
-          .filter((quotaId): quotaId is Quota["id"] => Boolean(quotaId));
+        const reuseQuotaIds = updatedQuotas.flatMap((quota) => (quota.existing ? [quota.existing.id] : []));
 
         // Remove previous Quotas not present in request
-        await Quota.destroy({
-          where: {
-            eventId: event.id,
-            id: { [Op.notIn]: reuseQuotaIds },
-          },
-          transaction,
-        });
+        await transaction
+          .update(quotaTable)
+          .set({ deletedAt: new Date() })
+          .where(
+            and(
+              eq(quotaTable.eventId, event.id),
+              isNull(quotaTable.deletedAt),
+              reuseQuotaIds.length ? notInArray(quotaTable.id, reuseQuotaIds) : undefined,
+            ),
+          );
 
         // Update or create the new Quotas
-        await Promise.all(
-          updatedQuotas.map(async (quota) => {
-            // Update if an id was provided
-            if (quota.existing) {
-              await quota.existing.update(quota, { transaction });
-            } else {
-              await Quota.create({ ...quota, eventId: event.id }, { transaction });
-            }
-          }),
-        );
+        for (const { existing, id: _id, ...quota } of updatedQuotas) {
+          if (existing) {
+            // oxlint-disable-next-line no-await-in-loop -- queries in a transaction share a connection and run in sequence
+            await transaction.update(quotaTable).set(quota).where(eq(quotaTable.id, existing.id));
+          } else {
+            // oxlint-disable-next-line no-await-in-loop -- queries in a transaction share a connection and run in sequence
+            await transaction.insert(quotaTable).values({ ...quota, eventId: event.id });
+          }
+        }
       }
 
       // Refresh positions, but don't move signups to queue unless explicitly allowed
-      await refreshSignupPositions(event, transaction, request.body.moveSignupsToQueue);
+      await refreshSignupPositions(updated, transaction, moveSignupsToQueue);
 
-      const isPublic = !event.draft;
+      const isPublic = !updated.draft;
       let action: AuditEvent;
       if (isPublic === wasPublic) action = AuditEvent.EDIT_EVENT;
       else action = isPublic ? AuditEvent.PUBLISH_EVENT : AuditEvent.UNPUBLISH_EVENT;
 
-      await request.logEvent(action, { event, transaction });
+      await request.logEvent(action, { event: updated, transaction });
     });
   } catch (error) {
-    throw convertSequelizeValidationErrors(error);
+    throw convertEventDatabaseErrors(error);
   }
 
   eventsListForUserCached.invalidate();

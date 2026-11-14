@@ -1,6 +1,5 @@
 import { maxBy } from "lodash";
 import moment from "moment";
-import { Op } from "sequelize";
 import { Stripe } from "stripe";
 import { testEvent, testSignups } from "test/testData";
 import { afterEach, beforeAll, beforeEach, describe, expect, Mock, test, vi } from "vitest";
@@ -16,12 +15,12 @@ import {
 } from "@tietokilta/ilmomasiina-models";
 import config from "../../src/config";
 import { FrontendsConfig } from "../../src/configSchemas";
-import { Answer } from "../../src/models/answer";
-import { Payment } from "../../src/models/payment";
-import { Question } from "../../src/models/question";
-import { Signup } from "../../src/models/signup";
+import { getDb } from "../../src/db";
+import { eventTable, paymentTable, questionTable, quotaTable, signupTable } from "../../src/db/schema";
+import type { Signup } from "../../src/models/signup";
 import { checkoutSessionStatusUpdated, expirePaymentForSignupUpdate, getStripe } from "../../src/routes/payment/stripe";
 import { refreshSignupPositions } from "../../src/routes/signups/computeSignupPosition";
+import { findActivePayment, findPayment, findPayments, reloadRow, reloadSignupWithAnswers, updateRow } from "../db";
 import * as api from "./api";
 
 // Mock Stripe API methods
@@ -116,30 +115,34 @@ async function defaultTestEventAndSignup() {
     count: 1,
     confirmed: true,
     overrides: { namePublic: false, language: "en" },
-    answers: { [event.questions![0].id]: "Option A" },
+    answers: { [event.questions[0].id]: "Option A" },
   });
   // Refresh positions to ensure signup has a valid status (required for queue validation)
   await refreshSignupPositions(event);
-  await signup.reload();
+  await reloadRow(signupTable, signup);
   return { event, signup };
 }
 
 /** Directly creates a payment in the database, granting more control than startPayment() */
-function createMockPayment(
+async function createMockPayment(
   signup: Signup,
   status: PaymentStatus = PaymentStatus.PENDING,
   session?: MockCheckoutSession,
 ) {
-  return Payment.create({
-    signupId: signup.id,
-    amount: signup.price!,
-    currency: signup.currency!,
-    products: signup.products!,
-    expiresAt: moment().add(1, "hour").toDate(),
-    status,
-    stripeCheckoutSessionId: session?.id,
-    completedAt: status === PaymentStatus.PAID || status === PaymentStatus.REFUNDED ? new Date() : null,
-  });
+  const [payment] = await getDb()
+    .insert(paymentTable)
+    .values({
+      signupId: signup.id,
+      amount: signup.price!,
+      currency: signup.currency!,
+      products: signup.products!,
+      expiresAt: moment().add(1, "hour").toDate(),
+      status,
+      stripeCheckoutSessionId: session?.id,
+      completedAt: status === PaymentStatus.PAID || status === PaymentStatus.REFUNDED ? new Date() : null,
+    })
+    .returning();
+  return payment;
 }
 
 describe("startPayment", () => {
@@ -151,7 +154,7 @@ describe("startPayment", () => {
     expect(data.paymentUrl).toEqual(expect.stringContaining("https://checkout.stripe.test/pay/"));
 
     // Verify payment was created in database
-    const payment = await signup.getActivePayment();
+    const payment = await findActivePayment(signup.id);
     expect(payment).toBeTruthy();
     expect(payment!.status).toBe(PaymentStatus.PENDING);
 
@@ -187,7 +190,7 @@ describe("startPayment", () => {
     expect(data2.paymentUrl).toBe(data.paymentUrl);
 
     // Verify only one payment exists
-    expect(await Payment.count({ where: { signupId: signup.id } })).toBe(1);
+    expect(await findPayments([signup.id])).toHaveLength(1);
     expect(mockStripeCheckoutSessionCreate).toHaveBeenCalledOnce();
     expect(mockStripeCheckoutSessionExpire).not.toHaveBeenCalled();
   });
@@ -200,7 +203,7 @@ describe("startPayment", () => {
     expect(response.statusCode).toBe(200);
 
     // Make the payment expired in Stripe
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     const session = mockCheckoutSessions.get(payment!.stripeCheckoutSessionId!);
     session!.status = "expired";
 
@@ -210,7 +213,7 @@ describe("startPayment", () => {
     expect(data2.paymentUrl).not.toBe(data.paymentUrl);
 
     // Verify two payments exist, first marked as EXPIRED
-    const payments = await Payment.findAll({ where: { signupId: signup.id }, order: [["createdAt", "ASC"]] });
+    const payments = await findPayments([signup.id]);
     expect(payments).toHaveLength(2);
     expect(payments[0].status).toBe(PaymentStatus.EXPIRED);
     expect(payments[1].status).toBe(PaymentStatus.PENDING);
@@ -227,7 +230,7 @@ describe("startPayment", () => {
     expect(response.statusCode).toBe(200);
 
     // Make the payment expired in Stripe
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     const session = mockCheckoutSessions.get(payment!.stripeCheckoutSessionId!);
     session!.status = "complete";
 
@@ -281,7 +284,7 @@ describe("startPayment", () => {
     expect(response.statusCode).toBe(200);
 
     // Verify payment was created in database
-    const payment = await signup.getActivePayment();
+    const payment = await findActivePayment(signup.id);
     expect(payment).toBeTruthy();
     expect(payment!.status).toBe(PaymentStatus.PENDING);
 
@@ -296,7 +299,7 @@ describe("startPayment", () => {
     const result = await api.startPayment(signup.id);
     expect(result).toBeApiError(400, ErrorCode.SIGNUP_NOT_CONFIRMED);
 
-    expect(await Payment.findOne({ where: { signupId: signup.id } })).toBeNull();
+    expect(await findPayment(signup.id)).toBeNull();
     expect(mockStripeCheckoutSessionCreate).not.toHaveBeenCalled();
   });
 
@@ -315,15 +318,15 @@ describe("startPayment", () => {
       },
       { payments: PaymentMode.ONLINE, nameQuestion: true, emailQuestion: true },
     );
-    await event.quotas![1].update({ price: 1000 }); // Make only one quota paid
+    await updateRow(quotaTable, event.quotas[1], { price: 1000 }); // Make only one quota paid
 
     // Create a free signup
     const [signup] = await testSignups({
       event,
       count: 1,
       confirmed: true,
-      overrides: { quotaId: event.quotas![0].id },
-      answers: { [event.questions![0].id]: "Free Option" },
+      overrides: { quotaId: event.quotas[0].id },
+      answers: { [event.questions[0].id]: "Free Option" },
     });
     expect(signup.price).toBe(0);
 
@@ -331,7 +334,7 @@ describe("startPayment", () => {
     const result = await api.startPayment(signup.id);
     expect(result).toBeApiError(400, ErrorCode.PAYMENT_NOT_REQUIRED);
 
-    expect(await Payment.findOne({ where: { signupId: signup.id } })).toBeNull();
+    expect(await findPayment(signup.id)).toBeNull();
     expect(mockStripeCheckoutSessionCreate).not.toHaveBeenCalled();
   });
 
@@ -339,16 +342,16 @@ describe("startPayment", () => {
     const { event, signup } = await defaultTestEventAndSignup();
 
     // Attempt to start payment in manual mode - should fail
-    await event.update({ payments: PaymentMode.MANUAL });
+    await updateRow(eventTable, event, { payments: PaymentMode.MANUAL });
     let result = await api.startPayment(signup.id);
     expect(result).toBeApiError(400, ErrorCode.ONLINE_PAYMENTS_DISABLED);
 
     // Attempt to start payment in non-payment mode - should fail
-    await event.update({ payments: PaymentMode.DISABLED });
+    await updateRow(eventTable, event, { payments: PaymentMode.DISABLED });
     result = await api.startPayment(signup.id);
     expect(result).toBeApiError(400, ErrorCode.ONLINE_PAYMENTS_DISABLED);
 
-    expect(await Payment.findOne({ where: { signupId: signup.id } })).toBeNull();
+    expect(await findPayment(signup.id)).toBeNull();
     expect(mockStripeCheckoutSessionCreate).not.toHaveBeenCalled();
   });
 
@@ -365,7 +368,7 @@ describe("startPayment", () => {
 
     // Refresh positions to assign statuses
     await refreshSignupPositions(event);
-    await queuedSignup.reload();
+    await reloadRow(signupTable, queuedSignup);
     expect(queuedSignup.status).toBe(SignupStatus.IN_QUEUE);
 
     // Attempt to start payment for queued signup - should fail
@@ -373,7 +376,7 @@ describe("startPayment", () => {
     expect(result).toBeApiError(400, ErrorCode.SIGNUP_IN_QUEUE);
 
     // Verify no payment was created
-    expect(await Payment.findOne({ where: { signupId: queuedSignup.id } })).toBeNull();
+    expect(await findPayment(queuedSignup.id)).toBeNull();
     expect(mockStripeCheckoutSessionCreate).not.toHaveBeenCalled();
   });
 
@@ -381,14 +384,14 @@ describe("startPayment", () => {
     const { signup } = await defaultTestEventAndSignup();
 
     // Manually set status to null to simulate edge case (startPayment called during/before position recomputation)
-    await signup.update({ status: null });
+    await updateRow(signupTable, signup, { status: null });
 
     // Attempt to start payment - should fail
     const result = await api.startPayment(signup.id);
     expect(result).toBeApiError(400, ErrorCode.SIGNUP_IN_QUEUE);
 
     // Verify no payment was created
-    expect(await Payment.findOne({ where: { signupId: signup.id } })).toBeNull();
+    expect(await findPayment(signup.id)).toBeNull();
     expect(mockStripeCheckoutSessionCreate).not.toHaveBeenCalled();
   });
 
@@ -407,7 +410,7 @@ describe("startPayment", () => {
     expect(result).toBeApiError(500);
 
     // Verify payment was marked as CREATION_FAILED
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     expect(payment!.status).toBe(PaymentStatus.CREATION_FAILED);
   });
 
@@ -423,7 +426,7 @@ describe("startPayment", () => {
     expect(result).toBeApiError(429, ErrorCode.PAYMENT_RATE_LIMITED);
 
     // Verify payment was marked as CREATION_FAILED
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     expect(payment!.status).toBe(PaymentStatus.CREATION_FAILED);
   });
 
@@ -442,7 +445,7 @@ describe("startPayment", () => {
     expect(results.every(([, response]) => response.statusCode === 200)).toBe(true);
 
     // Verify payments were created
-    const payments = await Payment.findAll({ where: { signupId: { [Op.in]: signups.map((s) => s.id) } } });
+    const payments = await findPayments(signups.map((s) => s.id));
     expect(payments).toHaveLength(signups.length);
     expect(new Set(payments.map((p) => p.signupId))).toEqual(new Set(signups.map((s) => s.id)));
     expect(payments.map((p) => p.status)).toEqual(signups.map(() => PaymentStatus.PENDING));
@@ -458,18 +461,18 @@ describe("payment and signup update locking", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Update signup
     const [, response] = await api.updateSignupAsUser(signup.id, {
       firstName: "Changed!",
       // Also change price/products
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
     expect(response.statusCode).toBe(200);
 
     // Verify the payment was expired
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.EXPIRED);
     expect(mockStripeCheckoutSessionExpire).toHaveBeenCalledExactlyOnceWith(payment!.stripeCheckoutSessionId!);
   });
@@ -479,18 +482,18 @@ describe("payment and signup update locking", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Admin update should succeed and expire the payment
     const [data, response] = await api.updateSignupAsAdmin(signup.id, {
       firstName: "AdminChanged!",
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
     expect(response.statusCode).toBe(200);
     expect(data.firstName).toBe("AdminChanged!");
 
     // Verify the payment was expired
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.EXPIRED);
     expect(mockStripeCheckoutSessionExpire).toHaveBeenCalledExactlyOnceWith(payment!.stripeCheckoutSessionId!);
   });
@@ -500,14 +503,14 @@ describe("payment and signup update locking", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Delete signup
     const [, response] = await api.deleteSignupAsUser(signup.id);
     expect(response.statusCode).toBe(204);
 
     // Verify the payment was expired
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.EXPIRED);
     expect(mockStripeCheckoutSessionExpire).toHaveBeenCalledExactlyOnceWith(payment!.stripeCheckoutSessionId!);
   });
@@ -517,14 +520,14 @@ describe("payment and signup update locking", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Admin delete signup
     const [, response] = await api.deleteSignupAsAdmin(signup.id);
     expect(response.statusCode).toBe(204);
 
     // Verify the payment was expired
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.EXPIRED);
     expect(mockStripeCheckoutSessionExpire).toHaveBeenCalledExactlyOnceWith(payment!.stripeCheckoutSessionId!);
   });
@@ -535,38 +538,41 @@ describe("payment and signup update locking", () => {
     const originalProducts = signup.products;
 
     // Add a question without prices
-    const newQuestion = await Question.create({
-      eventId: event.id,
-      question: "New question",
-      type: QuestionType.SELECT,
-      options: ["Option 1", "Option 2"],
-      prices: null,
-      required: true,
-      order: 1,
-    });
+    const [newQuestion] = await getDb()
+      .insert(questionTable)
+      .values({
+        eventId: event.id,
+        question: "New question",
+        type: QuestionType.SELECT,
+        options: ["Option 1", "Option 2"],
+        prices: null,
+        required: true,
+        order: 1,
+      })
+      .returning();
 
     // Create a payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     // Mark payment as PAID via webhook simulation
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
 
     // Update signup without changing price - should succeed
-    await signup.reload({ include: [Answer] });
+    await reloadSignupWithAnswers(signup);
     const [, response] = await api.updateSignupAsUser(signup.id, {
       namePublic: true,
       // Make changes to answers too, but don't change the existing paid one
       answers: [
-        { questionId: event.questions![0].id, answer: "Option A" },
+        { questionId: event.questions[0].id, answer: "Option A" },
         { questionId: newQuestion.id, answer: "Option 2" },
       ],
     });
     expect(response.statusCode).toBe(200);
 
     // Verify signup was changed
-    await signup.reload({ include: [Answer] });
+    await reloadSignupWithAnswers(signup);
     expect(signup.namePublic).toBe(true);
     expect(signup.answers!.map((ans) => ans.answer)).toContain("Option A");
     expect(signup.answers!.map((ans) => ans.answer)).toContain("Option 2");
@@ -575,7 +581,7 @@ describe("payment and signup update locking", () => {
     expect(signup.products).toEqual(originalProducts);
 
     // Payment status should remain PAID
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
   });
 
@@ -594,12 +600,12 @@ describe("payment and signup update locking", () => {
     // No active payment exists, so changing the price should be allowed
     const [, response] = await api.updateSignupAsUser(signup.id, {
       namePublic: true,
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
     expect(response.statusCode).toBe(200);
 
     // Verify answer and price was changed
-    await signup.reload({ include: [Answer] });
+    await reloadSignupWithAnswers(signup);
     expect(signup.answers![0].answer).toBe("Option B");
     expect(signup.price).not.toBe(originalPrice);
     expect(signup.products).not.toEqual(originalProducts);
@@ -612,25 +618,25 @@ describe("payment and signup update locking", () => {
 
     // Create and pay for initial signup
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
 
     // Attempt to change answer to different price option - should fail
     const result = await api.updateSignupAsUser(signup.id, {
       namePublic: true,
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
     expect(result).toBeApiError(400, ErrorCode.SIGNUP_ALREADY_PAID);
 
     // Verify answer was not changed
-    await signup.reload({ include: [Answer] });
+    await reloadSignupWithAnswers(signup);
     expect(signup.namePublic).toBe(false);
     expect(signup.answers![0].answer).toBe("Option A");
     expect(signup.price).toBe(originalPrice);
     expect(signup.products).toEqual(originalProducts);
 
     // Payment status should remain PAID
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
   });
 
@@ -639,32 +645,32 @@ describe("payment and signup update locking", () => {
 
     // Create a payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     // Mark payment as PAID via webhook simulation
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
 
     // Verify user update is blocked when price changes
     const userResult = await api.updateSignupAsUser(signup.id, {
       namePublic: true,
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
     expect(userResult).toBeApiError(400, ErrorCode.SIGNUP_ALREADY_PAID);
 
     // Admin update should succeed even when changing price-related answers
     const [data, response] = await api.updateSignupAsAdmin(signup.id, {
       firstName: "AdminChanged!",
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
     expect(response.statusCode).toBe(200);
     expect(data.firstName).toBe("AdminChanged!");
     expect(data.paymentStatus).toBe(SignupPaymentStatus.PAID);
 
     // Verify signup was changed including price
-    await signup.reload();
+    await reloadRow(signupTable, signup);
     expect(signup.firstName).toBe("AdminChanged!");
 
     // Payment status should remain PAID
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
   });
 
@@ -673,11 +679,11 @@ describe("payment and signup update locking", () => {
 
     // Create a payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mark payment as PAID via webhook simulation
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
 
     // Attempt to delete signup - should fail
@@ -685,7 +691,7 @@ describe("payment and signup update locking", () => {
     expect(result).toBeApiError(400, ErrorCode.SIGNUP_ALREADY_PAID);
 
     // Will fail if deleted or soft deleted
-    await signup.reload();
+    await reloadRow(signupTable, signup);
   });
 
   test("admin can delete signups even when PAID payment exists", async () => {
@@ -693,11 +699,11 @@ describe("payment and signup update locking", () => {
 
     // Create a payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mark payment as PAID via webhook simulation
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
 
     // Admin CAN now delete paid signups (soft delete)
@@ -705,7 +711,7 @@ describe("payment and signup update locking", () => {
     expect(response.statusCode).toBe(204);
 
     // Verify it was soft-deleted
-    await signup.reload();
+    await reloadRow(signupTable, signup);
     expect(signup.deletedAt).toBeTruthy();
   });
 
@@ -726,18 +732,18 @@ describe("payment and signup update locking", () => {
     await stripeMockRequest.promise; // Wait until Stripe create is called
 
     // Verify payment exists in CREATING state
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     expect(payment).toBeTruthy();
     expect(payment!.status).toBe(PaymentStatus.CREATING);
 
     // Attempt signup update - should mark payment as CREATION_FAILED
     await api.updateSignupAsUser(signup.id, {
       namePublic: true,
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
 
     // Verify the payment was marked as CREATION_FAILED
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.CREATION_FAILED);
 
     // Pretend Stripe create responded - the creation should now fail due to CREATION_FAILED state
@@ -765,7 +771,7 @@ describe("payment and signup update locking", () => {
     await stripeMockRequest.promise; // Wait until Stripe create is called
 
     // Verify payment exists in CREATING state
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     expect(payment).toBeTruthy();
     expect(payment!.status).toBe(PaymentStatus.CREATING);
 
@@ -773,7 +779,7 @@ describe("payment and signup update locking", () => {
     await api.deleteSignupAsUser(signup.id);
 
     // Verify the payment was marked as CREATION_FAILED
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.CREATION_FAILED);
 
     // Pretend Stripe create responded - the creation should now fail due to CREATION_FAILED state
@@ -800,7 +806,7 @@ describe("payment and signup update locking", () => {
     // Update signup - should fail because payment couldn't be expired
     const result = await api.updateSignupAsUser(signup.id, {
       namePublic: true,
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
 
     // Should fail because the payment is still active
@@ -830,17 +836,17 @@ describe("payment and signup update locking", () => {
       event,
       count: 1,
       confirmed: true,
-      answers: { [event.questions![0].id]: "Option A" },
+      answers: { [event.questions[0].id]: "Option A" },
     });
     expect(signup.price).toBe(1700);
 
     await refreshSignupPositions(event);
-    await signup.reload();
+    await reloadRow(signupTable, signup);
     expect(signup.status).toBe(SignupStatus.IN_QUOTA);
 
     // Create initial payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     expect(payment).toBeTruthy();
     expect(payment!.amount).toBe(1700);
     expect(payment!.status).toBe(PaymentStatus.PENDING);
@@ -848,11 +854,11 @@ describe("payment and signup update locking", () => {
     // Update signup - expires old payment
     await api.updateSignupAsUser(signup.id, {
       namePublic: true,
-      answers: [{ questionId: event.questions![0].id, answer: "Option B" }],
+      answers: [{ questionId: event.questions[0].id, answer: "Option B" }],
     });
 
     // Verify old payment is expired
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.EXPIRED);
     expect(mockStripeCheckoutSessionExpire).toHaveBeenCalledExactlyOnceWith(payment!.stripeCheckoutSessionId!);
 
@@ -862,7 +868,7 @@ describe("payment and signup update locking", () => {
     expect(data.paymentUrl).toEqual(expect.stringContaining("https://checkout.stripe.test/pay/"));
 
     // Verify new payment was created
-    const newPayment = await signup.getActivePayment();
+    const newPayment = await findActivePayment(signup.id);
     expect(newPayment).toBeTruthy();
     expect(newPayment!.id).not.toBe(payment!.id);
     expect(newPayment!.amount).toBe(2200);
@@ -877,7 +883,7 @@ describe("getEventDetailsForAdmin", () => {
 
     // Create a payment and mark it as PAID
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
 
     // Delete the signup
@@ -892,7 +898,7 @@ describe("getEventDetailsForAdmin", () => {
     expect(data.quotas[0].signups[0].paymentStatus).toBe(SignupPaymentStatus.PAID);
 
     // Mark the payment as REFUNDED
-    await payment!.update({ status: PaymentStatus.REFUNDED });
+    await updateRow(paymentTable, payment!, { status: PaymentStatus.REFUNDED });
 
     // Verify it's still returned by the admin event API
     [data] = await api.fetchAdminEventDetails(event);
@@ -907,7 +913,7 @@ describe("getEventDetailsForAdmin", () => {
 
     // Create a payment and mark it as PAID
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Verify initial paymentStatus is PENDING
     let [data] = await api.fetchAdminEventDetails(event);
@@ -921,7 +927,7 @@ describe("getEventDetailsForAdmin", () => {
     expect(data.quotas[0].signups[0].paymentStatus).toBe(SignupPaymentStatus.PAID);
 
     // Mark the payment as REFUNDED
-    await payment!.update({ status: PaymentStatus.REFUNDED });
+    await updateRow(paymentTable, payment!, { status: PaymentStatus.REFUNDED });
 
     // Verify paymentStatus is REFUNDED
     [data] = await api.fetchAdminEventDetails(event);
@@ -929,7 +935,7 @@ describe("getEventDetailsForAdmin", () => {
 
     // Create a new payment
     await api.startPayment(signup.id);
-    const newPayment = await Payment.findOne({ where: { signupId: signup.id, id: { [Op.ne]: payment!.id } } });
+    const newPayment = await findPayment(signup.id, payment!);
 
     // Verify paymentStatus is still REFUNDED (overrides PENDING)
     [data] = await api.fetchAdminEventDetails(event);
@@ -950,7 +956,7 @@ describe("completePayment", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mark the session as complete in Stripe
     const session = mockCheckoutSessions.get(payment!.stripeCheckoutSessionId!);
@@ -984,7 +990,7 @@ describe("completePayment", () => {
     });
 
     // Verify payment was marked as PAID
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
     expect(payment!.completedAt).toBeTruthy();
     expect(mockStripeCheckoutSessionRetrieve).toHaveBeenCalledWith(payment!.stripeCheckoutSessionId!);
@@ -1008,7 +1014,7 @@ describe("completePayment", () => {
     expect(result).toBeApiError(400, ErrorCode.PAYMENT_NOT_COMPLETE);
 
     // Verify payment status unchanged
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
     expect(payment!.status).toBe(PaymentStatus.PENDING);
 
     // Verify no email was sent
@@ -1020,7 +1026,7 @@ describe("completePayment", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mark the session as expired in Stripe
     const session = mockCheckoutSessions.get(payment!.stripeCheckoutSessionId!);
@@ -1031,7 +1037,7 @@ describe("completePayment", () => {
     expect(result).toBeApiError(400, ErrorCode.PAYMENT_NOT_COMPLETE);
 
     // Verify payment was marked as EXPIRED
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.EXPIRED);
 
     // Verify no email was sent
@@ -1054,7 +1060,7 @@ describe("completePayment", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mark the session as complete in Stripe
     const session = mockCheckoutSessions.get(payment!.stripeCheckoutSessionId!);
@@ -1062,7 +1068,7 @@ describe("completePayment", () => {
 
     // Simulate webhook processing the payment first
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
 
     // Verify an email was sent
@@ -1075,7 +1081,7 @@ describe("completePayment", () => {
     expect(data.signup.id).toBe(signup.id);
 
     // Verify payment is still PAID
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
 
     // Verify no extra email was sent
@@ -1087,7 +1093,7 @@ describe("completePayment", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mock Stripe API to fail with rate limit error
     mockStripeCheckoutSessionRetrieve.mockRejectedValueOnce(
@@ -1099,7 +1105,7 @@ describe("completePayment", () => {
     expect(result).toBeApiError(429, ErrorCode.PAYMENT_RATE_LIMITED);
 
     // Verify payment status unchanged
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PENDING);
 
     // Verify no email was sent
@@ -1130,7 +1136,7 @@ describe("Stripe webhook", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Send webhook event for checkout.session.completed
     const mockEvent = {
@@ -1143,7 +1149,7 @@ describe("Stripe webhook", () => {
     expect(response.json()).toEqual({ received: true });
 
     // Verify payment was marked as PAID
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
     expect(payment!.completedAt).toBeTruthy();
 
@@ -1160,7 +1166,7 @@ describe("Stripe webhook", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Send webhook event for checkout.session.expired
     const mockEvent = {
@@ -1173,7 +1179,7 @@ describe("Stripe webhook", () => {
     expect(response.json()).toEqual({ received: true });
 
     // Verify payment was marked as EXPIRED
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.EXPIRED);
 
     // Verify no email was sent
@@ -1189,7 +1195,7 @@ describe("Stripe webhook", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mock Stripe webhook signature verification to throw
     mockStripeWebhookConstructEvent.mockImplementationOnce(() => {
@@ -1206,7 +1212,7 @@ describe("Stripe webhook", () => {
     expect(response.statusCode).toBe(400);
 
     // Verify payment status unchanged
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PENDING);
 
     // Verify no email was sent
@@ -1218,7 +1224,7 @@ describe("Stripe webhook", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Send webhook event for checkout.session.completed a few times
     const mockEvent = {
@@ -1238,7 +1244,7 @@ describe("Stripe webhook", () => {
     }
 
     // Verify payment was marked as PAID exactly once
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
     expect(payment!.completedAt).toBeTruthy();
     expect(payment!.completedAt!.getTime()).toBeGreaterThanOrEqual(startedAt.getTime());
@@ -1257,7 +1263,7 @@ describe("Stripe webhook", () => {
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mark payment as PAID via webhook simulation
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
@@ -1274,7 +1280,7 @@ describe("Stripe webhook", () => {
     expect(response.json()).toEqual({ received: true });
 
     // Verify payment is still PAID
-    await payment!.reload();
+    await reloadRow(paymentTable, payment!);
     expect(payment!.status).toBe(PaymentStatus.PAID);
 
     // Verify only one email was sent (earlier)
@@ -1327,7 +1333,7 @@ describe("expirePaymentForSignupUpdate", () => {
 
     // Verify Stripe was called and payment was updated
     expect(mockStripeCheckoutSessionExpire).toHaveBeenCalledWith(session.id);
-    await payment.reload();
+    await reloadRow(paymentTable, payment);
     expect(payment.status).toBe(PaymentStatus.EXPIRED);
   });
 
@@ -1341,7 +1347,7 @@ describe("expirePaymentForSignupUpdate", () => {
     await expirePaymentForSignupUpdate(payment);
 
     // Verify payment was marked as CREATION_FAILED
-    await payment.reload();
+    await reloadRow(paymentTable, payment);
     expect(payment.status).toBe(PaymentStatus.CREATION_FAILED);
   });
 
@@ -1356,7 +1362,7 @@ describe("expirePaymentForSignupUpdate", () => {
     await expirePaymentForSignupUpdate(payment);
 
     // Verify status unchanged
-    await payment.reload();
+    await reloadRow(paymentTable, payment);
     expect(payment.status).toBe(PaymentStatus.PAID);
   });
 });
@@ -1369,7 +1375,7 @@ describe("checkoutSessionStatusUpdated", () => {
 
     const auditLog = await mockCheckoutSessionStatusUpdated(payment.stripeCheckoutSessionId!, "complete");
 
-    await payment.reload();
+    await reloadRow(paymentTable, payment);
     expect(payment.status).toBe(PaymentStatus.PAID);
     expect(payment.completedAt).toBeTruthy();
     expect(auditLog).toHaveBeenCalledExactlyOnceWith(
@@ -1385,7 +1391,7 @@ describe("checkoutSessionStatusUpdated", () => {
 
     const auditLog = await mockCheckoutSessionStatusUpdated(payment.stripeCheckoutSessionId!, "expired");
 
-    await payment.reload();
+    await reloadRow(paymentTable, payment);
     expect(payment.status).toBe(PaymentStatus.EXPIRED);
     expect(auditLog).toHaveBeenCalledExactlyOnceWith(
       AuditEvent.EXPIRE_PAYMENT,
@@ -1400,7 +1406,7 @@ describe("checkoutSessionStatusUpdated", () => {
 
     const auditLog = await mockCheckoutSessionStatusUpdated(payment.stripeCheckoutSessionId!, "open");
 
-    await payment.reload();
+    await reloadRow(paymentTable, payment);
     expect(payment.status).toBe(PaymentStatus.PENDING);
     expect(auditLog).not.toHaveBeenCalled();
   });
@@ -1416,7 +1422,7 @@ describe("checkoutSessionStatusUpdated", () => {
     const auditLog2 = await mockCheckoutSessionStatusUpdated(payment.stripeCheckoutSessionId!, "complete");
     expect(auditLog2).not.toHaveBeenCalled();
 
-    await payment.reload();
+    await reloadRow(paymentTable, payment);
     expect(payment.status).toBe(PaymentStatus.PAID);
   });
 });
@@ -1457,11 +1463,9 @@ describe("preferredFrontend in payments", () => {
   });
 
   test("startPayment uses preferredFrontend for Stripe callback URLs", async () => {
-    const { signup } = await defaultTestEventAndSignup();
+    const { event, signup } = await defaultTestEventAndSignup();
     // Set the event's preferredFrontend to the alternative
-    const quota = await signup.getQuota();
-    const event = await quota!.getEvent();
-    await event!.update({ preferredFrontend: "alt" });
+    await updateRow(eventTable, event, { preferredFrontend: "alt" });
 
     const [data, response] = await api.startPayment(signup.id);
     expect(response.statusCode).toBe(200);
@@ -1477,11 +1481,9 @@ describe("preferredFrontend in payments", () => {
   });
 
   test("startPayment uses default frontend URLs when preferredFrontend is default", async () => {
-    const { signup } = await defaultTestEventAndSignup();
+    const { event, signup } = await defaultTestEventAndSignup();
     // Ensure preferredFrontend is "default"
-    const quota = await signup.getQuota();
-    const event = await quota!.getEvent();
-    await event!.update({ preferredFrontend: "default" });
+    await updateRow(eventTable, event, { preferredFrontend: "default" });
 
     const [, response] = await api.startPayment(signup.id);
     expect(response.statusCode).toBe(200);
@@ -1496,11 +1498,9 @@ describe("preferredFrontend in payments", () => {
   });
 
   test("startPayment falls back to default for unknown frontend name", async () => {
-    const { signup } = await defaultTestEventAndSignup();
+    const { event, signup } = await defaultTestEventAndSignup();
     // Set preferredFrontend to a name that doesn't exist in config
-    const quota = await signup.getQuota();
-    const event = await quota!.getEvent();
-    await event!.update({ preferredFrontend: "nonexistent" });
+    await updateRow(eventTable, event, { preferredFrontend: "nonexistent" });
 
     const [, response] = await api.startPayment(signup.id);
     expect(response.statusCode).toBe(200);
@@ -1515,14 +1515,12 @@ describe("preferredFrontend in payments", () => {
   });
 
   test("completePayment sends email with preferredFrontend URL", async () => {
-    const { signup } = await defaultTestEventAndSignup();
-    const quota = await signup.getQuota();
-    const event = await quota!.getEvent();
-    await event!.update({ preferredFrontend: "alt" });
+    const { event, signup } = await defaultTestEventAndSignup();
+    await updateRow(eventTable, event, { preferredFrontend: "alt" });
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Mark the session as complete in Stripe
     const session = mockCheckoutSessions.get(payment!.stripeCheckoutSessionId!);
@@ -1541,14 +1539,12 @@ describe("preferredFrontend in payments", () => {
   });
 
   test("payment confirmation email uses preferredFrontend URL", async () => {
-    const { signup } = await defaultTestEventAndSignup();
-    const quota = await signup.getQuota();
-    const event = await quota!.getEvent();
-    await event!.update({ preferredFrontend: "alt" });
+    const { event, signup } = await defaultTestEventAndSignup();
+    await updateRow(eventTable, event, { preferredFrontend: "alt" });
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Simulate payment completion via webhook
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");
@@ -1562,14 +1558,12 @@ describe("preferredFrontend in payments", () => {
   });
 
   test("payment confirmation email falls back to default for unknown frontend name", async () => {
-    const { signup } = await defaultTestEventAndSignup();
-    const quota = await signup.getQuota();
-    const event = await quota!.getEvent();
-    await event!.update({ preferredFrontend: "nonexistent" });
+    const { event, signup } = await defaultTestEventAndSignup();
+    await updateRow(eventTable, event, { preferredFrontend: "nonexistent" });
 
     // Create a PENDING payment
     await api.startPayment(signup.id);
-    const payment = await Payment.findOne({ where: { signupId: signup.id } });
+    const payment = await findPayment(signup.id);
 
     // Simulate payment completion via webhook
     await mockCheckoutSessionStatusUpdated(payment!.stripeCheckoutSessionId!, "complete");

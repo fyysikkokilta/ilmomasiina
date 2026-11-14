@@ -1,0 +1,138 @@
+import debug from "debug";
+import { sql } from "drizzle-orm";
+import { readMigrationFiles } from "drizzle-orm/migrator";
+import { drizzle, NodePgDatabase } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import path from "path";
+import { Pool } from "pg";
+
+import config from "../config";
+import { relations } from "./relations";
+
+const debugLog = debug("app:db");
+
+export type Db = NodePgDatabase<typeof relations>;
+/** A transaction started with `db.transaction()`. */
+export type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
+/** Either the database or a transaction on it. Use for functions that can run inside or outside one. */
+export type DbOrTx = Db | Tx;
+/** The `where` filter of relational queries (`db.query.<table>`) on the given table. */
+export type Filter<Table extends keyof Db["query"]> = NonNullable<
+  NonNullable<Parameters<Db["query"][Table]["findMany"]>[0]>["where"]
+>;
+
+const MIGRATIONS_FOLDER = path.resolve(__dirname, "../../drizzle");
+const MIGRATIONS_SCHEMA = "drizzle";
+const MIGRATIONS_TABLE = "__drizzle_migrations";
+
+/** The last migration of the Sequelize-based versions. Its schema equals our initial migration. */
+const LAST_SEQUELIZE_MIGRATION = "0010-add-preferredFrontend";
+
+let pool: Pool | null = null;
+let db: Db | null = null;
+
+export function getDb(): Db {
+  if (!db) throw new Error("setupDatabase() has not been called");
+  return db;
+}
+
+export async function closeDatabase() {
+  if (pool) {
+    const old = pool;
+    pool = null;
+    db = null;
+    await old.end();
+  }
+}
+
+/**
+ * Databases created by Sequelize-based versions already have the schema of our initial migration.
+ * Record that migration as applied for them, so that only later migrations are run.
+ */
+async function adoptSequelizeDatabase(database: Db) {
+  const tableExists = async (name: string) => {
+    const [row] = await database.execute<{ name: string | null }>(sql`SELECT to_regclass(${name}) AS name`, "objects");
+    return row.name != null;
+  };
+  if (!(await tableExists('public."SequelizeMeta"'))) return;
+  if (await tableExists(`${MIGRATIONS_SCHEMA}.${MIGRATIONS_TABLE}`)) return;
+
+  const applied = await database.execute(
+    sql`SELECT 1 FROM "SequelizeMeta" WHERE name = ${LAST_SEQUELIZE_MIGRATION}`,
+    "objects",
+  );
+  if (!applied.length) {
+    throw new Error(
+      "This database was created by an older version of Ilmomasiina. " +
+        "Start the last Sequelize-based version once to run its migrations, then upgrade to this version.",
+    );
+  }
+
+  const [initial] = readMigrationFiles({ migrationsFolder: MIGRATIONS_FOLDER });
+  debugLog(`Adopting existing database: recording migration ${initial.name} as applied`);
+  await database.transaction(async (tx) => {
+    // Events created before defaultLanguage existed have no value; they used the configured default.
+    // A later migration makes the column required.
+    await tx.execute(
+      sql`UPDATE "event" SET "defaultLanguage" = ${config.defaultLanguage} WHERE "defaultLanguage" IS NULL`,
+    );
+    await tx.execute(sql`CREATE SCHEMA IF NOT EXISTS ${sql.identifier(MIGRATIONS_SCHEMA)}`);
+    // Same table as created by drizzle-orm's migrator.
+    await tx.execute(sql`
+      CREATE TABLE ${sql.identifier(MIGRATIONS_SCHEMA)}.${sql.identifier(MIGRATIONS_TABLE)} (
+        id SERIAL PRIMARY KEY,
+        hash text NOT NULL,
+        created_at bigint,
+        name text,
+        applied_at timestamp with time zone DEFAULT now()
+      )
+    `);
+    await tx.execute(sql`
+      INSERT INTO ${sql.identifier(MIGRATIONS_SCHEMA)}.${sql.identifier(MIGRATIONS_TABLE)} ("hash", "created_at", "name")
+      VALUES (${initial.hash}, ${initial.folderMillis}, ${initial.name})
+    `);
+  });
+}
+
+async function runMigrations(database: Db) {
+  debugLog("Running database migrations");
+  await adoptSequelizeDatabase(database);
+  await migrate(database, {
+    migrationsFolder: MIGRATIONS_FOLDER,
+    migrationsSchema: MIGRATIONS_SCHEMA,
+    migrationsTable: MIGRATIONS_TABLE,
+  });
+}
+
+export default async function setupDatabase(): Promise<Db> {
+  if (db) return db;
+
+  debugLog("Connecting to database");
+  const newPool = new Pool({
+    host: config.dbHost,
+    port: config.dbPort ?? undefined,
+    database: config.dbDatabase,
+    user: config.dbUser,
+    password: config.dbPassword ?? undefined,
+    ssl: config.dbSsl,
+  });
+  const newDb = drizzle({
+    client: newPool,
+    relations,
+    logger: config.debugDbLogging,
+  });
+  try {
+    await newDb.execute(sql`SELECT 1`);
+    debugLog(`Connected to ${config.dbHost}:${config.dbPort ?? 5432} as ${config.dbUser}.`);
+  } catch (err) {
+    console.error(`Error connecting to ${config.dbHost}:${config.dbPort ?? 5432} as ${config.dbUser}: ${String(err)}`);
+    await newPool.end();
+    throw err;
+  }
+
+  await runMigrations(newDb);
+
+  pool = newPool;
+  db = newDb;
+  return newDb;
+}
