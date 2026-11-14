@@ -3,15 +3,17 @@ import { NotFound } from "http-errors";
 import moment from "moment";
 import { Op } from "sequelize";
 
-import type {
+import {
   AdminEventPathParams,
   AdminEventResponse,
   AdminSignupSchema,
   EventID,
   EventSlug,
+  SignupPaymentStatus,
   UserEventPathParams,
   UserEventResponse,
 } from "@tietokilta/ilmomasiina-models";
+import { Answer } from "../../models/answer";
 import {
   adminEventGetEventAttrs,
   adminEventGetSignupAttrs,
@@ -20,14 +22,14 @@ import {
   eventGetQuestionAttrs,
   eventGetQuotaAttrs,
   eventGetSignupAttrs,
-} from "@tietokilta/ilmomasiina-models/dist/attrs/event";
-import { Answer } from "../../models/answer";
+} from "../../models/attrs";
 import { Event } from "../../models/event";
+import { Payment } from "../../models/payment";
 import { Question } from "../../models/question";
 import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";
 import createCache from "../../util/cache";
-import { StringifyApi } from "../utils";
+import type { StringifyApi } from "../utils";
 
 export const basicEventInfoCached = createCache({
   maxAgeMs: 5000,
@@ -120,9 +122,9 @@ export const eventDetailsForUserCached = createCache({
                 // Hide name if necessary
                 firstName: event.nameQuestion && signup.namePublic ? signup.firstName : null,
                 lastName: event.nameQuestion && signup.namePublic ? signup.lastName : null,
-                answers: signup.answers!,
+                answers: signup.answers!.map((answer) => answer.get({ plain: true })),
                 status: signup.status,
-                confirmed: signup.confirmedAt !== null,
+                confirmed: signup.confirmed,
               }))
             : // When signups are not public:
               [],
@@ -137,7 +139,6 @@ export const eventDetailsForUserCached = createCache({
 
 export async function eventDetailsForUser(eventSlug: EventSlug): Promise<UserEventResponse> {
   const { event, registrationStartDate, registrationEndDate } = await eventDetailsForUserCached(eventSlug);
-
   // Dynamic extra fields
   let registrationClosed = true;
   let millisTillOpening = null;
@@ -161,11 +162,12 @@ export async function eventDetailsForUser(eventSlug: EventSlug): Promise<UserEve
 
 /** Converts a signup with answers included to JSON for the admin API. */
 export function formatSignupForAdmin(signup: Signup): AdminSignupSchema {
+  const plain = signup.get({ plain: true });
   const result = {
-    ...signup.get({ plain: true }),
-    status: signup.status,
+    ...plain,
     answers: signup.answers!.map((answer) => answer.get({ plain: true })),
-    confirmed: Boolean(signup.confirmedAt),
+    confirmed: signup.confirmed,
+    paymentStatus: signup.effectivePaymentStatus,
   };
   return result as unknown as StringifyApi<typeof result>;
 }
@@ -199,7 +201,7 @@ export async function eventDetailsForAdmin(eventID: EventID): Promise<AdminEvent
     // Include all signups for the quotas
     include: [
       {
-        model: Signup.scope("active"),
+        model: Signup.scope("admin"),
         attributes: adminEventGetSignupAttrs,
         required: false,
         // ... and answers of signups
@@ -207,6 +209,11 @@ export async function eventDetailsForAdmin(eventID: EventID): Promise<AdminEvent
           {
             model: Answer,
             attributes: eventGetAnswerAttrs,
+            required: false,
+          },
+          {
+            model: Payment,
+            attributes: ["status"],
             required: false,
           },
         ],
@@ -218,17 +225,27 @@ export async function eventDetailsForAdmin(eventID: EventID): Promise<AdminEvent
       [Signup, "createdAt", "ASC"],
     ],
   });
-
   // Admins get a simple result with many columns
+  // Filter out deleted signups that don't have PAID/REFUNDED status
   const res = {
     ...event.get({ plain: true }),
-    questions: event.questions!.map((question) => question.get({ plain: true })),
+    // updatedAt must be manually repeated here, as it's not present in EventManualAttributes (see models/event.ts)
     updatedAt: event.updatedAt,
-    quotas: quotas.map((quota) => ({
-      ...quota.get({ plain: true }),
-      signups: quota.signups!.map(formatSignupForAdmin),
-      signupCount: quota.signups!.length,
-    })),
+    questions: event.questions!.map((question) => question.get({ plain: true })),
+    quotas: quotas.map((quota) => {
+      const filteredSignups = quota.signups!.filter((signup) => {
+        // Include all non-deleted signups
+        if (!signup.deletedAt) return true;
+        // Only include deleted signups with PAID/REFUNDED status
+        const status = signup.effectivePaymentStatus;
+        return status === SignupPaymentStatus.PAID || status === SignupPaymentStatus.REFUNDED;
+      });
+      return {
+        ...quota.get({ plain: true }),
+        signups: filteredSignups.map(formatSignupForAdmin),
+        signupCount: filteredSignups.filter((s) => !s.deletedAt).length,
+      };
+    }),
   };
   return res as unknown as StringifyApi<typeof res>;
 }

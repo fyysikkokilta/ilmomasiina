@@ -1,4 +1,10 @@
-import { SignupForEdit, SignupStatus, UserEventResponse } from "@tietokilta/ilmomasiina-models";
+import {
+  PaymentMode,
+  SignupForEdit,
+  SignupPaymentStatus,
+  SignupStatus,
+  UserEventResponse,
+} from "@tietokilta/ilmomasiina-models";
 import { editorEventToServer } from "../../../modules/editor/selectors";
 import type { EditorEvent } from "../../../modules/editor/types";
 
@@ -11,10 +17,12 @@ export const editorEventToUserEvent = (form: EditorEvent): UserEventResponse => 
       ...quota,
       id: quota.id ?? `preview${Math.random()}`,
       signupCount: 0,
+      price: quota.price,
       signups: [],
     })),
     questions: serverEvent.questions.map((question) => ({
       ...question,
+      prices: question.prices ?? [],
       id: question.id ?? `preview${Math.random()}`,
     })),
     registrationClosed: false,
@@ -27,6 +35,7 @@ export const previewDummyQuota = (event?: UserEventResponse): SignupForEdit["quo
     id: `preview${Math.random()}`,
     title: "\u2013",
     size: 0,
+    price: 0,
   };
 
 export const previewDummySignup = (event: UserEventResponse): SignupForEdit => ({
@@ -43,4 +52,18 @@ export const previewDummySignup = (event: UserEventResponse): SignupForEdit => (
   position: 1,
   confirmableForMillis: 30 * 60 * 60 * 1000,
   editableForMillis: 30 * 60 * 60 * 1000,
+  price: event.payments !== PaymentMode.DISABLED ? (event.quotas[0]?.price ?? 0) : 0,
+  currency: CURRENCY,
+  products:
+    event.payments !== PaymentMode.DISABLED && event.quotas[0]
+      ? [
+          {
+            name: event.quotas[0].title,
+            unitPrice: event.quotas[0].price,
+            amount: 1,
+          },
+        ]
+      : [],
+  paymentStatus: SignupPaymentStatus.PENDING,
+  deletedAt: null,
 });

@@ -4,12 +4,8 @@ import moment from "moment";
 import { col, fn, Op, Order, WhereOptions } from "sequelize";
 
 import type { AdminEventListResponse, EventListQuery, UserEventListResponse } from "@tietokilta/ilmomasiina-models";
-import {
-  adminEventListEventAttrs,
-  eventListEventAttrs,
-  eventListQuotaAttrs,
-} from "@tietokilta/ilmomasiina-models/dist/attrs/event";
 import config from "../../config";
+import { adminEventListEventAttrs, eventListEventAttrs, eventListQuotaAttrs } from "../../models/attrs";
 import { Event } from "../../models/event";
 import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";

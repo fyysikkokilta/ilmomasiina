@@ -4,6 +4,7 @@ import { Type } from "typebox";
 
 import * as schema from "@tietokilta/ilmomasiina-models";
 import { addLogEventHook } from "../auditlog";
+import getRawBody from "../util/rawBody";
 import getAuditLogItems from "./admin/auditlog/getAuditLogs";
 import getCategoriesList from "./admin/categories/getCategoriesList";
 import createEvent from "./admin/events/createEvent";
@@ -20,6 +21,9 @@ import { adminLogin, renewAdminToken, requireAdmin } from "./authentication/admi
 import { getEventDetailsForAdmin, getEventDetailsForUser } from "./events/getEventDetails";
 import { getEventsListForAdmin, getEventsListForUser } from "./events/getEventsList";
 import { sendICalFeed } from "./ical";
+import completePayment from "./payment/completePayment";
+import startPayment from "./payment/startPayment";
+import stripeWebhook from "./payment/webhook";
 import createSignup from "./signups/createNewSignup";
 import { deleteSignupAsAdmin, deleteSignupAsUser } from "./signups/deleteSignup";
 import { requireValidEditToken } from "./signups/editTokens";
@@ -41,9 +45,7 @@ async function setupAdminRoutes(fastifyInstance: FastifyInstance) {
   const server = fastifyInstance.withTypeProvider<TypeBoxTypeProvider>();
 
   /** Routes for categories */
-  server.get<{
-    /* Params: types.UserID */
-  }>(
+  server.get(
     "/categories",
     {
       schema: {
@@ -340,6 +342,48 @@ async function setupPublicRoutes(fastifyInstance: FastifyInstance) {
       preHandler: requireValidEditToken,
     },
     deleteSignupAsUser,
+  );
+
+  server.post<{ Params: schema.SignupPathParams }>(
+    "/signups/:id/payment/start",
+    {
+      schema: {
+        params: schema.signupPathParams,
+        response: {
+          ...errorResponses,
+          200: schema.startPaymentResponse,
+        },
+      },
+      // Require valid edit token:
+      preHandler: requireValidEditToken,
+    },
+    startPayment,
+  );
+
+  server.post<{ Params: schema.SignupPathParams }>(
+    "/signups/:id/payment/complete",
+    {
+      schema: {
+        params: schema.signupPathParams,
+        response: {
+          ...errorResponses,
+          200: schema.signupForEditResponse,
+        },
+      },
+      // Require valid edit token:
+      preHandler: requireValidEditToken,
+    },
+    completePayment,
+  );
+
+  // Stripe webhook
+  server.post(
+    "/stripe/webhook",
+    {
+      bodyLimit: 1048576, // 1MB limit
+      preParsing: getRawBody, // Keep raw body for signature verification
+    },
+    stripeWebhook,
   );
 
   // Admin session management routes

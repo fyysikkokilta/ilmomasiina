@@ -1,5 +1,43 @@
 # Changelog
 
+## 3.0.0-dev
+
+**TODO:**
+
+- The backend no longer allows saving questions with duplicate or ambiguous options (TODO)
+- Event end date is now required (TODO)
+- Migration support for MySQL to PostgreSQL
+
+**Breaking changes:**
+
+- Removed support for MySQL databases; only PostgreSQL is supported from now on
+- Added payment support via Stripe
+  - Paid signups cannot be edited or deleted by users after payment, unless the price does not change
+  - Custom frontends should be updated to support payments if enabled
+  - New error codes and locale strings related to payments
+- Removed support for the `EMAIL_BASE_URL` environment variable. Use `BASE_URL` and/or `FRONTENDS` instead.
+- Removed support for the `MAIL_DEFAULT_LANG` environment variable. Use `DEFAULT_LANGUAGE` instead.
+- Removed support for the `EVENT_DETAILS_URL`, `EDIT_SIGNUP_URL` and `ADMIN_URL`
+  environment variables. Use the new `FRONTENDS` system instead.
+- Empty question options are no longer allowed in the default language. (Breaking only for admin API users.)
+- **ilmomasiina-models**: Removed database models (moved to `ilmomasiina-backend`).
+
+**Features:**
+
+- Proper support for multiple frontends
+  - Events can now specify a preferred frontend, and emails will use the correct URLs
+- Frontend pages now set useful page titles
+- **ilmomasiina-client:** Added payment support to EditSignup, including new state flags in context
+
+**Bug fixes and improvements:**
+
+- Upgraded development tooling to (semi-)modern versions, including TypeScript 6/7, tsx, Vite 8, ESLint 9
+- Upgraded most other dependencies to modern versions
+- Added lots of backend tests
+- Improved validation of signup answers
+- Enabled hot reloading of locale files in development mode
+- Emails are now rendered with React instead of Pug, and styles are no longer inlined
+
 ## 2.1.0-beta.3
 
 **Bug fixes and improvements:**

@@ -2,18 +2,32 @@ import React from "react";
 
 import { Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { EditSignupProvider, errorDesc, errorTitle, useEditSignupContext } from "@tietokilta/ilmomasiina-client";
 import type { TKey } from "../../i18n";
+import useBrandedDocumentTitle from "../../utils/useBrandedDocumentTitle";
 import EditForm from "./components/EditForm";
 import NarrowContainer from "./components/NarrowContainer";
 
 import "./EditSignup.scss";
 
 const EditSignupView = () => {
-  const { error, pending } = useEditSignupContext();
+  const { error, pending, event, signup, editToken } = useEditSignupContext();
   const { t } = useTranslation();
+
+  // Determine the appropriate title based on the context
+  const getTitle = () => {
+    if (editToken && signup) {
+      return t("editSignup.title.edit");
+    }
+    if (event) {
+      return t("editSignup.title.signup");
+    }
+    return t("events.title");
+  };
+
+  useBrandedDocumentTitle(getTitle());
 
   if (error) {
     return (
@@ -35,13 +49,13 @@ const EditSignupView = () => {
   return <EditForm />;
 };
 
-const EditSignup = () => {
+const EditSignup = ({ paid = false }: { paid?: boolean }) => {
   const { id, editToken } = useParams<"id" | "editToken">();
   const {
     i18n: { language },
   } = useTranslation();
   return (
-    <EditSignupProvider id={id!} editToken={editToken!} language={language}>
+    <EditSignupProvider id={id!} editToken={editToken!} paid={paid} language={language}>
       <EditSignupView />
     </EditSignupProvider>
   );

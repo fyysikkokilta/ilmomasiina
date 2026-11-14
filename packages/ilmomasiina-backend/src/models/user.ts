@@ -1,16 +1,20 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
-import type { UserAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
+export interface UserAttributes {
+  id: number;
+  email: string;
+  password: string;
+}
 
 export interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
 
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  public id!: number;
-  public email!: string;
-  public password!: string;
+  declare id: number;
+  declare email: string;
+  declare password: string;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 }
 
 // User for local auth admin signup
@@ -19,7 +23,7 @@ export default function setupUserModel(sequelize: Sequelize) {
   User.init(
     {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },

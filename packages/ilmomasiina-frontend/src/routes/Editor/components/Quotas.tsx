@@ -1,17 +1,19 @@
 import React, { useMemo } from "react";
 
-import { Button, Col, Row } from "react-bootstrap";
+import { Alert, Button, Col, Row } from "react-bootstrap";
 import { UseFieldConfig } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
 import useShallowMemo from "@tietokilta/ilmomasiina-client/dist/utils/useShallowMemo";
-import { QuotaLanguage } from "@tietokilta/ilmomasiina-models";
+import { PaymentMode, QuotaLanguage } from "@tietokilta/ilmomasiina-models";
 import FieldRow from "../../../components/FieldRow";
 import { EditorQuota } from "../../../modules/editor/types";
+import { isZodIssue } from "../../../utils/convertZodError";
 import useEvent from "../../../utils/useEvent";
 import useEditorErrors from "./errors";
-import { useFieldValue } from "./hooks";
+import { useFieldError, useFieldValue } from "./hooks";
 import LocalizedFieldRow from "./LocalizedFieldRow";
+import PriceField, { priceFieldConfig } from "./PriceField";
 import Sortable from "./Sortable";
 import useFieldArrayMap from "./useFieldArrayMap";
 import useLocalizedFieldArrayMutators from "./useLocalizedFieldArrayMutators";
@@ -28,6 +30,7 @@ const numberConfig: UseFieldConfig<number | null> = {
 const QuotaRow = ({ name, index }: QuotaRowProps) => {
   const { t } = useTranslation();
   const formatError = useEditorErrors();
+  const hasPayments = useFieldValue<PaymentMode>("payments") !== PaymentMode.DISABLED;
 
   const { length } = useFieldArrayMap("quotas");
   const { remove } = useLocalizedFieldArrayMutators<EditorQuota, QuotaLanguage>("quotas");
@@ -61,6 +64,16 @@ const QuotaRow = ({ name, index }: QuotaRowProps) => {
           config={numberConfig}
           formatError={formatError}
         />
+        {hasPayments && (
+          <FieldRow
+            name={`${name}.price`}
+            label={t("editor.quotas.price")}
+            as={PriceField}
+            config={priceFieldConfig}
+            help={t("editor.quotas.price.info")}
+            formatError={formatError}
+          />
+        )}
       </Col>
       {index > 0 && (
         <Col xs="12" sm="2" className="no-focus">
@@ -75,7 +88,9 @@ const QuotaRow = ({ name, index }: QuotaRowProps) => {
 
 const Quotas = () => {
   const { t } = useTranslation();
+  const formatError = useEditorErrors();
   const quotas = useFieldValue<EditorQuota[]>("quotas");
+  const quotasError = useFieldError("quotas");
   const { map: mapFields } = useFieldArrayMap("quotas");
   const { push, move } = useLocalizedFieldArrayMutators<EditorQuota, QuotaLanguage>("quotas");
 
@@ -85,6 +100,7 @@ const Quotas = () => {
         key: `new-${Math.random()}`,
         title: "",
         size: null,
+        price: 0,
       },
       {
         title: "",
@@ -103,6 +119,7 @@ const Quotas = () => {
 
   return (
     <>
+      {isZodIssue(quotasError) && <Alert variant="danger">{formatError(quotasError)}</Alert>}
       <Sortable items={quotaItems} component={QuotaRow} move={move} />
       <div className="text-center mb-3">
         <Button type="button" variant="primary" onClick={addQuota}>

@@ -1,31 +1,42 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 import type { AuditEvent } from "@tietokilta/ilmomasiina-models";
-import type { AuditLogAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
 import { RANDOM_ID_LENGTH } from "./randomId";
+
+export interface AuditLogAttributes {
+  id: number;
+  user: string | null;
+  ipAddress: string;
+  action: AuditEvent;
+  eventId: string | null;
+  eventName: string | null;
+  signupId: string | null;
+  signupName: string | null;
+  extra: string | null;
+}
 
 export interface AuditLogCreationAttributes extends Optional<AuditLogAttributes, "id"> {}
 
 export class AuditLog extends Model<AuditLogAttributes, AuditLogCreationAttributes> implements AuditLogAttributes {
-  public id!: number;
-  public user!: string | null;
-  public ipAddress!: string;
-  public action!: AuditEvent;
-  public eventId!: string | null;
-  public eventName!: string | null;
-  public signupId!: string | null;
-  public signupName!: string | null;
-  public extra!: string;
+  declare id: number;
+  declare user: string | null;
+  declare ipAddress: string;
+  declare action: AuditEvent;
+  declare eventId: string | null;
+  declare eventName: string | null;
+  declare signupId: string | null;
+  declare signupName: string | null;
+  declare extra: string;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 }
 
 export default function setupAuditLogModel(sequelize: Sequelize) {
   AuditLog.init(
     {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },

@@ -21,13 +21,14 @@ export function getSignupsAsList<Ev extends AnyEventSchema>(
   event: Ev,
   emails: string[] | null = null,
 ): SignupWithQuota<Ev>[] {
-  return event.quotas.flatMap(
-    (quota) =>
-      quota.signups?.map((signup) => ({
-        ...signup,
-        quota,
-        ...(event.emailQuestion && "email" in signup ? { isMember: emails!.includes(signup.email!) } : {}),
-      })) ?? [],
+  return event.quotas.flatMap((quota) =>
+    quota.signups.map((signup) => ({
+      ...signup,
+      quota,
+      ...(emails && event.emailQuestion && "email" in signup && signup.email
+        ? { isMember: emails.includes(signup.email) }
+        : {}),
+    })),
   );
 }
 
@@ -43,7 +44,7 @@ export function countOverflowSignups(quotas: QuotaWithSignupCount[], openQuotaSi
 /** Expands the quota type from {Admin,User}EventSchema, makes quota properties nullable and adds references to quota. */
 export type QuotaSignups<Ev extends AnyEventSchema = AnyEventSchema> = Omit<
   Ev["quotas"][number],
-  "id" | "title" | "size" | "signups"
+  "id" | "title" | "size" | "price" | "signups"
 > & {
   type: SignupStatus;
   id: QuotaID | null;

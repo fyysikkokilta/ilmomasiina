@@ -3,20 +3,15 @@ import { range } from "lodash";
 import moment from "moment";
 import { Optional, UniqueConstraintError } from "sequelize";
 
-import { QuestionType, QuotaID } from "@tietokilta/ilmomasiina-models";
-import {
-  EventAttributes,
-  QuestionAttributes,
-  QuotaAttributes,
-  SignupAttributes,
-} from "@tietokilta/ilmomasiina-models/dist/models";
+import { OPTION_QUESTION_TYPES, PaymentMode, QuestionID, QuestionType } from "@tietokilta/ilmomasiina-models";
 import config from "../src/config";
 import { Answer, AnswerCreationAttributes } from "../src/models/answer";
-import { Event } from "../src/models/event";
-import { Question, QuestionCreationAttributes } from "../src/models/question";
-import { Quota } from "../src/models/quota";
-import { Signup, SignupCreationAttributes } from "../src/models/signup";
+import { Event, EventAttributes } from "../src/models/event";
+import { Question, QuestionAttributes, QuestionCreationAttributes } from "../src/models/question";
+import { Quota, QuotaAttributes } from "../src/models/quota";
+import { Signup, SignupAttributes, SignupCreationAttributes } from "../src/models/signup";
 import { User } from "../src/models/user";
+import { computePrice, getQuotaProducts, validateAnswersAndGetProducts } from "../src/routes/signups/updateSignup";
 
 export function testUser() {
   return User.create({
@@ -69,6 +64,8 @@ export function testEventAttributes({
     nameQuestion: true, // to be tested separately
     emailQuestion: true,
     signupsPublic: false,
+    payments: faker.helpers.arrayElement(Object.values(PaymentMode)),
+    preferredFrontend: "default",
     verificationEmail: faker.lorem.paragraphs({ min: 1, max: 5 }),
     defaultLanguage: "en",
     languages: {},
@@ -108,6 +105,11 @@ export function testQuestionOptions() {
   });
 }
 
+export function testQuestionPrices(optionCount: number) {
+  // Disallow zero so that there is no chance of all-zero prices. Zero will be tested manually.
+  return range(optionCount).map(() => faker.number.int({ min: 1, max: 10000 }));
+}
+
 export function testQuestionAttributes() {
   const attribs: Omit<QuestionCreationAttributes, "eventId" | "order"> = {
     question: faker.lorem.words({ min: 1, max: 5 }),
@@ -115,8 +117,9 @@ export function testQuestionAttributes() {
     required: faker.datatype.boolean(),
     public: faker.datatype.boolean(),
   };
-  if (attribs.type === QuestionType.SELECT || attribs.type === QuestionType.CHECKBOX) {
+  if (OPTION_QUESTION_TYPES.includes(attribs.type)) {
     attribs.options = testQuestionOptions();
+    attribs.prices = testQuestionPrices(attribs.options.length);
   }
   return attribs;
 }
@@ -125,6 +128,7 @@ export function testQuotaAttributes() {
   return {
     title: faker.lorem.words({ min: 1, max: 5 }),
     size: faker.helpers.maybe(() => faker.number.int({ min: 1, max: 50 }), { probability: 0.9 }) ?? null,
+    price: faker.number.int({ min: 1, max: 100000 }),
   };
 }
 
@@ -152,12 +156,15 @@ export async function testEvent(options: TestEventOptions = {}, overrides: Parti
     }
   }
   event.questions = await Question.bulkCreate(
-    range(questionCount).map((i) => ({
-      eventId: event.id,
-      order: i,
-      ...testQuestionAttributes(),
-      ...options.questionOverrides,
-    })),
+    range(questionCount).map((i) => {
+      const values = {
+        eventId: event.id,
+        order: i,
+        ...testQuestionAttributes(),
+        ...options.questionOverrides,
+      };
+      return { ...values, ...Question.normalizeOptions(values) };
+    }),
   );
   event.quotas = await Quota.bulkCreate(
     range(quotaCount).map((i) => ({
@@ -167,114 +174,142 @@ export async function testEvent(options: TestEventOptions = {}, overrides: Parti
       ...options.quotaOverrides,
     })),
   );
+  for (const quota of event.quotas) {
+    // Populate backlink to event
+    quota.event = event;
+  }
   return event;
 }
 
 type TestSignupsOptions = {
+  event: Event;
   count?: number;
-  quotaId?: QuotaID;
   expired?: boolean;
   confirmed?: boolean;
+  overrides?: Partial<SignupAttributes>;
+  answers?: Record<QuestionID, string | string[]>;
 };
 
-export async function testSignups(
-  event: Event,
-  {
-    count = faker.number.int({ min: 1, max: 40 }),
-    quotaId,
-    expired = false,
-    confirmed = expired ? false : undefined,
-  }: TestSignupsOptions = {},
-  overrides: Partial<SignupAttributes> = {},
-) {
+/** Generates test signups to the given event.
+ *
+ * If `confirmed` is set, all signups will be confirmed. If `expired` is set, all signups will be
+ * unconfirmed and expired.
+ *
+ * For confirmed signups, all fields are chosen randomly among available options and valid values,
+ * but `overrides` and `answers` can be used to set specific values.
+ */
+export async function testSignups({
+  event,
+  count = faker.number.int({ min: 1, max: 40 }),
+  expired = false,
+  confirmed = expired ? false : undefined,
+  overrides = {},
+  answers = {},
+}: TestSignupsOptions): Promise<Signup[]> {
   if (!event.quotas || !event.questions) {
     throw new Error("testSignups() expects event.quotas and event.questions to be populated");
   }
   if (!event.quotas.length) {
     throw new Error("testSignups() needs at least one existing quota");
   }
-  const signups = await Signup.bulkCreate(
-    range(count).map(() => {
-      const signup: SignupCreationAttributes = {
-        quotaId: quotaId ?? faker.helpers.arrayElement(event.quotas!).id,
-      };
-      if (expired) {
-        // Expired signup (never confirmed)
-        signup.createdAt = faker.date.recent({
-          refDate: moment().subtract(config.signupConfirmMins, "minutes").toDate(),
-        });
-      } else if (confirmed ?? faker.datatype.boolean({ probability: 0.8 })) {
-        // Confirmed signup
-        signup.confirmedAt = faker.date.recent();
-        signup.createdAt = faker.date.between({
-          from: moment(signup.confirmedAt).subtract(config.signupConfirmMins, "minutes").toDate(),
-          to: signup.confirmedAt,
-        });
-        if (event.nameQuestion) {
-          signup.firstName = faker.person.firstName();
-          signup.lastName = faker.person.lastName();
-          signup.namePublic = faker.datatype.boolean();
-        }
-        if (event.emailQuestion) {
-          signup.email = faker.internet.email({
-            firstName: signup.firstName ?? undefined,
-            lastName: signup.lastName ?? undefined,
-          });
-        }
-      } else {
-        // Unconfirmed signup
-        signup.createdAt = faker.date.between({
-          from: moment().subtract(config.signupConfirmMins, "minutes").toDate(),
-          to: new Date(),
+  const signupValues = range(count).map((): SignupCreationAttributes => {
+    const signup: SignupCreationAttributes = {
+      quotaId: faker.helpers.arrayElement(event.quotas!).id,
+    };
+    if (expired) {
+      // Expired signup (never confirmed)
+      signup.createdAt = faker.date.recent({
+        refDate: moment().subtract(config.signupConfirmMins, "minutes").toDate(),
+      });
+    } else if (confirmed ?? faker.datatype.boolean({ probability: 0.8 })) {
+      // Confirmed signup
+      signup.confirmedAt = faker.date.recent();
+      signup.createdAt = faker.date.between({
+        from: moment(signup.confirmedAt).subtract(config.signupConfirmMins, "minutes").toDate(),
+        to: signup.confirmedAt,
+      });
+      if (event.nameQuestion) {
+        signup.firstName = faker.person.firstName();
+        signup.lastName = faker.person.lastName();
+        signup.namePublic = faker.datatype.boolean();
+      }
+      if (event.emailQuestion) {
+        signup.email = faker.internet.email({
+          firstName: signup.firstName ?? undefined,
+          lastName: signup.lastName ?? undefined,
         });
       }
-      return {
-        ...signup,
-        ...overrides,
-      };
-    }),
-  );
-  await Answer.bulkCreate(
-    signups.flatMap((signup) => {
-      if (!signup.confirmedAt) return [];
-      return event.questions!.map((question) => {
-        const answer: AnswerCreationAttributes = {
-          questionId: question.id,
-          signupId: signup.id,
-          answer: "",
-        };
-        // Generate answer value based on question type and other constraints
-        if (question.type === QuestionType.TEXT) {
-          answer.answer =
-            faker.helpers.maybe(() => faker.lorem.words({ min: 1, max: 3 }), {
-              probability: question.required ? 1 : 0.5,
-            }) ?? "";
-        } else if (question.type === QuestionType.TEXT_AREA) {
-          answer.answer =
-            faker.helpers.maybe(() => faker.lorem.sentences({ min: 1, max: 2 }), {
-              probability: question.required ? 1 : 0.5,
-            }) ?? "";
-        } else if (question.type === QuestionType.NUMBER) {
-          answer.answer =
-            faker.helpers.maybe(() => faker.number.int().toString(), {
-              probability: question.required ? 1 : 0.5,
-            }) ?? "";
-        } else if (question.type === QuestionType.SELECT) {
-          answer.answer =
-            faker.helpers.maybe(() => faker.helpers.arrayElement(question.options!), {
-              probability: question.required ? 1 : 0.5,
-            }) ?? "";
-        } else if (question.type === QuestionType.CHECKBOX) {
-          answer.answer = faker.helpers.arrayElements(question.options!, {
-            min: question.required ? 1 : 0,
-            max: Infinity,
-          });
-        } else {
-          question.type satisfies never;
-        }
-        return answer;
+    } else {
+      // Unconfirmed signup
+      signup.createdAt = faker.date.between({
+        from: moment().subtract(config.signupConfirmMins, "minutes").toDate(),
+        to: new Date(),
       });
-    }),
+    }
+    return {
+      ...signup,
+      ...overrides,
+    };
+  });
+  // Generate answers and update signups with prices.
+  const answerValues = signupValues.map((signup) => {
+    if (!signup.confirmedAt) return [];
+    const answersForSignup = event.questions!.map((question) => {
+      const answer: Omit<AnswerCreationAttributes, "signupId"> = {
+        questionId: question.id,
+        answer: "",
+      };
+      // Generate answer value based on question type and other constraints
+      if (question.id in answers) {
+        answer.answer = answers[question.id];
+      } else if (question.type === QuestionType.TEXT) {
+        answer.answer =
+          faker.helpers.maybe(() => faker.lorem.words({ min: 1, max: 3 }), {
+            probability: question.required ? 1 : 0.5,
+          }) ?? "";
+      } else if (question.type === QuestionType.TEXT_AREA) {
+        answer.answer =
+          faker.helpers.maybe(() => faker.lorem.sentences({ min: 1, max: 2 }), {
+            probability: question.required ? 1 : 0.5,
+          }) ?? "";
+      } else if (question.type === QuestionType.NUMBER) {
+        answer.answer =
+          faker.helpers.maybe(() => faker.number.int().toString(), {
+            probability: question.required ? 1 : 0.5,
+          }) ?? "";
+      } else if (question.type === QuestionType.SELECT) {
+        answer.answer =
+          faker.helpers.maybe(() => faker.helpers.arrayElement(question.options!), {
+            probability: question.required ? 1 : 0.5,
+          }) ?? "";
+      } else {
+        question.type satisfies QuestionType.CHECKBOX;
+        answer.answer = faker.helpers.arrayElements(question.options!, {
+          min: question.required ? 1 : 0,
+          max: Infinity,
+        });
+      }
+      return answer;
+    });
+    const quota = event.quotas!.find((q) => q.id === signup.quotaId)!;
+    const products = [
+      ...getQuotaProducts(quota),
+      ...validateAnswersAndGetProducts(event, answersForSignup, true).answerProducts,
+    ];
+    Object.assign(signup, computePrice(products));
+    return answersForSignup;
+  });
+  // Actually create signups.
+  const signups = await Signup.bulkCreate(signupValues);
+  // Add signup IDs to answers and create them.
+  // (Note: This would not work in MySQL, since it doesn't return us the IDs from Signup.bulkCreate.)
+  await Answer.bulkCreate(
+    answerValues.flatMap((answersForSignup, i) =>
+      answersForSignup.map((ans) => ({
+        ...ans,
+        signupId: signups[i].id,
+      })),
+    ),
   );
   return signups;
 }

@@ -5,9 +5,14 @@ export type SignupFormData<S extends SignupUpdateBody = SignupUpdateBody> = Omit
   answers: Record<QuestionID, string | string[]>;
 };
 
-/** Converts answers to object form for react-final-form. */
-export const signupToFormData = <S extends Pick<SignupForEdit, "answers">>(signup: S): SignupFormData<S> => ({
+/** Converts answers to object form for react-final-form and ensures name/email are set. */
+export const signupToFormData = <S extends Pick<SignupForEdit, "firstName" | "lastName" | "email" | "answers">>(
+  signup: S,
+): SignupFormData<S> => ({
   ...signup,
+  firstName: signup.firstName,
+  lastName: signup.lastName,
+  email: signup.email,
   answers: Object.fromEntries(signup.answers.map(({ questionId, answer }) => [questionId, answer])),
 });
 

@@ -45,6 +45,7 @@ const AppContainer = () => (
             <Route path={paths.eventsList} element={<EventList />} />
             <Route path={paths.eventDetails(":slug")} element={<SingleEvent />} />
             <Route path={paths.editSignup(":id", ":editToken")} element={<EditSignup />} />
+            <Route path={paths.completePayment(":id", ":editToken")} element={<EditSignup paid />} />
             <Route path={paths.adminLogin} element={<Login />} />
             <Route path={paths.adminInitialSetup} element={<InitialSetup />} />
             <Route path={paths.adminEventsList} element={<AdminEventsList />} />

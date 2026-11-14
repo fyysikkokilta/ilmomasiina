@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import { Button, Form as BsForm, Modal, Spinner } from "react-bootstrap";
+import { Alert, Button, Form as BsForm, Modal, Spinner } from "react-bootstrap";
 import { FieldInputProps, Form, FormRenderProps, useFormState } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -11,8 +11,10 @@ import {
   EditSignupState,
   errorDesc,
   getLocalizedEvent,
+  useEditSignupContext,
 } from "@tietokilta/ilmomasiina-client";
-import type { QuotaID } from "@tietokilta/ilmomasiina-models";
+import { questionHasPrices } from "@tietokilta/ilmomasiina-client/dist/utils/paymentUtils";
+import { QuotaID } from "@tietokilta/ilmomasiina-models";
 import FieldRow from "../../../components/FieldRow";
 import type { TKey } from "../../../i18n";
 import type { EditorEvent, EditorSignup } from "../../../modules/editor/types";
@@ -28,7 +30,6 @@ const QuotaField = (props: FieldInputProps<QuotaID>) => {
   return (
     <BsForm.Select {...props}>
       {quotas.map((quota) => (
-        // eslint-disable-next-line react/no-array-index-key
         <option key={quota.id} value={quota.id}>
           {quota.title}
         </option>
@@ -42,6 +43,11 @@ const EditSignupModalBody = ({ handleSubmit, submitting }: FormRenderProps<Signu
   const signupEditCanceled = useStore((state) => state.editor.signupEditCanceled);
   const { t } = useTranslation();
   const onSubmit = useEvent(handleSubmit);
+  const { event } = useEditSignupContext();
+
+  // TODO: When quotas can be changed, this needs to also check for paid quotas (i.e. eventHasPayments).
+  const questions = event?.questions;
+  const hasPaidQuestions = useMemo(() => questions?.some(questionHasPrices), [questions]);
 
   return (
     <BsForm className="ilmo--form" onSubmit={onSubmit}>
@@ -51,7 +57,7 @@ const EditSignupModalBody = ({ handleSubmit, submitting }: FormRenderProps<Signu
       <Modal.Body>
         {isNew && <FieldRow name="quotaId" as={QuotaField} label={t("editor.editSignup.quota")} required />}
         <CommonFields />
-        <QuestionFields name="answers" />
+        <QuestionFields name="answers" validate={false} />
         <FieldRow
           name="sendEmail"
           as={BsForm.Check}
@@ -70,7 +76,10 @@ const EditSignupModalBody = ({ handleSubmit, submitting }: FormRenderProps<Signu
             checkLabel={t("editor.editSignup.keepEditing.check")}
           />
         )}
-        <p>{t("editor.editSignup.validation")}</p>
+        <Alert variant="warning">
+          <p className="mb-0">{t("editor.editSignup.validation")}</p>
+          {hasPaidQuestions && !isNew && <p className="mb-0 mt-2">{t("editor.editSignup.priceChangeWarning")}</p>}
+        </Alert>
       </Modal.Body>
       <Modal.Footer>
         {submitting && <Spinner animation="border" />}
@@ -99,6 +108,11 @@ const EditSignupModal = () => {
       status: null,
       position: null,
       confirmed: false,
+      price: 0,
+      currency: CURRENCY,
+      products: [],
+      paymentStatus: null,
+      deletedAt: null,
       editableForMillis: Infinity,
       confirmableForMillis: Infinity,
       // Override with values from signup if this is an existing signup.
@@ -111,13 +125,16 @@ const EditSignupModal = () => {
       editToken: "",
       isNew: true,
       event: convertedEvent,
-      localizedEvent: getLocalizedEvent(convertedEvent, editedSignup?.language ?? values.defaultLanguage),
+      localizedEvent: getLocalizedEvent(convertedEvent, editedSignup.language ?? values.defaultLanguage),
       signup,
       localizedSignup: signup, // No need for quota name localization
       editingClosedOnLoad: false,
       confirmableUntil: Infinity,
       editableUntil: Infinity,
-      admin: true,
+      showPayment: false,
+      canEdit: true,
+      canEditNameAndEmail: true,
+      canEditPaidQuestions: true,
     };
   }, [values, editedSignup]);
 
