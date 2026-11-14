@@ -7,10 +7,10 @@
     "url": "git+https://github.com/Tietokilta/ilmomasiina.git"
   },
   "scripts": {
-    "start": "bnr start:dev",
-    "start:dev": "bnr start:dev",
-    "start:prod": "pnpm build && bnr start:prod",
-    "start:bench": "pnpm build && bnr start:bench",
+    "start": "pnpm start:dev",
+    "start:dev": "NODE_ENV=development DEBUG=app:* PORT=3001 tsx watch src/bin/server.ts",
+    "start:prod": "pnpm build && NODE_ENV=production DEBUG=app:* pm2 start dist/bin/server.js",
+    "start:bench": "pnpm build && NODE_ENV=bench DEBUG=app:* node dist/bin/server.js",
     "loadTest": "k6 run loadTest.js",
     "stop:prod": "pm2 stop 0",
     "monit:prod": "pm2 monit",
@@ -22,30 +22,6 @@
     "test:coverage": "vitest run --coverage",
     "filldb": "tsx test/fillDatabase.ts"
   },
-  "betterScripts": {
-    "start:dev": {
-      "command": "tsx watch src/bin/server.ts",
-      "env": {
-        "NODE_ENV": "development",
-        "DEBUG": "app:*",
-        "PORT": "3001"
-      }
-    },
-    "start:prod": {
-      "command": "pm2 start dist/bin/server.js",
-      "env": {
-        "NODE_ENV": "production",
-        "DEBUG": "app:*"
-      }
-    },
-    "start:bench": {
-      "command": "node dist/bin/server.js",
-      "env": {
-        "NODE_ENV": "bench",
-        "DEBUG": "app:*"
-      }
-    }
-  },
   "dependencies": {
     "@fastify/compress": "^9.3.0",
     "@fastify/cors": "^11.4.3",
@@ -53,15 +29,11 @@
     "@fastify/static": "^10.1.11",
     "@fastify/type-provider-typebox": "^6.3.0",
     "@tietokilta/ilmomasiina-models": "workspace:*",
-    "@types/pg": "^8.23.1",
-    "@types/validator": "^13.15.10",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "base32-encode": "^2.0.0",
     "bcrypt": "^6.0.0",
-    "better-npm-run": "^0.1.1",
     "debug": "^4.4.3",
-    "dotenv-flow": "^4.1.0",
+    "dotenv": "^18.0.10",
     "drizzle-orm": "1.0.0-rc.5",
     "fast-jwt": "^6.3.6",
     "fastify": "^5.12.8",
@@ -92,8 +64,10 @@
     "@types/k6": "^2.3.1",
     "@types/lodash": "^4.17.27",
     "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@types/validator": "^13.15.10",
     "@types/web-resource-inliner": "^4.2.5",
     "@vitest/coverage-v8": "^5.1.0",
     "drizzle-kit": "1.0.0-rc.5",

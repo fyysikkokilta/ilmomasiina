@@ -1,8 +1,5 @@
 packages:
   - "packages/*"
-# Replace or drop deprecated sub-dependencies whose parents have no newer release.
-overrides:
-  "react-widgets>@types/classnames": "-"
 minimumReleaseAge: 1440
 allowBuilds:
   "@parcel/watcher": false

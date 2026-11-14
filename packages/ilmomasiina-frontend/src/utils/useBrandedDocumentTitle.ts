@@ -1,7 +1,9 @@
-import { useDocumentTitle } from "usehooks-ts";
+import { useEffect } from "react";
 
 import branding from "../branding";
 
 export default function useBrandedDocumentTitle(title: string | undefined) {
-  useDocumentTitle(title ? `${title} - ${branding.headerTitleShort}` : branding.headerTitleShort);
+  useEffect(() => {
+    document.title = title ? `${title} - ${branding.headerTitleShort}` : branding.headerTitleShort;
+  }, [title]);
 }

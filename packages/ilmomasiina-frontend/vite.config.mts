@@ -1,12 +1,22 @@
 import babel from "@rolldown/plugin-babel";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
-import dotenvFlow from "dotenv-flow";
+import dotenv from "dotenv";
 import path from "path";
 import { defineConfig } from "vite";
 import { checker } from "vite-plugin-checker";
 
-// Load environment variables from .env files (from the root of repository)
-dotenvFlow.config({ path: path.resolve(import.meta.dirname, "../..") });
+// Load environment variables from .env files (from the root of repository). Files listed first take
+// precedence, missing files are skipped, and variables already set in the environment are never overridden.
+const envDir = path.resolve(import.meta.dirname, "../..");
+const nodeEnv = process.env.NODE_ENV;
+dotenv.config({
+  quiet: true,
+  path: [
+    ...(nodeEnv ? [`.env.${nodeEnv}.local`, `.env.${nodeEnv}`] : []),
+    ...(nodeEnv === "test" ? [] : [".env.local"]),
+    ".env",
+  ].map((file) => path.join(envDir, file)),
+});
 
 // Default to 127.0.0.1:3001 for the backend.
 // Use the dev-only variable DEV_BACKEND_PORT for this, keeping PORT always for the user-facing port.
