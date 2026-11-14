@@ -1,2 +1,12 @@
 packages:
 - 'packages/*'
+overrides:
+  "react-final-form@6.5.9>react": ^19.2.0
+  "react-final-form-arrays@3.1.4>react": ^19.2.0
+  "@types/nodemailer@*>@aws-sdk/client-sesv2": "-"
+minimumReleaseAge: 1440
+allowBuilds:
+  "@parcel/watcher": false
+  bcrypt: false
+  esbuild: false
+  unrs-resolver: false
