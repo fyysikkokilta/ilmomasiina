@@ -22,13 +22,14 @@ type SignupButtonProps = {
   isClosed: boolean;
   seconds: number;
   total: number;
+  now: number;
 };
 
-const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) => {
+const SignupButton = ({ isOpen, isClosed, seconds, total, now }: SignupButtonProps) => {
   const { localizedEvent: event, preview } = useSingleEventContext();
   const { registrationStartDate, registrationEndDate, quotas } = event!;
   const navigate = useNavigate();
-  const eventState = signupState(registrationStartDate, registrationEndDate);
+  const eventState = signupState(registrationStartDate, registrationEndDate, new Date(now));
   const [submitting, setSubmitting] = useState(false);
   const isOnly = quotas.length === 1;
   const showPrices = eventHasPaidQuotas(event!);
