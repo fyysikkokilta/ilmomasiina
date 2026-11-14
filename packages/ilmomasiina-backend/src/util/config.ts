@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { prettifyError, ZodError, ZodType } from "zod";
 
 /** Gets a boolean from the environment as true/false or 0/1. */
 export function envBoolean(name: string, defaultValue?: boolean) {
@@ -16,24 +17,11 @@ export function envBoolean(name: string, defaultValue?: boolean) {
 /** Gets a string from the environment, only accepting given values. */
 export function envEnum<V extends string | null>(name: string, values: readonly V[], defaultValue?: V) {
   const value = process.env[name] ?? defaultValue;
-  if (values.includes(value as V)) {
-    return value as V;
+  const match = values.find((allowed) => allowed === value);
+  if (match !== undefined) {
+    return match;
   }
   throw new Error(`Env variable ${name} must be one of ${values.map((val) => `'${val}'`).join(", ")}`);
-}
-
-/** Gets an array of strings from the environment. */
-export function envArray(name: string, defaultValue: null): string[] | null;
-export function envArray(name: string, defaultValue?: string[]): string[];
-export function envArray(name: string, defaultValue?: string[] | null) {
-  const value = process.env[name];
-  if (value === undefined && defaultValue !== undefined) {
-    return defaultValue;
-  }
-  if (value !== undefined) {
-    return value.split(",");
-  }
-  throw new Error(`Env variable ${name} must be set`);
 }
 
 /** Gets and parses and integer from the environment. */
@@ -44,7 +32,7 @@ export function envInteger(name: string, defaultValue?: number | null) {
   if (value === undefined && defaultValue !== undefined) {
     return defaultValue;
   }
-  const number = parseInt(value as string);
+  const number = parseInt(value!, 10);
   if (Number.isSafeInteger(number)) {
     return number;
   }
@@ -60,6 +48,29 @@ export function envString(name: string, defaultValue?: string | null) {
     return value;
   }
   throw new Error(`Env variable ${name} must be set`);
+}
+
+/** Gets a JSON value from the environment, parsed and validated with a Zod schema. */
+export function envJson<T>(name: string, schema: ZodType<T>, defaultValue: T): T {
+  const json = process.env[name];
+  if (json === undefined) {
+    return schema.parse(defaultValue);
+  }
+  let parsedJson: unknown;
+  try {
+    parsedJson = JSON.parse(json);
+  } catch (err) {
+    throw new Error(`Env variable ${name} must be valid JSON: ${err instanceof Error ? err.message : String(err)}`, {
+      cause: err,
+    });
+  }
+  try {
+    return schema.parse(parsedJson);
+  } catch (err) {
+    throw new Error(`Env variable ${name} is invalid:\n${err instanceof ZodError ? prettifyError(err) : String(err)}`, {
+      cause: err,
+    });
+  }
 }
 
 /**

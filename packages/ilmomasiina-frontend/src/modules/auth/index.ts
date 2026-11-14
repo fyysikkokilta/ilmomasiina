@@ -1,3 +1,4 @@
+import { captureMessage } from "@sentry/browser";
 import { toast } from "react-toastify";
 
 import { ApiError, apiFetch, FetchOptions } from "@tietokilta/ilmomasiina-client";
@@ -34,14 +35,13 @@ function getTokenExpiry(jwt: string): number {
   const parts = jwt.split(".");
 
   try {
-    const payload = JSON.parse(window.atob(parts[1]));
+    const payload: unknown = JSON.parse(window.atob(parts[1]));
 
-    if (payload.exp) {
+    if (typeof payload === "object" && payload !== null && "exp" in payload && typeof payload.exp === "number") {
       return payload.exp * 1000;
     }
   } catch {
-    // eslint-disable-next-line no-console
-    console.error("Invalid jwt token received!");
+    captureMessage("Invalid JWT received", "error");
   }
 
   return 0;
@@ -119,10 +119,8 @@ export const authSlice = storeSlice<Root>()("auth", (set, get, store, getSlice, 
         body: { accessToken },
         headers: { Authorization: accessToken.token },
       });
-      if (sessionResponse) {
-        getSlice().loginSucceeded(sessionResponse.accessToken);
-      }
-    } catch (err) {
+      getSlice().loginSucceeded(sessionResponse.accessToken);
+    } catch {
       // Ignore errors from login renewal - loginExpired() will trigger via requireAuth.
     }
   },
@@ -131,7 +129,8 @@ export const authSlice = storeSlice<Root>()("auth", (set, get, store, getSlice, 
     try {
       const { accessToken } = getSlice();
       if (!accessToken) {
-        throw new ApiError(401, { isUnauthenticated: true });
+        // Just redirect to login - it shouldn't be possible to even browse admin pages without login.
+        throw new ApiError(401, { code: ErrorCode.BAD_SESSION, message: "Not logged in" });
       }
       return await apiFetch<T>(uri, {
         ...opts,

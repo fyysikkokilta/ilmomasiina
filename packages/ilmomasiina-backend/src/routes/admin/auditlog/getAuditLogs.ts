@@ -4,7 +4,7 @@ import { Op, WhereOptions } from "sequelize";
 import type { AuditLogResponse, AuditLoqQuery } from "@tietokilta/ilmomasiina-models";
 import { AUDIT_LOG_DEFAULT_LIMIT } from "@tietokilta/ilmomasiina-models";
 import { AuditLog } from "../../../models/auditlog";
-import { StringifyApi } from "../../utils";
+import { asApiResponse } from "../../utils";
 
 const MAX_LOGS = 100;
 
@@ -48,5 +48,5 @@ export default async function getAuditLogItems(
     })),
     count: logs.count,
   };
-  return res as unknown as StringifyApi<typeof res>;
+  return asApiResponse(res);
 }

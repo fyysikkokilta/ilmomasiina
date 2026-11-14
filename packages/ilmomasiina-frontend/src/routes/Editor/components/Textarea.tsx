@@ -1,5 +1,11 @@
-import React from "react";
+import React, { TextareaHTMLAttributes } from "react";
 
-import { Form } from "react-bootstrap";
+import { Form, FormControlProps } from "react-bootstrap";
 
-export default (props: any) => <Form.Control as="textarea" {...props} />;
+const Textarea = (props: TextareaHTMLAttributes<HTMLTextAreaElement>) => {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- react-bootstrap's polymorphic `as` typing can't express this
+  const controlProps = props as FormControlProps;
+  return <Form.Control as="textarea" {...controlProps} />;
+};
+
+export default Textarea;

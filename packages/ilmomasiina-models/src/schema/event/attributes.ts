@@ -1,5 +1,6 @@
 import { Type } from "typebox";
 
+import { PaymentMode } from "../../enum";
 import { questionLanguage } from "../question";
 import { quotaLanguage } from "../quota";
 import { Nullable } from "../utils";
@@ -66,6 +67,9 @@ export const publicEventAttributes = Type.Object({
   emailQuestion: Type.Boolean({
     description: "Whether signups should contain an email field. Also enables confirmation emails.",
   }),
+  payments: Type.Enum(PaymentMode, {
+    description: "Payment mode for the event.",
+  }),
   defaultLanguage: Type.String({
     maxLength: 8,
     description: "The language of fields contained directly in the event body.",
@@ -81,6 +85,14 @@ export const adminOnlyEventAttributes = Type.Object({
     description:
       "Whether the event is publicly visible on the front page of Ilmomasiina." +
       " Unlisted events are only accessible with a direct link",
+  }),
+});
+
+/** Event attributes that are only for admins, only in event details. */
+export const adminDetailsOnlyEventAttributes = Type.Object({
+  preferredFrontend: Type.String({
+    maxLength: 255,
+    description: "Preferred frontend instance for this event.",
   }),
 });
 

@@ -14,9 +14,11 @@ export const quotaLanguage = quotaLanguageAttributes;
 export const quotaCreate = quotaAttributes;
 
 /** Schema for updating a quota. */
-export const quotaUpdate = Type.Interface([Type.Partial(quotaIdentity), quotaCreate], {}, {
-  description: "Set id to reuse an existing quota, or leave it empty to create a new one.",
-});
+export const quotaUpdate = Type.Interface(
+  [Type.Partial(quotaIdentity), quotaCreate],
+  {},
+  { description: "Set id to reuse an existing quota, or leave it empty to create a new one." },
+);
 
 /** Quota ID type. Randomly generated alphanumeric string. */
 export type QuotaID = Static<typeof quotaID>;

@@ -14,7 +14,7 @@ interface Options<A, K, R> {
   /** If set, used to log cache usage statistics. */
   logName?: string;
   /** The actual implementation of the cached function. */
-  get(key: A): Promise<R>;
+  get: (key: A) => Promise<R>;
   /** If set, used to convert arguments to a cache key. */
   formatKey?: (key: A) => K;
 }
@@ -27,7 +27,7 @@ interface Ongoing<R> {
 
 interface CachedGet<A, R> {
   (key: A): Promise<R>;
-  invalidate(key?: A): void;
+  invalidate: (key?: A) => void;
 }
 
 /**
@@ -45,12 +45,12 @@ export default function createCache<A, K, R>({
   allowTesting = false,
   logName,
   get,
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- without formatKey, the argument itself is the key (K = A)
   formatKey = (key) => key as unknown as K,
 }: Options<A, K, R>) {
   // Disable cache when in testing.
   if (process.env.NODE_ENV === "test" && !allowTesting) {
-    const dummyGet = ((key: A) => get(key)) as CachedGet<A, R>;
-    dummyGet.invalidate = () => {};
+    const dummyGet: CachedGet<A, R> = Object.assign((key: A) => get(key), { invalidate: () => {} });
     return dummyGet;
   }
 
@@ -59,7 +59,7 @@ export default function createCache<A, K, R>({
   let requestCount = 0;
   let hitCount = 0;
 
-  const cachedGet = (async (key: A) => {
+  const cachedGet = async (key: A) => {
     const formattedKey = formatKey(key);
     const currentGet = cache.get(formattedKey);
 
@@ -86,7 +86,7 @@ export default function createCache<A, K, R>({
           newGet.state = "success";
           return result;
         },
-        (error) => {
+        (error: unknown) => {
           newGet.state = "error";
           throw error;
         },
@@ -105,12 +105,13 @@ export default function createCache<A, K, R>({
     }
 
     return newGet.promise;
-  }) as CachedGet<A, R>;
+  };
 
-  cachedGet.invalidate = (key) => {
+  const invalidate = (key?: A) => {
     if (key) cache.delete(formatKey(key));
     else cache.clear();
   };
 
-  return cachedGet;
+  const result: CachedGet<A, R> = Object.assign(cachedGet, { invalidate });
+  return result;
 }

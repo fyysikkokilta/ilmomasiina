@@ -6,7 +6,7 @@ import { Form } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import branding from "../../branding";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import type { TKey } from "../../i18n";
@@ -23,14 +23,14 @@ const UserForm = () => {
   const onSubmit = async (data: FormData, form: FormApi<FormData>) => {
     try {
       await createUser(data);
-      getUsers();
+      void getUsers();
       form.restart();
       toast.success(t("adminUsers.createUser.success", { email: data.email }), {
         autoClose: 2000,
       });
     } catch (err) {
       toast.error(
-        t(errorDesc<TKey>(err as ApiError, "adminUsers.createUser.errors"), {
+        t(errorDesc<TKey>(err, "adminUsers.createUser.errors"), {
           email: data.email,
         }),
         { autoClose: 5000 },
@@ -46,14 +46,14 @@ const UserForm = () => {
       onSubmit={onSubmit}
     >
       {({ submitting, handleSubmit }) => (
-        <BsForm className="ilmo--form" onSubmit={handleSubmit}>
+        <BsForm className="ilmo--form" onSubmit={(event) => void handleSubmit(event)}>
           <FieldFormGroup name="email" label={t("adminUsers.createUser.email")}>
             {({ input, meta: { touched, error } }) => (
               <FormControl
                 {...input}
                 type="email"
                 required
-                isInvalid={touched && error}
+                isInvalid={touched && !!error}
                 placeholder={branding.loginPlaceholderEmail}
               />
             )}

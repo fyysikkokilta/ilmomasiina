@@ -20,12 +20,42 @@ import {
   Sequelize,
 } from "sequelize";
 
-import { SignupStatus } from "@tietokilta/ilmomasiina-models";
-import type { SignupAttributes } from "@tietokilta/ilmomasiina-models/dist/models";
+import {
+  ManualPaymentStatus,
+  PaymentStatus,
+  ProductSchema,
+  SignupPaymentStatus,
+  SignupStatus,
+} from "@tietokilta/ilmomasiina-models";
 import config from "../config";
 import type { Answer } from "./answer";
+import type { Payment } from "./payment";
 import type { Quota } from "./quota";
 import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
+import { jsonColumnGetter } from "./util/json";
+
+export interface SignupAttributes {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  namePublic: boolean;
+  email: string | null;
+  language: string | null;
+  confirmedAt: Date | null;
+  status: SignupStatus | null;
+  position: number | null;
+  /** Total price of the signup in cents, calculated when it was last updated. */
+  price: number | null;
+  /** The currency in which the price is denominated. */
+  currency: string | null;
+  /** The product lines used to calculate the price. */
+  products: ProductSchema[] | null;
+  /** Payment status set manually by an admin, without creating a Payment record. */
+  manualPaymentStatus: ManualPaymentStatus | null;
+  createdAt: Date;
+  deletedAt: Date | null;
+  quotaId: Quota["id"];
+}
 
 export interface SignupCreationAttributes extends Optional<
   SignupAttributes,
@@ -38,43 +68,75 @@ export interface SignupCreationAttributes extends Optional<
   | "language"
   | "status"
   | "position"
+  | "price"
+  | "currency"
+  | "products"
+  | "manualPaymentStatus"
   | "createdAt"
+  | "deletedAt"
 > {}
 
 export class Signup extends Model<SignupAttributes, SignupCreationAttributes> implements SignupAttributes {
-  public id!: string;
-  public firstName!: string | null;
-  public lastName!: string | null;
-  public namePublic!: boolean;
-  public email!: string | null;
-  public language!: string | null;
-  public confirmedAt!: Date | null;
-  public status!: SignupStatus | null;
-  public position!: number | null;
+  declare id: string;
+  declare firstName: string | null;
+  declare lastName: string | null;
+  declare namePublic: boolean;
+  declare email: string | null;
+  declare language: string | null;
+  declare confirmedAt: Date | null;
+  declare status: SignupStatus | null;
+  declare position: number | null;
+  declare price: number | null;
+  declare currency: string | null;
+  declare products: ProductSchema[] | null;
+  declare manualPaymentStatus: ManualPaymentStatus | null;
+  declare deletedAt: Date | null;
 
-  public quotaId!: Quota["id"];
-  public quota?: Quota;
-  public getQuota!: HasOneGetAssociationMixin<Quota>;
-  public setQuota!: HasOneSetAssociationMixin<Quota, Quota["id"]>;
-  public createQuota!: HasOneCreateAssociationMixin<Quota>;
+  declare quotaId: Quota["id"];
+  declare quota?: Quota;
+  declare getQuota: HasOneGetAssociationMixin<Quota | null>;
+  declare setQuota: HasOneSetAssociationMixin<Quota, Quota["id"]>;
+  declare createQuota: HasOneCreateAssociationMixin<Quota>;
 
-  public answers?: Answer[];
-  public getAnswers!: HasManyGetAssociationsMixin<Answer>;
-  public countAnswers!: HasManyCountAssociationsMixin;
-  public hasAnswer!: HasManyHasAssociationMixin<Answer, Answer["id"]>;
-  public hasAnswers!: HasManyHasAssociationsMixin<Answer, Answer["id"]>;
-  public setAnswers!: HasManySetAssociationsMixin<Answer, Answer["id"]>;
-  public addAnswer!: HasManyAddAssociationMixin<Answer, Answer["id"]>;
-  public addAnswers!: HasManyAddAssociationsMixin<Answer, Answer["id"]>;
-  public removeAnswer!: HasManyRemoveAssociationMixin<Answer, Answer["id"]>;
-  public removeAnswers!: HasManyRemoveAssociationsMixin<Answer, Answer["id"]>;
-  public createAnswer!: HasManyCreateAssociationMixin<Answer>;
+  declare answers?: Answer[];
+  declare getAnswers: HasManyGetAssociationsMixin<Answer>;
+  declare countAnswers: HasManyCountAssociationsMixin;
+  declare hasAnswer: HasManyHasAssociationMixin<Answer, Answer["id"]>;
+  declare hasAnswers: HasManyHasAssociationsMixin<Answer, Answer["id"]>;
+  declare setAnswers: HasManySetAssociationsMixin<Answer, Answer["id"]>;
+  declare addAnswer: HasManyAddAssociationMixin<Answer, Answer["id"]>;
+  declare addAnswers: HasManyAddAssociationsMixin<Answer, Answer["id"]>;
+  declare removeAnswer: HasManyRemoveAssociationMixin<Answer, Answer["id"]>;
+  declare removeAnswers: HasManyRemoveAssociationsMixin<Answer, Answer["id"]>;
+  declare createAnswer: HasManyCreateAssociationMixin<Answer>;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+
+  declare payments?: Payment[];
+  declare getPayments: HasManyGetAssociationsMixin<Payment>;
+  declare countPayments: HasManyCountAssociationsMixin;
+  declare hasPayment: HasManyHasAssociationMixin<Payment, Payment["id"]>;
+  declare hasPayments: HasManyHasAssociationsMixin<Payment, Payment["id"]>;
+  declare setPayments: HasManySetAssociationsMixin<Payment, Payment["id"]>;
+  declare addPayment: HasManyAddAssociationMixin<Payment, Payment["id"]>;
+  declare addPayments: HasManyAddAssociationsMixin<Payment, Payment["id"]>;
+  declare removePayment: HasManyRemoveAssociationMixin<Payment, Payment["id"]>;
+  declare removePayments: HasManyRemoveAssociationsMixin<Payment, Payment["id"]>;
+  declare createPayment: HasManyCreateAssociationMixin<Payment>;
+
+  declare activePayment?: Payment | null;
+  declare getActivePayment: HasOneGetAssociationMixin<Payment | null>;
+  declare setActivePayment: HasOneSetAssociationMixin<Payment, Payment["id"]>;
+  declare createActivePayment: HasOneCreateAssociationMixin<Payment>;
 
   public static readonly MAX_NAME_LENGTH = 255;
   public static readonly MAX_EMAIL_LENGTH = 255; // TODO
+
+  /** Gets whether this signup has been confirmed (i.e. filled in after creation). */
+  public get confirmed(): boolean {
+    return this.confirmedAt != null;
+  }
 
   /** Gets the time this signup must be confirmed by before it expires. */
   public get confirmableUntil(): Date {
@@ -86,6 +148,32 @@ export class Signup extends Model<SignupAttributes, SignupCreationAttributes> im
     return config.signupConfirmAfterClose
       ? new Date(this.createdAt.getTime() + config.signupConfirmMins * 60 * 1000)
       : this.createdAt;
+  }
+
+  public get hasPrice(): boolean {
+    return this.price != null && this.price > 0;
+  }
+
+  public get effectivePaymentStatus(): SignupPaymentStatus | null {
+    if (!this.payments) throw new Error("Payments not loaded for signup");
+    return this.paymentStatusWith(this.payments);
+  }
+
+  /** Computes the payment status of this signup from the given payments. */
+  public paymentStatusWith(payments: Payment[]): SignupPaymentStatus | null {
+    // Find payments by status
+    const paidPayment = payments.some((p) => p.status === PaymentStatus.PAID);
+    const refundedPayment = payments.some((p) => p.status === PaymentStatus.REFUNDED);
+
+    // If paid online or manually, it's paid
+    if (paidPayment || this.manualPaymentStatus === ManualPaymentStatus.PAID) return SignupPaymentStatus.PAID;
+    // If refunded online or manually, it's refunded
+    if (refundedPayment || this.manualPaymentStatus === ManualPaymentStatus.REFUNDED)
+      return SignupPaymentStatus.REFUNDED;
+    // If no need to pay, don't check further
+    if (!this.hasPrice) return null;
+    // If the signup has a price but no payment, it's pending (regardless of if payments exist)
+    return SignupPaymentStatus.PENDING;
   }
 }
 
@@ -138,30 +226,65 @@ export default function setupSignupModel(sequelize: Sequelize) {
       position: {
         type: DataTypes.INTEGER,
       },
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      currency: {
+        type: DataTypes.STRING(8),
+        allowNull: true,
+      },
+      products: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        get: jsonColumnGetter<ProductSchema[]>("products"),
+      },
+      manualPaymentStatus: {
+        type: DataTypes.ENUM(...Object.values(ManualPaymentStatus)),
+        allowNull: true,
+      },
       // Add createdAt manually to support milliseconds
       createdAt: {
         type: DataTypes.DATE(3),
         defaultValue: () => new Date(),
         allowNull: false,
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       sequelize,
       modelName: "signup",
       freezeTableName: true,
-      paranoid: true,
+      paranoid: false,
       scopes: {
         active: () => ({
           where: {
+            // Not deleted
+            deletedAt: { [Op.is]: null },
             [Op.or]: {
               // Is confirmed, or is new enough
-              confirmedAt: {
-                [Op.ne]: null,
-              },
-              createdAt: {
-                [Op.gt]: moment().subtract(config.signupConfirmMins, "minutes").toDate(),
-              },
+              confirmedAt: { [Op.ne]: null },
+              createdAt: { [Op.gt]: moment().subtract(config.signupConfirmMins, "minutes").toDate() },
             },
+          },
+        }),
+        admin: () => ({
+          where: {
+            [Op.or]: [
+              // Non-deleted active signups like above
+              {
+                deletedAt: { [Op.is]: null },
+                [Op.or]: {
+                  confirmedAt: { [Op.ne]: null },
+                  createdAt: { [Op.gt]: moment().subtract(config.signupConfirmMins, "minutes").toDate() },
+                },
+              },
+              // All deleted signups - filter by payment status after query
+              { deletedAt: { [Op.ne]: null } },
+            ],
           },
         }),
       },

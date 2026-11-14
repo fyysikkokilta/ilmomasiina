@@ -3,13 +3,18 @@ import { Static, Type } from "typebox";
 import { quotaID } from "../quota/attributes";
 import { Nullable } from "../utils";
 import {
-  dynamicSignupAttributes,
-  editableSignupAttributes,
+  adminDynamicSignupAttributes,
+  adminEditableSignupAttributes,
   editToken,
+  ownerDynamicSignupAttributes,
+  ownerEditableSignupAttributes,
+  publicDynamicSignupAttributes,
   publicEditableSignupAttributes,
   signupID,
   signupIdentity,
 } from "./attributes";
+
+export { signupID } from "./attributes";
 
 /** Request body for creating a signup. */
 export const signupCreateBody = Type.Object({
@@ -35,25 +40,28 @@ const adminSignupUpdateOptions = Type.Object({
 });
 
 /** Request body for editing an existing signup. */
-export const signupUpdateBody = Type.Partial(Type.Interface([editableSignupAttributes, signupLanguage], {}));
+export const signupUpdateBody = Type.Partial(Type.Interface([ownerEditableSignupAttributes, signupLanguage], {}));
 
 /** Request body for editing an existing signup as an admin. */
 export const adminSignupUpdateBody = Type.Partial(
-  Type.Interface([editableSignupAttributes, signupLanguage, adminSignupUpdateOptions], {}),
+  Type.Interface([adminEditableSignupAttributes, signupLanguage, adminSignupUpdateOptions], {}),
 );
 
 /** Request body for creating a signup as an admin. */
 export const adminSignupCreateBody = Type.Interface([signupCreateBody, adminSignupUpdateBody], {});
 
 /** Response schema for successfully editing a signup. */
-export const signupUpdateResponse = signupIdentity;
+export const signupUpdateResponse = Type.Interface(
+  [signupIdentity, ownerEditableSignupAttributes, ownerDynamicSignupAttributes],
+  {},
+);
 
 /** Schema for signups in event details from the public API. */
-export const publicSignupSchema = Type.Interface([publicEditableSignupAttributes, dynamicSignupAttributes], {});
+export const publicSignupSchema = Type.Interface([publicEditableSignupAttributes, publicDynamicSignupAttributes], {});
 
 /** Schema for signups in event details from the admin API. */
 export const adminSignupSchema = Type.Interface(
-  [signupIdentity, editableSignupAttributes, dynamicSignupAttributes],
+  [signupIdentity, adminEditableSignupAttributes, adminDynamicSignupAttributes],
   {},
 );
 

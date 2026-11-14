@@ -2,7 +2,7 @@ import React, { BaseSyntheticEvent, useCallback, useEffect, useMemo, useState } 
 
 import { Button, Spinner } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { errorDesc, errorTitle } from "@tietokilta/ilmomasiina-client";
 import LinkButton from "../../components/LinkButton";
@@ -11,6 +11,7 @@ import type { TKey } from "../../i18n";
 import useStore from "../../modules/store";
 import paths from "../../paths";
 import { isEventInPast } from "../../utils/eventState";
+import useBrandedDocumentTitle from "../../utils/useBrandedDocumentTitle";
 import AdminEventListItem from "./AdminEventListItem";
 
 const AdminEventsList = () => {
@@ -18,20 +19,22 @@ const AdminEventsList = () => {
   const [showPast, setShowPast] = useState(false);
   const { t } = useTranslation();
 
+  useBrandedDocumentTitle(t("adminEvents.title"));
+
   const togglePast = useCallback((evt: BaseSyntheticEvent) => {
     evt.preventDefault();
     setShowPast((prev) => !prev);
   }, []);
 
   useEffect(() => {
-    getAdminEvents();
+    void getAdminEvents();
     return () => resetState();
   }, [getAdminEvents, resetState]);
 
   const shownEvents = useMemo(() => {
     const filtered = events?.filter((event) => isEventInPast(event) === showPast);
     // Additionally, reverse events when viewing past events, so the newest event comes first.
-    return showPast ? filtered?.reverse() : filtered;
+    return showPast ? filtered?.toReversed() : filtered;
   }, [events, showPast]);
 
   if (loadError) {
@@ -90,10 +93,9 @@ const AdminEventsList = () => {
               <td colSpan={5}>
                 <Trans t={t} i18nKey={showPast ? "adminEvents.noEvents.past" : "adminEvents.noEvents.upcoming"}>
                   No (type) events to show. Would you like to
-                  {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                  <a href="#" onClick={togglePast} role="button">
+                  <Button variant="link" className="p-0 align-baseline" onClick={togglePast}>
                     view (other type) events
-                  </a>
+                  </Button>
                   or
                   <Link to={paths.adminEditEvent("new")}>create a new event</Link>?
                 </Trans>

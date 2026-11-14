@@ -1,34 +1,25 @@
-import i18n, { DefaultNamespace, ParseKeys } from "i18next";
+import i18n, { ParseKeys, use } from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
-// Import via full path to reduce entry chunk size.
-import { i18nResources as componentsRes } from "@tietokilta/ilmomasiina-client/dist/locales";
-import en from "./locales/en.json";
-import fi from "./locales/fi.json";
+import { i18nResources } from "./locales";
 
 export const defaultNS = ["frontend", "public"] as const;
-const fiCombined = { ...fi, ...componentsRes.fi } as const;
-const enCombined = { ...en, ...componentsRes.en } as const;
-export const resources = {
-  // these generate typescript errors if not exact match
-  fi: fiCombined satisfies typeof enCombined,
-  en: enCombined satisfies typeof fiCombined,
-} as const;
 
-export type KnownLanguage = keyof typeof resources;
-export const knownLanguages = Object.keys(resources) as KnownLanguage[];
+export type KnownLanguage = keyof typeof i18nResources;
+export const knownLanguages = Object.keys(i18nResources).filter((lang): lang is KnownLanguage =>
+  Object.hasOwn(i18nResources, lang),
+);
 
-export type TKey = ParseKeys<DefaultNamespace>;
+export type TKey = ParseKeys;
 
-i18n
-  .use(LanguageDetector)
+void use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources,
+    resources: i18nResources,
     fallbackLng: DEFAULT_LANGUAGE,
     defaultNS,
-    supportedLngs: Object.keys(resources),
+    supportedLngs: knownLanguages,
     interpolation: {
       // for React
       escapeValue: false,
@@ -38,5 +29,19 @@ i18n
       nsMode: "fallback",
     },
   });
+
+if (import.meta.hot) {
+  // In development, accept updated translations without reloading the entire app.
+  import.meta.hot.accept("./locales", (module) => {
+    if (!module) return;
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- dev-only hot reload of our own locale module
+    const newResources = module.i18nResources as Record<string, Record<string, string>>;
+    for (const lang of Object.keys(newResources)) {
+      for (const ns of Object.keys(newResources[lang])) {
+        i18n.addResourceBundle(lang, ns, newResources[lang][ns], true, true);
+      }
+    }
+  });
+}
 
 export default i18n;

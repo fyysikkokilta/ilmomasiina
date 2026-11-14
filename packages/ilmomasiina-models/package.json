@@ -1,11 +1,11 @@
 {
   "name": "@tietokilta/ilmomasiina-models",
-  "version": "2.1.0-beta.2",
+  "version": "3.0.0-alpha.1",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Tietokilta/ilmomasiina.git"
   },
-  "license": "MIT",
   "main": "dist/cjs/index.js",
   "types": "dist/esm/index.d.ts",
   "exports": {
@@ -26,11 +26,11 @@
     "clean": "rimraf dist",
     "typecheck": "tsc --build"
   },
-  "devDependencies": {
-    "rimraf": "^6.1.2",
-    "typescript": "~5.9.3"
-  },
   "dependencies": {
-    "typebox": "^1.0.74"
+    "typebox": "^1.4.7"
+  },
+  "devDependencies": {
+    "rimraf": "^6.1.4",
+    "typescript": "~7.0.2"
   }
 }

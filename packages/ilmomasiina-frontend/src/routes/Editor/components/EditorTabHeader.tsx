@@ -48,9 +48,11 @@ const tabForField: Record<keyof EditorEvent, EditorTab | null> = {
   emailQuestion: EditorTab.QUESTIONS,
   draft: EditorTab.BASIC_DETAILS,
   listed: EditorTab.BASIC_DETAILS,
+  preferredFrontend: EditorTab.BASIC_DETAILS,
   verificationEmail: EditorTab.EMAILS,
   quotas: EditorTab.QUOTAS,
   questions: EditorTab.QUESTIONS,
+  payments: EditorTab.BASIC_DETAILS,
   languages: EditorTab.BASIC_DETAILS,
   defaultLanguage: EditorTab.BASIC_DETAILS,
   moveSignupsToQueue: null,
@@ -66,7 +68,9 @@ const Tab = ({ id, activeTab, setActiveTab }: TabProps) => {
   const { errors } = useFormState({ subscription: { errors: true } });
   const hasErrors =
     errors != null &&
-    Object.entries(errors).some(([field, error]) => error && tabForField[field as keyof EditorEvent] === id);
+    Object.entries(errors).some(
+      ([field, error]) => error && (tabForField as Partial<Record<string, EditorTab | null>>)[field] === id,
+    );
 
   const onClick = useCallback(() => setActiveTab(id), [id, setActiveTab]);
 

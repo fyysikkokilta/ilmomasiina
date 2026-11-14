@@ -13,7 +13,8 @@ import {
 } from "@tietokilta/ilmomasiina-client";
 import type { EditorEvent } from "../../../modules/editor/types";
 import useStore from "../../../modules/store";
-import EditSignupForm from "../../EditSignup/components/EditForm";
+import useNow from "../../../utils/useNow";
+import EditForm from "../../EditSignup/components/EditForm";
 import EventDescription from "../../SingleEvent/components/EventDescription";
 import SignupCountdown from "../../SingleEvent/components/SignupCountdown";
 import LanguageSelect from "./LanguageSelect";
@@ -22,6 +23,7 @@ import { editorEventToUserEvent, previewDummySignup } from "./userComponentInter
 const PreviewTab = () => {
   const { values } = useFormState<EditorEvent>();
   const [previewingForm, setPreviewingForm] = useState(false);
+  const now = useNow(60 * 1000);
   const { i18n, t } = useTranslation();
   const selectedLanguage = useStore((state) => state.editor.selectedLanguage);
 
@@ -37,6 +39,7 @@ const PreviewTab = () => {
         pending: false,
         event: convertedEvent,
         localizedEvent,
+        registrationOpens: values.registrationStartDate?.getTime() ?? now - 30 * 60 * 60 * 1000,
         preview: { setPreviewingForm },
       },
       {
@@ -48,12 +51,18 @@ const PreviewTab = () => {
         signup,
         localizedSignup: signup, // No need for quota name localization
         editingClosedOnLoad: false,
-        confirmableUntil: Date.now() + 30 * 60 * 60 * 1000,
-        editableUntil: Date.now() + 30 * 60 * 60 * 1000,
+        confirmableUntil: now + 30 * 60 * 60 * 1000,
+        editableUntil: now + 30 * 60 * 60 * 1000,
+        showPayment: false,
+        canEdit: true,
+        canEditNameAndEmail: true,
+        canEditPaidQuestions: true,
+        canPayOnline: false,
+        isInQuota: true,
         preview: { setPreviewingForm },
       },
     ];
-  }, [values, selectedLanguage]);
+  }, [values, selectedLanguage, now]);
 
   return (
     <>
@@ -61,7 +70,7 @@ const PreviewTab = () => {
       <I18nextProvider i18n={previewI18n}>
         {previewingForm ? (
           <EditSignupContextProvider value={editSignupCtx}>
-            <EditSignupForm />
+            <EditForm />
           </EditSignupContextProvider>
         ) : (
           <SingleEventContextProvider value={singleEventCtx}>

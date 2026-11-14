@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import { ErrorCode, SignupValidationErrors } from "@tietokilta/ilmomasiina-models";
 import CustomError from "../../util/customError";
 
@@ -26,11 +25,5 @@ export class SignupValidationError extends CustomError {
   constructor(message: string, errors: SignupValidationErrors) {
     super(400, ErrorCode.SIGNUP_VALIDATION_ERROR, message);
     this.errors = errors;
-  }
-}
-
-export class SignupBlocked extends CustomError {
-  constructor(message: string) {
-    super(403, ErrorCode.SIGNUP_BLOCKED, message);
   }
 }

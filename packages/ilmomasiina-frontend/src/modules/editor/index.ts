@@ -1,4 +1,4 @@
-import { ApiError } from "@tietokilta/ilmomasiina-client";
+import { ApiError, toApiError } from "@tietokilta/ilmomasiina-client";
 import {
   AdminEventResponse,
   AdminSignupCreateBody,
@@ -6,6 +6,7 @@ import {
   AdminSignupUpdateBody,
   CategoriesResponse,
   CheckSlugResponse,
+  EditConflictError,
   ErrorCode,
   EventID,
   SignupID,
@@ -68,9 +69,8 @@ const blankSignup = {
   lastName: "",
   email: "",
   answers: [],
+  manualPaymentStatus: null,
 } satisfies Partial<EditorSignup>;
-
-/* eslint-disable no-param-reassign -- immer in use */
 
 export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSlice, setSlice, resetState) => ({
   ...initialState,
@@ -82,14 +82,14 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
       const response = await get().auth.adminApiFetch<AdminEventResponse>(`admin/events/${id}`);
       getSlice().loaded(response, toCopy);
     } catch (e) {
-      setSlice({ loadError: e as ApiError });
+      setSlice({ loadError: toApiError(e) });
     }
   },
   reloadEvent: () => {
     const { event } = getSlice();
     if (!event) return;
     getSlice().resetState();
-    getSlice().getEvent(event.id);
+    void getSlice().getEvent(event.id);
   },
   loaded: (event: AdminEventResponse | null, isNew: boolean) =>
     setSlice({
@@ -104,7 +104,7 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
     try {
       const response = await get().auth.adminApiFetch<CheckSlugResponse>(`admin/slugs/${slug}`);
       setSlice({ slugAvailability: response });
-    } catch (e) {
+    } catch {
       setSlice({ slugAvailability: null });
     }
   },
@@ -148,11 +148,15 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
       return response;
     } catch (e) {
       if (e instanceof ApiError && e.code === ErrorCode.WOULD_MOVE_SIGNUPS_TO_QUEUE) {
-        setSlice({ moveToQueueModal: { count: e.response!.count } });
+        const { response } = e;
+        const count =
+          typeof response === "object" && response !== null && "count" in response ? Number(response.count) : 0;
+        setSlice({ moveToQueueModal: { count } });
         return null;
       }
       if (e instanceof ApiError && e.code === ErrorCode.EDIT_CONFLICT) {
-        setSlice({ editConflictModal: e.response! });
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the error code fixes the response shape
+        setSlice({ editConflictModal: e.response as EditConflictError });
         return null;
       }
       throw e;
@@ -171,7 +175,7 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
     }),
   editNewSignup: (language: string) =>
     setSlice((state) => {
-      if (!state.event || !state.event.quotas.length) return state;
+      if (!state.event || state.event.quotas.length === 0) return state;
       return {
         ...state,
         editedSignup: {
@@ -189,7 +193,7 @@ export const editorSlice = storeSlice<Root>()("editor", (set, get, store, getSli
     try {
       await get().auth.adminApiFetch(`admin/signups/${id}`, { method: "DELETE" });
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   },

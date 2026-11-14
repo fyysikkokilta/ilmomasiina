@@ -13,21 +13,25 @@ if (!config.allowTestsToResetDb) {
   throw new Error(
     "THIS_IS_A_TEST_DB_AND_CAN_BE_WIPED=1 must be set to run fillDatabase.ts.\n" +
       `Warning: This script will insert ${NUM_EVENTS} with random signups into ` +
-      `your ${config.dbDialect} DB '${config.dbDatabase}' on ${config.dbHost}.`,
+      `your database '${config.dbDatabase}' on ${config.dbHost}.`,
   );
 }
 
-/* eslint-disable no-await-in-loop */
 async function main() {
   await setupDatabase();
 
-  for (let i = 0; i < NUM_EVENTS; i++) {
-    process.stderr.write(`\rCreating test events: ${i + 1}/${NUM_EVENTS}...`);
-    const event = await testEvent();
-    await testSignups(event, {
-      count: faker.number.int(NUM_SIGNUPS_PER_EVENT),
-    });
-  }
+  let created = 0;
+  await Promise.all(
+    Array.from({ length: NUM_EVENTS }, async () => {
+      const event = await testEvent();
+      await testSignups({
+        event,
+        count: faker.number.int(NUM_SIGNUPS_PER_EVENT),
+      });
+      created += 1;
+      process.stderr.write(`\rCreating test events: ${created}/${NUM_EVENTS}...`);
+    }),
+  );
 }
 
-main();
+void main(); // no top-level await in CJS

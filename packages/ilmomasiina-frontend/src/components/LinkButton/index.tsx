@@ -8,5 +8,7 @@ type Props = Omit<ButtonProps, "as" | "href" | "onClick"> & Pick<LinkProps, "to"
 export default function LinkButton({ to, replace, ...props }: Props) {
   const onClick = useLinkClickHandler(to, { replace });
   const href = useHref(to);
+  // With href set, Button renders an <a>, so the anchor click handler fits even though Button types it for <button>.
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   return <Button {...props} href={href} onClick={onClick as unknown as MouseEventHandler<HTMLButtonElement>} />;
 }

@@ -1,11 +1,11 @@
-import fastifyCompress from "@fastify/compress";
-import fastifyCors from "@fastify/cors";
-import fastifySensible from "@fastify/sensible";
-import fastifyStatic from "@fastify/static";
-import Ajv from "ajv";
+import { fastifyCompress } from "@fastify/compress";
+import { fastifyCors } from "@fastify/cors";
+import { fastifySensible } from "@fastify/sensible";
+import { fastifyStatic } from "@fastify/static";
+import { Ajv } from "ajv";
 import ajvFormats from "ajv-formats";
-import fastify, { FastifyInstance } from "fastify";
-import cron from "node-cron";
+import { fastify, FastifyInstance } from "fastify";
+import { schedule } from "node-cron";
 import path from "path";
 import zlib from "zlib";
 
@@ -59,7 +59,7 @@ export default async function initApp(): Promise<FastifyInstance> {
 
   // Enable configurable CORS
   if (config.allowOrigin) {
-    const corsOrigins = config.allowOrigin === "*" ? "*" : (config.allowOrigin?.split(",") ?? []);
+    const corsOrigins = config.allowOrigin === "*" ? "*" : config.allowOrigin.split(",");
     await server.register(fastifyCors, {
       origin: corsOrigins,
       methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -104,7 +104,7 @@ export default async function initApp(): Promise<FastifyInstance> {
       setHeaders: (res, filePath) => {
         // set immutable cache for javascript files with hash in the name
         if (javascriptHashRegex.test(filePath)) {
-          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+          res.header("Cache-Control", "public, max-age=31536000, immutable");
         }
       },
     });
@@ -128,16 +128,16 @@ export default async function initApp(): Promise<FastifyInstance> {
 
   if (config.nodeEnv !== "test") {
     // Every minute, remove signups that haven't been confirmed fast enough
-    cron.schedule("* * * * *", deleteUnconfirmedSignups);
+    schedule("* * * * *", deleteUnconfirmedSignups);
 
     // Daily at 8am, anonymize old signups
-    cron.schedule("0 8 * * *", anonymizeOldSignups);
+    schedule("0 8 * * *", anonymizeOldSignups);
 
     // Daily at 8am, delete deleted items from the database
-    cron.schedule("0 8 * * *", removeDeletedData);
+    schedule("0 8 * * *", removeDeletedData);
 
     // Daily at 8am, delete old audit logs
-    cron.schedule("0 8 * * *", deleteOldAuditLogs);
+    schedule("0 8 * * *", deleteOldAuditLogs);
   }
 
   return server;

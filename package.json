@@ -1,47 +1,49 @@
 {
   "name": "ilmomasiina",
-  "version": "2.1.0-beta.2",
+  "version": "3.0.0-alpha.1",
   "private": true,
-  "license": "MIT",
-  "engines": {
-    "node": "^24"
+  "bugs": {
+    "url": "https://github.com/Fyysikkokilta/ilmomasiina/issues"
   },
-  "packageManager": "pnpm@9.1.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fyysikkokilta/ilmomasiina"
+  },
   "scripts": {
     "bootstrap": "pnpm install",
     "clean": "pnpm run -r clean",
     "build": "pnpm run -r --workspace-concurrency=1 build",
     "start": "pnpm run -r --parallel start",
-    "lint": "eslint packages",
-    "lint:fix": "npm run lint -- --fix",
-    "format": "prettier -w packages/*/{src,test}/**/*.{ts,tsx,scss}",
+    "start:backend": "pnpm run --filter ilmomasiina-backend start",
+    "start:frontend": "pnpm run --filter ilmomasiina-frontend start",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix && pnpm run format",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "typecheck": "pnpm run -r --workspace-concurrency=1 typecheck",
     "test": "pnpm run -r test",
-    "test:backend": "pnpm run --filter ilmomasiina-backend test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Fyysikkokilta/ilmomasiina"
-  },
-  "bugs": {
-    "url": "https://github.com/Fyysikkokilta/ilmomasiina/issues"
+    "test:backend": "pnpm run --filter ilmomasiina-backend test",
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-airbnb-typescript": "^17.1.0",
-    "eslint-config-prettier": "^9.1.2",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jest": "^27.9.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-promise": "^6.6.0",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "prettier": "^3.7.4",
-    "typescript": "~5.9.3"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
+  },
+  "devDependencies": {
+    "globals": "^17.14.0",
+    "lint-staged": "^17.6.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "oxlint-tsgolint": "^7.0.2007",
+    "simple-git-hooks": "^2.14.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged"
+  },
+  "babel": {
+    "presets": [
+      "react-app"
+    ]
   },
   "browserslist": {
     "production": [
@@ -55,23 +57,8 @@
       "last 1 safari version"
     ]
   },
-  "babel": {
-    "presets": [
-      "react-app"
-    ]
+  "engines": {
+    "node": "^26"
   },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "jquery",
-        "popper.js",
-        "eslint"
-      ]
-    },
-    "overrides": {
-      "react-final-form@6.5.9>react": "^19.2.0",
-      "react-final-form-arrays@3.1.4>react": "^19.2.0",
-      "email-templates@*>preview-email": "0.0.0"
-    }
-  }
+  "packageManager": "pnpm@12.18.0"
 }

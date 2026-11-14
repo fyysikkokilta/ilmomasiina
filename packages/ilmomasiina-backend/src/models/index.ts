@@ -1,4 +1,5 @@
 import debug from "debug";
+import { types } from "pg";
 import { Sequelize } from "sequelize";
 import { SequelizeStorage, Umzug } from "umzug";
 
@@ -7,6 +8,7 @@ import setupAuditLogModel from "./auditlog";
 import sequelizeConfig from "./config";
 import setupEventModel, { Event } from "./event";
 import migrations from "./migrations";
+import setupPaymentModel, { Payment } from "./payment";
 import setupQuestionModel, { Question } from "./question";
 import setupQuotaModel, { Quota } from "./quota";
 import setupSignupModel, { Signup } from "./signup";
@@ -43,6 +45,10 @@ async function runMigrations() {
   await umzug.up();
 }
 
+// IDs are stored as CHAR(12), which Postgres pads with spaces. IDs from old installations can be
+// shorter than that, so strip the padding when reading. Comparisons on CHAR columns ignore it anyway.
+types.setTypeParser(types.builtins.BPCHAR, (value) => value.trimEnd());
+
 export default async function setupDatabase() {
   if (sequelize) return sequelize;
 
@@ -50,15 +56,16 @@ export default async function setupDatabase() {
   sequelize = new Sequelize(sequelizeConfig.default);
   try {
     await sequelize.authenticate();
-    const cfg = (sequelize.connectionManager as any).config;
-    debugLog(`Connected to ${cfg.host} as ${cfg.username}.`);
+    const cfg = sequelize.config;
+    debugLog(`Connected to ${cfg.host}:${cfg.port} as ${cfg.username}.`);
   } catch (err) {
-    const cfg = (sequelize.connectionManager as any).config;
-    console.error(`Error connecting to ${cfg.host} as ${cfg.username}: ${err}`);
+    const cfg = sequelize.config;
+    console.error(`Error connecting to ${cfg.host}:${cfg.port} as ${cfg.username}: ${String(err)}`);
     throw err;
   }
 
   setupEventModel(sequelize);
+  setupPaymentModel(sequelize);
   setupQuotaModel(sequelize);
   setupSignupModel(sequelize);
   setupQuestionModel(sequelize);
@@ -97,6 +104,26 @@ export default async function setupDatabase() {
     onDelete: "CASCADE",
   });
   Answer.belongsTo(Signup);
+
+  Signup.hasMany(Payment, {
+    foreignKey: {
+      allowNull: false,
+    },
+    // Deleting/renumbering payments is not allowed anyway, but this shouldn't hurt.
+    // TODO: How should we handle signup deletion when payments exist?
+    onUpdate: "RESTRICT",
+    onDelete: "RESTRICT",
+  });
+  Payment.belongsTo(Signup);
+  Signup.hasOne(Payment.scope("active"), {
+    as: "activePayment",
+    foreignKey: {
+      name: "signupId",
+      allowNull: false,
+    },
+    onUpdate: "RESTRICT",
+    onDelete: "RESTRICT",
+  });
 
   Question.hasMany(Answer, {
     foreignKey: {

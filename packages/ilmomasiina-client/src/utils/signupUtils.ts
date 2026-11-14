@@ -21,13 +21,14 @@ export function getSignupsAsList<Ev extends AnyEventSchema>(
   event: Ev,
   emails: string[] | null = null,
 ): SignupWithQuota<Ev>[] {
-  return event.quotas.flatMap(
-    (quota) =>
-      quota.signups?.map((signup) => ({
-        ...signup,
-        quota,
-        ...(event.emailQuestion && "email" in signup ? { isMember: emails!.includes(signup.email!) } : {}),
-      })) ?? [],
+  return event.quotas.flatMap((quota) =>
+    quota.signups.map((signup) => ({
+      ...signup,
+      quota,
+      ...(emails && event.emailQuestion && "email" in signup && signup.email
+        ? { isMember: emails.includes(signup.email) }
+        : {}),
+    })),
   );
 }
 
@@ -43,7 +44,7 @@ export function countOverflowSignups(quotas: QuotaWithSignupCount[], openQuotaSi
 /** Expands the quota type from {Admin,User}EventSchema, makes quota properties nullable and adds references to quota. */
 export type QuotaSignups<Ev extends AnyEventSchema = AnyEventSchema> = Omit<
   Ev["quotas"][number],
-  "id" | "title" | "size" | "signups"
+  "id" | "title" | "size" | "price" | "signups"
 > & {
   type: SignupStatus;
   id: QuotaID | null;
@@ -57,23 +58,21 @@ export function getSignupsByQuota(event: AnyEventSchema): QuotaSignups[] {
   const signupsDisabled =
     signupState(event.registrationStartDate, event.registrationEndDate).state === SignupState.disabled;
   const signups = getSignupsAsList(event);
-  const quotas = [
-    ...event.quotas
-      // If the event does not have signups, only show quotas that somehow still have signups within.
-      .filter((quota) => !signupsDisabled || quota.signupCount > 0)
-      .map((quota): QuotaSignups => {
-        const quotaSignups = signups.filter(
-          (signup) => signup.quota.id === quota.id && signup.status === SignupStatus.IN_QUOTA,
-        );
-        return {
-          ...quota,
-          type: SignupStatus.IN_QUOTA,
-          signups: quotaSignups,
-          // Trust signupCount and size, unless we have concrete information that more signups exist
-          signupCount: Math.max(quotaSignups.length, Math.min(quota.signupCount, quota.size ?? Infinity)),
-        };
-      }),
-  ];
+  const quotas = event.quotas
+    // If the event does not have signups, only show quotas that somehow still have signups within.
+    .filter((quota) => !signupsDisabled || quota.signupCount > 0)
+    .map((quota): QuotaSignups => {
+      const quotaSignups = signups.filter(
+        (signup) => signup.quota.id === quota.id && signup.status === SignupStatus.IN_QUOTA,
+      );
+      return {
+        ...quota,
+        type: SignupStatus.IN_QUOTA,
+        signups: quotaSignups,
+        // Trust signupCount and size, unless we have concrete information that more signups exist
+        signupCount: Math.max(quotaSignups.length, Math.min(quota.signupCount, quota.size ?? Infinity)),
+      };
+    });
 
   const { openQuotaCount, queueCount } = countOverflowSignups(event.quotas, event.openQuotaSize);
 

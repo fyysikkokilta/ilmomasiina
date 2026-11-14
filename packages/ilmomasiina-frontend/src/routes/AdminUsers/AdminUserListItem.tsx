@@ -4,8 +4,9 @@ import { Button, ButtonGroup } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import type { UserSchema } from "@tietokilta/ilmomasiina-models";
+import useConfirmDialog from "../../components/ConfirmDialog";
 import type { TKey } from "../../i18n";
 import useStore from "../../modules/store";
 
@@ -16,10 +17,10 @@ type Props = {
 const AdminUserListItem = ({ user }: Props) => {
   const { deleteUser, getUsers, resetUserPassword } = useStore((state) => state.adminUsers);
   const { t } = useTranslation();
+  const { confirm, dialog } = useConfirmDialog();
 
   async function onDelete() {
-    // eslint-disable-next-line no-alert
-    const confirmed = window.confirm(t("adminUsers.deleteUser.confirm", { user: user.email }));
+    const confirmed = await confirm(t("adminUsers.deleteUser.confirm", { user: user.email }));
     if (confirmed) {
       try {
         await deleteUser(user.id);
@@ -28,18 +29,17 @@ const AdminUserListItem = ({ user }: Props) => {
         });
       } catch (err) {
         toast.error(
-          t(errorDesc<TKey>(err as ApiError, "adminUsers.deleteUser.errors"), {
+          t(errorDesc<TKey>(err, "adminUsers.deleteUser.errors"), {
             user: user.email,
           }),
           { autoClose: 5000 },
         );
       }
-      getUsers();
+      void getUsers();
     }
   }
   async function onResetPassword() {
-    // eslint-disable-next-line no-alert
-    const confirmed = window.confirm(t("adminUsers.resetPassword.confirm", { user: user.email }));
+    const confirmed = await confirm(t("adminUsers.resetPassword.confirm", { user: user.email }));
     if (confirmed) {
       try {
         await resetUserPassword(user.id);
@@ -48,7 +48,7 @@ const AdminUserListItem = ({ user }: Props) => {
         });
       } catch (err) {
         toast.error(
-          t(errorDesc<TKey>(err as ApiError, "adminUsers.resetPassword.errors"), {
+          t(errorDesc<TKey>(err, "adminUsers.resetPassword.errors"), {
             user: user.email,
           }),
           { autoClose: 5000 },
@@ -57,19 +57,22 @@ const AdminUserListItem = ({ user }: Props) => {
     }
   }
   return (
-    <tr>
-      <td>{user.email}</td>
-      <td>
-        <ButtonGroup size="sm">
-          <Button type="button" onClick={onResetPassword} size="sm" variant="secondary">
-            {t("adminUsers.resetPassword")}
-          </Button>
-          <Button type="button" onClick={onDelete} size="sm" variant="danger">
-            {t("adminUsers.deleteUser")}
-          </Button>
-        </ButtonGroup>
-      </td>
-    </tr>
+    <>
+      <tr>
+        <td>{user.email}</td>
+        <td>
+          <ButtonGroup size="sm">
+            <Button type="button" onClick={() => void onResetPassword()} size="sm" variant="secondary">
+              {t("adminUsers.resetPassword")}
+            </Button>
+            <Button type="button" onClick={() => void onDelete()} size="sm" variant="danger">
+              {t("adminUsers.deleteUser")}
+            </Button>
+          </ButtonGroup>
+        </td>
+      </tr>
+      {dialog}
+    </>
   );
 };
 

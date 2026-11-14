@@ -14,9 +14,11 @@ export const questionLanguage = questionLanguageAttributes;
 export const questionCreate = questionAttributes;
 
 /** Schema for updating a question. */
-export const questionUpdate = Type.Interface([Type.Partial(questionIdentity), questionCreate], {}, {
-  description: "Set id to reuse an existing question, or leave it empty to create a new one.",
-});
+export const questionUpdate = Type.Interface(
+  [Type.Partial(questionIdentity), questionCreate],
+  {},
+  { description: "Set id to reuse an existing question, or leave it empty to create a new one." },
+);
 
 /** Question ID type. Randomly generated alphanumeric string. */
 export type QuestionID = Static<typeof questionID>;

@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { FORM_ERROR } from "final-form";
-import { Button, Form as BsForm } from "react-bootstrap";
+import { Alert, Button, Form as BsForm, Table } from "react-bootstrap";
 import { Form, FormRenderProps, useFormState } from "react-final-form";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 import {
@@ -12,24 +12,86 @@ import {
   errorDesc,
   useDeleteSignup,
   useEditSignupContext,
+  useStartPayment,
   useUpdateSignup,
 } from "@tietokilta/ilmomasiina-client";
-import { ErrorCode, SignupValidationError } from "@tietokilta/ilmomasiina-models";
+import { ErrorCode, SignupPaymentStatus, SignupValidationError } from "@tietokilta/ilmomasiina-models";
 import LinkButton from "../../../components/LinkButton";
 import type { TKey } from "../../../i18n";
 import paths from "../../../paths";
 import { useDurationFormatter } from "../../../utils/dateFormat";
+import { useDecimalPriceFormatter } from "../../../utils/priceFormat";
 import useEvent from "../../../utils/useEvent";
+import useNow from "../../../utils/useNow";
 import CommonFields from "./CommonFields";
 import DeleteSignup from "./DeleteSignup";
 import { formDataToSignupUpdate, SignupFormData, signupToFormData } from "./formData";
 import NarrowContainer from "./NarrowContainer";
 import QuestionFields from "./QuestionFields";
-import SignupStatus from "./SignupStatus";
+import SignupStatusAndPosition from "./SignupStatusAndPosition";
+
+type PaymentProps = {
+  disabled: boolean;
+  onPay: () => Promise<void>;
+};
+
+const Payment = ({ disabled, onPay }: PaymentProps) => {
+  const { signup, paymentError, canPayOnline, isInQuota } = useEditSignupContext();
+  const formatPrice = useDecimalPriceFormatter(signup!.currency ?? CURRENCY);
+  const { t } = useTranslation();
+
+  let alert = null;
+  if (paymentError) {
+    alert = <Alert variant="danger">{t(errorDesc<TKey>(paymentError, "editSignup.paymentError"))}</Alert>;
+  } else if (signup!.paymentStatus === SignupPaymentStatus.PENDING) {
+    if (isInQuota) {
+      alert = <Alert variant="info">{t("editSignup.payment.status.pending")}</Alert>;
+    } else {
+      alert = <Alert variant="info">{t("editSignup.payment.status.inQueue")}</Alert>;
+    }
+  } else if (signup!.paymentStatus === SignupPaymentStatus.PAID) {
+    alert = <Alert variant="success">{t("editSignup.payment.status.paid")}</Alert>;
+  } else if (signup!.paymentStatus === SignupPaymentStatus.REFUNDED) {
+    alert = <Alert variant="info">{t("editSignup.payment.status.refunded")}</Alert>;
+  }
+
+  return (
+    <section className="ilmo--payment-summary">
+      <h2>{t("editSignup.title.payment")}</h2>
+      {alert}
+      <Table>
+        <tbody>
+          {signup!.products?.map((product) => (
+            <tr key={product.name}>
+              <td className="ilmo--amount">{t("editSignup.payment.amount", { amount: product.amount })}</td>
+              <td className="ilmo--product">{product.name}</td>
+              <td className="ilmo--price">{formatPrice(product.unitPrice)}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th className="ilmo--total" colSpan={2}>
+              {t("editSignup.payment.total")}
+            </th>
+            <th className="ilmo--price">{formatPrice(signup!.price ?? 0)}</th>
+          </tr>
+        </tfoot>
+      </Table>
+      {canPayOnline && (
+        <nav className="ilmo--submit-buttons">
+          <Button variant="primary" onClick={() => void onPay()} disabled={disabled || !isInQuota}>
+            {t("editSignup.action.pay")}
+          </Button>
+        </nav>
+      )}
+    </section>
+  );
+};
 
 const SubmitError = () => {
   const { isNew } = useEditSignupContext();
-  const { submitError } = useFormState({ subscription: { submitError: true } });
+  const submitError: unknown = useFormState({ subscription: { submitError: true } }).submitError;
   const { t } = useTranslation();
 
   return submitError ? (
@@ -43,36 +105,22 @@ const SubmitError = () => {
 const EXPIRY_WARNING_THRESHOLD = 5 * 60 * 1000;
 
 const EditableUntil = () => {
-  const {
-    localizedEvent: event,
-    signup,
-    editingClosedOnLoad,
-    editableUntil,
-    confirmableUntil,
-  } = useEditSignupContext();
+  const { signup, editingClosedOnLoad, editableUntil, confirmableUntil } = useEditSignupContext();
   const { t } = useTranslation();
   const duration = useDurationFormatter();
 
   // Rerender every second
-  const [, refresh] = useState({});
-  useEffect(() => {
-    if (editingClosedOnLoad) return undefined;
-    const timer = window.setInterval(() => refresh({}), 1000);
-    return () => window.clearInterval(timer);
-  }, [editingClosedOnLoad]);
+  const now = useNow(1000, !editingClosedOnLoad);
 
   if (editingClosedOnLoad) {
-    return (
-      <>
-        <p>{t("editSignup.editable.closed")}</p>
-        <p>
-          <Link to={paths.eventDetails(event!.slug)}>{t("editSignup.backToEvent")}</Link>
-        </p>
-      </>
-    );
+    return <p>{t("editSignup.editable.closed")}</p>;
   }
 
-  const now = Date.now();
+  if (signup!.paymentStatus === SignupPaymentStatus.PAID) {
+    // Handled by the <Alert> in <Payment>
+    return null;
+  }
+
   if (signup!.confirmed) {
     return <p>{t("editSignup.editable.confirmed", { duration: duration(Math.max(editableUntil! - now)) })}</p>;
   }
@@ -88,23 +136,25 @@ const EditableUntil = () => {
 };
 
 const EditFormSubmit = ({ disabled }: { disabled: boolean }) => {
-  const { localizedEvent: event, editingClosedOnLoad, isNew, preview } = useEditSignupContext();
+  const { localizedEvent: event, isNew, canEdit, preview } = useEditSignupContext();
   const { t } = useTranslation();
 
-  return editingClosedOnLoad ? null : (
+  return (
     <>
-      <p>
-        {t("editSignup.editInstructions")}
-        {event!.emailQuestion && ` ${t("editSignup.editInstructions.email")}`}
-      </p>
+      {canEdit && (
+        <p>
+          {t("editSignup.editInstructions")}
+          {event!.emailQuestion && ` ${t("editSignup.editInstructions.email")}`}
+        </p>
+      )}
       <nav className="ilmo--submit-buttons">
         {!preview && !isNew && (
           <LinkButton variant="link" to={paths.eventDetails(event!.slug)}>
-            {t("editSignup.action.cancel")}
+            {t("editSignup.action.back")}
           </LinkButton>
         )}
         {!preview && (
-          <Button type="submit" variant="primary" formNoValidate disabled={disabled}>
+          <Button type="submit" variant="primary" formNoValidate disabled={!canEdit || disabled}>
             {isNew ? t("editSignup.action.save") : t("editSignup.action.edit")}
           </Button>
         )}
@@ -119,12 +169,13 @@ const EditFormSubmit = ({ disabled }: { disabled: boolean }) => {
 };
 
 type BodyProps = FormRenderProps<SignupFormData> & {
-  deleting: boolean;
-  onDelete: () => void;
+  processing: boolean;
+  onDelete: () => Promise<void>;
+  onPay: () => Promise<void>;
 };
 
-const EditFormBody = ({ handleSubmit, deleting, onDelete }: BodyProps) => {
-  const { isNew, editingClosedOnLoad, preview } = useEditSignupContext();
+const EditFormBody = ({ handleSubmit, processing, onDelete, onPay }: BodyProps) => {
+  const { isNew, canEdit, showPayment, preview } = useEditSignupContext();
   const { t } = useTranslation();
   const { submitting } = useFormState({ subscription: { submitting: true } });
   const onSubmit = useEvent(handleSubmit);
@@ -132,22 +183,28 @@ const EditFormBody = ({ handleSubmit, deleting, onDelete }: BodyProps) => {
   return useMemo(
     () => (
       <NarrowContainer>
+        {showPayment && <Payment onPay={onPay} disabled={submitting || processing} />}
         <h2>
-          {/* eslint-disable-next-line no-nested-ternary */}
-          {preview ? t("editSignup.title.preview") : isNew ? t("editSignup.title.signup") : t("editSignup.title.edit")}
+          {preview
+            ? t("editSignup.title.preview")
+            : !canEdit
+              ? t("editSignup.title.view")
+              : isNew
+                ? t("editSignup.title.signup")
+                : t("editSignup.title.edit")}
         </h2>
-        <SignupStatus />
+        <SignupStatusAndPosition />
         <EditableUntil />
         <SubmitError />
-        <BsForm onSubmit={onSubmit} className="ilmo--form">
+        <BsForm onSubmit={(event) => void onSubmit(event)} className="ilmo--form">
           <CommonFields />
           <QuestionFields name="answers" />
-          <EditFormSubmit disabled={submitting || deleting} />
+          <EditFormSubmit disabled={submitting || processing} />
         </BsForm>
-        {!editingClosedOnLoad && !preview && <DeleteSignup deleting={deleting} onDelete={onDelete} />}
+        {canEdit && !preview && <DeleteSignup processing={processing} onDelete={onDelete} />}
       </NarrowContainer>
     ),
-    [onSubmit, onDelete, deleting, isNew, editingClosedOnLoad, submitting, preview, t],
+    [onSubmit, onDelete, onPay, processing, isNew, submitting, canEdit, preview, showPayment, t],
   );
 };
 
@@ -155,7 +212,8 @@ const EditForm = () => {
   const { localizedEvent: event, localizedSignup: signup, isNew, preview } = useEditSignupContext();
   const updateSignup = useUpdateSignup();
   const deleteSignup = useDeleteSignup();
-  const [deleting, setDeleting] = useState(false);
+  const startPayment = useStartPayment();
+  const [processing, setProcessing] = useState(false);
   const navigate = useNavigate();
   const {
     t,
@@ -171,22 +229,27 @@ const EditForm = () => {
     // Convert answers back from object to array.
     const update = formDataToSignupUpdate(formData);
     try {
-      await updateSignup({ ...update, language });
+      const updated = await updateSignup({ ...update, language });
       toast.update(progressToast, {
-        render: isNew ? t("editSignup.status.signupSuccess") : t("editSignup.status.editSuccess"),
+        render: isNew
+          ? updated.paymentStatus != null
+            ? t("editSignup.status.signupSuccess.needPayment")
+            : t("editSignup.status.signupSuccess")
+          : t("editSignup.status.editSuccess"),
         type: "success",
         autoClose: 5000,
         closeButton: true,
         closeOnClick: true,
         isLoading: false,
       });
-      if (isNew) {
-        navigate(paths.eventDetails(event!.slug));
+      // If this was a new signup and no payment is needed, go to event details.
+      if (isNew && updated.paymentStatus == null) {
+        void navigate(paths.eventDetails(event!.slug));
       }
       return undefined;
     } catch (error) {
       toast.update(progressToast, {
-        render: t(errorDesc<TKey>(error as ApiError, isNew ? "editSignup.signupError" : "editSignup.editError")),
+        render: t(errorDesc<TKey>(error, isNew ? "editSignup.signupError" : "editSignup.editError")),
         type: "error",
         autoClose: 5000,
         closeButton: true,
@@ -196,7 +259,8 @@ const EditForm = () => {
       // Augment the submit errors object if the error is a submit validation error.
       const errors =
         error instanceof ApiError && error.code === ErrorCode.SIGNUP_VALIDATION_ERROR
-          ? (error.response! as SignupValidationError).errors
+          ? // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the error code fixes the response shape
+            (error.response as SignupValidationError).errors
           : null;
       return { [FORM_ERROR]: error, ...errors };
     }
@@ -205,7 +269,7 @@ const EditForm = () => {
   const onDelete = useEvent(async () => {
     const progressToast = toast.loading(t("editSignup.status.delete"));
     try {
-      setDeleting(true);
+      setProcessing(true);
       await deleteSignup();
       toast.update(progressToast, {
         render: t("editSignup.status.deleteSuccess"),
@@ -214,10 +278,10 @@ const EditForm = () => {
         closeOnClick: true,
         isLoading: false,
       });
-      navigate(paths.eventDetails(event!.slug));
+      void navigate(paths.eventDetails(event!.slug));
     } catch (error) {
       toast.update(progressToast, {
-        render: t(errorDesc<TKey>(error as ApiError, "editSignup.deleteError")),
+        render: t(errorDesc<TKey>(error, "editSignup.deleteError")),
         type: "error",
         autoClose: 5000,
         closeButton: true,
@@ -225,13 +289,35 @@ const EditForm = () => {
         isLoading: false,
       });
     } finally {
-      setDeleting(false);
+      setProcessing(false);
+    }
+  });
+
+  const onPay = useEvent(async () => {
+    const progressToast = toast.loading(t("editSignup.status.startingPayment"));
+    try {
+      setProcessing(true);
+      const paymentUrl = await startPayment();
+      toast.dismiss(progressToast);
+      // Redirect to payment provider.
+      window.location.href = paymentUrl;
+    } catch (error) {
+      toast.update(progressToast, {
+        render: t(errorDesc<TKey>(error, "editSignup.paymentError")),
+        type: "error",
+        autoClose: 5000,
+        closeButton: true,
+        closeOnClick: true,
+        isLoading: false,
+      });
+      // Keep the form disabled when redirecting, so only reset this in catch.
+      setProcessing(false);
     }
   });
 
   return (
     <Form<SignupFormData> onSubmit={onSubmit} initialValues={initialValues}>
-      {(props) => <EditFormBody {...props} deleting={deleting} onDelete={onDelete} />}
+      {(props) => <EditFormBody {...props} processing={processing} onDelete={onDelete} onPay={onPay} />}
     </Form>
   );
 };

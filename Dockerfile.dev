@@ -4,27 +4,24 @@
 # Node modules will be installed at the build phase and included in the container image.
 # Sources and other files are intended to be provided using bind mounts.
 
-FROM node:24-alpine
+FROM node:26-alpine
 
 WORKDIR /opt/ilmomasiina
 
 # Copy static resources from the repository root
-COPY .eslint* package.json pnpm-*.yaml ./
+COPY .oxlintrc.json .oxfmtrc.json package.json pnpm-*.yaml ./
 
 # Copy static resources from each package
 COPY packages/ilmomasiina-frontend/package.json \
   packages/ilmomasiina-frontend/tsconfig.json \
-  packages/ilmomasiina-frontend/.eslint* \
   packages/ilmomasiina-frontend/
 
 COPY packages/ilmomasiina-client/package.json \
   packages/ilmomasiina-client/tsconfig.json \
-  packages/ilmomasiina-client/.eslint* \
   packages/ilmomasiina-client/
 
 COPY packages/ilmomasiina-backend/package.json \
   packages/ilmomasiina-backend/tsconfig.json \
-  packages/ilmomasiina-backend/.eslint* \
   packages/ilmomasiina-backend/
 
 COPY packages/ilmomasiina-models/package.json \
@@ -36,4 +33,5 @@ ENV NODE_ENV=development
 ENV HOST=0.0.0.0
 
 # Install dependencies (we're running as root, so the postinstall script doesn't run automatically)
-RUN corepack enable && pnpm install --frozen-lockfile
+# Node 25+ no longer ships corepack, so install it via npm first.
+RUN npm install -g corepack && corepack enable pnpm && pnpm install --frozen-lockfile

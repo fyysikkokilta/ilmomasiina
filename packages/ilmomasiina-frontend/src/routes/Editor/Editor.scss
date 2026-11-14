@@ -110,6 +110,11 @@
   --bs-table-color-type: var(--bs-secondary-color);
 }
 
+.event-editor--signup-table .ilmo--deleted {
+  text-decoration: line-through;
+  --bs-table-color-type: var(--bs-secondary-color);
+}
+
 @include media-breakpoint-down(sm) {
   .event-editor--question-buttons {
     display: flex;

@@ -12,5 +12,6 @@ export default function useEvent<T extends (...args: never[]) => unknown>(func: 
     ref.current = func;
   }, [func]);
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the wrapper has the same signature as func
   return useCallback((...args: Parameters<T>) => ref.current(...args), []) as T;
 }

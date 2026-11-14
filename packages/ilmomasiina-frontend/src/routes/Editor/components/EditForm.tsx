@@ -1,14 +1,14 @@
 import React, { BaseSyntheticEvent, useMemo, useState } from "react";
 
 import { FormApi } from "final-form";
-import arrayMutators from "final-form-arrays";
+import arrayMutators, { remove as removeMutator } from "final-form-arrays";
 import { Form as BsForm } from "react-bootstrap";
 import { Form, FormRenderProps } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
-import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import type { TKey } from "../../../i18n";
 import { selectFormData, serverEventToEditor } from "../../../modules/editor/selectors";
 import type { EditorEvent } from "../../../modules/editor/types";
@@ -90,9 +90,12 @@ const mutators = {
   // The default remove() mutator deletes the entire field if the array becomes empty.
   // This is written based on final-form-arrays's source code to undo that stupidity.
   // See https://github.com/final-form/final-form-arrays/blob/master/src/remove.js
-  remove: ([name, index], state, tools) => {
-    const returnValue = arrayMutators.remove([name, index], state, tools);
-    tools.changeValue(state, name, (value) => value ?? []);
+  remove: (args, state, tools) => {
+    const name: unknown = args[0];
+    const index: unknown = args[1];
+    if (typeof name !== "string" || typeof index !== "number") throw new Error("Invalid remove() arguments");
+    const returnValue: unknown = removeMutator([name, index], state, tools);
+    tools.changeValue(state, name, (value?: unknown[]) => value ?? []);
     return returnValue;
   },
 } satisfies typeof arrayMutators;
@@ -113,7 +116,7 @@ const EditForm = () => {
       let saved;
       if (isNew) {
         saved = await publishNewEvent(data);
-        navigate(paths.adminEditEvent(saved.id));
+        void navigate(paths.adminEditEvent(saved.id));
         toast.success(t("editor.status.createSuccess"), { autoClose: 2000 });
       } else {
         saved = await publishEventUpdate(event!.id, data);
@@ -129,7 +132,7 @@ const EditForm = () => {
         form.change("questions", newFormData.questions);
       }
     } catch (error) {
-      toast.error(t(errorDesc<TKey>(error as ApiError, "editor.saveError")), {
+      toast.error(t(errorDesc<TKey>(error, "editor.saveError")), {
         autoClose: 2000,
       });
     }

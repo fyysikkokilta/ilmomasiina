@@ -2,12 +2,12 @@ import { Static, Type } from "typebox";
 
 import { userEventForSignup } from "../event";
 import { quota } from "../quota";
-import { dynamicSignupAttributes, editableSignupAttributes, signupIdentity } from "../signup/attributes";
+import { ownerDynamicSignupAttributes, ownerEditableSignupAttributes, signupIdentity } from "../signup/attributes";
 
 // This is here because it depends on quota, causing an import cycle.
 /** Schema for fetching a signup for editing. */
 export const signupForEdit = Type.Interface(
-  [signupIdentity, editableSignupAttributes, dynamicSignupAttributes],
+  [signupIdentity, ownerEditableSignupAttributes, ownerDynamicSignupAttributes],
   {
     quota,
     confirmableForMillis: Type.Integer({

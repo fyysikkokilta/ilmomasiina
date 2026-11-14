@@ -1,7 +1,7 @@
 import i18n from "i18next";
 
-import * as en from "./locales/en.json";
-import * as fi from "./locales/fi.json";
+import en from "./locales/en.json";
+import fi from "./locales/fi.json";
 
 const resources = {
   // this way we generate typescript errors if not exact match
@@ -10,7 +10,9 @@ const resources = {
 } as const;
 
 export type KnownLanguage = keyof typeof resources;
-export const knownLanguages = Object.keys(resources) as KnownLanguage[];
+export const knownLanguages = Object.keys(resources).filter((lang): lang is KnownLanguage =>
+  Object.hasOwn(resources, lang),
+);
 
 export { resources as i18nResources };
 

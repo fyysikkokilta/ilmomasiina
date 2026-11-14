@@ -8,12 +8,9 @@ import FieldRow from "../../../components/FieldRow";
 import useFieldErrors from "./fieldError";
 
 const CommonFields = () => {
-  const { localizedEvent: event, localizedSignup: signup, editingClosedOnLoad, admin } = useEditSignupContext();
-  const isNew = !signup!.confirmed;
+  const { localizedEvent: event, canEdit, canEditNameAndEmail } = useEditSignupContext();
   const { t } = useTranslation();
   const formatError = useFieldErrors();
-
-  const canEditNameAndEmail = isNew && !editingClosedOnLoad;
 
   return (
     <>
@@ -25,7 +22,7 @@ const CommonFields = () => {
             label={t("editSignup.fields.firstName")}
             placeholder={t("editSignup.fields.firstName.placeholder")}
             required
-            readOnly={!canEditNameAndEmail && !admin}
+            readOnly={!canEditNameAndEmail}
             formatError={formatError}
           />
           <FieldRow
@@ -34,14 +31,14 @@ const CommonFields = () => {
             label={t("editSignup.fields.lastName")}
             placeholder={t("editSignup.fields.lastName.placeholder")}
             required
-            readOnly={!canEditNameAndEmail && !admin}
+            readOnly={!canEditNameAndEmail}
             formatError={formatError}
           />
           <FieldRow
             name="namePublic"
             as={Form.Check}
             type="checkbox"
-            disabled={editingClosedOnLoad && !admin}
+            disabled={!canEdit}
             checkAlign
             checkLabel={t("editSignup.namePublic")}
           />
@@ -54,7 +51,7 @@ const CommonFields = () => {
           label={t("editSignup.fields.email")}
           placeholder={t("editSignup.fields.email.placeholder")}
           required
-          readOnly={!canEditNameAndEmail && !admin}
+          readOnly={!canEditNameAndEmail}
           formatError={formatError}
         />
       )}

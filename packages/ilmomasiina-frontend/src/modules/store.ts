@@ -33,6 +33,7 @@ const useStore = create<Root>()(
         merge: (persistedAuth, current) => ({
           ...current,
           // Merge in the persisted auth slice; keep functions etc. from current state.
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- written by partialize() above
           auth: { ...current.auth, ...(persistedAuth as AuthSlice) },
         }),
       },

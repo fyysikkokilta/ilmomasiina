@@ -22,7 +22,7 @@ const SignupList = ({ isSingleQuota, quota }: Props) => {
   return (
     <div className="ilmo--quota-signups">
       <h3>{quota.type !== SignupStatus.IN_QUOTA ? t(`singleEvent.signups.quotaTitle.${quota.type}`) : quota.title}</h3>
-      {!signups?.length ? (
+      {!signups.length ? (
         <p>{t("singleEvent.signups.emptyQuota")}</p>
       ) : (
         <div className="table-responsive">
@@ -50,8 +50,7 @@ const SignupList = ({ isSingleQuota, quota }: Props) => {
                   index={i + 1}
                   signup={signup}
                   showQuota={showQuotas}
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={i}
+                  key={`${signup.quota.id}-${signup.createdAt}`}
                 />
               ))}
             </tbody>

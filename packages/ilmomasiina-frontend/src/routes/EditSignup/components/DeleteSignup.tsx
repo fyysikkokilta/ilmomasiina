@@ -9,11 +9,11 @@ import ConfirmButton from "../../../components/ConfirmButton";
 const DELETE_CONFIRM_MS = 4000;
 
 type Props = {
-  deleting: boolean;
-  onDelete: () => void;
+  processing: boolean;
+  onDelete: () => Promise<void>;
 };
 
-const DeleteSignup = ({ deleting, onDelete }: Props) => {
+const DeleteSignup = ({ processing, onDelete }: Props) => {
   const event = useEditSignupContext().localizedEvent!;
   const { t } = useTranslation();
 
@@ -33,8 +33,8 @@ const DeleteSignup = ({ deleting, onDelete }: Props) => {
       </p>
       <ConfirmButton
         type="button"
-        disabled={submitting || deleting}
-        onClick={onDelete}
+        disabled={submitting || processing}
+        onClick={() => void onDelete()}
         variant="danger"
         confirmDelay={DELETE_CONFIRM_MS}
         confirmLabel={t("editSignup.delete.action.confirm")}

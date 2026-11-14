@@ -5,6 +5,7 @@ import { useForm } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import Combobox from "react-widgets/Combobox";
 
+import { PaymentMode } from "@tietokilta/ilmomasiina-models";
 import FieldRow from "../../../components/FieldRow";
 import { EditorEventType } from "../../../modules/editor/types";
 import useStore from "../../../modules/store";
@@ -28,7 +29,7 @@ const GenerateSlug = () => {
   const touched = useFieldTouched("slug");
 
   useEffect(() => {
-    if (isNew && !touched && title !== undefined) {
+    if (isNew && !touched) {
       const generatedSlug = title
         .normalize("NFD") // converts e.g. ä to a + umlaut
         .replace(/[^A-Za-z0-9]+/g, "")
@@ -54,7 +55,7 @@ const SlugAvailability = () => {
     window.clearTimeout(checkDelay.current);
     checkDelay.current = window.setTimeout(() => {
       if (slug) {
-        checkSlugAvailability(slug);
+        void checkSlugAvailability(slug);
       }
     }, SLUG_CHECK_DELAY);
   }, [slug, checkSlugAvailability, checkingSlugAvailability]);
@@ -88,7 +89,7 @@ const BasicDetailsTab = () => {
   const registrationEndDate = useFieldValue<Date | null>("registrationEndDate");
 
   useEffect(() => {
-    loadCategories();
+    void loadCategories();
   }, [loadCategories]);
 
   return (
@@ -196,6 +197,29 @@ const BasicDetailsTab = () => {
           formatError={formatError}
         />
       )}
+      {eventType !== EditorEventType.ONLY_EVENT && (
+        <FieldRow
+          name="payments"
+          label={t("editor.basic.payments")}
+          as={SelectBox}
+          options={[
+            [PaymentMode.DISABLED, t("editor.basic.payments.disabled")],
+            [PaymentMode.MANUAL, t("editor.basic.payments.manual")],
+            [PaymentMode.ONLINE, t("editor.basic.payments.online")],
+          ]}
+          formatError={formatError}
+        />
+      )}
+      {FRONTEND_NAMES.length > 1 && (
+        <FieldRow
+          name="preferredFrontend"
+          label={t("editor.basic.preferredFrontend")}
+          help={t("editor.basic.preferredFrontend.info")}
+          as={SelectBox}
+          options={FRONTEND_NAMES.map((name) => [name, name] as [string, string])}
+          formatError={formatError}
+        />
+      )}
       <FieldRow
         name="category"
         label={t("editor.basic.category")}
@@ -231,6 +255,7 @@ const BasicDetailsTab = () => {
         defaultAsPlaceholder
         label={t("editor.basic.price")}
         maxLength={255}
+        help={t("editor.basic.price.info")}
         formatError={formatError}
       />
       <LocalizedFieldRow

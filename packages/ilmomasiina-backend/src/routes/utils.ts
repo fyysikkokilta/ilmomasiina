@@ -1,7 +1,12 @@
 /** Converts given value to a Date if it is a string, and otherwise just passthroughs the input */
-// eslint-disable-next-line import/prefer-default-export
-export function toDate<T>(s: T): Date | Exclude<T, string> {
-  return typeof s === "string" ? new Date(s) : (s as Exclude<T, string>);
+export function toDate<T extends null | undefined>(s: string | T): Date | T {
+  return typeof s === "string" ? new Date(s) : s;
+}
+
+/** Types a response for the API schema. Fastify's serializer turns the Dates in it into strings. */
+export function asApiResponse<T>(value: T): StringifyApi<T> {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the conversion happens during serialization
+  return value as unknown as StringifyApi<T>;
 }
 
 /** Utility type that converts fields in the imported API to string. */

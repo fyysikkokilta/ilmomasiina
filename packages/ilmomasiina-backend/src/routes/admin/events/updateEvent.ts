@@ -9,7 +9,7 @@ import type {
   EventUpdateBody,
   WouldMoveSignupsToQueueError,
 } from "@tietokilta/ilmomasiina-models";
-import { AuditEvent, QuestionType } from "@tietokilta/ilmomasiina-models";
+import { AuditEvent } from "@tietokilta/ilmomasiina-models";
 import { getSequelize } from "../../../models";
 import { convertSequelizeValidationErrors } from "../../../models/errors";
 import { Event } from "../../../models/event";
@@ -55,11 +55,9 @@ export default async function updateEvent(
       // Find existing questions and quotas for requested IDs, and add order fields
       const updatedQuestions = request.body.questions?.map((question, order) => ({
         ...question,
+        ...Question.normalizeOptions(question),
         order,
         existing: question.id ? event.questions!.find((old) => question.id === old.id) : undefined,
-        // Remove options if the question type doesn't support them
-        options:
-          question.type === QuestionType.CHECKBOX || question.type === QuestionType.SELECT ? question.options : null,
       }));
       const updatedQuotas = request.body.quotas?.map((quota, order) => ({
         ...quota,
@@ -85,7 +83,7 @@ export default async function updateEvent(
 
       // Update the Event
       const wasPublic = !event.draft;
-      await event.set({
+      event.set({
         ...request.body,
         registrationEndDate: toDate(request.body.registrationEndDate),
         registrationStartDate: toDate(request.body.registrationStartDate),
@@ -93,22 +91,20 @@ export default async function updateEvent(
         endDate: toDate(request.body.endDate),
       });
       // Validate and fixup data within languages. This uses event.languages and is thus done after set()
-      event.validateLanguages(updatedQuestions ?? event.questions!, updatedQuotas ?? event.quotas!);
+      event.validateLanguages(updatedQuestions ?? event.questions, updatedQuotas ?? event.quotas);
 
       await event.save({ transaction });
 
       if (updatedQuestions !== undefined) {
         const reuseQuestionIds = updatedQuestions
           .map((question) => question.id)
-          .filter((questionId) => questionId) as Question["id"][];
+          .filter((questionId): questionId is Question["id"] => Boolean(questionId));
 
         // Remove previous Questions not present in request
         await Question.destroy({
           where: {
             eventId: event.id,
-            id: {
-              [Op.notIn]: reuseQuestionIds,
-            },
+            id: { [Op.notIn]: reuseQuestionIds },
           },
           transaction,
         });
@@ -127,15 +123,15 @@ export default async function updateEvent(
       }
 
       if (updatedQuotas !== undefined) {
-        const reuseQuotaIds = updatedQuotas.map((quota) => quota.id).filter((quotaId) => quotaId) as Quota["id"][];
+        const reuseQuotaIds = updatedQuotas
+          .map((quota) => quota.id)
+          .filter((quotaId): quotaId is Quota["id"] => Boolean(quotaId));
 
         // Remove previous Quotas not present in request
         await Quota.destroy({
           where: {
             eventId: event.id,
-            id: {
-              [Op.notIn]: reuseQuotaIds,
-            },
+            id: { [Op.notIn]: reuseQuotaIds },
           },
           transaction,
         });

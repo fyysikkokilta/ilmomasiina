@@ -14,8 +14,6 @@ type RawAnswer = {
   type: string;
 };
 
-/* eslint-disable no-await-in-loop */
-
 export default defineMigration({
   name: "0004-answers-to-json",
   async up({ context: { sequelize, transaction } }) {
@@ -27,13 +25,15 @@ export default defineMigration({
       `SELECT ${q`id`}, ${q`type`}, ${q`options`} FROM ${q`question`}`,
       { type: QueryTypes.SELECT, transaction },
     );
-    for (const row of questions) {
-      let optionsJson = null;
-      if (row.type === "checkbox" || row.type === "select") {
-        optionsJson = row.options ? JSON.stringify(row.options.split(";")) : JSON.stringify([""]);
-      }
-      await query.bulkUpdate("question", { options: optionsJson }, { id: row.id }, { transaction });
-    }
+    await Promise.all(
+      questions.map((row) => {
+        let optionsJson = null;
+        if (row.type === "checkbox" || row.type === "select") {
+          optionsJson = row.options ? JSON.stringify(row.options.split(";")) : JSON.stringify([""]);
+        }
+        return query.bulkUpdate("question", { options: optionsJson }, { id: row.id }, { transaction });
+      }),
+    );
     // Convert answers to JSON
     const answers = await sequelize.query<RawAnswer>(
       `SELECT ${q`answer.id`}, ${q`answer.answer`}, ${q`question.type`} ` +
@@ -41,13 +41,15 @@ export default defineMigration({
         `LEFT JOIN ${q`question`} ON ${q`answer.questionId`} = ${q`question.id`}`,
       { type: QueryTypes.SELECT, transaction },
     );
-    for (const row of answers) {
-      // Non-checkbox question -> "entire answer"
-      // Non-empty answer to checkbox question -> ["ans1", "ans2"]
-      // Empty answer to checkbox question -> []
-      const answer = row.type === "checkbox" ? row.answer.split(";").filter(Boolean) : row.answer;
-      const answerJson = JSON.stringify(answer);
-      await query.bulkUpdate("answer", { answer: answerJson }, { id: row.id }, { transaction });
-    }
+    await Promise.all(
+      answers.map((row) => {
+        // Non-checkbox question -> "entire answer"
+        // Non-empty answer to checkbox question -> ["ans1", "ans2"]
+        // Empty answer to checkbox question -> []
+        const answer = row.type === "checkbox" ? row.answer.split(";").filter(Boolean) : row.answer;
+        const answerJson = JSON.stringify(answer);
+        return query.bulkUpdate("answer", { answer: answerJson }, { id: row.id }, { transaction });
+      }),
+    );
   },
 });

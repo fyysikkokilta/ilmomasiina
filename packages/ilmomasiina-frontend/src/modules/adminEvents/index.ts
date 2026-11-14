@@ -1,4 +1,4 @@
-import { ApiError } from "@tietokilta/ilmomasiina-client";
+import { ApiError, toApiError } from "@tietokilta/ilmomasiina-client";
 import type { AdminEventListResponse, EventID } from "@tietokilta/ilmomasiina-models";
 import storeSlice from "../../utils/storeSlice";
 import type { Root } from "../store";
@@ -29,7 +29,7 @@ export const adminEventsSlice = storeSlice<Root>()(
         const response = await get().auth.adminApiFetch<AdminEventListResponse>("admin/events");
         setSlice({ events: response, loadError: undefined });
       } catch (e) {
-        setSlice({ events: null, loadError: e as ApiError });
+        setSlice({ events: null, loadError: toApiError(e) });
       }
     },
 

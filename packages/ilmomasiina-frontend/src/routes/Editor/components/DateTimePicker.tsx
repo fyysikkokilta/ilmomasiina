@@ -2,7 +2,7 @@ import React, { ComponentPropsWithoutRef } from "react";
 
 import { enUS } from "date-fns/locale/en-US";
 import { fi } from "date-fns/locale/fi";
-import DatePicker, { registerLocale } from "react-datepicker";
+import ReactDatePicker, { registerLocale } from "react-datepicker";
 import { useField } from "react-final-form";
 import { useTranslation } from "react-i18next";
 
@@ -12,7 +12,7 @@ registerLocale("fi", fi);
 registerLocale("en", enUS);
 
 type Props = Pick<
-  ComponentPropsWithoutRef<typeof DatePicker>,
+  ComponentPropsWithoutRef<typeof ReactDatePicker>,
   "selectsStart" | "selectsEnd" | "startDate" | "endDate" | "id"
 > & {
   name: string;
@@ -21,13 +21,13 @@ type Props = Pick<
 export default function DateTimePicker({ name, id, selectsStart, selectsEnd, startDate, endDate }: Props) {
   const {
     input: { value, onChange, onBlur },
-  } = useField(name);
+  } = useField<Date | null>(name);
   const {
     t,
     i18n: { language },
   } = useTranslation();
   return (
-    <DatePicker
+    <ReactDatePicker
       name={name}
       id={id}
       selected={value}

@@ -50,6 +50,12 @@ export interface EditorState {
 export interface EditorQuestion extends Omit<QuestionUpdate, "options"> {
   key: QuestionID;
   options: string[];
+  prices: number[];
+  /**
+   * Used as a separate checkbox to enable the pricing inputs for each question. Otherwise the UI looks
+   * horrible if you have a lot of options but don't care about pricing (like most use cases).
+   */
+  hasPrices: boolean;
 }
 
 /** Quota type for event editor */
@@ -58,23 +64,11 @@ export type EditorQuota = QuotaUpdate & {
 };
 
 /** Root form data type for event editor */
-export interface EditorEvent
-  extends
-    Omit<
-      Required<EventUpdateBody>,
-      // Omit fields we'll overwrite for editing states that aren't valid in the API
-      | "quotas"
-      | "questions"
-      | "date"
-      | "endDate"
-      | "registrationStartDate"
-      | "registrationEndDate"
-      | "openQuotaSize"
-      // Omit fields we want to keep optional
-      | "moveSignupsToQueue"
-    >,
-    // Add optional fields
-    Pick<EventUpdateBody, "moveSignupsToQueue"> {
+export interface EditorEvent extends Omit<
+  Required<EventUpdateBody>,
+  // Omit fields we'll overwrite for editing states that aren't valid in the API
+  "quotas" | "questions" | "date" | "endDate" | "registrationStartDate" | "registrationEndDate" | "openQuotaSize"
+> {
   eventType: EditorEventType;
 
   date: Date | null;

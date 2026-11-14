@@ -71,15 +71,14 @@ useShallowMemo({
   field3: someValue,
 });
 
-useMemo(() => ({
-  field1,
-  field2,
-  field3: someValue,
-}), [
-  field1,
-  field2,
-  someValue,
-]);
+useMemo(
+  () => ({
+    field1,
+    field2,
+    field3: someValue,
+  }),
+  [field1, field2, someValue],
+);
 ```
 
 i.e. objects returned are kept reference-equal as long as the objects passed are shallow-equal.

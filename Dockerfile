@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.15-labs
 
 # Build stage:
-FROM node:24-alpine AS builder
+FROM node:26-alpine AS builder
 RUN apk add --no-cache brotli
 
 # Build-time env variables
@@ -15,14 +15,16 @@ ARG BRANDING_FOOTER_GDPR_LINK
 ARG BRANDING_FOOTER_HOME_TEXT
 ARG BRANDING_FOOTER_HOME_LINK
 ARG BRANDING_LOGIN_PLACEHOLDER_EMAIL
+ARG FRONTENDS
 
 WORKDIR /opt/ilmomasiina
 
 # Copy files needed for dependency installation
-COPY --parents .eslint* package.json pnpm-*.yaml packages/*/package.json /opt/ilmomasiina/
+COPY --parents package.json pnpm-*.yaml packages/*/package.json /opt/ilmomasiina/
 
 # Install dependencies (we're running as root, so the postinstall script doesn't run automatically)
-RUN corepack enable && pnpm install --frozen-lockfile
+# Node 25+ no longer ships corepack, so install it via npm first.
+RUN npm install -g corepack && corepack enable pnpm && pnpm install --frozen-lockfile
 
 # Copy rest of source files
 COPY packages /opt/ilmomasiina/packages
@@ -38,7 +40,7 @@ RUN find packages/ilmomasiina-frontend/build -type f\
   -regex ".*\.\(js\|json\|html\|map\|css\|svg\|ico\|txt\)" -exec gzip -k "{}" \; -exec brotli "{}" \;
 
 # Main stage:
-FROM node:24-alpine
+FROM node:26-alpine
 
 # Accept VERSION at build time, pass to backend server
 ARG VERSION
@@ -56,7 +58,7 @@ WORKDIR /opt/ilmomasiina
 COPY --parents package.json pnpm-*.yaml packages/*/package.json /opt/ilmomasiina/
 
 # Install dependencies for backend only
-RUN corepack enable && pnpm install --frozen-lockfile --prod --filter @tietokilta/ilmomasiina-backend --filter @tietokilta/ilmomasiina-models
+RUN npm install -g corepack && corepack enable pnpm && pnpm install --frozen-lockfile --prod --filter @tietokilta/ilmomasiina-backend --filter @tietokilta/ilmomasiina-models
 
 # Copy rest of source files
 COPY packages /opt/ilmomasiina/packages

@@ -1,12 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
-    "lib": [
-      "ES2019",
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    // target/lib from https://github.com/tsconfig/bases/blob/main/bases/node24.json
+    "target": "es2024",
+    "lib": ["es2024", "ESNext.Array", "ESNext.Collection", "ESNext.Error", "ESNext.Iterator", "ESNext.Promise"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -14,30 +10,22 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "jsx": "react-jsx",
     "incremental": true,
     "rootDirs": ["src", "test", "."],
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
-    "baseUrl": ".",
     "paths": {
       "@tietokilta/ilmomasiina-models": ["../ilmomasiina-models/src/index.ts"],
-      "@tietokilta/ilmomasiina-models/dist/*": ["../ilmomasiina-models/src/*"]
+      "@tietokilta/ilmomasiina-models/dist/*": ["../ilmomasiina-models/src/*"],
+      "test/*": ["./test/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
-  "include": [
-    "src/**/*",
-    "test/**/*",
-    "vitest.config.mts"
-  ],
-  "references": [
-    { "path": "../ilmomasiina-models/tsconfig.cjs.json" }
-  ]
+  "exclude": ["node_modules", "dist"],
+  "include": ["src/**/*", "test/**/*", "vitest.config.ts"],
+  "references": [{ "path": "../ilmomasiina-models/tsconfig.cjs.json" }]
 }

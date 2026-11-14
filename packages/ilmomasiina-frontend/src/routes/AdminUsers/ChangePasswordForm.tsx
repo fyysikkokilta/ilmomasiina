@@ -6,7 +6,7 @@ import { Form } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import i18n, { TKey } from "../../i18n";
 import useStore from "../../modules/store";
@@ -58,7 +58,7 @@ const ChangePasswordForm = () => {
         autoClose: 5000,
       });
     } catch (err) {
-      toast.error(t(errorDesc<TKey>(err as ApiError, "adminUsers.changePassword.errors")), {
+      toast.error(t(errorDesc<TKey>(err, "adminUsers.changePassword.errors")), {
         autoClose: 5000,
       });
     }
@@ -67,20 +67,20 @@ const ChangePasswordForm = () => {
   return (
     <Form<FormData> initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
       {({ submitting, handleSubmit }) => (
-        <BsForm className="ilmo--form" onSubmit={handleSubmit}>
+        <BsForm className="ilmo--form" onSubmit={(event) => void handleSubmit(event)}>
           <FieldFormGroup name="oldPassword" required label={t("adminUsers.changePassword.oldPassword")}>
             {({ input, meta: { touched, error } }) => (
-              <FormControl {...input} type="password" required isInvalid={touched && error} placeholder="••••••••" />
+              <FormControl {...input} type="password" required isInvalid={touched && !!error} placeholder="••••••••" />
             )}
           </FieldFormGroup>
           <FieldFormGroup name="newPassword" required label={t("adminUsers.changePassword.newPassword")}>
             {({ input, meta: { touched, error } }) => (
-              <FormControl {...input} type="password" required isInvalid={touched && error} placeholder="••••••••" />
+              <FormControl {...input} type="password" required isInvalid={touched && !!error} placeholder="••••••••" />
             )}
           </FieldFormGroup>
           <FieldFormGroup name="newPasswordVerify" required label={t("adminUsers.changePassword.newPasswordVerify")}>
             {({ input, meta: { touched, error } }) => (
-              <FormControl {...input} type="password" required isInvalid={touched && error} placeholder="••••••••" />
+              <FormControl {...input} type="password" required isInvalid={touched && !!error} placeholder="••••••••" />
             )}
           </FieldFormGroup>
           <Button type="submit" variant="secondary" disabled={submitting}>

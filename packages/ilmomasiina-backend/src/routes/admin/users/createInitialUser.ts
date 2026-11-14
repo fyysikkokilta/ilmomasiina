@@ -1,5 +1,4 @@
-/* eslint-disable max-classes-per-file */
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { Transaction } from "sequelize";
 
 import { AdminLoginResponse, ErrorCode, UserCreateSchema } from "@tietokilta/ilmomasiina-models";
@@ -32,7 +31,6 @@ export async function isInitialSetupDone(transaction?: Transaction) {
  * For additional users, use {@link inviteUser} instead.
  */
 export default async function createInitialUser(
-  this: FastifyInstance,
   request: FastifyRequest<{ Body: UserCreateSchema }>,
   reply: FastifyReply,
 ): Promise<AdminLoginResponse> {
@@ -45,10 +43,10 @@ export default async function createInitialUser(
     return createUser(request.body, request.logEvent, transaction);
   });
 
-  const accessToken = this.adminSession.createSession(user);
+  const accessToken = request.server.adminSession.createSession(user);
 
   // Stop raising errors on requests to event list
-  this.initialSetupDone = true;
+  request.server.initialSetupDone = true;
 
   reply.status(201);
   return { accessToken };

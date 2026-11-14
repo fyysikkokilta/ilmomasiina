@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "es2023",
+    "lib": ["dom", "dom.iterable", "es2023"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -25,8 +25,5 @@
   },
   "exclude": ["dist"],
   "include": ["src", "vite.config.mts"],
-  "references": [
-    { "path": "../ilmomasiina-client" },
-    { "path": "../ilmomasiina-models" }
-  ]
+  "references": [{ "path": "../ilmomasiina-client" }, { "path": "../ilmomasiina-models" }]
 }
