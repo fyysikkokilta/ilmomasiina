@@ -31,7 +31,7 @@ function quoteValues(values: Record<string, string | number | boolean | string[]
 
 /** Parses and lightly validates the FRONTENDS environment variable and returns an array of frontend names. */
 function parseFrontendNames(frontends: string): string[] {
-  const parsed = JSON.parse(frontends);
+  const parsed: unknown = JSON.parse(frontends);
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
     throw new Error("FRONTENDS must be a JSON object");
   }

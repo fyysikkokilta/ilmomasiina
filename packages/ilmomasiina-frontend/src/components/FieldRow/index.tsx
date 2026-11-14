@@ -93,18 +93,15 @@ export default function FieldRow<C extends As = "input">({
   config,
   ...props
 }: FieldRowProps<C>) {
-  const {
-    input,
-    meta: { error: validationError, submitError, invalid },
-  } = useField(name, {
+  const { input, meta } = useField(name, {
     type,
     // react-final-form replaces empty strings by undefined for whatever reason.
     // Override the default (but allow config to override this).
     parse: identity,
     ...config,
   });
-  const error = submitError || validationError;
-  const formattedError = invalid && formatError(error);
+  const error: unknown = meta.submitError || meta.error;
+  const formattedError = meta.invalid && formatError(error);
 
   let field: ReactNode;
   if (children) {
@@ -118,7 +115,7 @@ export default function FieldRow<C extends As = "input">({
     type InjectedProps = typeof input &
       typeof props & { isInvalid?: boolean; required?: boolean; id?: string; label?: ReactNode };
     const Component = (as ?? Form.Control) as ComponentType<InjectedProps>;
-    field = <Component required={required} isInvalid={invalid} {...props} id={id} {...input} {...overrideProps} />;
+    field = <Component required={required} isInvalid={meta.invalid} {...props} id={id} {...input} {...overrideProps} />;
   }
 
   return (

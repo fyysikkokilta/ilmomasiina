@@ -296,6 +296,22 @@ export default defineConfig(
     },
   },
 
+  // Vitest's asymmetric matchers such as expect.any() are typed as `any` by design.
+  {
+    files: ["**/test/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-unsafe-assignment": "off",
+    },
+  },
+
+  // Build tool configs run in Node and may log.
+  {
+    files: ["**/vite.config.mts", "**/vitest.config.mts"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+
   // Must be last, to turn off rules that conflict with Prettier.
   prettier,
 );

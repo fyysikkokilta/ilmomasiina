@@ -33,8 +33,9 @@ if (import.meta.hot) {
   // In development, accept updated translations without reloading the entire app.
   import.meta.hot.accept("./locales", (module) => {
     if (!module) return;
+    // eslint-disable-next-line no-console -- dev-only notice
     console.log("hot reloading i18n resources");
-    const newResources: Record<string, Record<string, string>> = module.i18nResources;
+    const newResources = module.i18nResources as Record<string, Record<string, string>>;
     for (const lang of Object.keys(newResources)) {
       for (const ns of Object.keys(newResources[lang])) {
         i18n.addResourceBundle(lang, ns, newResources[lang][ns], true, true);

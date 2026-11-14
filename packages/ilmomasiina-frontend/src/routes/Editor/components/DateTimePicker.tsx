@@ -21,7 +21,7 @@ type Props = Pick<
 export default function DateTimePicker({ name, id, selectsStart, selectsEnd, startDate, endDate }: Props) {
   const {
     input: { value, onChange, onBlur },
-  } = useField(name);
+  } = useField<Date | null>(name);
   const {
     t,
     i18n: { language },

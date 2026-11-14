@@ -2,7 +2,9 @@ import React, { ComponentPropsWithoutRef, MouseEvent, ReactNode, useCallback, us
 
 import { Button } from "react-bootstrap";
 
-type Props = ComponentPropsWithoutRef<typeof Button> & {
+// react-bootstrap types onClick loosely, so narrow it to a button click handler.
+type Props = Omit<ComponentPropsWithoutRef<typeof Button>, "onClick"> & {
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   /** The interval within which the button must be repressed. */
   confirmDelay?: number;
   /** The button contents shown when waiting for a confirmation press. */

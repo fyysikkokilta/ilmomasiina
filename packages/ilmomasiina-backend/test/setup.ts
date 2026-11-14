@@ -15,7 +15,7 @@ import { testUser } from "./testData";
 const needsDb = (suite: RunnerTaskBase) => suite.name.includes("test/routes");
 const needsApi = (suite: RunnerTaskBase) => suite.name.includes("test/routes");
 
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unnecessary-condition */
 
 // Common setup for all backend test files: initialize Sequelize & Fastify, tear down at test end.
 // eslint-disable-next-line no-empty-pattern -- vitest requires a destructured argument

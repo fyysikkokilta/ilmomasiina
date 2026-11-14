@@ -91,7 +91,7 @@ const Payment = ({ disabled, onPay }: PaymentProps) => {
 
 const SubmitError = () => {
   const { isNew } = useEditSignupContext();
-  const { submitError } = useFormState({ subscription: { submitError: true } });
+  const submitError = useFormState({ subscription: { submitError: true } }).submitError as ApiError | undefined;
   const { t } = useTranslation();
 
   return submitError ? (

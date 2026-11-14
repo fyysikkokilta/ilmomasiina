@@ -12,7 +12,7 @@ type Props<FieldValue, T extends HTMLElement = HTMLElement, InputValue = FieldVa
 
 export default function FieldFormGroup<FieldValue = string>({ name, label, required, children }: Props<FieldValue>) {
   return (
-    <Field name={name}>
+    <Field<FieldValue> name={name}>
       {({ input, meta }) => (
         <FormGroup className="mb-3" controlId={name}>
           <FormLabel data-required={required}>{label}</FormLabel>

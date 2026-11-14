@@ -40,6 +40,7 @@ function getTokenExpiry(jwt: string): number {
       return payload.exp * 1000;
     }
   } catch {
+    // eslint-disable-next-line no-console -- worth surfacing in the browser console
     console.error("Invalid JWT received!");
   }
 

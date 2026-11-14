@@ -31,6 +31,7 @@ const AdminEventListItem = ({ event }: Props) => {
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
     // TODO: Use a proper modal instead of window.confirm
+    // eslint-disable-next-line no-alert -- a native confirm dialog is intended here
     const confirmed = window.confirm(t("adminEvents.action.delete.confirm"));
     if (confirmed) {
       try {

@@ -44,6 +44,7 @@ const SignupRow = ({ position, signup, showQuota }: SignupProps) => {
   const onEdit = useEvent(() => editSignup(signup));
   const onDelete = useEvent(async () => {
     // TODO: Use a proper modal instead of window.confirm
+    // eslint-disable-next-line no-alert -- a native confirm dialog is intended here
     const confirmation = window.confirm(t("editor.signups.action.delete.confirm"));
     if (confirmation) {
       await deleteSignup(signup.id);
