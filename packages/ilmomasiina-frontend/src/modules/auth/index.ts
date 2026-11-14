@@ -1,3 +1,4 @@
+import { captureMessage } from "@sentry/browser";
 import { toast } from "react-toastify";
 
 import { ApiError, apiFetch, FetchOptions } from "@tietokilta/ilmomasiina-client";
@@ -40,8 +41,7 @@ function getTokenExpiry(jwt: string): number {
       return payload.exp * 1000;
     }
   } catch {
-    // oxlint-disable-next-line no-console -- surface bad tokens in the browser console instead of failing silently
-    console.error("Invalid JWT received!");
+    captureMessage("Invalid JWT received", "error");
   }
 
   return 0;

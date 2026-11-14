@@ -58,11 +58,8 @@ export default async function deleteUnconfirmedSignups() {
     await Signup.destroy({
       where: { id: signupIds },
     });
-    // Refresh one event at a time rather than opening a transaction per event at once.
-    for (const event of uniqueEvents) {
-      // oxlint-disable-next-line no-await-in-loop -- sequential on purpose, see above
-      await refreshSignupPositions(event);
-    }
+    // Each refresh runs in its own transaction; the connection pool limits how many run at once.
+    await Promise.all(uniqueEvents.map((event) => refreshSignupPositions(event)));
     debugLog("Unconfirmed signups deleted");
   } catch (error) {
     console.error(error);

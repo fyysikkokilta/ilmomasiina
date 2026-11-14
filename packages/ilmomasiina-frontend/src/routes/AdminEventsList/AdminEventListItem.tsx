@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 import { errorDesc } from "@tietokilta/ilmomasiina-client/dist/utils/errorMessage";
 import type { AdminEventListItem as AdminEventListItemSchema } from "@tietokilta/ilmomasiina-models";
+import useConfirmDialog from "../../components/ConfirmDialog";
 import LinkButton from "../../components/LinkButton";
 import type { TKey } from "../../i18n";
 import useStore from "../../modules/store";
@@ -26,12 +27,11 @@ const AdminEventListItem = ({ event }: Props) => {
 
   const { t } = useTranslation();
   const eventDateFormat = useEventDateFormatter();
+  const { confirm, dialog } = useConfirmDialog();
 
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
-    // TODO: Use a proper modal instead of window.confirm
-    // oxlint-disable-next-line no-alert -- native confirm dialog until a modal exists
-    const confirmed = window.confirm(t("adminEvents.action.delete.confirm"));
+    const confirmed = await confirm(t("adminEvents.action.delete.confirm"));
     if (confirmed) {
       try {
         await deleteEvent(id);
@@ -57,25 +57,28 @@ const AdminEventListItem = ({ event }: Props) => {
   }
 
   return (
-    <tr>
-      <td>
-        <Link to={paths.adminEditEvent(id)}>{title}</Link>
-      </td>
-      <td>{date ? eventDateFormat.format(new Date(date)) : ""}</td>
-      <td>{status}</td>
-      <td>{sumBy(quotas, "signupCount")}</td>
-      <td>
-        <LinkButton variant="primary" size="sm" className="me-1" to={paths.adminEditEvent(id)}>
-          {t("adminEvents.action.edit")}
-        </LinkButton>
-        <LinkButton variant="primary" size="sm" className="me-1" to={paths.adminCopyEvent(id)}>
-          {t("adminEvents.action.copy")}
-        </LinkButton>
-        <Button variant="danger" size="sm" onClick={(clickEvent) => void onDelete(clickEvent)}>
-          {t("adminEvents.action.delete")}
-        </Button>
-      </td>
-    </tr>
+    <>
+      <tr>
+        <td>
+          <Link to={paths.adminEditEvent(id)}>{title}</Link>
+        </td>
+        <td>{date ? eventDateFormat.format(new Date(date)) : ""}</td>
+        <td>{status}</td>
+        <td>{sumBy(quotas, "signupCount")}</td>
+        <td>
+          <LinkButton variant="primary" size="sm" className="me-1" to={paths.adminEditEvent(id)}>
+            {t("adminEvents.action.edit")}
+          </LinkButton>
+          <LinkButton variant="primary" size="sm" className="me-1" to={paths.adminCopyEvent(id)}>
+            {t("adminEvents.action.copy")}
+          </LinkButton>
+          <Button variant="danger" size="sm" onClick={(clickEvent) => void onDelete(clickEvent)}>
+            {t("adminEvents.action.delete")}
+          </Button>
+        </td>
+      </tr>
+      {dialog}
+    </>
   );
 };
 

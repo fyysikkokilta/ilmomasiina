@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { stringifyAnswer } from "@tietokilta/ilmomasiina-client/dist/utils/signupUtils";
 import { AdminEventResponse, PaymentMode, SignupPaymentStatus, SignupStatus } from "@tietokilta/ilmomasiina-models";
+import useConfirmDialog from "../../../components/ConfirmDialog";
 import type { AdminSignupWithQuota } from "../../../modules/editor/types";
 import useStore from "../../../modules/store";
 import { useActionDateTimeFormatter } from "../../../utils/dateFormat";
@@ -39,13 +40,12 @@ const SignupRow = ({ position, signup, showQuota }: SignupProps) => {
   const { t } = useTranslation();
   const actionDateFormat = useActionDateTimeFormatter();
 
+  const { confirm, dialog } = useConfirmDialog();
   const answersMap = useMemo(() => getAnswersFromSignup(event, signup), [event, signup]);
 
   const onEdit = useEvent(() => editSignup(signup));
   const onDelete = useEvent(async () => {
-    // TODO: Use a proper modal instead of window.confirm
-    // oxlint-disable-next-line no-alert -- native confirm dialog until a modal exists
-    const confirmation = window.confirm(t("editor.signups.action.delete.confirm"));
+    const confirmation = await confirm(t("editor.signups.action.delete.confirm"));
     if (confirmation) {
       await deleteSignup(signup.id);
       void getEvent(event.id);
@@ -63,51 +63,54 @@ const SignupRow = ({ position, signup, showQuota }: SignupProps) => {
   const isDeleted = Boolean(signup.deletedAt);
 
   return (
-    <tr className={`${!signup.confirmed ? "ilmo--unconfirmed" : ""} ${isDeleted ? "ilmo--deleted" : ""}`}>
-      <td key="position">{`${position}.`}</td>
-      {signup.confirmed && event.nameQuestion && <td key="firstName">{signup.firstName}</td>}
-      {signup.confirmed && event.nameQuestion && <td key="lastName">{signup.lastName}</td>}
-      {signup.confirmed && event.emailQuestion && <td key="email">{signup.email}</td>}
-      {signup.confirmed && event.emailQuestion && <td key="membership">{signup.isMember && "\u2705"}</td>}
-      {!signup.confirmed && nameEmailCols && (
-        <td colSpan={nameEmailCols} className="fst-italic">
-          {t("editor.signups.unconfirmed")}
-        </td>
-      )}
-      {showQuota && (
-        <td key="quota">{signupStatus ? `${signup.quota.title} (${signupStatus})` : signup.quota.title}</td>
-      )}
-      {event.questions.map((question) => (
-        <td key={question.id}>{stringifyAnswer(answersMap[question.id])}</td>
-      ))}
-      <td key="timestamp">{actionDateFormat.format(new Date(signup.createdAt))}</td>
-      {event.payments !== PaymentMode.DISABLED && (
-        <td key="price">{signup.price != null && formatPrice(signup.price)}</td>
-      )}
-      {event.payments !== PaymentMode.DISABLED && (
-        <td key="paymentStatus">
-          {signup.paymentStatus && (
-            <Badge bg={paymentStatusVariant[signup.paymentStatus]}>
-              {t(`editor.signups.column.paymentStatus.${signup.paymentStatus}`)}
-            </Badge>
+    <>
+      <tr className={`${!signup.confirmed ? "ilmo--unconfirmed" : ""} ${isDeleted ? "ilmo--deleted" : ""}`}>
+        <td key="position">{`${position}.`}</td>
+        {signup.confirmed && event.nameQuestion && <td key="firstName">{signup.firstName}</td>}
+        {signup.confirmed && event.nameQuestion && <td key="lastName">{signup.lastName}</td>}
+        {signup.confirmed && event.emailQuestion && <td key="email">{signup.email}</td>}
+        {signup.confirmed && event.emailQuestion && <td key="membership">{signup.isMember && "\u2705"}</td>}
+        {!signup.confirmed && nameEmailCols && (
+          <td colSpan={nameEmailCols} className="fst-italic">
+            {t("editor.signups.unconfirmed")}
+          </td>
+        )}
+        {showQuota && (
+          <td key="quota">{signupStatus ? `${signup.quota.title} (${signupStatus})` : signup.quota.title}</td>
+        )}
+        {event.questions.map((question) => (
+          <td key={question.id}>{stringifyAnswer(answersMap[question.id])}</td>
+        ))}
+        <td key="timestamp">{actionDateFormat.format(new Date(signup.createdAt))}</td>
+        {event.payments !== PaymentMode.DISABLED && (
+          <td key="price">{signup.price != null && formatPrice(signup.price)}</td>
+        )}
+        {event.payments !== PaymentMode.DISABLED && (
+          <td key="paymentStatus">
+            {signup.paymentStatus && (
+              <Badge bg={paymentStatusVariant[signup.paymentStatus]}>
+                {t(`editor.signups.column.paymentStatus.${signup.paymentStatus}`)}
+              </Badge>
+            )}
+          </td>
+        )}
+        <td key="actions">
+          {!isDeleted ? (
+            <>
+              <Button type="button" variant="primary" size="sm" onClick={onEdit}>
+                {t("editor.signups.action.edit")}
+              </Button>
+              <Button type="button" variant="danger" size="sm" onClick={() => void onDelete()} className="ms-1">
+                {t("editor.signups.action.delete")}
+              </Button>
+            </>
+          ) : (
+            <span>{t("editor.signups.deleted")}</span>
           )}
         </td>
-      )}
-      <td key="actions">
-        {!isDeleted ? (
-          <>
-            <Button type="button" variant="primary" size="sm" onClick={onEdit}>
-              {t("editor.signups.action.edit")}
-            </Button>
-            <Button type="button" variant="danger" size="sm" onClick={() => void onDelete()} className="ms-1">
-              {t("editor.signups.action.delete")}
-            </Button>
-          </>
-        ) : (
-          <span>{t("editor.signups.deleted")}</span>
-        )}
-      </td>
-    </tr>
+      </tr>
+      {dialog}
+    </>
   );
 };
 

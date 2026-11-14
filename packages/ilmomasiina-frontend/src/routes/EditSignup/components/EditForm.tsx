@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { FORM_ERROR } from "final-form";
 import { Alert, Button, Form as BsForm, Table } from "react-bootstrap";
@@ -22,6 +22,7 @@ import paths from "../../../paths";
 import { useDurationFormatter } from "../../../utils/dateFormat";
 import { useDecimalPriceFormatter } from "../../../utils/priceFormat";
 import useEvent from "../../../utils/useEvent";
+import useNow from "../../../utils/useNow";
 import CommonFields from "./CommonFields";
 import DeleteSignup from "./DeleteSignup";
 import { formDataToSignupUpdate, SignupFormData, signupToFormData } from "./formData";
@@ -109,12 +110,7 @@ const EditableUntil = () => {
   const duration = useDurationFormatter();
 
   // Rerender every second
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    if (editingClosedOnLoad) return undefined;
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, [editingClosedOnLoad]);
+  const now = useNow(1000, !editingClosedOnLoad);
 
   if (editingClosedOnLoad) {
     return <p>{t("editSignup.editable.closed")}</p>;

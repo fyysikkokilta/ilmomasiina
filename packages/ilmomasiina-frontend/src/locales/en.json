@@ -40,6 +40,8 @@
     "adminEvents.action.edit": "Edit",
     "adminEvents.action.copy": "Copy",
     "adminEvents.action.delete": "Delete",
+    "confirmDialog.confirm": "Confirm",
+    "confirmDialog.cancel": "Cancel",
     "adminEvents.action.delete.confirm": "Are you sure you want to delete this event? This cannot be undone.",
     "adminEvents.action.delete.error.default.description": "Failed to delete event.",
     "adminUsers.loadError.default.description": "Failed to load users. $t(errors.contactAdmin)",

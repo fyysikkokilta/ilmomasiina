@@ -13,6 +13,7 @@ import {
 } from "@tietokilta/ilmomasiina-client";
 import type { EditorEvent } from "../../../modules/editor/types";
 import useStore from "../../../modules/store";
+import useNow from "../../../utils/useNow";
 import EditForm from "../../EditSignup/components/EditForm";
 import EventDescription from "../../SingleEvent/components/EventDescription";
 import SignupCountdown from "../../SingleEvent/components/SignupCountdown";
@@ -22,8 +23,7 @@ import { editorEventToUserEvent, previewDummySignup } from "./userComponentInter
 const PreviewTab = () => {
   const { values } = useFormState<EditorEvent>();
   const [previewingForm, setPreviewingForm] = useState(false);
-  // oxlint-disable-next-line react/hook-use-state -- a value fixed when the component mounts, never updated
-  const now = useState(() => Date.now())[0];
+  const now = useNow(60 * 1000);
   const { i18n, t } = useTranslation();
   const selectedLanguage = useStore((state) => state.editor.selectedLanguage);
 

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import type { UserSchema } from "@tietokilta/ilmomasiina-models";
+import useConfirmDialog from "../../components/ConfirmDialog";
 import type { TKey } from "../../i18n";
 import useStore from "../../modules/store";
 
@@ -16,11 +17,10 @@ type Props = {
 const AdminUserListItem = ({ user }: Props) => {
   const { deleteUser, getUsers, resetUserPassword } = useStore((state) => state.adminUsers);
   const { t } = useTranslation();
+  const { confirm, dialog } = useConfirmDialog();
 
   async function onDelete() {
-    // TODO: Use a proper modal instead of window.confirm
-    // oxlint-disable-next-line no-alert -- native confirm dialog until a modal exists
-    const confirmed = window.confirm(t("adminUsers.deleteUser.confirm", { user: user.email }));
+    const confirmed = await confirm(t("adminUsers.deleteUser.confirm", { user: user.email }));
     if (confirmed) {
       try {
         await deleteUser(user.id);
@@ -39,9 +39,7 @@ const AdminUserListItem = ({ user }: Props) => {
     }
   }
   async function onResetPassword() {
-    // TODO: Use a proper modal instead of window.confirm
-    // oxlint-disable-next-line no-alert -- native confirm dialog until a modal exists
-    const confirmed = window.confirm(t("adminUsers.resetPassword.confirm", { user: user.email }));
+    const confirmed = await confirm(t("adminUsers.resetPassword.confirm", { user: user.email }));
     if (confirmed) {
       try {
         await resetUserPassword(user.id);
@@ -59,19 +57,22 @@ const AdminUserListItem = ({ user }: Props) => {
     }
   }
   return (
-    <tr>
-      <td>{user.email}</td>
-      <td>
-        <ButtonGroup size="sm">
-          <Button type="button" onClick={() => void onResetPassword()} size="sm" variant="secondary">
-            {t("adminUsers.resetPassword")}
-          </Button>
-          <Button type="button" onClick={() => void onDelete()} size="sm" variant="danger">
-            {t("adminUsers.deleteUser")}
-          </Button>
-        </ButtonGroup>
-      </td>
-    </tr>
+    <>
+      <tr>
+        <td>{user.email}</td>
+        <td>
+          <ButtonGroup size="sm">
+            <Button type="button" onClick={() => void onResetPassword()} size="sm" variant="secondary">
+              {t("adminUsers.resetPassword")}
+            </Button>
+            <Button type="button" onClick={() => void onDelete()} size="sm" variant="danger">
+              {t("adminUsers.deleteUser")}
+            </Button>
+          </ButtonGroup>
+        </td>
+      </tr>
+      {dialog}
+    </>
   );
 };
 

@@ -40,6 +40,8 @@
     "adminEvents.action.edit": "Muokkaa",
     "adminEvents.action.copy": "Kopioi",
     "adminEvents.action.delete": "Poista",
+    "confirmDialog.confirm": "Vahvista",
+    "confirmDialog.cancel": "Peruuta",
     "adminEvents.action.delete.confirm": "Haluatko varmasti poistaa tämän tapahtuman? Tätä toimintoa ei voi perua.",
     "adminEvents.action.delete.error.default.description": "Tapahtuman poistaminen epäonnistui.",
     "adminUsers.loadError.default.description": "Käyttäjien lataaminen epäonnistui. $t(errors.contactAdmin)",

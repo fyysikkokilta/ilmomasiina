@@ -1226,22 +1226,23 @@ describe("Stripe webhook", () => {
       data: { object: { id: payment!.stripeCheckoutSessionId } },
     } as Stripe.Event;
 
-    const confirmationTimes = [new Date()];
-    // Deliver the same webhook repeatedly, one after another, to test idempotency.
-    for (let i = 0; i < 4; i++) {
-      // oxlint-disable-next-line no-await-in-loop -- deliveries must be sequential
-      const response = await api.stripeWebhook(JSON.stringify(mockEvent), "t=12345,v1=fakesignature");
+    // Deliver the same webhook several times at once, as Stripe may do when retrying.
+    const startedAt = new Date();
+    const responses = await Promise.all(
+      Array.from({ length: 4 }, () => api.stripeWebhook(JSON.stringify(mockEvent), "t=12345,v1=fakesignature")),
+    );
+    const finishedAt = new Date();
+    for (const response of responses) {
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual({ received: true });
-      confirmationTimes.push(new Date());
     }
 
-    // Verify payment was marked as PAID during first webhook only
+    // Verify payment was marked as PAID exactly once
     await payment!.reload();
     expect(payment!.status).toBe(PaymentStatus.PAID);
     expect(payment!.completedAt).toBeTruthy();
-    expect(payment!.completedAt!.getTime()).toBeGreaterThanOrEqual(confirmationTimes[0].getTime());
-    expect(payment!.completedAt!.getTime()).toBeLessThanOrEqual(confirmationTimes[1].getTime());
+    expect(payment!.completedAt!.getTime()).toBeGreaterThanOrEqual(startedAt.getTime());
+    expect(payment!.completedAt!.getTime()).toBeLessThanOrEqual(finishedAt.getTime());
 
     // Verify only one email was sent
     expect(emailSend).toHaveBeenCalledExactlyOnceWith(
