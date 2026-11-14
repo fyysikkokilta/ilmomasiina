@@ -26,7 +26,7 @@ import {
   testQuestionPrices,
   testSignups,
 } from "../testData";
-import { createEvent, deleteEvent, fetchAdminEventDetails, fetchAdminEventList, updateEvent } from "./api";
+import { createEvent, deleteEvent, fetchAdminEventDetails, fetchAdminEventList, testServer, updateEvent } from "./api";
 
 describe("GET /api/admin/events/:id", () => {
   test("returns event information", async () => {
@@ -125,6 +125,24 @@ describe("GET /api/admin/events/:id", () => {
 
     expect(before.questions.map((q) => q.id)).not.toEqual(after.questions.map((q) => q.id));
     expect(after.questions.map((q) => q.id)).toEqual(sortBy(event.questions, "order").map((q) => q.id));
+  });
+
+  test("returns legacy short event IDs without padding", async () => {
+    // IDs from old installations can be shorter than the CHAR(12) column, which Postgres pads with spaces.
+    const created = await testEvent({ questionCount: 0, quotaCount: 0 });
+    await Event.update({ id: "7" }, { where: { id: created.id }, hooks: false });
+    const event = { id: "7", slug: created.slug };
+
+    const [data] = await fetchAdminEventDetails(event);
+    const slugResponse = await testServer().inject({
+      method: "GET",
+      url: `/api/admin/slugs/${event.slug}`,
+      headers: { authorization: adminToken },
+    });
+
+    expect(data.id).toBe("7");
+    expect(slugResponse.statusCode).toBe(200);
+    expect(slugResponse.json()).toMatchObject({ id: "7" });
   });
 
   test("returns legacy questions that store empty options", async () => {

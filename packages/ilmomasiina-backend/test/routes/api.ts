@@ -21,7 +21,7 @@ import { generateToken } from "../../src/routes/signups/editTokens";
 export type InjectResponse = Awaited<ReturnType<FastifyInstance["inject"]>>;
 
 /** Returns the Fastify instance set up for API tests. */
-function testServer() {
+export function testServer() {
   if (!global.server) throw new Error("The API server is only set up for test files under test/routes");
   return global.server;
 }
