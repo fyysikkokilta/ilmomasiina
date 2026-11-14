@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useMemo } from "react";
 
 import type { UserEventResponse } from "@tietokilta/ilmomasiina-models";
-import { ApiError, apiFetch } from "../../api";
+import { ApiError, apiFetch, toApiError } from "../../api";
 import { useAbortablePromise } from "../../utils/abortable";
 import { getLocalizedEvent } from "../../utils/localizedEvent";
 import { getSignupsByQuota, QuotaSignups } from "../../utils/signupUtils";
@@ -56,7 +56,7 @@ export function useSingleEventState({ slug, language }: SingleEventProps) {
     signupsByQuota,
     registrationOpens,
     pending,
-    error: error as ApiError | undefined,
+    error: error === undefined ? undefined : toApiError(error),
   });
 }
 

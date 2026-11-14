@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useMemo } from "react";
 
 import type { SignupForEditResponse, SignupUpdateResponse } from "@tietokilta/ilmomasiina-models";
 import { EDIT_TOKEN_HEADER, PaymentMode, SignupPaymentStatus, SignupStatus } from "@tietokilta/ilmomasiina-models";
-import { ApiError, apiFetch } from "../../api";
+import { ApiError, apiFetch, toApiError } from "../../api";
 import { useAbortablePromise } from "../../utils/abortable";
 import { getLocalizedEvent, getLocalizedSignup } from "../../utils/localizedEvent";
 import useShallowMemo from "../../utils/useShallowMemo";
@@ -42,7 +42,7 @@ export function useEditSignupState({ id, editToken, paid, language }: EditSignup
             },
           });
         } catch (err) {
-          paymentError = err as ApiError;
+          paymentError = toApiError(err);
         }
       }
       if (!response) {
@@ -117,7 +117,7 @@ export function useEditSignupState({ id, editToken, paid, language }: EditSignup
   return useShallowMemo<State>({
     editToken,
     pending,
-    error: error as ApiError | undefined,
+    error: error === undefined ? undefined : toApiError(error),
     ...initialValues,
     ...mergedValues,
     localizedEvent,

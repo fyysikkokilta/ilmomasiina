@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
-import { ApiError, beginSignup, errorDesc, useSingleEventContext } from "@tietokilta/ilmomasiina-client";
+import { beginSignup, errorDesc, useSingleEventContext } from "@tietokilta/ilmomasiina-client";
 import { eventHasPaidQuotas } from "@tietokilta/ilmomasiina-client/dist/utils/paymentUtils";
 import { SignupState, signupState } from "@tietokilta/ilmomasiina-client/dist/utils/signupState";
 import type { QuotaID } from "@tietokilta/ilmomasiina-models";
@@ -48,7 +48,7 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
       } catch (err) {
         setSubmitting(false);
         toast.update(progressToast, {
-          render: t(errorDesc<TKey>(err as ApiError, "singleEvent.signupError")),
+          render: t(errorDesc<TKey>(err, "singleEvent.signupError")),
           type: "error",
           autoClose: 5000,
           closeButton: true,

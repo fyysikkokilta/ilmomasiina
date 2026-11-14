@@ -1,4 +1,4 @@
-import { ApiError } from "@tietokilta/ilmomasiina-client";
+import { ApiError, toApiError } from "@tietokilta/ilmomasiina-client";
 import type {
   UserChangePasswordSchema,
   UserID,
@@ -35,7 +35,7 @@ export const adminUsersSlice = storeSlice<Root>()("adminUsers", (set, get, store
       const response = await get().auth.adminApiFetch<UserListResponse>("admin/users");
       setSlice({ users: response, loadError: undefined });
     } catch (e) {
-      setSlice({ users: null, loadError: e as ApiError });
+      setSlice({ users: null, loadError: toApiError(e) });
     }
   },
 

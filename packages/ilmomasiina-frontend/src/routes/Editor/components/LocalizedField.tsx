@@ -66,6 +66,7 @@ export default function LocalizedField<C extends As>({
   // Pretend we can safely stuff all these props into whatever Component is.
   type InjectedProps = typeof input &
     typeof props & { isInvalid?: boolean; required?: boolean; placeholder?: string | undefined };
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- react-bootstrap's polymorphic `as` typing can't express this
   const Component = (as ?? Form.Control) as ComponentType<InjectedProps>;
   return <Component isInvalid={invalid} required={required} {...placeholder} {...props} {...input} />;
 }

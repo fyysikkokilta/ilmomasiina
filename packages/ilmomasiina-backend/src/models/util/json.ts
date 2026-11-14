@@ -8,7 +8,10 @@ import type { Model } from "sequelize";
 /** Getter for JSON columns that deserializes string values. */
 export const jsonColumnGetter = <T>(name: string) =>
   function getJsonColumn(this: Model): T {
+    // The column type is declared by the model; the database is trusted to hold matching JSON.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
     const json = this.getDataValue(name) as string | T;
     if (this.sequelize.getDialect() === "postgres") return json as T;
     return typeof json === "string" ? (JSON.parse(json) as T) : json;
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
   };

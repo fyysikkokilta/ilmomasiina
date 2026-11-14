@@ -7,7 +7,7 @@ import { Payment } from "../../models/payment";
 import { Question } from "../../models/question";
 import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";
-import { StringifyApi } from "../utils";
+import { asApiResponse } from "../utils";
 import { NoSuchSignup } from "./errors";
 
 /** Requires editTokenVerification */
@@ -74,5 +74,5 @@ export default async function getSignupForEdit(
 
   reply.status(200);
 
-  return response as unknown as StringifyApi<typeof response>;
+  return asApiResponse(response);
 }

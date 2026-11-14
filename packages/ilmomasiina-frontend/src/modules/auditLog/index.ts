@@ -1,4 +1,4 @@
-import { ApiError } from "@tietokilta/ilmomasiina-client";
+import { ApiError, toApiError } from "@tietokilta/ilmomasiina-client";
 import { AuditLogResponse, AuditLoqQuery } from "@tietokilta/ilmomasiina-models";
 import storeSlice from "../../utils/storeSlice";
 import type { Root } from "../store";
@@ -48,7 +48,7 @@ export const auditLogSlice = storeSlice<Root>()("auditLog", (set, get, store, ge
     } catch (e) {
       setSlice({
         auditLog: null,
-        loadError: e as ApiError,
+        loadError: toApiError(e),
       });
     }
   },

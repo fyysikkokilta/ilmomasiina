@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useMemo } from "react";
 
 import type { UserEventListResponse } from "@tietokilta/ilmomasiina-models";
-import { ApiError, apiFetch } from "../../api";
+import { ApiError, apiFetch, toApiError } from "../../api";
 import { useAbortablePromise } from "../../utils/abortable";
 import { getLocalizedEventListItem } from "../../utils/localizedEvent";
 import { createStateContext } from "../../utils/stateContext";
@@ -50,7 +50,7 @@ export function useEventListState({ category, maxAge, language }: EventListProps
     events,
     localizedEvents,
     pending,
-    error: error as ApiError | undefined,
+    error: error === undefined ? undefined : toApiError(error),
   });
 }
 

@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { toast } from "react-toastify";
 
-import { ApiError } from "@tietokilta/ilmomasiina-client";
 import { errorDesc } from "@tietokilta/ilmomasiina-client/dist/utils/errorMessage";
 import type { AdminEventListItem as AdminEventListItemSchema } from "@tietokilta/ilmomasiina-models";
 import LinkButton from "../../components/LinkButton";
@@ -36,7 +35,7 @@ const AdminEventListItem = ({ event }: Props) => {
       try {
         await deleteEvent(id);
       } catch (err) {
-        toast.error(t(errorDesc<TKey>(err as ApiError, "adminEvents.action.delete.error")), {
+        toast.error(t(errorDesc<TKey>(err, "adminEvents.action.delete.error")), {
           autoClose: 2000,
         });
       } finally {

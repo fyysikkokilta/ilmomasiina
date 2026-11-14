@@ -6,7 +6,7 @@ import { Form } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import i18n, { TKey } from "../../i18n";
 import useStore from "../../modules/store";
@@ -58,7 +58,7 @@ const ChangePasswordForm = () => {
         autoClose: 5000,
       });
     } catch (err) {
-      toast.error(t(errorDesc<TKey>(err as ApiError, "adminUsers.changePassword.errors")), {
+      toast.error(t(errorDesc<TKey>(err, "adminUsers.changePassword.errors")), {
         autoClose: 5000,
       });
     }

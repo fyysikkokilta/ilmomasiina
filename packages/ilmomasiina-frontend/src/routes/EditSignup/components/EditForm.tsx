@@ -90,7 +90,7 @@ const Payment = ({ disabled, onPay }: PaymentProps) => {
 
 const SubmitError = () => {
   const { isNew } = useEditSignupContext();
-  const submitError = useFormState({ subscription: { submitError: true } }).submitError as ApiError | undefined;
+  const submitError: unknown = useFormState({ subscription: { submitError: true } }).submitError;
   const { t } = useTranslation();
 
   return submitError ? (
@@ -253,7 +253,7 @@ const EditForm = () => {
       return undefined;
     } catch (error) {
       toast.update(progressToast, {
-        render: t(errorDesc<TKey>(error as ApiError, isNew ? "editSignup.signupError" : "editSignup.editError")),
+        render: t(errorDesc<TKey>(error, isNew ? "editSignup.signupError" : "editSignup.editError")),
         type: "error",
         autoClose: 5000,
         closeButton: true,
@@ -263,7 +263,8 @@ const EditForm = () => {
       // Augment the submit errors object if the error is a submit validation error.
       const errors =
         error instanceof ApiError && error.code === ErrorCode.SIGNUP_VALIDATION_ERROR
-          ? (error.response! as SignupValidationError).errors
+          ? // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the error code fixes the response shape
+            (error.response as SignupValidationError).errors
           : null;
       return { [FORM_ERROR]: error, ...errors };
     }
@@ -284,7 +285,7 @@ const EditForm = () => {
       void navigate(paths.eventDetails(event!.slug));
     } catch (error) {
       toast.update(progressToast, {
-        render: t(errorDesc<TKey>(error as ApiError, "editSignup.deleteError")),
+        render: t(errorDesc<TKey>(error, "editSignup.deleteError")),
         type: "error",
         autoClose: 5000,
         closeButton: true,
@@ -306,7 +307,7 @@ const EditForm = () => {
       window.location.href = paymentUrl;
     } catch (error) {
       toast.update(progressToast, {
-        render: t(errorDesc<TKey>(error as ApiError, "editSignup.paymentError")),
+        render: t(errorDesc<TKey>(error, "editSignup.paymentError")),
         type: "error",
         autoClose: 5000,
         closeButton: true,

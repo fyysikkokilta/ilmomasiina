@@ -6,7 +6,7 @@ import { Form } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
-import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import branding from "../../branding";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import i18n, { TKey } from "../../i18n";
@@ -81,9 +81,7 @@ const InitialSetup = () => {
       <Form<FormData> initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
         {({ handleSubmit, submitting, submitError }) => (
           <BsForm onSubmit={handleSubmit} className="ilmo--form">
-            {submitError && (
-              <Alert variant="danger">{t(errorDesc<TKey>(submitError as ApiError, "initialSetup.errors"))}</Alert>
-            )}
+            {submitError && <Alert variant="danger">{t(errorDesc<TKey>(submitError, "initialSetup.errors"))}</Alert>}
             <FieldFormGroup name="email" required label={t("initialSetup.email")}>
               {({ input, meta: { touched, error } }) => (
                 <FormControl

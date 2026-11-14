@@ -110,7 +110,7 @@ async function createPayment(signupId: SignupID, event: Event, auditLogger: Audi
       await auditLogger(AuditEvent.START_PAYMENT, { signup, event, transaction });
     });
   } catch (error) {
-    if (error instanceof DatabaseError && (error.parent as PgDatabaseError).code === "P0001") {
+    if (error instanceof DatabaseError && error.parent instanceof PgDatabaseError && error.parent.code === "P0001") {
       throw new PaymentInProgress("Payment creation failed due to concurrent update");
     }
     throw error;

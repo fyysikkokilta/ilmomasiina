@@ -11,9 +11,15 @@
   "ignorePatterns": ["**/node_modules/**", "**/dist/**", "**/build/**", "**/coverage/**", "**/loadTest.js"],
   "rules": {
     "react/react-in-jsx-scope": "off",
-    "typescript/no-unsafe-type-assertion": "off",
-    "vitest/warn-todo": "off",
-    "oxc/no-this-in-exported-function": "off",
-    "react/no-array-index-key": "warn"
-  }
+    "react/no-array-index-key": "warn",
+    "vitest/warn-todo": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/test/**"],
+      "rules": {
+        "typescript/no-unsafe-type-assertion": "off"
+      }
+    }
+  ]
 }

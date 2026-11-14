@@ -14,6 +14,7 @@ export default function useEditorErrors(): (error: unknown) => string {
       }
       // Handle one-off custom error messages by passing the i18n key directly in .message
       if (issue.message.startsWith("editor.errors.")) {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the schema only uses editor.errors.* keys as messages
         return String(t(issue.message as TKey, { ...(issue.code === "custom" ? issue.params : {}) }));
       }
       // Custom messages for the errors that should be possible to input with the form elements

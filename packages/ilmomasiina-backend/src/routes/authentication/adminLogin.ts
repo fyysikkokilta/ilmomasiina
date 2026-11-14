@@ -8,7 +8,6 @@ import { User } from "../../models/user";
 import CustomError from "../../util/customError";
 
 export async function adminLogin(
-  this: FastifyInstance,
   request: FastifyRequest<{ Body: AdminLoginBody }>,
   reply: FastifyReply,
 ): Promise<AdminLoginResponse> {
@@ -26,18 +25,14 @@ export async function adminLogin(
   }
 
   // Authentication success -> generate auth token
-  const accessToken = this.adminSession.createSession(user);
+  const accessToken = request.server.adminSession.createSession(user);
   reply.status(200);
   return { accessToken };
 }
 
-export async function renewAdminToken(
-  this: FastifyInstance,
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<AdminLoginResponse> {
+export async function renewAdminToken(request: FastifyRequest, reply: FastifyReply): Promise<AdminLoginResponse> {
   // Verify existing token
-  const sessionData = this.adminSession.verifySession(request);
+  const sessionData = request.server.adminSession.verifySession(request);
 
   // Verify that the user exists
   const user = await User.findByPk(sessionData.user);
@@ -46,7 +41,7 @@ export async function renewAdminToken(
   }
 
   // Create a new one
-  const accessToken = this.adminSession.createSession(user);
+  const accessToken = request.server.adminSession.createSession(user);
   reply.status(200);
   return { accessToken };
 }

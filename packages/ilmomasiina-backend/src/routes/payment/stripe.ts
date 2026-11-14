@@ -217,7 +217,11 @@ export async function expirePaymentForSignupUpdate(payment: Payment): Promise<vo
           { where: { id: payment.id } },
         );
       } catch (error) {
-        if (error instanceof DatabaseError && (error.parent as PgDatabaseError).code === "P0001") {
+        if (
+          error instanceof DatabaseError &&
+          error.parent instanceof PgDatabaseError &&
+          error.parent.code === "P0001"
+        ) {
           // Also ignore now and fail later when we check for conflicting payments.
           console.error("Failed to expire CREATING payment for updating signup:", error);
           return;

@@ -4,7 +4,7 @@ import { Button, ButtonGroup } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import type { UserSchema } from "@tietokilta/ilmomasiina-models";
 import type { TKey } from "../../i18n";
 import useStore from "../../modules/store";
@@ -28,7 +28,7 @@ const AdminUserListItem = ({ user }: Props) => {
         });
       } catch (err) {
         toast.error(
-          t(errorDesc<TKey>(err as ApiError, "adminUsers.deleteUser.errors"), {
+          t(errorDesc<TKey>(err, "adminUsers.deleteUser.errors"), {
             user: user.email,
           }),
           { autoClose: 5000 },
@@ -48,7 +48,7 @@ const AdminUserListItem = ({ user }: Props) => {
         });
       } catch (err) {
         toast.error(
-          t(errorDesc<TKey>(err as ApiError, "adminUsers.resetPassword.errors"), {
+          t(errorDesc<TKey>(err, "adminUsers.resetPassword.errors"), {
             user: user.email,
           }),
           { autoClose: 5000 },

@@ -98,7 +98,7 @@ export default async function updateEvent(
       if (updatedQuestions !== undefined) {
         const reuseQuestionIds = updatedQuestions
           .map((question) => question.id)
-          .filter((questionId) => questionId) as Question["id"][];
+          .filter((questionId): questionId is Question["id"] => Boolean(questionId));
 
         // Remove previous Questions not present in request
         await Question.destroy({
@@ -123,7 +123,9 @@ export default async function updateEvent(
       }
 
       if (updatedQuotas !== undefined) {
-        const reuseQuotaIds = updatedQuotas.map((quota) => quota.id).filter((quotaId) => quotaId) as Quota["id"][];
+        const reuseQuotaIds = updatedQuotas
+          .map((quota) => quota.id)
+          .filter((quotaId): quotaId is Quota["id"] => Boolean(quotaId));
 
         // Remove previous Quotas not present in request
         await Quota.destroy({

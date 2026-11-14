@@ -112,6 +112,7 @@ export default function FieldRow<C extends As = "input">({
     // Pretend we can safely stuff all these props into whatever Component is.
     type InjectedProps = typeof input &
       typeof props & { isInvalid?: boolean; required?: boolean; id?: string; label?: ReactNode };
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- react-bootstrap's polymorphic `as` typing can't express this
     const Component = (as ?? Form.Control) as ComponentType<InjectedProps>;
     field = <Component required={required} isInvalid={meta.invalid} {...props} id={id} {...input} {...overrideProps} />;
   }

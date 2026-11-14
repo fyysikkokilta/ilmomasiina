@@ -35,7 +35,8 @@ function useItemDescription(item: AuditLogItemSchema) {
   const { t } = useTranslation();
   let extra: Record<string, unknown> = {};
   try {
-    extra = JSON.parse(item.extra || "") as Record<string, unknown>;
+    const parsed: unknown = JSON.parse(item.extra || "");
+    if (typeof parsed === "object" && parsed !== null) extra = Object.fromEntries(Object.entries(parsed));
   } catch {
     /* ignore */
   }

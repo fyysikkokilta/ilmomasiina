@@ -34,9 +34,9 @@ function getTokenExpiry(jwt: string): number {
   const parts = jwt.split(".");
 
   try {
-    const payload = JSON.parse(window.atob(parts[1])) as { exp?: number };
+    const payload: unknown = JSON.parse(window.atob(parts[1]));
 
-    if (payload.exp) {
+    if (typeof payload === "object" && payload !== null && "exp" in payload && typeof payload.exp === "number") {
       return payload.exp * 1000;
     }
   } catch {

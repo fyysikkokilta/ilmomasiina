@@ -17,8 +17,9 @@ export function envBoolean(name: string, defaultValue?: boolean) {
 /** Gets a string from the environment, only accepting given values. */
 export function envEnum<V extends string | null>(name: string, values: readonly V[], defaultValue?: V) {
   const value = process.env[name] ?? defaultValue;
-  if (values.includes(value as V)) {
-    return value as V;
+  const match = values.find((allowed) => allowed === value);
+  if (match !== undefined) {
+    return match;
   }
   throw new Error(`Env variable ${name} must be one of ${values.map((val) => `'${val}'`).join(", ")}`);
 }
@@ -59,12 +60,16 @@ export function envJson<T>(name: string, schema: ZodType<T>, defaultValue: T): T
   try {
     parsedJson = JSON.parse(json);
   } catch (err) {
-    throw new Error(`Env variable ${name} must be valid JSON: ${(err as Error).message}`, { cause: err });
+    throw new Error(`Env variable ${name} must be valid JSON: ${err instanceof Error ? err.message : String(err)}`, {
+      cause: err,
+    });
   }
   try {
     return schema.parse(parsedJson);
   } catch (err) {
-    throw new Error(`Env variable ${name} is invalid:\n${prettifyError(err as ZodError)}`, { cause: err });
+    throw new Error(`Env variable ${name} is invalid:\n${err instanceof ZodError ? prettifyError(err) : String(err)}`, {
+      cause: err,
+    });
   }
 }
 

@@ -25,7 +25,7 @@ import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";
 import { formatSignupForAdmin } from "../events/getEventDetails";
 import { checkForConflictingPaymentsForSignupUpdate, expireExistingPaymentsForSignupUpdate } from "../payment/stripe";
-import type { StringifyApi } from "../utils";
+import { asApiResponse } from "../utils";
 import { refreshSignupPositions } from "./computeSignupPosition";
 import { signupEditable } from "./createNewSignup";
 import { NoSuchQuota, NoSuchSignup, SignupsClosed, SignupValidationError } from "./errors";
@@ -399,7 +399,7 @@ export async function updateSignupAsUser(
   };
 
   reply.status(200);
-  return response as unknown as StringifyApi<typeof response>;
+  return asApiResponse(response);
 }
 
 export async function updateSignupAsAdmin(

@@ -6,7 +6,7 @@ import { Form } from "react-final-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { ApiError, errorDesc } from "@tietokilta/ilmomasiina-client";
+import { errorDesc } from "@tietokilta/ilmomasiina-client";
 import branding from "../../branding";
 import FieldFormGroup from "../../components/FieldFormGroup";
 import type { TKey } from "../../i18n";
@@ -30,7 +30,7 @@ const UserForm = () => {
       });
     } catch (err) {
       toast.error(
-        t(errorDesc<TKey>(err as ApiError, "adminUsers.createUser.errors"), {
+        t(errorDesc<TKey>(err, "adminUsers.createUser.errors"), {
           email: data.email,
         }),
         { autoClose: 5000 },

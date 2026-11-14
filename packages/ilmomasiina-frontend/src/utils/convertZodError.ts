@@ -21,6 +21,7 @@ export default function convertZodError<T extends object, R>(
 
 export default function convertZodError<T extends object>(zodErr: ZodError<T>): FinalFormRootError<T, z.core.$ZodIssue>;
 
+/* oxlint-disable typescript/no-unsafe-type-assertion -- builds a loosely typed nested object, typed by the overloads */
 /** Converts a Zod formatted error to a final-form compatible format. */
 export default function convertZodError<T extends object, R>(
   zodErr: ZodError<T>,
@@ -65,3 +66,4 @@ export default function convertZodError<T extends object, R>(
   }
   return result as FinalFormRootError<T, R>;
 }
+/* oxlint-enable typescript/no-unsafe-type-assertion */

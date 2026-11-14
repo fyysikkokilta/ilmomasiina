@@ -32,7 +32,12 @@ export function getLocalizedEventListItem(event: UserEventListItem, language: st
  *
  * If the language version is not found (including invalid languages), falls back to the default language.
  */
-export function getLocalizedEvent<E extends UserEventResponse | EventForEditSignup>(event: E, language: string): E {
+export function getLocalizedEvent(event: UserEventResponse, language: string): UserEventResponse;
+export function getLocalizedEvent(event: EventForEditSignup, language: string): EventForEditSignup;
+export function getLocalizedEvent(
+  event: UserEventResponse | EventForEditSignup,
+  language: string,
+): UserEventResponse | EventForEditSignup {
   const locale = event.languages?.[language] ?? event;
   return {
     ...event,
@@ -54,8 +59,7 @@ export function getLocalizedEvent<E extends UserEventResponse | EventForEditSign
         ...quota,
         title: locale.quotas[index]?.title || quota.title,
       })) ?? [],
-    // TypeScript isn't able to typecheck generics like E, so sanity-check at least slightly better.
-  } satisfies UserEventResponse | EventForEditSignup as E;
+  };
 }
 
 /** Overrides localized properties in the quota of the edited signup with localized versions.

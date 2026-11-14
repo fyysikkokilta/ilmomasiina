@@ -68,7 +68,9 @@ const Tab = ({ id, activeTab, setActiveTab }: TabProps) => {
   const { errors } = useFormState({ subscription: { errors: true } });
   const hasErrors =
     errors != null &&
-    Object.entries(errors).some(([field, error]) => error && tabForField[field as keyof EditorEvent] === id);
+    Object.entries(errors).some(
+      ([field, error]) => error && (tabForField as Partial<Record<string, EditorTab | null>>)[field] === id,
+    );
 
   const onClick = useCallback(() => setActiveTab(id), [id, setActiveTab]);
 

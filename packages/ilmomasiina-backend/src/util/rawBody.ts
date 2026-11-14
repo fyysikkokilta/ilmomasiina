@@ -5,7 +5,7 @@ import { Readable } from "stream";
 const getRawBody: preParsingAsyncHookHandler = async (request, _reply, payload) => {
   const chunks: Buffer[] = [];
   for await (const chunk of payload) {
-    chunks.push(chunk as Buffer);
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
   }
   const rawBody = Buffer.concat(chunks);
   // Store raw body for signature verification

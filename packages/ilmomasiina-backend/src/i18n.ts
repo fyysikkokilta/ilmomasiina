@@ -10,7 +10,9 @@ const resources = {
 } as const;
 
 export type KnownLanguage = keyof typeof resources;
-export const knownLanguages = Object.keys(resources) as KnownLanguage[];
+export const knownLanguages = Object.keys(resources).filter((lang): lang is KnownLanguage =>
+  Object.hasOwn(resources, lang),
+);
 
 export { resources as i18nResources };
 

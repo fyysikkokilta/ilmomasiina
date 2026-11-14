@@ -29,7 +29,7 @@ import { Question } from "../../models/question";
 import { Quota } from "../../models/quota";
 import { Signup } from "../../models/signup";
 import createCache from "../../util/cache";
-import type { StringifyApi } from "../utils";
+import { asApiResponse } from "../utils";
 
 export const basicEventInfoCached = createCache({
   maxAgeMs: 5000,
@@ -157,7 +157,7 @@ export async function eventDetailsForUser(eventSlug: EventSlug): Promise<UserEve
     millisTillOpening,
     registrationClosed,
   };
-  return res as unknown as StringifyApi<typeof res>;
+  return asApiResponse(res);
 }
 
 /** Converts a signup with answers included to JSON for the admin API. */
@@ -169,7 +169,7 @@ export function formatSignupForAdmin(signup: Signup): AdminSignupSchema {
     confirmed: signup.confirmed,
     paymentStatus: signup.effectivePaymentStatus,
   };
-  return result as unknown as StringifyApi<typeof result>;
+  return asApiResponse(result);
 }
 
 export async function eventDetailsForAdmin(eventID: EventID): Promise<AdminEventResponse> {
@@ -247,7 +247,7 @@ export async function eventDetailsForAdmin(eventID: EventID): Promise<AdminEvent
       };
     }),
   };
-  return res as unknown as StringifyApi<typeof res>;
+  return asApiResponse(res);
 }
 
 export async function getEventDetailsForUser(

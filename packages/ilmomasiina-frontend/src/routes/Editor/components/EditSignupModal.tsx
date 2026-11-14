@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
 import {
-  ApiError,
   EditSignupContextProvider,
   EditSignupState,
   errorDesc,
@@ -148,7 +147,7 @@ const EditSignupModal = () => {
       await saveSignup(update);
       toast.success(t("editor.editSignup.success"), { autoClose: 5000 });
     } catch (error) {
-      toast.error(t(errorDesc<TKey>(error as ApiError, "editor.saveSignupError")), { autoClose: 5000 });
+      toast.error(t(errorDesc<TKey>(error, "editor.saveSignupError")), { autoClose: 5000 });
     }
   });
 

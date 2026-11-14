@@ -2,7 +2,9 @@ import { useCallback } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import type { SignupFieldError } from "@tietokilta/ilmomasiina-models";
+import { SignupFieldError } from "@tietokilta/ilmomasiina-models";
+
+const fieldErrors = new Map<unknown, SignupFieldError>(Object.values(SignupFieldError).map((code) => [code, code]));
 
 /**
  * Localizes a SignupFieldError. Relies on the fact that server-sent errors on
@@ -11,8 +13,11 @@ import type { SignupFieldError } from "@tietokilta/ilmomasiina-models";
 export default function useFieldErrors() {
   const { t } = useTranslation();
   return useCallback(
-    (error?: unknown): string[] | string | undefined =>
-      error ? t([`editSignup.fieldError.${error as SignupFieldError}`, "editSignup.fieldError"]) : undefined,
+    (error?: unknown): string[] | string | undefined => {
+      if (!error) return undefined;
+      const code = fieldErrors.get(error);
+      return code ? t([`editSignup.fieldError.${code}`, "editSignup.fieldError"]) : t("editSignup.fieldError");
+    },
     [t],
   );
 }

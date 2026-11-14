@@ -7,7 +7,9 @@ import { i18nResources } from "./locales";
 export const defaultNS = ["frontend", "public"] as const;
 
 export type KnownLanguage = keyof typeof i18nResources;
-export const knownLanguages = Object.keys(i18nResources) as KnownLanguage[];
+export const knownLanguages = Object.keys(i18nResources).filter((lang): lang is KnownLanguage =>
+  Object.hasOwn(i18nResources, lang),
+);
 
 export type TKey = ParseKeys;
 
@@ -34,6 +36,7 @@ if (import.meta.hot) {
   import.meta.hot.accept("./locales", (module) => {
     if (!module) return;
     console.log("hot reloading i18n resources");
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- dev-only hot reload of our own locale module
     const newResources = module.i18nResources as Record<string, Record<string, string>>;
     for (const lang of Object.keys(newResources)) {
       for (const ns of Object.keys(newResources[lang])) {

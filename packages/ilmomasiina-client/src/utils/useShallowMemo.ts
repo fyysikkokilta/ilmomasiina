@@ -10,13 +10,13 @@ function shallowEqual(a: unknown, b: unknown) {
 
   if (typeof a !== "object" || a === null || typeof b !== "object" || b === null) return false;
 
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
+  const entriesA = Object.entries(a);
+  const valuesB = new Map(Object.entries(b));
 
-  if (keysA.length !== keysB.length) return false;
+  if (entriesA.length !== valuesB.size) return false;
 
-  for (const key of keysA) {
-    if (!Object.hasOwn(b, key) || !Object.is(a[key as keyof typeof a], b[key as keyof typeof b])) return false;
+  for (const [key, value] of entriesA) {
+    if (!valuesB.has(key) || !Object.is(value, valuesB.get(key))) return false;
   }
   return true;
 }

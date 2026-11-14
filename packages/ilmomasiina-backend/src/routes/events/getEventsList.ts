@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { BadRequest } from "http-errors";
 import moment from "moment";
 import { col, fn, Op, Order, WhereOptions } from "sequelize";
@@ -12,7 +12,7 @@ import { Signup } from "../../models/signup";
 import { ascNullsFirst } from "../../models/util/ascNullsFirst";
 import createCache from "../../util/cache";
 import { InitialSetupNeeded, isInitialSetupDone } from "../admin/users/createInitialUser";
-import { StringifyApi } from "../utils";
+import { asApiResponse } from "../utils";
 
 function eventOrder(): Order {
   return [
@@ -82,18 +82,17 @@ export const eventsListForUserCached = createCache({
 });
 
 export async function getEventsListForUser(
-  this: FastifyInstance,
   request: FastifyRequest<{ Querystring: EventListQuery }>,
   reply: FastifyReply,
 ): Promise<UserEventListResponse> {
   // When the application hasn't been set up for the first time, throw an error.
-  if (!this.initialSetupDone && !(await isInitialSetupDone())) {
+  if (!request.server.initialSetupDone && !(await isInitialSetupDone())) {
     throw new InitialSetupNeeded("Initial setup of Ilmomasiina is needed.");
   }
 
   const res = await eventsListForUserCached({ category: request.query.category, maxAge: request.query.maxAge });
   reply.status(200);
-  return res as StringifyApi<typeof res>;
+  return asApiResponse(res);
 }
 
 export async function getEventsListForAdmin(
@@ -132,5 +131,5 @@ export async function getEventsListForAdmin(
   }));
 
   reply.status(200);
-  return res as StringifyApi<typeof res>;
+  return asApiResponse(res);
 }
