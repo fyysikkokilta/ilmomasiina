@@ -128,23 +128,21 @@ async function refreshSignupPositionsInternal(
     });
   }
 
-  // Store changes in database, if any, with a single query.
+  // Store changes in database, if any, with a single query. Drizzle has no builder for a VALUES list,
+  // so that part is raw SQL. Its values are cast to the column types, so that the primary key index is used.
   const changed = result.filter(
     ({ signup, status, position }) => signup.status !== status || signup.position !== position,
   );
   if (changed.length) {
-    const values = sql.join(
-      changed.map(({ signup, status, position }) => sql`(${signup.id}, ${status}, ${position}::integer)`),
-      sql`, `,
+    const statusType = sql.identifier(signupStatusEnum.enumName);
+    const rows = changed.map(
+      ({ signup, status, position }) => sql`(${signup.id}::bpchar, ${status}::${statusType}, ${position}::integer)`,
     );
-    await transaction.execute(sql`
-      UPDATE ${signupTable}
-      SET "status" = v."status"::${sql.identifier(signupStatusEnum.enumName)},
-          "position" = v."position",
-          "updatedAt" = ${new Date()}
-      FROM (VALUES ${values}) AS v("id", "status", "position")
-      WHERE ${signupTable.id} = v."id"
-    `);
+    await transaction
+      .update(signupTable)
+      .set({ status: sql`v.status`, position: sql`v.position` })
+      .from(sql`(VALUES ${sql.join(rows, sql`, `)}) AS v(id, status, position)`)
+      .where(eq(signupTable.id, sql`v.id`));
   }
 
   const duration = performance.now() - startTime;
