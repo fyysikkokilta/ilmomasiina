@@ -16,7 +16,7 @@ const sequelizeConfig: Options = {
   benchmark: debugDbLogging,
 };
 
-export = {
+export default {
   // Sequelize CLI uses development as default NODE_ENV
   development: sequelizeConfig,
   // ...but make sure we can also run migrate with NODE_ENV=production

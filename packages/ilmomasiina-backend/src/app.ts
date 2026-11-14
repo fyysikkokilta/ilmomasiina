@@ -5,7 +5,7 @@ import { fastifyStatic } from "@fastify/static";
 import { Ajv } from "ajv";
 import ajvFormats from "ajv-formats";
 import { fastify, FastifyInstance } from "fastify";
-import cron from "node-cron";
+import { schedule } from "node-cron";
 import path from "path";
 import zlib from "zlib";
 
@@ -128,16 +128,16 @@ export default async function initApp(): Promise<FastifyInstance> {
 
   if (config.nodeEnv !== "test") {
     // Every minute, remove signups that haven't been confirmed fast enough
-    cron.schedule("* * * * *", deleteUnconfirmedSignups);
+    schedule("* * * * *", deleteUnconfirmedSignups);
 
     // Daily at 8am, anonymize old signups
-    cron.schedule("0 8 * * *", anonymizeOldSignups);
+    schedule("0 8 * * *", anonymizeOldSignups);
 
     // Daily at 8am, delete deleted items from the database
-    cron.schedule("0 8 * * *", removeDeletedData);
+    schedule("0 8 * * *", removeDeletedData);
 
     // Daily at 8am, delete old audit logs
-    cron.schedule("0 8 * * *", deleteOldAuditLogs);
+    schedule("0 8 * * *", deleteOldAuditLogs);
   }
 
   return server;

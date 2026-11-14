@@ -1,5 +1,5 @@
 import Mailgun from "mailgun.js";
-import nodemailer, { Transport } from "nodemailer";
+import { createTransport, Transport } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import config from "../config";
@@ -20,7 +20,7 @@ type AbstractTransporter = {
 
 const mailTransporter: AbstractTransporter = (() => {
   if (config.nodeEnv === "test") {
-    return nodemailer.createTransport({
+    return createTransport({
       name: "console fallback",
       version: "0",
       send(_mail, callback) {
@@ -51,7 +51,7 @@ const mailTransporter: AbstractTransporter = (() => {
     if (!config.smtpUser || !config.smtpPassword) {
       throw new Error("Invalid email config: SMTP_USER and SMTP_PASSWORD must be set with SMTP_HOST.");
     }
-    return nodemailer.createTransport({
+    return createTransport({
       host: config.smtpHost,
       port: config.smtpPort ?? undefined,
       secure: config.smtpTls,
@@ -63,7 +63,7 @@ const mailTransporter: AbstractTransporter = (() => {
   }
 
   console.warn("Neither Mailgun nor SMTP is configured. Falling back to debug mail service.");
-  return nodemailer.createTransport({
+  return createTransport({
     name: "console fallback",
     version: "0",
     send(mail, callback) {

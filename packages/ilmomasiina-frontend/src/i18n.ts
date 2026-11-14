@@ -1,4 +1,4 @@
-import i18n, { ParseKeys } from "i18next";
+import i18n, { ParseKeys, use } from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
@@ -13,8 +13,7 @@ export const knownLanguages = Object.keys(i18nResources).filter((lang): lang is 
 
 export type TKey = ParseKeys;
 
-void i18n
-  .use(LanguageDetector)
+void use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: i18nResources,
@@ -35,7 +34,6 @@ if (import.meta.hot) {
   // In development, accept updated translations without reloading the entire app.
   import.meta.hot.accept("./locales", (module) => {
     if (!module) return;
-    console.log("hot reloading i18n resources");
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- dev-only hot reload of our own locale module
     const newResources = module.i18nResources as Record<string, Record<string, string>>;
     for (const lang of Object.keys(newResources)) {

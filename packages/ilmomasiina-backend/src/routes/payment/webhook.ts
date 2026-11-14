@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { BadRequest } from "http-errors";
-import Stripe from "stripe";
+import { Stripe } from "stripe";
 
 import config from "../../config";
 import { checkoutSessionStatusUpdated, getStripe } from "./stripe";

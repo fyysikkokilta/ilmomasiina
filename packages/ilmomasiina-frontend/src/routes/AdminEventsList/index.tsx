@@ -93,9 +93,9 @@ const AdminEventsList = () => {
               <td colSpan={5}>
                 <Trans t={t} i18nKey={showPast ? "adminEvents.noEvents.past" : "adminEvents.noEvents.upcoming"}>
                   No (type) events to show. Would you like to
-                  <a href="#" onClick={togglePast} role="button">
+                  <Button variant="link" className="p-0 align-baseline" onClick={togglePast}>
                     view (other type) events
-                  </a>
+                  </Button>
                   or
                   <Link to={paths.adminEditEvent("new")}>create a new event</Link>?
                 </Trans>

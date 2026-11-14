@@ -52,7 +52,7 @@ const Login = () => {
       <h1>{t("login.title")}</h1>
       <Form<FormData> initialValues={initialValues} onSubmit={onSubmit}>
         {({ handleSubmit, submitting, submitError }) => (
-          <BsForm onSubmit={handleSubmit} className="ilmo--form">
+          <BsForm onSubmit={(event) => void handleSubmit(event)} className="ilmo--form">
             {submitError && <Alert variant="danger">{t(errorDesc<TKey>(submitError, "login.errors"))}</Alert>}
             <FieldFormGroup name="email" required label={t("login.email")}>
               {({ input, meta: { touched, error } }) => (

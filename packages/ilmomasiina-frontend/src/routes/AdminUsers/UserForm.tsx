@@ -46,7 +46,7 @@ const UserForm = () => {
       onSubmit={onSubmit}
     >
       {({ submitting, handleSubmit }) => (
-        <BsForm className="ilmo--form" onSubmit={handleSubmit}>
+        <BsForm className="ilmo--form" onSubmit={(event) => void handleSubmit(event)}>
           <FieldFormGroup name="email" label={t("adminUsers.createUser.email")}>
             {({ input, meta: { touched, error } }) => (
               <FormControl

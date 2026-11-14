@@ -44,6 +44,7 @@ const SignupRow = ({ position, signup, showQuota }: SignupProps) => {
   const onEdit = useEvent(() => editSignup(signup));
   const onDelete = useEvent(async () => {
     // TODO: Use a proper modal instead of window.confirm
+    // oxlint-disable-next-line no-alert -- native confirm dialog until a modal exists
     const confirmation = window.confirm(t("editor.signups.action.delete.confirm"));
     if (confirmation) {
       await deleteSignup(signup.id);
@@ -98,7 +99,7 @@ const SignupRow = ({ position, signup, showQuota }: SignupProps) => {
             <Button type="button" variant="primary" size="sm" onClick={onEdit}>
               {t("editor.signups.action.edit")}
             </Button>
-            <Button type="button" variant="danger" size="sm" onClick={onDelete} className="ms-1">
+            <Button type="button" variant="danger" size="sm" onClick={() => void onDelete()} className="ms-1">
               {t("editor.signups.action.delete")}
             </Button>
           </>

@@ -49,7 +49,7 @@ const EditSignupModalBody = ({ handleSubmit, submitting }: FormRenderProps<Signu
   const hasPaidQuestions = useMemo(() => questions?.some(questionHasPrices), [questions]);
 
   return (
-    <BsForm className="ilmo--form" onSubmit={onSubmit}>
+    <BsForm className="ilmo--form" onSubmit={(formEvent) => void onSubmit(formEvent)}>
       <Modal.Header>
         <Modal.Title>{isNew ? t("editor.editSignup.title.create") : t("editor.editSignup.title.edit")}</Modal.Title>
       </Modal.Header>
@@ -98,7 +98,8 @@ const EditSignupModal = () => {
   const { values } = useFormState<EditorEvent>();
   const { t } = useTranslation();
   // Placeholder creation time for the mock signup, fixed when the modal mounts.
-  const [mockCreatedAt] = useState(() => new Date().toISOString());
+  // oxlint-disable-next-line react/hook-use-state -- a value fixed when the component mounts, never updated
+  const mockCreatedAt = useState(() => new Date().toISOString())[0];
 
   // We will reuse components from the user signup form, so prepare a mock context.
   const editSignupCtx = useMemo((): EditSignupState | null => {

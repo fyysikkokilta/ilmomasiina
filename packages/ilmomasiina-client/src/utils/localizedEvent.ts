@@ -11,8 +11,12 @@ type EventForEditSignup = SignupForEditResponse["event"];
  *
  * If the language version is not found (including invalid languages), falls back to the default language.
  */
+/** Servers before 2.0.0-alpha42 may omit languages and quotas, so treat them as optional here. */
+type MaybeLocalized<L> = { languages?: Partial<Record<string, L>> };
+
 export function getLocalizedEventListItem(event: UserEventListItem, language: string): UserEventListItem {
-  const locale = event.languages?.[language] ?? event;
+  const { languages } = event as MaybeLocalized<UserEventListItem["languages"][string]>;
+  const locale = languages?.[language] ?? event;
   return {
     ...event,
     title: locale.title || event.title,
@@ -38,7 +42,9 @@ export function getLocalizedEvent(
   event: UserEventResponse | EventForEditSignup,
   language: string,
 ): UserEventResponse | EventForEditSignup {
-  const locale = event.languages?.[language] ?? event;
+  const { languages } = event as MaybeLocalized<(typeof event.languages)[string]>;
+  const locale = languages?.[language] ?? event;
+  const { quotas } = event as { quotas?: typeof event.quotas };
   return {
     ...event,
     title: locale.title || event.title,
@@ -55,7 +61,7 @@ export function getLocalizedEvent(
     })),
     quotas:
       // Servers prior to 2.0.0-alpha42 do not return quotas in EventForEditSignup.
-      event.quotas?.map((quota, index) => ({
+      quotas?.map((quota, index) => ({
         ...quota,
         title: locale.quotas[index]?.title || quota.title,
       })) ?? [],
@@ -67,7 +73,8 @@ export function getLocalizedEvent(
  * If the language version is not found (including invalid languages), falls back to the default language.
  */
 export function getLocalizedSignup({ event, signup }: SignupForEditResponse, language: string): SignupForEdit {
-  const locale = event.languages?.[language];
+  const { languages } = event as MaybeLocalized<(typeof event.languages)[string]>;
+  const locale = languages?.[language];
   // Short circuit: don't attempt anything if we don't have the locale.
   if (!locale) return signup;
   // This is a bit unfortunate, but we have to find the quota manually.

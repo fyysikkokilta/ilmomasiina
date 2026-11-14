@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+import { Stripe } from "stripe";
 import { z, ZodType } from "zod";
 
 /** Validation schema for frontend URL configurations.

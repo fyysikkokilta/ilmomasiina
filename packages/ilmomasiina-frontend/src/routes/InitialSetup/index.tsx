@@ -80,7 +80,7 @@ const InitialSetup = () => {
       <p>{t("initialSetup.welcome2")}</p>
       <Form<FormData> initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
         {({ handleSubmit, submitting, submitError }) => (
-          <BsForm onSubmit={handleSubmit} className="ilmo--form">
+          <BsForm onSubmit={(event) => void handleSubmit(event)} className="ilmo--form">
             {submitError && <Alert variant="danger">{t(errorDesc<TKey>(submitError, "initialSetup.errors"))}</Alert>}
             <FieldFormGroup name="email" required label={t("initialSetup.email")}>
               {({ input, meta: { touched, error } }) => (

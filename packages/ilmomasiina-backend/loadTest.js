@@ -1,5 +1,5 @@
-import http from "k6/http";
 import { check, fail } from "k6";
+import http from "k6/http";
 import { Counter, Rate, Trend } from "k6/metrics";
 
 // Define custom metrics for events list and individual events

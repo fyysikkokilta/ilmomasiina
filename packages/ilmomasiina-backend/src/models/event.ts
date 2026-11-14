@@ -312,7 +312,9 @@ export default function setupEventModel(sequelize: Sequelize) {
         allowNull: false,
         // The default value used for this depends on config, so we can't set it in the database easily.
         get(): string {
-          return this.getDataValue("defaultLanguage") ?? config.defaultLanguage;
+          // Rows created before the column was added may not have a value.
+          const value = this.getDataValue("defaultLanguage") as string | null;
+          return value ?? config.defaultLanguage;
         },
       },
     },
@@ -350,7 +352,7 @@ export default function setupEventModel(sequelize: Sequelize) {
           }
         },
         noDuplicateDefaultLanguage(this: Event) {
-          if (this.languages != null && this.languages[this.defaultLanguage]) {
+          if (Object.hasOwn(this.languages, this.defaultLanguage)) {
             throw new EventValidationError("defaultLanguage may not be present in languages");
           }
         },

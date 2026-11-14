@@ -1,5 +1,6 @@
-import path from "path";
 import type { ReactElement } from "react";
+
+import path from "path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { I18nextProvider } from "react-i18next";
 import inline from "web-resource-inliner";

@@ -30,6 +30,7 @@ const AdminEventListItem = ({ event }: Props) => {
   async function onDelete(e: MouseEvent) {
     e.preventDefault();
     // TODO: Use a proper modal instead of window.confirm
+    // oxlint-disable-next-line no-alert -- native confirm dialog until a modal exists
     const confirmed = window.confirm(t("adminEvents.action.delete.confirm"));
     if (confirmed) {
       try {
@@ -70,7 +71,7 @@ const AdminEventListItem = ({ event }: Props) => {
         <LinkButton variant="primary" size="sm" className="me-1" to={paths.adminCopyEvent(id)}>
           {t("adminEvents.action.copy")}
         </LinkButton>
-        <Button variant="danger" size="sm" onClick={onDelete}>
+        <Button variant="danger" size="sm" onClick={(clickEvent) => void onDelete(clickEvent)}>
           {t("adminEvents.action.delete")}
         </Button>
       </td>

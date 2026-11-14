@@ -23,22 +23,22 @@ beforeAll(async ({}, suite) => {
     // Drop the trigger that prevents deleting payments to allow test data to be reset.
     await global.sequelize.query("DROP TRIGGER IF EXISTS payment_prevent_delete ON payment;");
   } else {
-    global.sequelize = undefined as any;
+    global.sequelize = undefined;
   }
   if (needsApi(suite)) {
     global.server = await initApp();
   } else {
-    global.server = undefined as any;
+    global.server = undefined;
   }
 });
 afterAll(async () => {
   if (global.sequelize) {
     await closeDatabase();
-    global.sequelize = undefined as any;
+    global.sequelize = undefined;
   }
   if (global.server) {
     await global.server.close();
-    global.server = undefined as any;
+    global.server = undefined;
   }
 });
 
@@ -79,7 +79,7 @@ expect.extend({
     if (!Array.isArray(received) || received.length !== 2) {
       throw new Error("toBeApiError matcher expects an array of [data, response]");
     }
-    const [data, response] = received as [ErrorResponse, InjectResponse];
+    const [data, response] = received as [ErrorResponse | null, InjectResponse];
     if (response.statusCode !== expectedStatus) {
       return {
         pass: false,

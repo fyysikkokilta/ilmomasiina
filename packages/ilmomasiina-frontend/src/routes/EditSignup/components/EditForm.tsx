@@ -31,7 +31,7 @@ import SignupStatusAndPosition from "./SignupStatusAndPosition";
 
 type PaymentProps = {
   disabled: boolean;
-  onPay: () => void;
+  onPay: () => Promise<void>;
 };
 
 const Payment = ({ disabled, onPay }: PaymentProps) => {
@@ -79,7 +79,7 @@ const Payment = ({ disabled, onPay }: PaymentProps) => {
       </Table>
       {canPayOnline && (
         <nav className="ilmo--submit-buttons">
-          <Button variant="primary" onClick={onPay} disabled={disabled || !isInQuota}>
+          <Button variant="primary" onClick={() => void onPay()} disabled={disabled || !isInQuota}>
             {t("editSignup.action.pay")}
           </Button>
         </nav>
@@ -174,8 +174,8 @@ const EditFormSubmit = ({ disabled }: { disabled: boolean }) => {
 
 type BodyProps = FormRenderProps<SignupFormData> & {
   processing: boolean;
-  onDelete: () => void;
-  onPay: () => void;
+  onDelete: () => Promise<void>;
+  onPay: () => Promise<void>;
 };
 
 const EditFormBody = ({ handleSubmit, processing, onDelete, onPay }: BodyProps) => {
@@ -200,7 +200,7 @@ const EditFormBody = ({ handleSubmit, processing, onDelete, onPay }: BodyProps) 
         <SignupStatusAndPosition />
         <EditableUntil />
         <SubmitError />
-        <BsForm onSubmit={onSubmit} className="ilmo--form">
+        <BsForm onSubmit={(event) => void onSubmit(event)} className="ilmo--form">
           <CommonFields />
           <QuestionFields name="answers" />
           <EditFormSubmit disabled={submitting || processing} />

@@ -19,6 +19,7 @@ const AdminUserListItem = ({ user }: Props) => {
 
   async function onDelete() {
     // TODO: Use a proper modal instead of window.confirm
+    // oxlint-disable-next-line no-alert -- native confirm dialog until a modal exists
     const confirmed = window.confirm(t("adminUsers.deleteUser.confirm", { user: user.email }));
     if (confirmed) {
       try {
@@ -39,6 +40,7 @@ const AdminUserListItem = ({ user }: Props) => {
   }
   async function onResetPassword() {
     // TODO: Use a proper modal instead of window.confirm
+    // oxlint-disable-next-line no-alert -- native confirm dialog until a modal exists
     const confirmed = window.confirm(t("adminUsers.resetPassword.confirm", { user: user.email }));
     if (confirmed) {
       try {
@@ -61,10 +63,10 @@ const AdminUserListItem = ({ user }: Props) => {
       <td>{user.email}</td>
       <td>
         <ButtonGroup size="sm">
-          <Button type="button" onClick={onResetPassword} size="sm" variant="secondary">
+          <Button type="button" onClick={() => void onResetPassword()} size="sm" variant="secondary">
             {t("adminUsers.resetPassword")}
           </Button>
-          <Button type="button" onClick={onDelete} size="sm" variant="danger">
+          <Button type="button" onClick={() => void onDelete()} size="sm" variant="danger">
             {t("adminUsers.deleteUser")}
           </Button>
         </ButtonGroup>

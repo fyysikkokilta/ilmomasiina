@@ -67,7 +67,7 @@ const ChangePasswordForm = () => {
   return (
     <Form<FormData> initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
       {({ submitting, handleSubmit }) => (
-        <BsForm className="ilmo--form" onSubmit={handleSubmit}>
+        <BsForm className="ilmo--form" onSubmit={(event) => void handleSubmit(event)}>
           <FieldFormGroup name="oldPassword" required label={t("adminUsers.changePassword.oldPassword")}>
             {({ input, meta: { touched, error } }) => (
               <FormControl {...input} type="password" required isInvalid={touched && !!error} placeholder="••••••••" />

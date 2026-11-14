@@ -20,6 +20,12 @@ import { generateToken } from "../../src/routes/signups/editTokens";
 
 export type InjectResponse = Awaited<ReturnType<FastifyInstance["inject"]>>;
 
+/** Returns the Fastify instance set up for API tests. */
+function testServer() {
+  if (!global.server) throw new Error("The API server is only set up for test files under test/routes");
+  return global.server;
+}
+
 /** Handles server errors from injected requests. */
 // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- the caller chooses the value type
 export function handleTestResponse<R>(response: InjectResponse, ignore500 = false) {
@@ -38,7 +44,7 @@ function editTokenHeaders(signupId: string, editToken?: string | false) {
 }
 
 export async function fetchUserEventList(query?: EventListQuery) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "GET",
     url: "/api/events",
     query: query as Record<string, string>,
@@ -47,7 +53,7 @@ export async function fetchUserEventList(query?: EventListQuery) {
 }
 
 export async function fetchUserEventDetails(event: Event) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "GET",
     url: `/api/events/${event.slug}`,
   });
@@ -55,7 +61,7 @@ export async function fetchUserEventDetails(event: Event) {
 }
 
 export async function fetchSignupForEdit(signupId: string, editToken?: string | false) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "GET",
     url: `/api/signups/${signupId}`,
     headers: editTokenHeaders(signupId, editToken),
@@ -64,7 +70,7 @@ export async function fetchSignupForEdit(signupId: string, editToken?: string | 
 }
 
 export async function updateSignupAsUser(signupId: string, body: SignupUpdateBody, editToken?: string | false) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "PATCH",
     url: `/api/signups/${signupId}`,
     headers: editTokenHeaders(signupId, editToken),
@@ -74,7 +80,7 @@ export async function updateSignupAsUser(signupId: string, body: SignupUpdateBod
 }
 
 export async function deleteSignupAsUser(signupId: string, editToken?: string | false) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "DELETE",
     url: `/api/signups/${signupId}`,
     headers: editTokenHeaders(signupId, editToken),
@@ -83,7 +89,7 @@ export async function deleteSignupAsUser(signupId: string, editToken?: string | 
 }
 
 export async function startPayment(signupId: string, editToken?: string | false, ignore500 = false) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "POST",
     url: `/api/signups/${signupId}/payment/start`,
     headers: editTokenHeaders(signupId, editToken),
@@ -92,7 +98,7 @@ export async function startPayment(signupId: string, editToken?: string | false,
 }
 
 export async function completePayment(signupId: string, editToken?: string | false, ignore500 = false) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "POST",
     url: `/api/signups/${signupId}/payment/complete`,
     headers: editTokenHeaders(signupId, editToken),
@@ -101,7 +107,7 @@ export async function completePayment(signupId: string, editToken?: string | fal
 }
 
 export async function fetchAdminEventList() {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "GET",
     url: "/api/admin/events",
     headers: { authorization: adminToken },
@@ -110,7 +116,7 @@ export async function fetchAdminEventList() {
 }
 
 export async function fetchAdminEventDetails(event: Pick<Event, "id">) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "GET",
     url: `/api/admin/events/${event.id}`,
     headers: { authorization: adminToken },
@@ -119,7 +125,7 @@ export async function fetchAdminEventDetails(event: Pick<Event, "id">) {
 }
 
 export async function createEvent(body: EventCreateBody) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "POST",
     url: "/api/admin/events",
     body,
@@ -129,7 +135,7 @@ export async function createEvent(body: EventCreateBody) {
 }
 
 export async function updateEvent(event: Pick<Event, "id">, body: EventUpdateBody) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "PATCH",
     url: `/api/admin/events/${event.id}`,
     body,
@@ -139,7 +145,7 @@ export async function updateEvent(event: Pick<Event, "id">, body: EventUpdateBod
 }
 
 export async function deleteEvent(event: Pick<Event, "id">) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "DELETE",
     url: `/api/admin/events/${event.id}`,
     headers: { authorization: adminToken },
@@ -148,7 +154,7 @@ export async function deleteEvent(event: Pick<Event, "id">) {
 }
 
 export async function updateSignupAsAdmin(signupId: string, body: AdminSignupUpdateBody) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "PATCH",
     url: `/api/admin/signups/${signupId}`,
     headers: { authorization: adminToken },
@@ -158,7 +164,7 @@ export async function updateSignupAsAdmin(signupId: string, body: AdminSignupUpd
 }
 
 export async function deleteSignupAsAdmin(signupId: string) {
-  const response = await server.inject({
+  const response = await testServer().inject({
     method: "DELETE",
     url: `/api/admin/signups/${signupId}`,
     headers: { authorization: adminToken },

@@ -156,9 +156,14 @@ export class Signup extends Model<SignupAttributes, SignupCreationAttributes> im
 
   public get effectivePaymentStatus(): SignupPaymentStatus | null {
     if (!this.payments) throw new Error("Payments not loaded for signup");
+    return this.paymentStatusWith(this.payments);
+  }
+
+  /** Computes the payment status of this signup from the given payments. */
+  public paymentStatusWith(payments: Payment[]): SignupPaymentStatus | null {
     // Find payments by status
-    const paidPayment = this.payments.some((p) => p.status === PaymentStatus.PAID);
-    const refundedPayment = this.payments.some((p) => p.status === PaymentStatus.REFUNDED);
+    const paidPayment = payments.some((p) => p.status === PaymentStatus.PAID);
+    const refundedPayment = payments.some((p) => p.status === PaymentStatus.REFUNDED);
 
     // If paid online or manually, it's paid
     if (paidPayment || this.manualPaymentStatus === ManualPaymentStatus.PAID) return SignupPaymentStatus.PAID;

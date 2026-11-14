@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from "react";
+
 import { useTranslation } from "react-i18next";
 
 import config from "../../config";
@@ -37,9 +38,7 @@ export default function Layout({ children }: PropsWithChildren) {
                     <tbody>
                       <tr>
                         {/* Janky, but this is what it's looked like for the last 8 years :D */}
-                        <td className="alert alert-neutral">
-                          <p className="alertText" />
-                        </td>
+                        <td className="alert alert-neutral" aria-hidden="true" />
                       </tr>
                       <tr>
                         <td className="content-wrap">{children}</td>

@@ -6,8 +6,10 @@ import EmailService from "../src/mail";
 import { User } from "../src/models/user";
 
 declare global {
-  var server: FastifyInstance;
-  var sequelize: Sequelize;
+  /** Set only for test files under test/routes. */
+  var server: FastifyInstance | undefined;
+  /** Set only for test files that need the database. */
+  var sequelize: Sequelize | undefined;
   var emailSend: Mock<(typeof EmailService)["send"]>;
   var consoleLog: Mock<typeof console.log>;
   var consoleWarn: Mock<typeof console.warn>;
@@ -26,6 +28,6 @@ interface CustomMatchers<R = unknown> {
 }
 
 declare module "vitest" {
-  interface Assertion<T = any> extends CustomMatchers<T> {}
+  interface Assertion<T = unknown> extends CustomMatchers<T> {}
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 }

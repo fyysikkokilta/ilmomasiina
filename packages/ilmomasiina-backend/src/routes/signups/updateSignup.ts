@@ -135,20 +135,21 @@ export function validateAnswersAndGetProducts(
       });
       // Then, collect valid options from other languages
       for (const lang of Object.values(event.languages)) {
-        const localized = lang.questions[index];
+        // Languages may have fewer questions than the default language.
+        const localized = lang.questions.at(index);
 
-        if (localized && localized.options) {
-          localized.options.forEach((opt, i) => {
+        if (localized?.options) {
+          for (const [i, opt] of localized.options.entries()) {
             // Only include non-empty options, since empty ones use the default language
-            if (!opt) return;
+            if (!opt) continue;
 
             if (validOptions.has(opt) && validOptions.get(opt) !== i) {
               console.warn(`Duplicate option "${opt}" detected in question ${question.id}`);
               error = SignupFieldError.DUPLICATE_OPTION;
-              return;
+              continue;
             }
             validOptions.set(opt, i);
-          });
+          }
         }
       }
     }
@@ -352,7 +353,7 @@ async function updateExistingSignup(
     },
     transaction,
   });
-  signup.answers = await Answer.bulkCreate(
+  return Answer.bulkCreate(
     newAnswers.map((answer) => ({ ...answer, signupId: signup.id })),
     { transaction },
   );
@@ -376,7 +377,7 @@ export async function updateSignupAsUser(
     /** Is this signup already confirmed (i.e. is this the first update for this signup) */
     const alreadyConfirmed = signup.confirmed;
 
-    await updateExistingSignup(signup, event, request.body, transaction, false);
+    signup.answers = await updateExistingSignup(signup, event, request.body, transaction, false);
     await request.logEvent(AuditEvent.EDIT_SIGNUP, { signup, event, transaction });
 
     return {
@@ -411,7 +412,7 @@ export async function updateSignupAsAdmin(
 
   const updatedSignup = await getSequelize().transaction(async (transaction) => {
     const { signup, event } = await getSignupAndEventForUpdate(request.params.id, transaction);
-    await updateExistingSignup(signup, event, request.body, transaction, true);
+    signup.answers = await updateExistingSignup(signup, event, request.body, transaction, true);
     await request.logEvent(AuditEvent.EDIT_SIGNUP, { signup, event, transaction });
     return signup;
   });
@@ -452,7 +453,7 @@ export async function createSignupAsAdmin(
     const signup = await Signup.create({ quotaId: quota.id }, { transaction });
     // Set the quota, which create() doesn't do.
     signup.quota = quota;
-    await updateExistingSignup(signup, quota.event, request.body, transaction, true);
+    signup.answers = await updateExistingSignup(signup, quota.event, request.body, transaction, true);
     await request.logEvent(AuditEvent.CREATE_SIGNUP, { signup, event: quota.event, transaction });
     return signup;
   });

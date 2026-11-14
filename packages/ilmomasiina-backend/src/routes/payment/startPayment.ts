@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import moment from "moment";
 import { DatabaseError as PgDatabaseError } from "pg";
 import { DatabaseError, Transaction, UniqueConstraintError } from "sequelize";
-import Stripe from "stripe";
+import { Stripe } from "stripe";
 
 import {
   AuditEvent,

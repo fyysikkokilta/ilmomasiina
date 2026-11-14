@@ -1,4 +1,4 @@
-import React, { ComponentPropsWithoutRef, ComponentType, JSX, ReactNode } from "react";
+import React, { ComponentPropsWithoutRef, ComponentType, ElementType, ReactNode } from "react";
 
 import identity from "lodash-es/identity";
 import { Col, Form, FormControlProps, Row } from "react-bootstrap";
@@ -58,7 +58,7 @@ type PropsWithChildren = BaseProps & {
   as?: undefined;
 };
 
-type As = keyof JSX.IntrinsicElements | ComponentType<any>;
+type As = ElementType;
 
 // Props with a custom `as` component.
 type PropsWithAs<C extends As> = BaseProps & {

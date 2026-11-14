@@ -10,7 +10,7 @@ const DELETE_CONFIRM_MS = 4000;
 
 type Props = {
   processing: boolean;
-  onDelete: () => void;
+  onDelete: () => Promise<void>;
 };
 
 const DeleteSignup = ({ processing, onDelete }: Props) => {
@@ -34,7 +34,7 @@ const DeleteSignup = ({ processing, onDelete }: Props) => {
       <ConfirmButton
         type="button"
         disabled={submitting || processing}
-        onClick={onDelete}
+        onClick={() => void onDelete()}
         variant="danger"
         confirmDelay={DELETE_CONFIRM_MS}
         confirmLabel={t("editSignup.delete.action.confirm")}

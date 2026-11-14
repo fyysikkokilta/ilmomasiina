@@ -54,14 +54,16 @@ const baseUrl = envString("BASE_URL");
 
 // Fill in default values in frontend config
 const baseFrontends = envJson("FRONTENDS", frontendsSchema, {});
+// FRONTENDS doesn't have to define a default frontend.
+const baseDefault = Object.hasOwn(baseFrontends, "default") ? baseFrontends.default : undefined;
 const frontends: FrontendsConfig = {
   ...baseFrontends,
   default: {
-    ...baseFrontends.default,
-    eventDetailsUrl: baseFrontends.default?.eventDetailsUrl ?? `${baseUrl}/events/{slug}`,
-    editSignupUrl: baseFrontends.default?.editSignupUrl ?? `${baseUrl}/signup/{id}/{editToken}`,
-    completePaymentUrl: baseFrontends.default?.completePaymentUrl ?? `${baseUrl}/payment/{id}/{editToken}`,
-    adminUrl: baseFrontends.default?.adminUrl ?? `${baseUrl}/admin`,
+    ...baseDefault,
+    eventDetailsUrl: baseDefault?.eventDetailsUrl ?? `${baseUrl}/events/{slug}`,
+    editSignupUrl: baseDefault?.editSignupUrl ?? `${baseUrl}/signup/{id}/{editToken}`,
+    completePaymentUrl: baseDefault?.completePaymentUrl ?? `${baseUrl}/payment/{id}/{editToken}`,
+    adminUrl: baseDefault?.adminUrl ?? `${baseUrl}/admin`,
   },
 };
 

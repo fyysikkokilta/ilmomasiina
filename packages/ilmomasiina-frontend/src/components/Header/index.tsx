@@ -29,10 +29,10 @@ const Header = () => {
           <span className="d-sm-none">{branding.headerTitleShort}</span>
         </Link>
         {language !== "fi" && (
-          <Button onClick={() => i18n.changeLanguage("fi")}>{t("header.switchLanguage", { lng: "fi" })}</Button>
+          <Button onClick={() => void i18n.changeLanguage("fi")}>{t("header.switchLanguage", { lng: "fi" })}</Button>
         )}
         {language !== "en" && (
-          <Button onClick={() => i18n.changeLanguage("en")}>{t("header.switchLanguage", { lng: "en" })}</Button>
+          <Button onClick={() => void i18n.changeLanguage("en")}>{t("header.switchLanguage", { lng: "en" })}</Button>
         )}
         <Suspense>
           <Logout />

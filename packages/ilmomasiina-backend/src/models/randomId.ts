@@ -10,6 +10,6 @@ export function generateRandomId() {
   // Could probably use Math.random() as well, but might as well make it secure.
   const bytes = randomBytes(RANDOM_ID_LENGTH);
   return Array.from(bytes)
-    .map((b: number) => RANDOM_ID_ALPHABET[b & 31])
+    .map((b: number) => RANDOM_ID_ALPHABET[b % 32])
     .join("");
 }

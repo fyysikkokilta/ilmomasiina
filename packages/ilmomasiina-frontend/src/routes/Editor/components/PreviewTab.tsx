@@ -22,7 +22,8 @@ import { editorEventToUserEvent, previewDummySignup } from "./userComponentInter
 const PreviewTab = () => {
   const { values } = useFormState<EditorEvent>();
   const [previewingForm, setPreviewingForm] = useState(false);
-  const [now] = useState(() => Date.now());
+  // oxlint-disable-next-line react/hook-use-state -- a value fixed when the component mounts, never updated
+  const now = useState(() => Date.now())[0];
   const { i18n, t } = useTranslation();
   const selectedLanguage = useStore((state) => state.editor.selectedLanguage);
 

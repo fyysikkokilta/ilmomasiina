@@ -81,7 +81,7 @@ const SignupButton = ({ isOpen, isClosed, seconds, total }: SignupButtonProps) =
             variant="secondary"
             disabled={!isOpen || submitting}
             className="ilmo--signup-button"
-            onClick={() => onClick(quota.id)}
+            onClick={() => void onClick(quota.id)}
           >
             {isOnly ? t("singleEvent.signupButton.singleQuota") : t("singleEvent.signupButton", { quota: quota.title })}
             {showPrices && ` (${priceFormat(quota.price)})`}

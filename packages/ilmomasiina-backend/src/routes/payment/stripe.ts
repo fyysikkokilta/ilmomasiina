@@ -1,7 +1,7 @@
 import moment from "moment";
 import { DatabaseError as PgDatabaseError } from "pg";
 import { DatabaseError, Transaction } from "sequelize";
-import Stripe from "stripe";
+import { Stripe } from "stripe";
 
 import { AuditEvent, PaymentStatus, SignupID } from "@tietokilta/ilmomasiina-models";
 import type { AuditLogger } from "../../auditlog";

@@ -20,14 +20,18 @@ if (!config.allowTestsToResetDb) {
 async function main() {
   await setupDatabase();
 
-  for (let i = 0; i < NUM_EVENTS; i++) {
-    process.stderr.write(`\rCreating test events: ${i + 1}/${NUM_EVENTS}...`);
-    const event = await testEvent();
-    await testSignups({
-      event,
-      count: faker.number.int(NUM_SIGNUPS_PER_EVENT),
-    });
-  }
+  let created = 0;
+  await Promise.all(
+    Array.from({ length: NUM_EVENTS }, async () => {
+      const event = await testEvent();
+      await testSignups({
+        event,
+        count: faker.number.int(NUM_SIGNUPS_PER_EVENT),
+      });
+      created += 1;
+      process.stderr.write(`\rCreating test events: ${created}/${NUM_EVENTS}...`);
+    }),
+  );
 }
 
 void main(); // no top-level await in CJS

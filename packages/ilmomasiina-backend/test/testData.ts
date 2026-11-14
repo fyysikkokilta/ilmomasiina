@@ -321,11 +321,8 @@ export async function fetchSignups(event: Event) {
   if (!event.quotas.length) {
     throw new Error("fetchSignups() needs at least one existing quota");
   }
-  await Promise.all(
-    event.quotas.map(async (quota) => {
-      quota.signups = await quota.getSignups({
-        include: [Answer],
-      });
-    }),
-  );
+  const signupsPerQuota = await Promise.all(event.quotas.map((quota) => quota.getSignups({ include: [Answer] })));
+  for (const [i, quota] of event.quotas.entries()) {
+    quota.signups = signupsPerQuota[i];
+  }
 }

@@ -1,13 +1,13 @@
 import moment from "moment-timezone";
 
 import { SignupStatus } from "@tietokilta/ilmomasiina-models";
+import EmailService, { ConfirmationMailParams, PaymentMailParams, QueueMailParams } from ".";
 import config, { editSignupUrl } from "../config";
 import i18n from "../i18n";
 import { Event } from "../models/event";
 import { Payment } from "../models/payment";
 import { Signup } from "../models/signup";
 import { generateToken } from "../routes/signups/editTokens";
-import EmailService, { ConfirmationMailParams, PaymentMailParams, QueueMailParams } from ".";
 
 /**
  * In test mode, we want to "send" emails synchronously so that we can verify the mock emails.
@@ -33,7 +33,7 @@ export const sendPromotedFromQueueMail = sendSynchronouslyInTest(async (signup: 
 
   const lang = signup.language ?? config.defaultLanguage;
 
-  signup.payments = await signup.getPayments();
+  const payments = await signup.getPayments();
   const quota = await signup.getQuota({ attributes: [], include: [Event] });
   if (!quota || !quota.event) return; // Quota or event soft deleted
   const { event } = quota;
@@ -47,7 +47,7 @@ export const sendPromotedFromQueueMail = sendSynchronouslyInTest(async (signup: 
   const params: QueueMailParams = {
     event,
     date,
-    paymentStatus: signup.effectivePaymentStatus,
+    paymentStatus: signup.paymentStatusWith(payments),
     signupLink,
   };
 
@@ -61,14 +61,15 @@ export const sendSignupConfirmationMail = sendSynchronouslyInTest(
 
     const lang = signup.language ?? config.defaultLanguage;
 
-    signup.payments = await signup.getPayments();
+    const payments = await signup.getPayments();
     const answers = await signup.getAnswers();
     const quota = await signup.getQuota({ include: [Event] });
     if (!quota || !quota.event) return; // Quota or event soft deleted
     const { event } = quota;
     const questions = await event.getQuestions({ order: [["order", "ASC"]] });
 
-    const localeQuestions = event.languages[lang]?.questions ?? questions;
+    const locale = Object.hasOwn(event.languages, lang) ? event.languages[lang] : undefined;
+    const localeQuestions = locale?.questions ?? questions;
 
     // Show name only if filled
     const fullName = `${signup.firstName ?? ""} ${signup.lastName ?? ""}`.trim();
@@ -94,7 +95,7 @@ export const sendSignupConfirmationMail = sendSynchronouslyInTest(
       quota: quota.title,
       answers: questionFields,
       queuePosition: signup.status === SignupStatus.IN_QUEUE ? signup.position : null,
-      paymentStatus: signup.effectivePaymentStatus,
+      paymentStatus: signup.paymentStatusWith(payments),
       type,
       admin,
       date,

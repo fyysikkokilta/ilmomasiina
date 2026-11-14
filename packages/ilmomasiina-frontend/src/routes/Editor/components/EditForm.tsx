@@ -1,7 +1,7 @@
 import React, { BaseSyntheticEvent, useMemo, useState } from "react";
 
 import { FormApi } from "final-form";
-import arrayMutators from "final-form-arrays";
+import arrayMutators, { remove as removeMutator } from "final-form-arrays";
 import { Form as BsForm } from "react-bootstrap";
 import { Form, FormRenderProps } from "react-final-form";
 import { useTranslation } from "react-i18next";
@@ -91,9 +91,10 @@ const mutators = {
   // This is written based on final-form-arrays's source code to undo that stupidity.
   // See https://github.com/final-form/final-form-arrays/blob/master/src/remove.js
   remove: (args, state, tools) => {
-    const [name, index]: unknown[] = args;
+    const name: unknown = args[0];
+    const index: unknown = args[1];
     if (typeof name !== "string" || typeof index !== "number") throw new Error("Invalid remove() arguments");
-    const returnValue: unknown = arrayMutators.remove([name, index], state, tools);
+    const returnValue: unknown = removeMutator([name, index], state, tools);
     tools.changeValue(state, name, (value?: unknown[]) => value ?? []);
     return returnValue;
   },

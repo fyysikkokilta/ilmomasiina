@@ -1,7 +1,7 @@
 import { maxBy } from "lodash";
 import moment from "moment";
 import { Op } from "sequelize";
-import Stripe from "stripe";
+import { Stripe } from "stripe";
 import { testEvent, testSignups } from "test/testData";
 import { afterEach, beforeAll, beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
@@ -68,34 +68,32 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  if (mockStripeCheckoutSessionCreate) {
-    // Default mock implementation for creating checkout sessions
-    mockStripeCheckoutSessionCreate.mockImplementation(async () => createMockCheckoutSession());
-    // Default mock implementation for expiring checkout sessions
-    mockStripeCheckoutSessionExpire.mockImplementation(async (sessionId) => {
-      const session = mockCheckoutSessions.get(sessionId);
-      if (!session) {
-        throw new Stripe.errors.StripeInvalidRequestError({ type: "invalid_request_error" });
-      }
-      if (session.status !== "open") {
-        throw new Stripe.errors.StripeInvalidRequestError({ type: "invalid_request_error" });
-      }
-      session.status = "expired";
-      return session as Stripe.Response<Stripe.Checkout.Session>;
-    });
+  // Default mock implementation for creating checkout sessions
+  mockStripeCheckoutSessionCreate.mockImplementation(async () => createMockCheckoutSession());
+  // Default mock implementation for expiring checkout sessions
+  mockStripeCheckoutSessionExpire.mockImplementation(async (sessionId) => {
+    const session = mockCheckoutSessions.get(sessionId);
+    if (!session) {
+      throw new Stripe.errors.StripeInvalidRequestError({ type: "invalid_request_error" });
+    }
+    if (session.status !== "open") {
+      throw new Stripe.errors.StripeInvalidRequestError({ type: "invalid_request_error" });
+    }
+    session.status = "expired";
+    return session as Stripe.Response<Stripe.Checkout.Session>;
+  });
 
-    // Default mock implementation for retrieving checkout sessions
-    mockStripeCheckoutSessionRetrieve.mockImplementation(async (sessionId) => {
-      const session = mockCheckoutSessions.get(sessionId);
-      if (!session) {
-        throw new Stripe.errors.StripeInvalidRequestError({ type: "invalid_request_error" });
-      }
-      return session as Stripe.Response<Stripe.Checkout.Session>;
-    });
+  // Default mock implementation for retrieving checkout sessions
+  mockStripeCheckoutSessionRetrieve.mockImplementation(async (sessionId) => {
+    const session = mockCheckoutSessions.get(sessionId);
+    if (!session) {
+      throw new Stripe.errors.StripeInvalidRequestError({ type: "invalid_request_error" });
+    }
+    return session as Stripe.Response<Stripe.Checkout.Session>;
+  });
 
-    // Default mock implementation for webhook event construction: always pass
-    mockStripeWebhookConstructEvent.mockImplementation((body) => JSON.parse(body as string) as Stripe.Event);
-  }
+  // Default mock implementation for webhook event construction: always pass
+  mockStripeWebhookConstructEvent.mockImplementation((body) => JSON.parse(body as string) as Stripe.Event);
 });
 
 /** Creates a test event and signup for the most common payment test cases. */
@@ -1229,7 +1227,9 @@ describe("Stripe webhook", () => {
     } as Stripe.Event;
 
     const confirmationTimes = [new Date()];
+    // Deliver the same webhook repeatedly, one after another, to test idempotency.
     for (let i = 0; i < 4; i++) {
+      // oxlint-disable-next-line no-await-in-loop -- deliveries must be sequential
       const response = await api.stripeWebhook(JSON.stringify(mockEvent), "t=12345,v1=fakesignature");
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual({ received: true });
