@@ -2,19 +2,7 @@ import { Options } from "sequelize";
 
 import config from "../config";
 
-const {
-  dbHost,
-  dbPort,
-  dbSsl,
-  dbDatabase,
-  dbUser,
-  dbPassword,
-  debugDbLogging,
-  dbPoolMax,
-  dbPoolMin,
-  dbPoolAcquire,
-  dbPoolIdle,
-} = config;
+const { dbHost, dbPort, dbSsl, dbDatabase, dbUser, dbPassword, debugDbLogging } = config;
 
 const sequelizeConfig: Options = {
   dialect: "postgres",
@@ -26,12 +14,6 @@ const sequelizeConfig: Options = {
   dialectOptions: dbSsl ? { ssl: true } : {},
   logging: debugDbLogging,
   benchmark: debugDbLogging,
-  pool: {
-    max: dbPoolMax,
-    min: dbPoolMin,
-    acquire: dbPoolAcquire,
-    idle: dbPoolIdle,
-  },
 };
 
 export = {
