@@ -100,8 +100,28 @@ async function adoptSequelizeDatabase(database: Db) {
   });
 }
 
+/**
+ * drizzle-orm's migrator keeps its table in a schema of its own and runs CREATE SCHEMA IF NOT EXISTS
+ * on every start. Postgres only allows that with the CREATE privilege on the database, even when the
+ * schema already exists. Fail with instructions instead of a bare permission error.
+ */
+async function ensureCanMigrate(database: Db) {
+  const [row] = await database.execute<{ allowed: boolean }>(
+    sql`SELECT has_database_privilege(current_database(), 'CREATE') AS allowed`,
+    "objects",
+  );
+  if (!row.allowed) {
+    throw new Error(
+      `Database user "${config.dbUser}" needs the CREATE privilege on database "${config.dbDatabase}" ` +
+        "to run migrations. Grant it as a database superuser:\n" +
+        `  GRANT CREATE ON DATABASE "${config.dbDatabase}" TO "${config.dbUser}";`,
+    );
+  }
+}
+
 async function runMigrations(database: Db, connections: Pool) {
   debugLog("Running database migrations");
+  await ensureCanMigrate(database);
   // Several instances may start at the same time. Let them migrate one at a time.
   const lock = await connections.connect();
   try {
