@@ -1,11 +1,8 @@
 import React, { ComponentType } from "react";
 
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { DragDropProvider } from "@dnd-kit/react";
+import { isSortable, useSortable } from "@dnd-kit/react/sortable";
 import { Card } from "react-bootstrap";
-
-import useEvent from "../../../utils/useEvent";
 
 type SortableItemProps = {
   id: string;
@@ -21,17 +18,14 @@ type SortableRowProps = SortableItemComponentProps & {
 };
 
 const SortableRow = ({ id, index, name, component: Component }: SortableRowProps) => {
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
-    id,
-  });
+  const { ref, handleRef, isDragging } = useSortable({ id, index });
   return (
     <Card
-      ref={setNodeRef}
+      ref={ref}
       // Set .ilmo--form to keep styling of form elements
       className={`sortable-item ${isDragging ? "sorting" : ""} ilmo--form`}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
     >
-      <span ref={setActivatorNodeRef} className="handler" {...listeners} {...attributes} />
+      <span ref={handleRef} className="handler" />
       <Component id={id} index={index} name={name} />
     </Card>
   );
@@ -44,25 +38,21 @@ type SortableProps = {
 };
 
 export default function Sortable({ items, component, move }: SortableProps) {
-  const onDragEnd = useEvent((event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = items.findIndex((item) => item.id === active.id);
-      const newIndex = items.findIndex((item) => item.id === over.id);
-      move(oldIndex, newIndex);
-    }
-  });
-
   return (
     <div>
-      <DndContext onDragEnd={onDragEnd}>
-        <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          {items.map((value, index) => (
-            <SortableRow key={value.id} id={value.id} index={index} name={value.name} component={component} />
-          ))}
-        </SortableContext>
-      </DndContext>
+      <DragDropProvider
+        onDragEnd={(event) => {
+          const { source } = event.operation;
+          // The library moves the dragged item while dragging; store the result when it's dropped.
+          if (!event.canceled && isSortable(source) && source.initialIndex !== source.index) {
+            move(source.initialIndex, source.index);
+          }
+        }}
+      >
+        {items.map((value, index) => (
+          <SortableRow key={value.id} id={value.id} index={index} name={value.name} component={component} />
+        ))}
+      </DragDropProvider>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import dotenvFlow from "dotenv-flow";
+import dotenv from "dotenv";
 import path from "path";
 
 import { FrontendsConfig, frontendsSchema, stripeBrandingSchema } from "./configSchemas";
@@ -11,8 +11,19 @@ if (process.env.VITEST) {
   process.env.BASE_URL = "http://localhost:3000/";
 }
 
-// Load environment variables from .env files (from the root of repository)
-dotenvFlow.config({ path: path.resolve(__dirname, "../../..") });
+// Load environment variables from .env files (from the root of repository). Files listed first take
+// precedence, missing files are skipped, and variables already set in the environment are never overridden.
+const envDir = path.resolve(__dirname, "../../..");
+const nodeEnv = process.env.NODE_ENV;
+dotenv.config({
+  quiet: true,
+  path: [
+    ...(nodeEnv ? [`.env.${nodeEnv}.local`, `.env.${nodeEnv}`] : []),
+    // Tests should behave the same for everyone, so they ignore local overrides.
+    ...(nodeEnv === "test" ? [] : [".env.local"]),
+    ".env",
+  ].map((file) => path.join(envDir, file)),
+});
 
 // Check for no longer supported configuration options
 if (process.env.CLEARDB_DATABASE_URL || (process.env.DB_DIALECT && process.env.DB_DIALECT !== "postgres")) {

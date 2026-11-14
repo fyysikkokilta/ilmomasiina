@@ -1,4 +1,3 @@
-import base32Encode from "base32-encode";
 import { createHash, createHmac } from "crypto";
 import { FastifyRequest } from "fastify";
 
@@ -12,11 +11,22 @@ function generateLegacyToken(signupId: SignupID): string {
   return createHash("md5").update(data).digest().toString("hex");
 }
 
+const BASE32_ALPHABET = "abcdefghijklmnopqrstuvwxyz234567";
+
+/** Returns the first `length` characters of `data` in lowercase base32 (RFC 4648), without padding. */
+export function base32Prefix(data: Buffer, length: number) {
+  const bits = Array.from(data, (byte) => byte.toString(2).padStart(8, "0")).join("");
+  return Array.from(
+    { length: Math.min(length, Math.ceil(bits.length / 5)) },
+    (_, i) => BASE32_ALPHABET[parseInt(bits.slice(i * 5, i * 5 + 5).padEnd(5, "0"), 2)],
+  ).join("");
+}
+
 export function generateToken(signupId: SignupID) {
   const key = Buffer.from(config.newEditTokenSecret, "utf-8");
   const data = Buffer.from(signupId, "utf-8");
   const mac = createHmac("sha256", key).update(data).digest();
-  return base32Encode(mac, "RFC4648").substring(0, 13).toLowerCase();
+  return base32Prefix(mac, 13);
 }
 
 function verifyToken(signupId: SignupID, token: string): boolean {

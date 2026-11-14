@@ -1,0 +1,51 @@
+diff --git a/dist/react-final-form.cjs.js b/dist/react-final-form.cjs.js
+index 82d660167c1f2597afce0aa8f7c0f43b3ac018d1..1082dee887be3c56246e3a691fe15640677bfeb1 100644
+--- a/dist/react-final-form.cjs.js
++++ b/dist/react-final-form.cjs.js
+@@ -641,7 +641,11 @@ function useField(name, config) {
+       var formState = form.getState();
+       var formInitialValue = formState.initialValues ? finalForm.getIn(formState.initialValues, name) : undefined;
+       var valueToSet = formInitialValue !== undefined ? formInitialValue : initialValue;
+-      if (valueToSet !== undefined) {
++      // PATCHED: only restore the initial value when the form holds no value for this field.
++      // Fields that are re-registered under a new name, like array items after a move or
++      // removal, would otherwise be reset to their initial values.
++      var currentValue = formState.values ? finalForm.getIn(formState.values, name) : undefined;
++      if (valueToSet !== undefined && currentValue === undefined) {
+         form.change(name, valueToSet);
+       }
+     }
+diff --git a/dist/react-final-form.es.js b/dist/react-final-form.es.js
+index cfb2e24a75f91c08f00a1ab51aa42d97016541f2..a893846ddf1ad874aabbcbc0a86888eabc44bb40 100644
+--- a/dist/react-final-form.es.js
++++ b/dist/react-final-form.es.js
+@@ -621,7 +621,11 @@ function useField(name, config) {
+       var formState = form.getState();
+       var formInitialValue = formState.initialValues ? getIn(formState.initialValues, name) : undefined;
+       var valueToSet = formInitialValue !== undefined ? formInitialValue : initialValue;
+-      if (valueToSet !== undefined) {
++      // PATCHED: only restore the initial value when the form holds no value for this field.
++      // Fields that are re-registered under a new name, like array items after a move or
++      // removal, would otherwise be reset to their initial values.
++      var currentValue = formState.values ? getIn(formState.values, name) : undefined;
++      if (valueToSet !== undefined && currentValue === undefined) {
+         form.change(name, valueToSet);
+       }
+     }
+diff --git a/dist/react-final-form.umd.js b/dist/react-final-form.umd.js
+index f6668031909a1673105a3fe1e787ac4c46021794..59e6f1923d5f92c83d78eab3b157f5a748f0ac31 100644
+--- a/dist/react-final-form.umd.js
++++ b/dist/react-final-form.umd.js
+@@ -659,7 +659,11 @@
+         var formState = form.getState();
+         var formInitialValue = formState.initialValues ? finalForm.getIn(formState.initialValues, name) : undefined;
+         var valueToSet = formInitialValue !== undefined ? formInitialValue : initialValue;
+-        if (valueToSet !== undefined) {
++        // PATCHED: only restore the initial value when the form holds no value for this field.
++        // Fields that are re-registered under a new name, like array items after a move or
++        // removal, would otherwise be reset to their initial values.
++        var currentValue = formState.values ? finalForm.getIn(formState.values, name) : undefined;
++        if (valueToSet !== undefined && currentValue === undefined) {
+           form.change(name, valueToSet);
+         }
+       }

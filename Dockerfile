@@ -20,7 +20,7 @@ ARG FRONTENDS
 WORKDIR /opt/ilmomasiina
 
 # Copy files needed for dependency installation
-COPY --parents package.json pnpm-*.yaml packages/*/package.json /opt/ilmomasiina/
+COPY --parents package.json pnpm-*.yaml patches packages/*/package.json /opt/ilmomasiina/
 
 # Install dependencies (we're running as root, so the postinstall script doesn't run automatically)
 # Node 25+ no longer ships corepack, so install it via npm first.
@@ -55,7 +55,7 @@ ENV HOST=0.0.0.0
 WORKDIR /opt/ilmomasiina
 
 # Copy files needed for dependency installation
-COPY --parents package.json pnpm-*.yaml packages/*/package.json /opt/ilmomasiina/
+COPY --parents package.json pnpm-*.yaml patches packages/*/package.json /opt/ilmomasiina/
 
 # Install dependencies for backend only
 RUN npm install -g corepack && corepack enable pnpm && pnpm install --frozen-lockfile --prod --filter @tietokilta/ilmomasiina-backend --filter @tietokilta/ilmomasiina-models

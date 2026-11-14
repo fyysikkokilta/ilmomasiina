@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from "react";
 import { Form } from "react-bootstrap";
 import { useForm } from "react-final-form";
 import { useTranslation } from "react-i18next";
-import Combobox from "react-widgets/Combobox";
 
 import { PaymentMode } from "@tietokilta/ilmomasiina-models";
 import FieldRow from "../../../components/FieldRow";
@@ -223,10 +222,18 @@ const BasicDetailsTab = () => {
       <FieldRow
         name="category"
         label={t("editor.basic.category")}
-        as={Combobox}
-        data={allCategories || []}
-        busy={allCategories === null}
-        inputProps={{ maxLength: 255 }}
+        maxLength={255}
+        // Suggest the categories of existing events.
+        list="ilmo--category-options"
+        extraFeedback={
+          <datalist id="ilmo--category-options">
+            {allCategories?.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </datalist>
+        }
         formatError={formatError}
       />
       <LocalizedFieldRow

@@ -1,8 +1,5 @@
 packages:
   - "packages/*"
-# Replace or drop deprecated sub-dependencies whose parents have no newer release.
-overrides:
-  "react-widgets>@types/classnames": "-"
 minimumReleaseAge: 1440
 allowBuilds:
   "@parcel/watcher": false
@@ -10,3 +7,5 @@ allowBuilds:
   simple-git-hooks: false
   esbuild: false
   unrs-resolver: false
+patchedDependencies:
+  react-final-form@7.0.1: patches/react-final-form@7.0.1.patch
