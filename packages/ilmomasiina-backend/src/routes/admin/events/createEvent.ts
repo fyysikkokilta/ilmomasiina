@@ -1,13 +1,14 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { omit } from "lodash";
+import { pick } from "lodash";
 
 import type { AdminEventResponse, EventCreateBody } from "@tietokilta/ilmomasiina-models";
 import { AuditEvent } from "@tietokilta/ilmomasiina-models";
 import { getDb } from "../../../db";
 import { eventTable, questionTable, quotaTable } from "../../../db/schema";
 import { convertEventDatabaseErrors } from "../../../models/errors";
-import { validateEvent, validateLanguages } from "../../../models/event";
-import { normalizeOptions, validateQuestion } from "../../../models/question";
+import { EVENT_EDITABLE_COLUMNS, validateEvent, validateLanguages } from "../../../models/event";
+import { normalizeOptions, QUESTION_EDITABLE_COLUMNS, validateQuestion } from "../../../models/question";
+import { QUOTA_EDITABLE_COLUMNS } from "../../../models/quota";
 import { basicEventInfoCached, eventDetailsForAdmin, eventDetailsForUserCached } from "../../events/getEventDetails";
 import { eventsListForUserCached } from "../../events/getEventsList";
 import { toDate } from "../../utils";
@@ -16,8 +17,9 @@ export default async function createEvent(
   request: FastifyRequest<{ Body: EventCreateBody }>,
   response: FastifyReply,
 ): Promise<AdminEventResponse> {
-  // Ensure event id is always generated
-  const { quotas, questions: rawQuestions, ...attrs } = omit(request.body, "id");
+  // Only take the editable fields: IDs and timestamps are always generated, and the editor sends extra fields.
+  const attrs = pick(request.body, EVENT_EDITABLE_COLUMNS);
+  const quotas = request.body.quotas.map((quota) => pick(quota, QUOTA_EDITABLE_COLUMNS));
   const eventValues = {
     ...attrs,
     date: toDate(attrs.date),
@@ -26,8 +28,8 @@ export default async function createEvent(
     registrationEndDate: toDate(attrs.registrationEndDate),
   };
   // Remove options from question types that don't support them. This must be done before validateLanguages().
-  const questions = rawQuestions.map((question) => ({
-    ...question,
+  const questions = request.body.questions.map((question) => ({
+    ...pick(question, QUESTION_EDITABLE_COLUMNS),
     ...normalizeOptions(question),
   }));
 

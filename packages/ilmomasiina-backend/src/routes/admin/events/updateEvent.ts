@@ -1,7 +1,7 @@
 import { and, asc, eq, isNull, notInArray } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { NotFound } from "http-errors";
-import { isUndefined, omitBy } from "lodash";
+import { isUndefined, omitBy, pick } from "lodash";
 
 import type {
   AdminEventPathParams,
@@ -14,8 +14,9 @@ import { AuditEvent } from "@tietokilta/ilmomasiina-models";
 import { getDb } from "../../../db";
 import { eventTable, questionTable, quotaTable } from "../../../db/schema";
 import { convertEventDatabaseErrors } from "../../../models/errors";
-import { Event, validateEvent, validateLanguages } from "../../../models/event";
-import { normalizeOptions, validateQuestion } from "../../../models/question";
+import { Event, EVENT_EDITABLE_COLUMNS, validateEvent, validateLanguages } from "../../../models/event";
+import { normalizeOptions, QUESTION_EDITABLE_COLUMNS, validateQuestion } from "../../../models/question";
+import { QUOTA_EDITABLE_COLUMNS } from "../../../models/quota";
 import { basicEventInfoCached, eventDetailsForAdmin, eventDetailsForUserCached } from "../../events/getEventDetails";
 import { eventsListForUserCached } from "../../events/getEventsList";
 import { refreshSignupPositions } from "../../signups/computeSignupPosition";
@@ -29,13 +30,9 @@ export default async function updateEvent(
   }>,
   response: FastifyReply,
 ): Promise<AdminEventResponse | EditConflictError | WouldMoveSignupsToQueueError> {
-  const {
-    quotas: bodyQuotas,
-    questions: bodyQuestions,
-    moveSignupsToQueue,
-    updatedAt: bodyUpdatedAt,
-    ...attrs
-  } = request.body;
+  const { quotas: bodyQuotas, questions: bodyQuestions, moveSignupsToQueue, updatedAt: bodyUpdatedAt } = request.body;
+  // Only take the editable fields: the editor sends extra fields, which must not reach the database.
+  const attrs = pick(request.body, EVENT_EDITABLE_COLUMNS);
 
   try {
     await getDb().transaction(async (transaction) => {
@@ -65,13 +62,15 @@ export default async function updateEvent(
 
       // Find existing questions and quotas for requested IDs, and add order fields
       const updatedQuestions = bodyQuestions?.map((question, order) => ({
-        ...question,
+        ...pick(question, QUESTION_EDITABLE_COLUMNS),
         ...normalizeOptions(question),
+        id: question.id,
         order,
         existing: question.id ? oldQuestions.find((old) => question.id === old.id) : undefined,
       }));
       const updatedQuotas = bodyQuotas?.map((quota, order) => ({
-        ...quota,
+        ...pick(quota, QUOTA_EDITABLE_COLUMNS),
+        id: quota.id,
         order,
         existing: quota.id ? oldQuotas.find((old) => quota.id === old.id) : undefined,
       }));

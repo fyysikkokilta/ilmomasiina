@@ -11,6 +11,36 @@ export type { EventLanguage };
 export type Event = typeof eventTable.$inferSelect;
 export type EventInsert = typeof eventTable.$inferInsert;
 
+/**
+ * The columns of an event that can be set through the API. Request bodies may contain other fields
+ * (the editor sends its whole form state), which must not reach the database.
+ */
+export const EVENT_EDITABLE_COLUMNS = [
+  "title",
+  "slug",
+  "date",
+  "endDate",
+  "registrationStartDate",
+  "registrationEndDate",
+  "openQuotaSize",
+  "description",
+  "price",
+  "location",
+  "facebookUrl",
+  "webpageUrl",
+  "category",
+  "draft",
+  "listed",
+  "signupsPublic",
+  "nameQuestion",
+  "emailQuestion",
+  "verificationEmail",
+  "languages",
+  "defaultLanguage",
+  "payments",
+  "preferredFrontend",
+] as const satisfies readonly (keyof Event)[];
+
 /** Determines the effective end date of the event, matching the logic of `userEventFilter`. */
 export function effectiveEndDate(event: Pick<Event, "date" | "endDate" | "registrationEndDate">) {
   const endDates = [event.endDate, event.date, event.registrationEndDate]

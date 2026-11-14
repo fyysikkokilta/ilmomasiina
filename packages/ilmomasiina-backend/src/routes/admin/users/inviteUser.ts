@@ -26,7 +26,7 @@ export async function createUser(params: UserCreateSchema, auditLogger: AuditLog
   const [user] = await transaction
     .insert(userTable)
     .values({
-      ...params,
+      email: params.email,
       password: AdminPasswordAuth.createHash(params.password),
     })
     .returning();

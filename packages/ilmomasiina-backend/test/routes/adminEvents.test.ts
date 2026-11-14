@@ -635,6 +635,49 @@ describe("POST /api/admin/events", () => {
     expect(event!.languages.fi.questions[3].options).toEqual(localizedOptions);
   });
 
+  test("ignores extra fields sent by the editor", async () => {
+    // The editor sends its whole form state. None of this may reach the database.
+    const serverManaged = {
+      id: "customid",
+      createdAt: "2000-01-01T00:00:00.000Z",
+      updatedAt: "",
+      deletedAt: "2000-01-01T00:00:00.000Z",
+    };
+    const body = {
+      ...eventBody(),
+      ...serverManaged,
+      eventType: "event+signup",
+      useOpenQuota: false,
+      moveSignupsToQueue: false,
+      quotas: [{ title: "Quota", size: 10, price: 0, key: "new-1", eventId: "other", ...serverManaged }],
+      questions: [
+        {
+          type: QuestionType.TEXT,
+          question: "Question",
+          required: true,
+          public: false,
+          options: null,
+          prices: null,
+          key: "new-2",
+          hasPrices: false,
+          eventId: "other",
+          ...serverManaged,
+        },
+      ],
+    };
+    const [data, response] = await createEvent(body);
+
+    expect(response.statusCode).toBe(201);
+    expect(data.id).not.toBe("customid");
+    const event = await findEvent(data.id);
+    expect(event).toBeTruthy();
+    expect(event!.createdAt.getFullYear()).toBeGreaterThan(2000);
+    expect(event!.quotas.map((quota) => [quota.id === "customid", quota.eventId])).toEqual([[false, data.id]]);
+    expect(event!.questions.map((question) => [question.id === "customid", question.eventId])).toEqual([
+      [false, data.id],
+    ]);
+  });
+
   test("audit logs creations", async () => {
     const [event] = await createEvent(eventBody());
 
@@ -988,6 +1031,42 @@ describe("PATCH /api/admin/events/:id", () => {
 
     const dbEvent = await findEvent(event.id);
     expect(dbEvent!.languages.fi.questions.map((question) => question.options)).toEqual([null, ["x", "y"]]);
+  });
+
+  test("ignores extra fields sent by the editor", async () => {
+    const event = await testEvent({ quotaCount: 1, questionCount: 1 });
+    const other = await testEvent({ quotaCount: 0, questionCount: 0 });
+    const [before] = await fetchAdminEventDetails(event);
+    const serverManaged = {
+      createdAt: "2000-01-01T00:00:00.000Z",
+      deletedAt: "2000-01-01T00:00:00.000Z",
+      eventId: other.id,
+    };
+    const body = {
+      id: "customid",
+      title: "Changed",
+      eventType: "event+signup",
+      useOpenQuota: false,
+      ...serverManaged,
+      updatedAt: before.updatedAt,
+      quotas: [
+        { id: before.quotas[0].id, title: "Kept quota", size: 10, price: 0, key: "a", ...serverManaged },
+        { title: "New quota", size: 10, price: 0, key: "new-1", ...serverManaged },
+      ],
+      questions: before.questions.map((question) => ({ ...question, key: "b", hasPrices: false, ...serverManaged })),
+    };
+    const [data, response] = await updateEvent(event, body);
+
+    expect(response.statusCode).toBe(200);
+    expect(data.id).toBe(event.id);
+    expect(data.title).toBe("Changed");
+    // Nothing was deleted or moved to the other event.
+    const dbEvent = await findEvent(event.id);
+    expect(dbEvent!.createdAt.getFullYear()).toBeGreaterThan(2000);
+    expect(dbEvent!.quotas.map((quota) => quota.title)).toEqual(["Kept quota", "New quota"]);
+    expect(dbEvent!.quotas.map((quota) => quota.createdAt.getFullYear() > 2000)).toEqual([true, true]);
+    expect(dbEvent!.questions).toHaveLength(1);
+    expect((await findEvent(other.id))!.quotas).toHaveLength(0);
   });
 
   test("checks moving signups to queue", async () => {

@@ -5,6 +5,16 @@ import { EventValidationError } from "./errors";
 export type Question = typeof questionTable.$inferSelect;
 export type QuestionInsert = typeof questionTable.$inferInsert;
 
+/** The columns of a question that can be set through the API. */
+export const QUESTION_EDITABLE_COLUMNS = [
+  "question",
+  "type",
+  "options",
+  "prices",
+  "required",
+  "public",
+] as const satisfies readonly (keyof Question)[];
+
 /**
  * Returns override values to normalize `options` and/or `prices` to null in cases such as:
  *
