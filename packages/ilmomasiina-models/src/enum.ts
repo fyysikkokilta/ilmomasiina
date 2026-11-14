@@ -44,7 +44,6 @@ export enum ErrorCode {
   INITIAL_SETUP_NEEDED = "InitialSetupNeeded",
   INITIAL_SETUP_ALREADY_DONE = "InitialSetupAlreadyDone",
   SIGNUP_VALIDATION_ERROR = "SignupValidationError",
-  SIGNUP_BLOCKED = "SignupBlocked",
   EVENT_VALIDATION_ERROR = "EventValidationError",
   VALIDATION_ERROR = "FST_ERR_VALIDATION",
 }

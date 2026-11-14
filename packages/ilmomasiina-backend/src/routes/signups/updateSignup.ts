@@ -13,7 +13,6 @@ import type {
   SignupValidationErrors,
 } from "@tietokilta/ilmomasiina-models";
 import { AuditEvent, QuestionType, SignupFieldError } from "@tietokilta/ilmomasiina-models";
-import config from "../../config";
 import sendSignupConfirmationMail from "../../mail/signupConfirmation";
 import { getSequelize } from "../../models";
 import { Answer, AnswerCreationAttributes } from "../../models/answer";
@@ -24,7 +23,7 @@ import { Signup } from "../../models/signup";
 import { formatSignupForAdmin } from "../events/getEventDetails";
 import { refreshSignupPositions } from "./computeSignupPosition";
 import { signupEditable } from "./createNewSignup";
-import { NoSuchQuota, NoSuchSignup, SignupBlocked, SignupsClosed, SignupValidationError } from "./errors";
+import { NoSuchQuota, NoSuchSignup, SignupsClosed, SignupValidationError } from "./errors";
 
 async function getSignupAndEventForUpdate(id: SignupID, transaction: Transaction) {
   // Retrieve event data and lock the row for editing
@@ -94,10 +93,6 @@ export async function updateSignupAsUser(
 
     if (!signupEditable(event, signup)) {
       throw new SignupsClosed("Signups closed for this event.");
-    }
-
-    if (event.emailQuestion && request.body.email && config.blockedEmails.includes(request.body.email)) {
-      throw new SignupBlocked("Email blocked");
     }
 
     /** Is this signup already confirmed (i.e. is this the first update for this signup) */
