@@ -6,11 +6,11 @@ import { useField, UseFieldConfig } from "react-final-form";
 
 import useLocalizedFieldProps, { FieldLocalizationOptions } from "./useLocalizedFieldProps";
 
-type BaseProps = Pick<UseFieldConfig<unknown>, "type"> & {
+type BaseProps = Pick<UseFieldConfig, "type"> & {
   /** The name of the field in the data. */
   name: string;
   /** useField() config. */
-  config?: UseFieldConfig<unknown>;
+  config?: UseFieldConfig;
   /** Whether the field is required. */
   required?: boolean;
 } & FieldLocalizationOptions;

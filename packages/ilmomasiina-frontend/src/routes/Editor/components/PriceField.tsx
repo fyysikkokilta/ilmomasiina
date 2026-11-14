@@ -25,7 +25,7 @@ function parseValue(raw: string): number | null {
   return Math.round(num * 100);
 }
 
-export const priceFieldConfig: UseFieldConfig<number | null> = {
+export const priceFieldConfig: UseFieldConfig = {
   allowNull: true,
 };
 

@@ -14,7 +14,7 @@ const defaultFormatError = (error: unknown) =>
     : // Errors without a message field are for a nested field and will be shown there.
       null;
 
-type BaseProps = Pick<UseFieldConfig<unknown>, "type"> & {
+type BaseProps = Pick<UseFieldConfig, "type"> & {
   /** The name of the field in the data. */
   name: string;
   /** Passed as `controlId` if no `controlId` is separately set. */
@@ -36,8 +36,7 @@ type BaseProps = Pick<UseFieldConfig<unknown>, "type"> & {
   /** Passed as `label` to the field component. Intended for checkboxes. */
   checkLabel?: ReactNode;
   /** useField() config. */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- T is invariant, and we're doing too much ugly stuff with props to pass it everywhere.
-  config?: UseFieldConfig<any>;
+  config?: UseFieldConfig;
 };
 
 // These typings do the best attempt we can do with merged props.
