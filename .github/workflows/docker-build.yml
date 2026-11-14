@@ -18,6 +18,10 @@ on:
     branches:
       - main
 
+# Read-only by default; jobs that publish request more themselves.
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint & type-check
