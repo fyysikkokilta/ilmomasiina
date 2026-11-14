@@ -10,3 +10,5 @@ allowBuilds:
   simple-git-hooks: false
   esbuild: false
   unrs-resolver: false
+patchedDependencies:
+  react-final-form@7.0.1: patches/react-final-form@7.0.1.patch

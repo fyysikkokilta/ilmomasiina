@@ -10,6 +10,7 @@ WORKDIR /opt/ilmomasiina
 
 # Copy static resources from the repository root
 COPY .oxlintrc.json .oxfmtrc.json package.json pnpm-*.yaml ./
+COPY patches ./patches
 
 # Copy static resources from each package
 COPY packages/ilmomasiina-frontend/package.json \

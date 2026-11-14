@@ -165,6 +165,9 @@ settings:
 overrides:
   react-widgets>@types/classnames: '-'
 
+patchedDependencies:
+  react-final-form@7.0.1: f0ebbaadde96fee1c9f1b125daa323517ff47babff9b7f326cf7e01f7dfc417f
+
 importers:
 
   .:
@@ -441,7 +444,7 @@ importers:
         version: 19.3.1(react@19.3.1)
       react-final-form:
         specifier: ^7.0.1
-        version: 7.0.1(final-form@5.0.1)(react@19.3.1)
+        version: 7.0.1(patch_hash=f0ebbaadde96fee1c9f1b125daa323517ff47babff9b7f326cf7e01f7dfc417f)(final-form@5.0.1)(react@19.3.1)
       react-i18next:
         specifier: ^18.0.1
         version: 18.0.1(@types/react@19.3.0)(i18next@27.1.1(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)
@@ -5584,7 +5587,7 @@ snapshots:
       react: 19.3.1
       scheduler: 0.28.0
 
-  react-final-form@7.0.1(final-form@5.0.1)(react@19.3.1):
+  react-final-form@7.0.1(patch_hash=f0ebbaadde96fee1c9f1b125daa323517ff47babff9b7f326cf7e01f7dfc417f)(final-form@5.0.1)(react@19.3.1):
     dependencies:
       '@babel/runtime': 7.29.14
       final-form: 5.0.1
