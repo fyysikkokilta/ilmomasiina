@@ -162,9 +162,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@types/nodemailer@*>@aws-sdk/client-sesv2': '-'
-
 importers:
 
   .:
