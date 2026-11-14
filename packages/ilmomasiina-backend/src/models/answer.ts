@@ -9,7 +9,7 @@ import {
 } from "sequelize";
 
 import type { Question } from "./question";
-import { RANDOM_ID_LENGTH } from "./randomId";
+import { RANDOM_ID_LENGTH } from "../db/randomId";
 import { Signup } from "./signup";
 import { jsonColumnGetter } from "./util/json";
 

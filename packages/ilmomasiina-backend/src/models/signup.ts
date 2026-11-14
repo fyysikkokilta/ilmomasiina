@@ -31,7 +31,7 @@ import config from "../config";
 import type { Answer } from "./answer";
 import type { Payment } from "./payment";
 import type { Quota } from "./quota";
-import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
+import { generateRandomId, RANDOM_ID_LENGTH } from "../db/randomId";
 import { jsonColumnGetter } from "./util/json";
 
 export interface SignupAttributes {

@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 import type { AuditEvent } from "@tietokilta/ilmomasiina-models";
-import { RANDOM_ID_LENGTH } from "./randomId";
+import { RANDOM_ID_LENGTH } from "../db/randomId";
 
 export interface AuditLogAttributes {
   id: number;

@@ -19,7 +19,7 @@ import {
 } from "sequelize";
 
 import type { Event } from "./event";
-import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
+import { generateRandomId, RANDOM_ID_LENGTH } from "../db/randomId";
 import type { Signup } from "./signup";
 
 export interface QuotaAttributes {

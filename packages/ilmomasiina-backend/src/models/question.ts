@@ -22,7 +22,7 @@ import { OPTION_QUESTION_TYPES, QuestionCreate, QuestionType } from "@tietokilta
 import type { Answer } from "./answer";
 import { EventValidationError } from "./errors";
 import type { Event } from "./event";
-import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
+import { generateRandomId, RANDOM_ID_LENGTH } from "../db/randomId";
 import { jsonColumnGetter } from "./util/json";
 
 export interface QuestionAttributes {

@@ -23,7 +23,7 @@ import config from "../config";
 import { EventValidationError } from "./errors";
 import type { Question, QuestionCreationAttributes } from "./question";
 import type { Quota, QuotaCreationAttributes } from "./quota";
-import { generateRandomId, RANDOM_ID_LENGTH } from "./randomId";
+import { generateRandomId, RANDOM_ID_LENGTH } from "../db/randomId";
 import { jsonColumnGetter } from "./util/json";
 
 interface EventPerLanguageAttributes {
