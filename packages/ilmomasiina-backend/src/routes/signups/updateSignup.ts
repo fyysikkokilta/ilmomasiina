@@ -20,6 +20,7 @@ import { getDb, Tx } from "../../db";
 import { answerTable, signupTable } from "../../db/schema";
 import { sendSignupConfirmationMail } from "../../mail/signups";
 import { Event, paymentsEnabled } from "../../models/event";
+import { getPaymentStatuses } from "../../models/payment";
 import type { Question } from "../../models/question";
 import type { Quota } from "../../models/quota";
 import {
@@ -388,9 +389,6 @@ async function updateExistingSignup(
   return { updatedSignup, answers };
 }
 
-const getPayments = (signupId: SignupID) =>
-  getDb().query.payment.findMany({ where: { signupId }, columns: { status: true } });
-
 /** Requires editTokenVerification and validates answers thoroughly */
 export async function updateSignupAsUser(
   request: FastifyRequest<{ Params: SignupPathParams; Body: SignupUpdateBody }>,
@@ -418,7 +416,7 @@ export async function updateSignupAsUser(
   });
 
   // Fetch updated payment data for response.
-  const payments = await getPayments(updatedSignup.id);
+  const payments = await getPaymentStatuses(updatedSignup.id);
 
   // Send the confirmation email.
   await sendSignupConfirmationMail(updatedSignup, wasConfirmed ? "edit" : "signup", false);
@@ -453,7 +451,7 @@ export async function updateSignupAsAdmin(
   });
 
   // Fetch updated payment data for response.
-  const payments = await getPayments(updatedSignup.id);
+  const payments = await getPaymentStatuses(updatedSignup.id);
 
   // For clarity, always title the email "edit confirmation", even if the signup hadn't been confirmed yet.
   if (request.body.sendEmail ?? true) await sendSignupConfirmationMail(updatedSignup, "edit", true);
@@ -489,18 +487,17 @@ export async function createSignupAsAdmin(
     return [];
   });
   const refreshed = positions.find((signup) => signup.id === updatedSignup.id);
-
-  // Fetch updated payment data for response. (Should always be empty, but for consistency.)
-  const payments = await getPayments(updatedSignup.id);
-
-  if (request.body.sendEmail ?? true) await sendSignupConfirmationMail(updatedSignup, "signup", true);
-
-  reply.status(200);
-  return formatSignupForAdmin({
+  const signup = {
     ...updatedSignup,
     status: refreshed?.status ?? updatedSignup.status,
     position: refreshed?.position ?? updatedSignup.position,
-    answers,
-    payments,
-  });
+  };
+
+  // Fetch updated payment data for response. (Should always be empty, but for consistency.)
+  const payments = await getPaymentStatuses(signup.id);
+
+  if (request.body.sendEmail ?? true) await sendSignupConfirmationMail(signup, "signup", true);
+
+  reply.status(200);
+  return formatSignupForAdmin({ ...signup, answers, payments });
 }

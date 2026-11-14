@@ -1,9 +1,10 @@
 import debug from "debug";
 import { and, eq, inArray, isNull, lt } from "drizzle-orm";
+import { chunk } from "lodash";
 import moment from "moment";
 
 import config from "../config";
-import { getDb } from "../db";
+import { getDb, MAX_LIST_PARAMS } from "../db";
 import { eventTable, quotaTable, signupTable } from "../db/schema";
 import { refreshSignupPositions } from "../routes/signups/computeSignupPosition";
 
@@ -38,7 +39,10 @@ export default async function deleteUnconfirmedSignups() {
   try {
     // These cannot have payments, so we can just hard delete them.
     // If they do, this will error due to foreign key constraints.
-    await db.delete(signupTable).where(inArray(signupTable.id, signupIds));
+    for (const batch of chunk(signupIds, MAX_LIST_PARAMS)) {
+      // oxlint-disable-next-line no-await-in-loop -- batches are run in sequence to limit load
+      await db.delete(signupTable).where(inArray(signupTable.id, batch));
+    }
     // Each refresh runs in its own transaction; the connection pool limits how many run at once.
     await Promise.all([...eventIds].map((id) => refreshSignupPositions({ id })));
     debugLog("Unconfirmed signups deleted");

@@ -15,16 +15,24 @@ import createCache from "../../util/cache";
 import { InitialSetupNeeded, isInitialSetupDone } from "../admin/users/createInitialUser";
 import { asApiResponse } from "../utils";
 
-/** Counts the active signups in each quota of the given events. */
-async function countSignups(events: { quotas: Pick<Quota, "id">[] }[]) {
+/** Adds the number of active signups to each quota of the given events. */
+async function withSignupCounts<E extends { quotas: Pick<Quota, "id">[] }>(events: E[]) {
   const quotaIds = events.flatMap((event) => event.quotas.map((quota) => quota.id));
-  if (!quotaIds.length) return new Map<Quota["id"], number>();
-  const counts = await getDb()
-    .select({ quotaId: signupTable.quotaId, count: count() })
-    .from(signupTable)
-    .where(and(activeSignupCondition(), inArray(signupTable.quotaId, quotaIds)))
-    .groupBy(signupTable.quotaId);
-  return new Map(counts.map((row) => [row.quotaId, row.count]));
+  const counts = quotaIds.length
+    ? await getDb()
+        .select({ quotaId: signupTable.quotaId, count: count() })
+        .from(signupTable)
+        .where(and(activeSignupCondition(), inArray(signupTable.quotaId, quotaIds)))
+        .groupBy(signupTable.quotaId)
+    : [];
+  const signupCounts = new Map(counts.map((row) => [row.quotaId, row.count]));
+  return events.map((event) => ({
+    ...event,
+    quotas: event.quotas.map((quota: E["quotas"][number]) => ({
+      ...quota,
+      signupCount: signupCounts.get(quota.id) ?? 0,
+    })),
+  }));
 }
 
 /** Sorts events for the event lists. */
@@ -71,11 +79,7 @@ export const eventsListForUserCached = createCache({
       orderBy: eventOrder,
     });
 
-    const signupCounts = await countSignups(events);
-    return events.map((event) => ({
-      ...event,
-      quotas: event.quotas.map((quota) => ({ ...quota, signupCount: signupCounts.get(quota.id) ?? 0 })),
-    }));
+    return withSignupCounts(events);
   },
 });
 
@@ -107,11 +111,7 @@ export async function getEventsListForAdmin(
     orderBy: eventOrder,
   });
 
-  const signupCounts = await countSignups(events);
-  const res = events.map((event) => ({
-    ...event,
-    quotas: event.quotas.map((quota) => ({ ...quota, signupCount: signupCounts.get(quota.id) ?? 0 })),
-  }));
+  const res = await withSignupCounts(events);
 
   reply.status(200);
   return asApiResponse(res);

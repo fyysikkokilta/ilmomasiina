@@ -1,9 +1,10 @@
 import debug from "debug";
 import { and, eq, inArray, isNotNull, isNull, lt, ne, or } from "drizzle-orm";
+import { chunk } from "lodash";
 import moment from "moment";
 
 import config from "../config";
-import { getDb } from "../db";
+import { getDb, MAX_LIST_PARAMS } from "../db";
 import { answerTable, eventTable, quotaTable, signupTable } from "../db/schema";
 
 const redactedName = "Deleted";
@@ -48,15 +49,19 @@ export default async function anonymizeOldSignups() {
 
   console.info(`Redacting older signups: ${ids.join(", ")}`);
   try {
-    await db
-      .update(signupTable)
-      .set({
-        firstName: redactedName,
-        lastName: redactedName,
-        email: redactedEmail,
-      })
-      .where(inArray(signupTable.id, ids));
-    await db.update(answerTable).set({ answer: redactedAnswer }).where(inArray(answerTable.signupId, ids));
+    for (const batch of chunk(ids, MAX_LIST_PARAMS)) {
+      // oxlint-disable-next-line no-await-in-loop -- batches are run in sequence to limit load
+      await db
+        .update(signupTable)
+        .set({
+          firstName: redactedName,
+          lastName: redactedName,
+          email: redactedEmail,
+        })
+        .where(inArray(signupTable.id, batch));
+      // oxlint-disable-next-line no-await-in-loop -- batches are run in sequence to limit load
+      await db.update(answerTable).set({ answer: redactedAnswer }).where(inArray(answerTable.signupId, batch));
+    }
     debugLog("Signups anonymized");
   } catch (error) {
     console.error(error);

@@ -56,22 +56,21 @@ export function effectivePaymentStatus(
 
 const unconfirmedSince = () => moment().subtract(config.signupConfirmMins, "minutes").toDate();
 
-/** Relational query filter for signups that are not deleted and are confirmed or still confirmable. */
-export function activeSignupFilter(): Filter<"signup"> {
-  return {
+/** SQL condition for signups that are not deleted and are confirmed or still confirmable. */
+export function activeSignupCondition(
+  table: Pick<typeof signupTable, "deletedAt" | "confirmedAt" | "createdAt"> = signupTable,
+) {
+  return and(
     // Not deleted
-    deletedAt: { isNull: true },
+    isNull(table.deletedAt),
     // Is confirmed, or is new enough
-    OR: [{ confirmedAt: { isNotNull: true } }, { createdAt: { gt: unconfirmedSince() } }],
-  };
+    or(isNotNull(table.confirmedAt), gt(table.createdAt, unconfirmedSince())),
+  )!;
 }
 
-/** SQL condition matching `activeSignupFilter`. */
-export function activeSignupCondition() {
-  return and(
-    isNull(signupTable.deletedAt),
-    or(isNotNull(signupTable.confirmedAt), gt(signupTable.createdAt, unconfirmedSince())),
-  );
+/** Relational query filter matching `activeSignupCondition`. */
+export function activeSignupFilter(): Filter<"signup"> {
+  return { RAW: (table) => activeSignupCondition(table) };
 }
 
 /** Relational query filter for the signups admins see: active ones, plus all deleted ones. */

@@ -1,9 +1,10 @@
 import debug from "debug";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { chunk } from "lodash";
 
 import { AuditEvent, SignupStatus } from "@tietokilta/ilmomasiina-models";
 import { internalAuditLogger } from "../../auditlog";
-import { getDb, Tx } from "../../db";
+import { getDb, MAX_LIST_PARAMS, Tx } from "../../db";
 import { eventTable, quotaTable, signupStatusEnum, signupTable } from "../../db/schema";
 import { sendPromotedFromQueueMail } from "../../mail/signups";
 import type { Event } from "../../models/event";
@@ -133,11 +134,12 @@ async function refreshSignupPositionsInternal(
   const changed = result.filter(
     ({ signup, status, position }) => signup.status !== status || signup.position !== position,
   );
-  if (changed.length) {
-    const statusType = sql.identifier(signupStatusEnum.enumName);
-    const rows = changed.map(
+  const statusType = sql.identifier(signupStatusEnum.enumName);
+  for (const batch of chunk(changed, MAX_LIST_PARAMS / 3)) {
+    const rows = batch.map(
       ({ signup, status, position }) => sql`(${signup.id}::bpchar, ${status}::${statusType}, ${position}::integer)`,
     );
+    // oxlint-disable-next-line no-await-in-loop -- queries in a transaction share a connection and run in sequence
     await transaction
       .update(signupTable)
       .set({ status: sql`v.status`, position: sql`v.position` })

@@ -955,6 +955,41 @@ describe("PATCH /api/admin/events/:id", () => {
     expect(response.statusCode).toBe(409);
   });
 
+  test("keeps localized options when questions are not sent", async () => {
+    const localized = {
+      title: "Tapahtuma",
+      description: null,
+      price: null,
+      location: null,
+      webpageUrl: null,
+      facebookUrl: null,
+      verificationEmail: null,
+      quotas: [{ title: "Kiintiö" }],
+      questions: [
+        { question: "Teksti", options: null },
+        { question: "Valinta", options: ["x", "y"] },
+      ],
+    };
+    const event = await testEvent(
+      { quotaCount: 1, questionCount: 2, questionOverrides: { type: QuestionType.TEXT, options: null, prices: null } },
+      { languages: { fi: localized } },
+    );
+    // Make the question stored first the second one in order, and give it options.
+    await updateRow(questionTable, event.questions[0], {
+      order: 1,
+      type: QuestionType.SELECT,
+      options: ["a", "b"],
+    });
+    await updateRow(questionTable, event.questions[1], { order: 0 });
+
+    const [before] = await fetchAdminEventDetails(event);
+    const [, response] = await updateEvent(event, { draft: true, updatedAt: before.updatedAt });
+    expect(response.statusCode).toBe(200);
+
+    const dbEvent = await findEvent(event.id);
+    expect(dbEvent!.languages.fi.questions.map((question) => question.options)).toEqual([null, ["x", "y"]]);
+  });
+
   test("checks moving signups to queue", async () => {
     const event = await testEvent({ quotaCount: 1, quotaOverrides: { size: 3 } }, { openQuotaSize: 3 });
     await testSignups({ event, count: 5, confirmed: true });

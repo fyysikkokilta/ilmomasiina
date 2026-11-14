@@ -1,4 +1,4 @@
-import { and, eq, isNull, notInArray } from "drizzle-orm";
+import { and, asc, eq, isNull, notInArray } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { NotFound } from "http-errors";
 import { isUndefined, omitBy } from "lodash";
@@ -53,11 +53,14 @@ export default async function updateEvent(
         .select({ id: quotaTable.id, title: quotaTable.title, size: quotaTable.size, price: quotaTable.price })
         .from(quotaTable)
         .where(and(eq(quotaTable.eventId, event.id), isNull(quotaTable.deletedAt)))
+        .orderBy(asc(quotaTable.order))
         .for("update");
       const oldQuestions = await transaction
         .select()
         .from(questionTable)
         .where(and(eq(questionTable.eventId, event.id), isNull(questionTable.deletedAt)))
+        // Languages refer to questions by their position.
+        .orderBy(asc(questionTable.order))
         .for("update");
 
       // Find existing questions and quotas for requested IDs, and add order fields

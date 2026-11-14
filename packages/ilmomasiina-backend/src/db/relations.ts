@@ -1,10 +1,6 @@
 import { defineRelations } from "drizzle-orm";
 
-import { PaymentStatus } from "@tietokilta/ilmomasiina-models";
-import { schema } from "./schema";
-
-/** Statuses of payments that are still relevant, i.e. not failed or expired. */
-export const ACTIVE_PAYMENT_STATUSES = [PaymentStatus.CREATING, PaymentStatus.PENDING, PaymentStatus.PAID];
+import { ACTIVE_PAYMENT_STATUSES, schema } from "./schema";
 
 const notDeleted = { deletedAt: { isNull: true } } as const;
 

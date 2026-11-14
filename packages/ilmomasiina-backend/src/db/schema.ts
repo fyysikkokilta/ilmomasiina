@@ -208,9 +208,9 @@ const SESSION_STATUSES = sql.raw(
 const COMPLETED_STATUSES = sql.raw(
   [PaymentStatus.PAID, PaymentStatus.REFUNDED].map((status) => `'${status}'`).join(", "),
 );
-const ACTIVE_STATUSES = sql.raw(
-  [PaymentStatus.CREATING, PaymentStatus.PENDING, PaymentStatus.PAID].map((status) => `'${status}'`).join(", "),
-);
+/** Statuses of payments that are still relevant, i.e. not failed or expired. */
+export const ACTIVE_PAYMENT_STATUSES = [PaymentStatus.CREATING, PaymentStatus.PENDING, PaymentStatus.PAID];
+const ACTIVE_STATUSES = sql.raw(ACTIVE_PAYMENT_STATUSES.map((status) => `'${status}'`).join(", "));
 
 // Deleting payments and changing most of their fields is additionally prevented by triggers,
 // which are created in the initial migration.

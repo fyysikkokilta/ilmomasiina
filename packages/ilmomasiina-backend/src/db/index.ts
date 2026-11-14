@@ -21,6 +21,12 @@ export type Filter<Table extends keyof Db["query"]> = NonNullable<
   NonNullable<Parameters<Db["query"][Table]["findMany"]>[0]>["where"]
 >;
 
+/**
+ * The most values to pass to a single query as a list. A query can have at most 65535 parameters,
+ * so split longer lists with lodash's `chunk()`.
+ */
+export const MAX_LIST_PARAMS = 10000;
+
 const MIGRATIONS_FOLDER = path.resolve(__dirname, "../../drizzle");
 const MIGRATIONS_SCHEMA = "drizzle";
 const MIGRATIONS_TABLE = "__drizzle_migrations";
@@ -69,8 +75,8 @@ async function adoptSequelizeDatabase(database: Db) {
   }
 
   const [initial] = readMigrationFiles({ migrationsFolder: MIGRATIONS_FOLDER });
-  debugLog(`Adopting existing database: recording migration ${initial.name} as applied`);
   await database.transaction(async (tx) => {
+    debugLog(`Adopting existing database: recording migration ${initial.name} as applied`);
     // Events created before defaultLanguage existed have no value; they used the configured default.
     // A later migration makes the column required.
     await tx.execute(
@@ -94,14 +100,22 @@ async function adoptSequelizeDatabase(database: Db) {
   });
 }
 
-async function runMigrations(database: Db) {
+async function runMigrations(database: Db, connections: Pool) {
   debugLog("Running database migrations");
-  await adoptSequelizeDatabase(database);
-  await migrate(database, {
-    migrationsFolder: MIGRATIONS_FOLDER,
-    migrationsSchema: MIGRATIONS_SCHEMA,
-    migrationsTable: MIGRATIONS_TABLE,
-  });
+  // Several instances may start at the same time. Let them migrate one at a time.
+  const lock = await connections.connect();
+  try {
+    await lock.query("SELECT pg_advisory_lock(hashtext($1))", [`${MIGRATIONS_SCHEMA}.${MIGRATIONS_TABLE}`]);
+    await adoptSequelizeDatabase(database);
+    await migrate(database, {
+      migrationsFolder: MIGRATIONS_FOLDER,
+      migrationsSchema: MIGRATIONS_SCHEMA,
+      migrationsTable: MIGRATIONS_TABLE,
+    });
+  } finally {
+    // Closing the connection releases the lock.
+    lock.release(true);
+  }
 }
 
 export default async function setupDatabase(): Promise<Db> {
@@ -116,6 +130,9 @@ export default async function setupDatabase(): Promise<Db> {
     password: config.dbPassword ?? undefined,
     ssl: config.dbSsl,
   });
+  // Idle connections emit errors when the server closes them, e.g. on a database restart.
+  // The pool replaces them on its own; without a listener, the error would crash the process.
+  newPool.on("error", (err) => console.error("Database connection error:", err));
   const newDb = drizzle({
     client: newPool,
     relations,
@@ -130,7 +147,12 @@ export default async function setupDatabase(): Promise<Db> {
     throw err;
   }
 
-  await runMigrations(newDb);
+  try {
+    await runMigrations(newDb, newPool);
+  } catch (err) {
+    await newPool.end();
+    throw err;
+  }
 
   pool = newPool;
   db = newDb;

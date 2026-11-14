@@ -1,4 +1,3 @@
-import { and, eq, gt, isNull, or } from "drizzle-orm";
 import moment from "moment";
 
 import { PaymentMode, QuestionCreate, QuotaCreate } from "@tietokilta/ilmomasiina-models";
@@ -44,16 +43,6 @@ export function userEventFilter(): Filter<"event"> {
       { endDate: { gt: since } },
     ],
   };
-}
-
-/** SQL condition for the events that users can see. Matches `userEventFilter`. */
-export function userEventCondition() {
-  const since = hideEventsBefore();
-  return and(
-    isNull(eventTable.deletedAt),
-    eq(eventTable.draft, false),
-    or(gt(eventTable.registrationEndDate, since), gt(eventTable.date, since), gt(eventTable.endDate, since)),
-  );
 }
 
 type EventDates = Pick<Event, "date" | "endDate" | "registrationStartDate" | "registrationEndDate">;

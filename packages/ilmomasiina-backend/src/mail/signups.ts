@@ -5,7 +5,7 @@ import EmailService, { ConfirmationMailParams, PaymentMailParams, QueueMailParam
 import config, { editSignupUrl } from "../config";
 import { getDb } from "../db";
 import i18n from "../i18n";
-import type { Payment } from "../models/payment";
+import { getPaymentStatuses, Payment } from "../models/payment";
 import { effectivePaymentStatus, Signup } from "../models/signup";
 import { generateToken } from "../routes/signups/editTokens";
 
@@ -27,10 +27,6 @@ function sendSynchronouslyInTest<A extends unknown[]>(
   };
 }
 
-/** Fetches the payments of a signup. */
-const getPayments = (signup: Pick<Signup, "id">) =>
-  getDb().query.payment.findMany({ where: { signupId: signup.id }, columns: { status: true } });
-
 /** Fetches the quota of a signup together with its event. Either is missing if it was soft deleted. */
 const getQuotaWithEvent = (signup: Pick<Signup, "quotaId">) =>
   getDb().query.quota.findFirst({
@@ -46,7 +42,7 @@ export const sendPromotedFromQueueMail = sendSynchronouslyInTest(async (signup: 
 
   const lang = signup.language ?? config.defaultLanguage;
 
-  const payments = await getPayments(signup);
+  const payments = await getPaymentStatuses(signup.id);
   const quota = await getQuotaWithEvent(signup);
   if (!quota || !quota.event) return; // Quota or event soft deleted
   const { event } = quota;
@@ -75,7 +71,7 @@ export const sendSignupConfirmationMail = sendSynchronouslyInTest(
     const lang = signup.language ?? config.defaultLanguage;
 
     const db = getDb();
-    const payments = await getPayments(signup);
+    const payments = await getPaymentStatuses(signup.id);
     const answers = await db.query.answer.findMany({
       where: { signupId: signup.id, deletedAt: { isNull: true } },
     });
