@@ -21,12 +21,15 @@ function dateToArray(date: Date) {
  */
 const uidDomain = config.icalUidDomain || new URL(config.baseUrl).hostname;
 
-/** An event that has both a start and an end date, and can thus be exported to iCalendar. */
-export type ICalExportableEvent = Event & { date: Date; endDate: Date };
+/** Length given in iCalendar files to events that have no end date. */
+const DEFAULT_EVENT_DURATION_MS = 60 * 60 * 1000;
 
-/** Checks whether an event can be exported to iCalendar, i.e. has both start and end dates. */
+/** An event that has a start date, and can thus be exported to iCalendar. */
+export type ICalExportableEvent = Event & { date: Date };
+
+/** Checks whether an event can be exported to iCalendar, i.e. is not signup-only. */
 export function isICalExportable(event: Event): event is ICalExportableEvent {
-  return event.date != null && event.endDate != null;
+  return event.date != null;
 }
 
 /** Builds iCalendar attributes for an event, using the event's version in the given language if it has one. */
@@ -38,7 +41,7 @@ export function icsAttrsFromEvent(event: ICalExportableEvent, lang: string = con
     uid: `${event.id}@${uidDomain}`,
     start: dateToArray(event.date),
     startInputType: "utc",
-    end: dateToArray(new Date(event.endDate)),
+    end: dateToArray(event.endDate ?? new Date(event.date.getTime() + DEFAULT_EVENT_DURATION_MS)),
     endInputType: "utc",
     title: locale?.title || event.title,
     description: locale?.description || event.description || undefined, // TODO convert markdown
@@ -73,8 +76,6 @@ export async function eventsAsICal() {
           listed: true,
           // only events, not signup-only
           date: { isNotNull: true },
-          // ignore legacy events with no end date
-          endDate: { isNotNull: true },
         },
       ],
     },

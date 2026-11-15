@@ -96,7 +96,7 @@ describe("getSignupForEdit", () => {
 });
 
 describe("signup confirmation email", () => {
-  test("attaches invite.ics only if event has start and end dates", async () => {
+  test("attaches invite.ics only if event has a start date", async () => {
     const datedEvent = await testEvent({ hasDate: true });
     const [datedSignup] = await testSignups({ event: datedEvent, count: 1, confirmed: true });
     const undatedEvent = await testEvent({ hasDate: false });
@@ -159,5 +159,28 @@ describe("signup confirmation email", () => {
     expect(await eventAsICalCached({ event: sameVersion, lang: "fi" })).toBe(first);
     expect(await eventAsICalCached({ event: sameVersion, lang: "en" })).toContain("Should not be used");
     expect(await eventAsICalCached({ event: edited, lang: "fi" })).toContain("Edited title");
+  });
+
+  test("invite.ics lasts one hour if the event has no end date", async () => {
+    const event = await testEvent({ hasDate: true }, { endDate: null });
+    const [signup] = await testSignups({ event, count: 1, confirmed: true });
+    emailSend.mockClear();
+    if (!isICalExportable(event)) throw new Error("test event should have a start date");
+
+    const expectedEnd = new Date(event.date.getTime() + 60 * 60 * 1000);
+    expect(icsAttrsFromEvent(event)).toMatchObject({
+      end: [
+        expectedEnd.getUTCFullYear(),
+        expectedEnd.getUTCMonth() + 1,
+        expectedEnd.getUTCDate(),
+        expectedEnd.getUTCHours(),
+        expectedEnd.getUTCMinutes(),
+      ],
+    });
+
+    await sendSignupConfirmationMail(signup, "signup", false);
+    expect(emailSend).toHaveBeenCalledWith(signup.email, expect.any(String), expect.any(String), [
+      expect.objectContaining({ filename: "invite.ics" }),
+    ]);
   });
 });

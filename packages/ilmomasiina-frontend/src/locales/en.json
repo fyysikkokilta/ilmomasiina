@@ -187,7 +187,7 @@
     "editor.basic.name.copyPrefix": "Copy: ",
     "editor.basic.startDate": "Starts at",
     "editor.basic.endDate": "Ends at",
-    "editor.basic.endDate.info": "The event will only appear in calendar exports if it has an ending time.",
+    "editor.basic.endDate.info": "If no ending time is set, the event lasts one hour in calendar exports.",
     "editor.basic.url": "Event URL",
     "editor.basic.url.checking": "Checking availability\u2026",
     "editor.basic.url.free": "URL available!",

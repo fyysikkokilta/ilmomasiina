@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import { PaymentMode } from "@tietokilta/ilmomasiina-models";
 import { questionTable, quotaTable } from "../../src/db/schema";
+import { eventsAsICal } from "../../src/routes/ical";
 import { updateRow } from "../db";
 import { fetchSignups, testEvent, testSignups } from "../testData";
 import * as api from "./api";
@@ -350,5 +351,19 @@ describe("GET /api/events", () => {
 
     expect(before[0].quotas.map((q) => q.id)).not.toEqual(after[0].quotas.map((q) => q.id));
     expect(after[0].quotas.map((q) => q.id)).toEqual(sortBy(event.quotas, "order").map((q) => q.id));
+  });
+});
+
+describe("eventsAsICal", () => {
+  test("includes events without an end date, but not signup-only events", async () => {
+    const dated = await testEvent({ hasDate: true });
+    const noEndDate = await testEvent({ hasDate: true }, { endDate: null });
+    const signupOnly = await testEvent({ hasDate: false });
+
+    const ical = await eventsAsICal();
+
+    expect(ical).toContain(`UID:${dated.id}@`);
+    expect(ical).toContain(`UID:${noEndDate.id}@`);
+    expect(ical).not.toContain(`UID:${signupOnly.id}@`);
   });
 });

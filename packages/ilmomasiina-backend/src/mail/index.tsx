@@ -50,7 +50,7 @@ function getLanguage(language: string | null): string {
   return language || config.defaultLanguage;
 }
 
-/** Creates an invite.ics attachment for the event, or returns null if the event lacks a start or end date. */
+/** Creates an invite.ics attachment for the event, or returns null if the event has no start date. */
 async function createICalAttachment(event: Event, lang: string): Promise<AbstractMailAttachment | null> {
   if (!isICalExportable(event)) return null;
 

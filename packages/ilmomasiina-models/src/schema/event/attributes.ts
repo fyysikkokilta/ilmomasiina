@@ -41,7 +41,7 @@ export const publicEventAttributes = Type.Object({
       "the event is signup-only.",
   }),
   endDate: Nullable(Type.String({ format: "date-time" }), {
-    description: "Event end date. If null, the event will not appear in iCalendar exports.",
+    description: "Event end date. If null, the event lasts one hour in iCalendar exports.",
   }),
   registrationStartDate: Nullable(Type.String({ format: "date-time" }), {
     description: "Event signup opening date. If null, the event does not have a signup.",
