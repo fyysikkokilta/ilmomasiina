@@ -187,7 +187,7 @@
     "editor.basic.name.copyPrefix": "Kopio: ",
     "editor.basic.startDate": "Alkuaika",
     "editor.basic.endDate": "Loppuaika",
-    "editor.basic.endDate.info": "Tapahtuma näkyy kalenteriviennissä vain, jos sille on asetettu loppuaika.",
+    "editor.basic.endDate.info": "Jos loppuaikaa ei ole asetettu, tapahtuma kestää kalenteriviennissä yhden tunnin.",
     "editor.basic.url": "Tapahtuman URL",
     "editor.basic.url.checking": "Tarkistetaan saatavuutta\u2026",
     "editor.basic.url.free": "URL-osoite vapaa!",
